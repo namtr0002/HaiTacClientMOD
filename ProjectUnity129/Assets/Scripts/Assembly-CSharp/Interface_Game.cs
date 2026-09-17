@@ -559,7 +559,19 @@ public class Interface_Game
 		{
 			if (GameCanvas.isTouch && typeTouch == 0)
 			{
-				g.drawImage(imgMove[0], xPointMove, yPointMove, 3);
+				UITheme curTheme = UIThemeManager.getCurrentTheme();
+				if (curTheme != null && curTheme.id > 0 && UITheme.imgDpadRing != null)
+				{
+					g.drawImage(UITheme.imgDpadRing, xPointMove, yPointMove, 3);
+					if (UITheme.imgDpadKnob != null)
+					{
+						g.drawImage(UITheme.imgDpadKnob, xPointMove, yPointMove, 3);
+					}
+				}
+				else
+				{
+					g.drawImage(imgMove[0], xPointMove, yPointMove, 3);
+				}
 				for (int i = 0; i < 4; i++)
 				{
 					if (timePointer > 0 && mKeyMove[i] == keyPoint)
@@ -619,13 +631,25 @@ public class Interface_Game
 							paintHotKey(g, hotkey, num, num2, 20, flag);
 							if (hotkey.skill == null || hotkey.skill.lvDevil == 0 || flag)
 							{
-								if (j == 2 && typeTouch == 0)
+								UITheme curTheme = UIThemeManager.getCurrentTheme();
+								if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && j == 2 && typeTouch == 0)
 								{
-									g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+									UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
+								}
+								else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+								{
+									UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
 								}
 								else
 								{
-									g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+									if (j == 2 && typeTouch == 0)
+									{
+										g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+									}
+									else
+									{
+										g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+									}
 								}
 							}
 						}
@@ -652,7 +676,15 @@ public class Interface_Game
 								if (hotkey2 != null)
 								{
 									paintHotKey(g, hotkey2, num4, num5, 20, isPaintGiaotiep: false);
-									g.drawRegion(imgFire[2], 0, num6 * 50, 50, 50, 0, num4, num5, 3);
+									UITheme curTheme = UIThemeManager.getCurrentTheme();
+									if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+									{
+										UITheme.fraSkillSlot.drawFrame(num6, num4, num5, 0, 3, g);
+									}
+									else
+									{
+										g.drawRegion(imgFire[2], 0, num6 * 50, 50, 50, 0, num4, num5, 3);
+									}
 								}
 							}
 						}
@@ -960,13 +992,25 @@ public class Interface_Game
 				paintHotKey(g, hotkey, num, num2, 20, isPaintGiaotiep: false);
 				if (hotkey.skill == null || hotkey.skill.lvDevil == 0)
 				{
-					if (i == 2 && typeTouch == 0)
+					UITheme curTheme = UIThemeManager.getCurrentTheme();
+					if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && i == 2 && typeTouch == 0)
 					{
-						g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+						UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
+					}
+					else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+					{
+						UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
 					}
 					else
 					{
-						g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+						if (i == 2 && typeTouch == 0)
+						{
+							g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+						}
+						else
+						{
+							g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+						}
 					}
 				}
 			}
@@ -1075,11 +1119,26 @@ public class Interface_Game
 
 	public static void paintInfoPlayer_Short(mGraphics g, int x, int y, bool isborder, mFont fontLv)
 	{
+		UITheme curTheme = UIThemeManager.getCurrentTheme();
 		mImage arg = ((GameScreen.player.Lv < 100) ? imgIconMPHP : imgIconMPHP2);
 		AvMain.paintRect(g, x, y, 320, 15, 1, 4);
-		g.drawRegion(arg, 0, 0, 10, 11, 0, x + 8, y + 9, 3);
+		if (curTheme != null && curTheme.id > 0 && UITheme.imgIconHp != null)
+		{
+			g.drawImage(UITheme.imgIconHp, x + 8, y + 9, 3);
+		}
+		else
+		{
+			g.drawRegion(arg, 0, 0, 10, 11, 0, x + 8, y + 9, 3);
+		}
 		PaintHPMP(g, 1, GameScreen.player.Hp, GameScreen.player.maxHp, x + 15, y + 3, 0, 9, 66, 0, isflip: false, GameScreen.player.HpEff, isEffHP, GameScreen.player.lvHeart);
-		g.drawRegion(arg, 0, 11, 10, 11, 0, x + 17 + 70, y + 9, 3);
+		if (curTheme != null && curTheme.id > 0 && UITheme.imgIconMp != null)
+		{
+			g.drawImage(UITheme.imgIconMp, x + 17 + 70, y + 9, 3);
+		}
+		else
+		{
+			g.drawRegion(arg, 0, 11, 10, 11, 0, x + 17 + 70, y + 9, 3);
+		}
 		PaintHPMP(g, 2, GameScreen.player.Mp, GameScreen.player.maxMp, x + 15 + 10 + 70, y + 3, 0, 9, 66, 0, isflip: false, 0, isEffMP, 0);
 		x += 165;
 		int num = y + 7;
@@ -2760,7 +2819,7 @@ public class Interface_Game
 					{
 						text = T.Clan + " ";
 					}
-					GameCanvas.chatTabScr.addNewChat(T.tabServer, "", text + infoShowNotify.strShow, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Thế Giới", "", text + infoShowNotify.strShow, 1, false, -1, ChatDetail.CAT_WORLD);
 					vecInfoServer.removeElement(infoShowNotify);
 					break;
 				}
@@ -2808,7 +2867,7 @@ public class Interface_Game
 				{
 					infoInput = new InfoShowNotify(infoShowNotify.strShow, infoShowNotify.type);
 					infoInput.setValue(infoShowNotify.fontpaint);
-					GameCanvas.chatTabScr.addNewChat(T.tabServer, "", infoShowNotify.strShow, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Hệ Thống", "", infoShowNotify.strShow, 1, false, -1, ChatDetail.CAT_SYSTEM);
 					vecInfoServer.removeElement(infoShowNotify);
 					break;
 				}

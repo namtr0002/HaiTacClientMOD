@@ -384,7 +384,15 @@ public final class Interface_Game {
          int var4;
          if (GameScreen.player != null && GameScreen.player.Action != 4) {
             if (GameCanvas.isTouch && typeTouch == 0) {
-               var1.drawRegion((mImage)imgMove[0], xPointMove, yPointMove, 3);
+               UITheme curTheme = UIThemeManager.getCurrentTheme();
+               if (curTheme != null && curTheme.id > 0 && UITheme.imgDpadRing != null) {
+                  var1.drawImage(UITheme.imgDpadRing, xPointMove, yPointMove, 3);
+                  if (UITheme.imgDpadKnob != null) {
+                     var1.drawImage(UITheme.imgDpadKnob, xPointMove, yPointMove, 3);
+                  }
+               } else {
+                  var1.drawRegion((mImage)imgMove[0], xPointMove, yPointMove, 3);
+               }
 
                for(var2 = 0; var2 < 4; ++var2) {
                   if (timePointer > 0 && this.AR[var2] == keyPoint) {
@@ -436,7 +444,12 @@ public final class Interface_Game {
                               Hotkey var11;
                               if ((var11 = Player.hotkeyBuffPlayer[var2]) != null) {
                                  AA(var1, var11, var3, var4, 20, false);
-                                 var1.drawRegion(imgFire[2], 0, var9 * 50, 50, 50, 0, var3, var4, 3);
+                                 UITheme curTheme = UIThemeManager.getCurrentTheme();
+                                 if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null) {
+                                    UITheme.fraSkillSlot.drawFrame(var9, var3, var4, 0, 3, var1);
+                                 } else {
+                                    var1.drawRegion(imgFire[2], 0, var9 * 50, 50, 50, 0, var3, var4, 3);
+                                 }
                               }
                            }
 
@@ -466,10 +479,17 @@ public final class Interface_Game {
 
                         AA(var1, var5, var3, var4, 20, var6);
                         if (var5.skill == null || var5.skill.lvDevil == 0 || var6) {
-                           if (var2 == 2 && typeTouch == 0) {
-                              var1.drawRegion(imgFire[1], 0, var7 * 50, 50, 50, 0, var3, var4, 3);
+                           UITheme curTheme = UIThemeManager.getCurrentTheme();
+                           if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && var2 == 2 && typeTouch == 0) {
+                              UITheme.fraAttack.drawFrame(var7, var3, var4, 0, 3, var1);
+                           } else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null) {
+                              UITheme.fraSkillSlot.drawFrame(var7, var3, var4, 0, 3, var1);
                            } else {
-                              var1.drawRegion(imgFire[0], 0, var7 * 50, 50, 50, 0, var3, var4, 3);
+                              if (var2 == 2 && typeTouch == 0) {
+                                 var1.drawRegion(imgFire[1], 0, var7 * 50, 50, 50, 0, var3, var4, 3);
+                              } else {
+                                 var1.drawRegion(imgFire[0], 0, var7 * 50, 50, 50, 0, var3, var4, 3);
+                              }
                            }
                         }
                      } else {
@@ -830,6 +850,7 @@ public final class Interface_Game {
    }
 
    public static void AA(mGraphics var0, int var1, int var2) {
+      UITheme curTheme = UIThemeManager.getCurrentTheme();
       mImage var3;
       if (GameScreen.player.Lv == 100) {
          var3 = imgIconMPHP2;
@@ -838,9 +859,17 @@ public final class Interface_Game {
       }
 
       AvMain.paintRect(var0, var1, var2, 320, 15, (byte)1, 4);
-      var0.drawRegion(var3, 0, 0, 10, 11, 0, var1 + 8, var2 + 9, 3);
+      if (curTheme != null && curTheme.id > 0 && UITheme.imgIconHp != null) {
+         var0.drawImage(UITheme.imgIconHp, var1 + 8, var2 + 9, 3);
+      } else {
+         var0.drawRegion(var3, 0, 0, 10, 11, 0, var1 + 8, var2 + 9, 3);
+      }
       AA(var0, (byte)1, GameScreen.player.Hp, GameScreen.player.maxHp, var1 + 15, var2 + 3, 0, 9, 66, 0, false, GameScreen.player.KI, EI, GameScreen.player.MA);
-      var0.drawRegion(var3, 0, 11, 10, 11, 0, var1 + 17 + 70, var2 + 9, 3);
+      if (curTheme != null && curTheme.id > 0 && UITheme.imgIconMp != null) {
+         var0.drawImage(UITheme.imgIconMp, var1 + 17 + 70, var2 + 9, 3);
+      } else {
+         var0.drawRegion(var3, 0, 11, 10, 11, 0, var1 + 17 + 70, var2 + 9, 3);
+      }
       AA(var0, (byte)2, GameScreen.player.Mp, GameScreen.player.maxMp, var1 + 15 + 10 + 70, var2 + 3, 0, 9, 66, 0, false, 0, EJ, 0);
       var1 += 165;
       var2 += 7;
@@ -2247,7 +2276,7 @@ public final class Interface_Game {
                   var2 = T.Clan + " ";
                }
 
-               GameCanvas.chatTabScr.AB(T.CR, "", var2 + var1.strShow, (byte)1, false);
+               GameCanvas.chatTabScr.addNewChat("Thế Giới", "", var2 + var1.strShow, (byte)1, false, -1, ChatDetail.CAT_WORLD);
                vecInfoServer.removeElement(var1);
                break;
             }
@@ -2285,7 +2314,7 @@ public final class Interface_Game {
             InfoShowNotify var3;
             if ((var3 = (InfoShowNotify)vecInfoServer.elementAt(var2)).AI == var1) {
                (var0 = new InfoShowNotify(var3.strShow, var3.AI)).setValue(var3.fontpaint);
-               GameCanvas.chatTabScr.AB(T.CR, "", var3.strShow, (byte)1, false);
+               GameCanvas.chatTabScr.addNewChat("Hệ Thống", "", var3.strShow, (byte)1, false, -1, ChatDetail.CAT_SYSTEM);
                vecInfoServer.removeElement(var3);
                break;
             }
