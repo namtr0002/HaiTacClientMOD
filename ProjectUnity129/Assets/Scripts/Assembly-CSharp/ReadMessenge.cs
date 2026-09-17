@@ -8136,12 +8136,15 @@ public class ReadMessenge : AvMain
 			}
 			case 5:
 			{
-				MainObject mainObject = MainObject.get_Object(msg.reader().readShort(), 0);
+				short objId = msg.reader().readShort();
+				short iD = msg.reader().readShort();
+				short idIcon = msg.reader().readShort();
+				sbyte b = msg.reader().readByte();
+				sbyte borderIconClan = msg.reader().readByte();
+
+				MainObject mainObject = MainObject.get_Object(objId, 0);
 				if (mainObject != null)
 				{
-					short iD = msg.reader().readShort();
-					short idIcon = msg.reader().readShort();
-					sbyte b = msg.reader().readByte();
 					if (mainObject.clan == null)
 					{
 						mainObject.clan = new MainClan(iD, idIcon, b);
@@ -8156,12 +8159,12 @@ public class ReadMessenge : AvMain
 					{
 						MainClan.UpdateRankMe(b);
 					}
-					sbyte borderIconClan = msg.reader().readByte();
 					mainObject.clan.borderIconClan = borderIconClan;
-				}
-				if (mainObject.boatSea != null)
-				{
-					mainObject.boatSea.setIconClan();
+
+					if (mainObject.boatSea != null)
+					{
+						mainObject.boatSea.setIconClan();
+					}
 				}
 				break;
 			}

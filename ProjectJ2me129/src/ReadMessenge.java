@@ -6648,30 +6648,32 @@ public final class ReadMessenge extends AvMain {
 
             MainObject var16;
             if (var2 == 5) {
-               if ((var16 = MainObject.get_Object((int)var1.reader().readShort(), (byte)0)) != null) {
-                  short var19 = var1.reader().readShort();
-                  var5 = var1.reader().readShort();
-                  var2 = var1.reader().readByte();
+               short objId = var1.reader().readShort();
+               short var19 = var1.reader().readShort();
+               short iconId = var1.reader().readShort();
+               byte chucvu = var1.reader().readByte();
+               byte borderIcon = var1.reader().readByte();
+
+               if ((var16 = MainObject.get_Object((int)objId, (byte)0)) != null) {
                   if (var16.clan == null) {
-                     var16.clan = new MainClan(var19, var5, var2);
+                     var16.clan = new MainClan(var19, iconId, chucvu);
                   } else {
                      var16.clan.ID = var19;
-                     var16.clan.idIcon = var5;
-                     var16.clan.AJ = var2;
+                     var16.clan.idIcon = iconId;
+                     var16.clan.AJ = chucvu;
                   }
 
                   if (var16 == GameScreen.player) {
-                     Player.QN = var2;
+                     Player.QN = chucvu;
                   }
 
-                  byte var13 = var1.reader().readByte();
-                  var16.clan.AT = var13;
-               }
+                  var16.clan.AT = borderIcon;
 
-               if (var16.boatSea != null) {
-                  var16.boatSea.AA();
-                  return;
+                  if (var16.boatSea != null) {
+                     var16.boatSea.AA();
+                  }
                }
+               return;
             } else {
                if (var2 == 8) {
                   if (GameScreen.player.clan != null && GameCanvas.ClanScr != null) {
