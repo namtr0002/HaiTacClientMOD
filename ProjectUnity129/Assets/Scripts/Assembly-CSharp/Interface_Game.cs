@@ -1337,6 +1337,12 @@ public class Interface_Game
 		}
 		int color = 13631520;
 		int color2 = 5451296;
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0 && (type == 1 || type == 0))
+		{
+			color = currentTheme.colorHpTop;
+			color2 = currentTheme.colorHpBot;
+		}
 		if (type < 0)
 		{
 			if (CRes.abs(type) == 2)
@@ -1445,7 +1451,8 @@ public class Interface_Game
 				}
 				else
 				{
-					g.setColor(0);
+					int trailColor = (currentTheme != null && currentTheme.id > 0) ? currentTheme.colorHpTrail : 0;
+					g.setColor(trailColor);
 					if (!isflip)
 					{
 						g.fillRect(x, y, num4, hrect);

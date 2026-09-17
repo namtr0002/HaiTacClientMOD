@@ -70,7 +70,9 @@ public class AvMain {
    public static mImage[] mImgRoomW;
    public static mImage[] FN;
    public static mImage[] mImgThanhTich;
-   private static mImage[] AA;
+   public static mImage[] AA;
+   public static mImage[] mimgBgB;
+   public static mImage[] mimgBgC;
    public static mImage[] FP;
    public static mImage[] mimgWanted2;
    public static FrameImage fraPk;
@@ -395,6 +397,11 @@ public class AvMain {
    }
 
    public static void AA(mGraphics var0, int var1, int var2, int var3, int var4, int var5) {
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         currentTheme.paintButton(var0, var1, var2, var3, var4, "", ModernUI.BTN_GOLD, var5 == 2, var5 == 1);
+         return;
+      }
       if (var5 >= IG.length) {
          var5 = (byte)(IG.length - 1);
       }
@@ -836,6 +843,14 @@ public class AvMain {
    }
 
    public void paintSelect(mGraphics var1, int var2, int var3, int var4, int var5) {
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         var1.setColor(currentTheme.colorBgCardHover);
+         var1.fillRect(var2, var3, var4, var5);
+         var1.setColor(currentTheme.colorAccentBright);
+         var1.drawRect(var2, var3, var4 - 1, var5 - 1);
+         return;
+      }
       var1.setColor(-2458);
       var1.fillRect(var2, var3, var4, var5);
    }
@@ -889,6 +904,11 @@ public class AvMain {
    }
 
    public final void AD(mGraphics var1, int var2, int var3, int var4, int var5, int var6) {
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         currentTheme.paintWindow(var1, var2, var3, var4, var5, null);
+         return;
+      }
       if (GameCanvas.lowGraphic) {
          paintRect(var1, var2 + 4, var3 + 4, var4 - 8, var5 - 8, (byte)1, 3);
       } else {
@@ -987,7 +1007,88 @@ public class AvMain {
 
    }
 
+   public static void paintThongThao(mGraphics g, int x, int y, int w, int h) {
+      if (GameCanvas.lowGraphic) {
+         paintRect(g, x + 4, y + 4, w - 8, h - 8, (byte)1, 3);
+         return;
+      }
+      if (mimgBgB == null) {
+         LoadImageStatic.loadImageBgB();
+      }
+      if (mimgBgB == null) return;
+      int num = 0;
+      g.drawImage(mimgBgB[num], x, y, 0);
+      g.drawImage(mimgBgB[2 + num], x + w - 36, y, 0);
+      int num6 = (w - 73) / 36 + 1;
+      for (int i = 0; i < num6; i++) {
+         if (i == num6 - 1) {
+            g.drawImage(mimgBgB[1 + num], x + w - 72, y, 0);
+            g.drawImage(mimgBgB[7 + num], x + w - 72, y + h - 36, 0);
+         } else {
+            g.drawImage(mimgBgB[1 + num], x + 36 + i * 36, y, 0);
+            g.drawImage(mimgBgB[7 + num], x + 36 + i * 36, y + h - 36, 0);
+         }
+      }
+      int num7 = (h - 36 - 37) / 36 + 1;
+      for (int j = 0; j < num7; j++) {
+         if (j == num7 - 1) {
+            g.drawImage(mimgBgB[3 + num], x, y + h - 72, 0);
+            g.drawImage(mimgBgB[5 + num], x + w - 36, y + h - 72, 0);
+         } else {
+            g.drawImage(mimgBgB[3 + num], x, y + 36 + j * 36, 0);
+            g.drawImage(mimgBgB[5 + num], x + w - 36, y + 36 + j * 36, 0);
+         }
+      }
+      g.drawImage(mimgBgB[4 + num], x, y + h - 36, 0);
+      g.drawImage(mimgBgB[6 + num], x + w - 36, y + h - 36, 0);
+      g.setColor(15392973);
+      g.fillRect(x + 35, y + 35, w - 70, h - 70);
+   }
+
+   public static void paintRuongVip(mGraphics g, int x, int y, int w, int h) {
+      if (GameCanvas.lowGraphic) {
+         paintRect(g, x + 4, y + 4, w - 8, h - 8, (byte)1, 3);
+         return;
+      }
+      if (mimgBgC == null) {
+         LoadImageStatic.loadImageBgC();
+      }
+      if (mimgBgC == null) return;
+      int num = 0;
+      g.drawImage(mimgBgC[num], x, y, 0);
+      g.drawImage(mimgBgC[2 + num], x + w - 46, y, 0);
+      int num6 = (w - 93) / 46 + 1;
+      for (int i = 0; i < num6; i++) {
+         if (i == num6 - 1) {
+            g.drawImage(mimgBgC[1 + num], x + w - 92, y, 0);
+            g.drawImage(mimgBgC[7 + num], x + w - 92, y + h - 46, 0);
+         } else {
+            g.drawImage(mimgBgC[1 + num], x + 46 + i * 46, y, 0);
+            g.drawImage(mimgBgC[7 + num], x + 46 + i * 46, y + h - 46, 0);
+         }
+      }
+      int num7 = (h - 46 - 47) / 46 + 1;
+      for (int j = 0; j < num7; j++) {
+         if (j == num7 - 1) {
+            g.drawImage(mimgBgC[3 + num], x, y + h - 92, 0);
+            g.drawImage(mimgBgC[5 + num], x + w - 46, y + h - 92, 0);
+         } else {
+            g.drawImage(mimgBgC[3 + num], x, y + 46 + j * 46, 0);
+            g.drawImage(mimgBgC[5 + num], x + w - 46, y + 46 + j * 46, 0);
+         }
+      }
+      g.drawImage(mimgBgC[4 + num], x, y + h - 46, 0);
+      g.drawImage(mimgBgC[6 + num], x + w - 46, y + h - 46, 0);
+      g.setColor(15392973);
+      g.fillRect(x + 45, y + 45, w - 90, h - 90);
+   }
+
    public final void AE(mGraphics var1, int var2, int var3, int var4, int var5, int var6) {
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         currentTheme.paintWindow(var1, var2, var3, var4, var5, null);
+         return;
+      }
       if (imgPaperDoc == null) {
          this.AD(var1, var2, var3 - 4, var4, var5 + 4, 0);
       } else {

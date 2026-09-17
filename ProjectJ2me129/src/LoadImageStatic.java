@@ -275,6 +275,24 @@ public class LoadImageStatic {
 
    }
 
+   public static void loadImageBgB() {
+      if (!GameCanvas.lowGraphic) {
+         AvMain.mimgBgB = new mImage[9];
+         for (int i = 0; i < AvMain.mimgBgB.length; i++) {
+            AvMain.mimgBgB[i] = mImage.createImage("/interface/bgb" + i + ".png");
+         }
+      }
+   }
+
+   public static void loadImageBgC() {
+      if (!GameCanvas.lowGraphic) {
+         AvMain.mimgBgC = new mImage[9];
+         for (int i = 0; i < AvMain.mimgBgC.length; i++) {
+            AvMain.mimgBgC[i] = mImage.createImage("/interface/bgc" + i + ".png");
+         }
+      }
+   }
+
    public static void loadImageEffBoat() {
       if (!GameCanvas.lowGraphic) {
          if (LoadMapScreen.isMapSky == 1) {

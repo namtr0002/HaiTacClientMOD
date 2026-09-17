@@ -719,6 +719,12 @@ public class AvMain
 
 	public static void paintRectButton(mGraphics g, int xText, int yText, int wText, int hText, int index)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			currentTheme.paintButton(g, xText, yText, wText, hText, "", ModernUI.BTN_GOLD, index == 2, index == 1);
+			return;
+		}
 		if (GameMidlet.DEVICE == 0)
 		{
 			if (index >= colorRect.Length)
@@ -750,6 +756,12 @@ public class AvMain
 
 	public static void paintImgButton(mGraphics g, int xText, int yText, int wText, int hText, int index)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			currentTheme.paintButton(g, xText, yText, wText, hText, "", ModernUI.BTN_GOLD, index == 2, index == 1);
+			return;
+		}
 		wText += wText % 2;
 		hText += hText % 2;
 		if (index >= colorRect.Length)
@@ -1384,6 +1396,15 @@ public class AvMain
 
 	public virtual void paintSelect(mGraphics g, int x, int y, int w, int h)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			g.setColor(currentTheme.colorBgCardHover);
+			g.fillRect(x, y, w, h);
+			g.setColor(currentTheme.colorAccentBright);
+			g.drawRect(x, y, w - 1, h - 1);
+			return;
+		}
 		g.setColor(16774758);
 		g.fillRect(x, y, w, h);
 	}
@@ -1428,6 +1449,12 @@ public class AvMain
 
 	public void paintPaper(mGraphics g, int x, int y, int w, int h, int maxw, int type)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			currentTheme.paintWindow(g, x, y, w, h, null);
+			return;
+		}
 		if (GameCanvas.lowGraphic)
 		{
 			paintRect(g, x + 4, y + 4, w - 8, h - 8, 1, 3);
@@ -1528,6 +1555,12 @@ public class AvMain
 
 	public void paintPaper_UpDown(mGraphics g, int x, int y, int w, int h, int maxw)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			currentTheme.paintWindow(g, x, y, w, h, null);
+			return;
+		}
 		if (imgPaperDoc == null)
 		{
 			paintPaper(g, x, y - 4, w, h + 4, maxw, PAPER_NORMAL);

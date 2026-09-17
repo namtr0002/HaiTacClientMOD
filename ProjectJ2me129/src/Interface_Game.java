@@ -1058,6 +1058,11 @@ public final class Interface_Game {
 
       int var15 = -3145696;
       int var16 = -11325920;
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0 && (var1 == 1 || var1 == 0)) {
+         var15 = currentTheme.colorHpTop;
+         var16 = currentTheme.colorHpBot;
+      }
       if (var1 < 0) {
          if (CRes.abs(var1) == 2) {
             var15 = -14512428;
@@ -1137,7 +1142,8 @@ public final class Interface_Game {
             }
 
             if (var1 != 98 && var1 != 97 && var1 != 96) {
-               var0.setColor(0);
+               int trailColor = (currentTheme != null && currentTheme.id > 0) ? currentTheme.colorHpTrail : 0;
+               var0.setColor(trailColor);
                if (!var10) {
                   var0.fillRect(var4, var5, var11, var7);
                } else {

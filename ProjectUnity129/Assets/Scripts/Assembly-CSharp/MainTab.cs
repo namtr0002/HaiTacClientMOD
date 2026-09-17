@@ -496,6 +496,12 @@ public class MainTab : AvMain
 
 	public static void paintPaperTab(mGraphics g, int x, int y, int w, int h)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme != null && currentTheme.id > 0)
+		{
+			currentTheme.paintWindow(g, x, y, w, h, null);
+			return;
+		}
 		g.setColor(COLOR_NEN);
 		g.fillRect(x + 9, y, w - 18, h);
 		for (int i = 0; i < h - 39; i += 40)

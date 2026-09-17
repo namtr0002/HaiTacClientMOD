@@ -217,9 +217,36 @@ public final class LoginScreen extends MainScreen {
         }
         super.paint(var1);
     }
+
+    // Theme selector button at bottom-left: [ Giao diện: Gốc ▼ ]
+    UITheme curTheme = UIThemeManager.getCurrentTheme();
+    String themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
+    int themeBtnX = 10;
+    int themeBtnY = MotherCanvas.h - 26;
+    int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
+    if (themeBtnW < 110) themeBtnW = 110;
+    int themeBtnH = 20;
+
+    if (curTheme != null) {
+        curTheme.paintButton(var1, themeBtnX, themeBtnY, themeBtnW, themeBtnH, themeText, ModernUI.BTN_GOLD, false, false);
+    }
    }
 
    public final void updatePointer() {
+      int themeBtnX = 10;
+      int themeBtnY = MotherCanvas.h - 26;
+      UITheme curTheme = UIThemeManager.getCurrentTheme();
+      String themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
+      int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
+      if (themeBtnW < 110) themeBtnW = 110;
+      int themeBtnH = 20;
+
+      if (GameCanvas.AB(themeBtnX, themeBtnY, themeBtnW, themeBtnH)) {
+         GameCanvas.isPointerSelect = false;
+         openSelectThemeMenu();
+         return;
+      }
+
       if (GameCanvas.AB(this.AD.AA, this.AD.AB + this.AV, this.AD.AC, this.AD.AD)) {
          GameCanvas.isPointerSelect = false;
          openSelectServerMenu();
@@ -228,6 +255,21 @@ public final class LoginScreen extends MainScreen {
       super.updatePointer();
       this.AC.updatePointer();
       this.AD.updatePointer();
+   }
+
+   public void openSelectThemeMenu() {
+      mVector vec = new mVector();
+      String[] names = UIThemeManager.getThemeNames();
+      int curTheme = UIThemeManager.getCurrentThemeId();
+      for (int i = 0; i < names.length; i++) {
+         iCommand cmd = new iCommand(names[i], 100 + i, this);
+         vec.addElement(cmd);
+      }
+      GameCanvas.menu.startAt(vec, 2, "Ch\u1ecdn Giao Di\u1ec7n");
+      if (curTheme >= 0 && curTheme < names.length) {
+         GameCanvas.menu.AC = curTheme;
+         GameCanvas.menu.menuSelectedItem = curTheme;
+      }
    }
 
    public void openSelectServerMenu() {
@@ -339,6 +381,20 @@ public final class LoginScreen extends MainScreen {
    }
 
    public final void commandPointer(int var1, int var2) {
+      if (var1 >= 100 && var1 < 100 + UIThemeManager.TOTAL_THEMES) {
+         int selTheme = var1 - 100;
+         UIThemeManager.setTheme(selTheme);
+         GameCanvas.menu.doCloseMenu();
+         return;
+      }
+      if (var1 == 99) {
+         openSelectThemeMenu();
+         return;
+      }
+      if (var1 == 98) {
+         UIShowcaseScreen.getInstance().Show(this);
+         return;
+      }
       mVector var7;
       switch(var1) {
       case 0:
@@ -387,6 +443,8 @@ public final class LoginScreen extends MainScreen {
             var7.addElement(new iCommand("+ Thêm IP Server", 25, this));
          }
 
+         var7.addElement(new iCommand("\uD83C\uDFA8 " + (UIThemeManager.getCurrentTheme() != null ? UIThemeManager.getCurrentTheme().displayName : "\u0110\u1ed5i Giao Di\u1ec7n"), 99, this));
+         var7.addElement(new iCommand("\uD83D\uDDA5 UI Showcase", 98, this));
          var7.addElement(this.AM);
          GameCanvas.menu.startAt(var7, 0, T.AU);
          break;

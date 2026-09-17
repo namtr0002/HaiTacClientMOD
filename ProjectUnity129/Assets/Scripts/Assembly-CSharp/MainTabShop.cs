@@ -295,6 +295,12 @@ public class MainTabShop : MainTab
 				base.updatePointer();
 				return;
 			}
+			else if (GameCanvas.isPointerSelect)
+			{
+				isShowInfo = false;
+				GameCanvas.isPointerSelect = false;
+				return;
+			}
 		}
 		if (GameCanvas.isPointSelect(xCurBegin, yCurBegin, wCur, hCur))
 		{

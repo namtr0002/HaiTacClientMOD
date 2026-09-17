@@ -368,6 +368,11 @@ public class MainTab extends AvMain {
    }
 
    public static void AA(mGraphics var0, int var1, int var2, int var3, int var4) {
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         currentTheme.paintWindow(var0, var1, var2, var3, var4, null);
+         return;
+      }
       var0.setColor(BS);
       var0.fillRect(var1 + 9, var2, var3 - 18, var4);
 

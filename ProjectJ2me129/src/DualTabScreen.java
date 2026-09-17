@@ -127,7 +127,7 @@ public void recalculateLayout() {
     y = MotherCanvas.hh - h / 2;
     maxWShow = 0;
 
-    isWide = (MotherCanvas.w >= 280 && MotherCanvas.w >= MotherCanvas.h);
+    isWide = (MotherCanvas.w >= 280 && MotherCanvas.w >= MotherCanvas.h) || UILayoutEngine.isWidescreen();
 
     if (GameCanvas.isTouch && MainTab.fraCloseTab != null) {
         cmdClose.setPos(x + w - 16, y + 14, MainTab.fraCloseTab, "");
@@ -2132,7 +2132,7 @@ public void close() {
 
         this.AD(g, x, y, w, h, 0);
 
-        if (Interface_Game.imgHoavan != null) {
+        if (Interface_Game.imgHoavan != null && (UIThemeManager.getCurrentTheme() == null || UIThemeManager.getCurrentTheme().id == 0)) {
             g.drawImage(Interface_Game.imgHoavan, x + 6, y + 6, 0);
             g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 2, x + w - 29, y + 6, 0);
             g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 1, x + 6, y + h - 29, 0);

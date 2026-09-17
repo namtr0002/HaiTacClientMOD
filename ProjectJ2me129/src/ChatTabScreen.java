@@ -273,6 +273,11 @@ public class ChatTabScreen extends MainScreen {
 
    public static void drawPirateWindowFrame(mGraphics g, int x, int y, int w, int h) {
       if (g == null || w <= 0 || h <= 0) return;
+      UITheme currentTheme = UIThemeManager.getCurrentTheme();
+      if (currentTheme != null && currentTheme.id > 0) {
+         currentTheme.paintWindow(g, x, y, w, h, null);
+         return;
+      }
       // 1. Drop shadow
       g.setColor(0x000000);
       g.fillRect(x + 3, y + 3, w, h);

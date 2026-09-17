@@ -159,6 +159,18 @@ public class FristLoginScreen : MainScreen
 
 	public override void commandPointer(int index, int subIndex)
 	{
+		if (index >= 100 && index < 100 + UIThemeManager.TOTAL_THEMES)
+		{
+			int selTheme = index - 100;
+			UIThemeManager.setTheme(selTheme);
+			GameCanvas.menu.doCloseMenu();
+			return;
+		}
+		if (index == 99)
+		{
+			openSelectThemeMenu();
+			return;
+		}
 		switch (index)
 		{
 		case 0:
@@ -402,6 +414,20 @@ public class FristLoginScreen : MainScreen
 			iCommand2.paint(g, iCommand2.xCmd, iCommand2.yCmd);
 		}
 		base.paint(g);
+
+		// Theme selector button at bottom-left: [ Giao diện: Gốc ▼ ]
+		UITheme curTheme = UIThemeManager.getCurrentTheme();
+		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
+		int themeBtnX = 10;
+		int themeBtnY = MotherCanvas.h - 26;
+		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
+		if (themeBtnW < 110) themeBtnW = 110;
+		int themeBtnH = 20;
+
+		if (curTheme != null)
+		{
+			curTheme.paintButton(g, themeBtnX, themeBtnY, themeBtnW, themeBtnH, themeText, ModernUI.BTN_GOLD, false, false);
+		}
 	}
 
 	public override void update()
@@ -458,11 +484,43 @@ public class FristLoginScreen : MainScreen
 
 	public override void updatePointer()
 	{
+		int themeBtnX = 10;
+		int themeBtnY = MotherCanvas.h - 26;
+		UITheme curTheme = UIThemeManager.getCurrentTheme();
+		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
+		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
+		if (themeBtnW < 110) themeBtnW = 110;
+		int themeBtnH = 20;
+
+		if (GameCanvas.isPointSelect(themeBtnX, themeBtnY, themeBtnW, themeBtnH))
+		{
+			openSelectThemeMenu();
+			GameCanvas.isPointerSelect = false;
+			return;
+		}
+
 		for (int i = 0; i < vecCmd.size(); i++)
 		{
 			((iCommand)vecCmd.elementAt(i)).updatePointer();
 		}
 		base.updatePointer();
+	}
+
+	public void openSelectThemeMenu()
+	{
+		mVector vec = new mVector();
+		string[] names = UIThemeManager.getThemeNames();
+		int curTheme = UIThemeManager.getCurrentThemeId();
+		for (int i = 0; i < names.Length; i++)
+		{
+			iCommand cmd = new iCommand(names[i], 100 + i, this);
+			vec.addElement(cmd);
+		}
+		GameCanvas.menu.startAt(vec, 2, "Ch\u1ecdn Giao Di\u1ec7n");
+		if (curTheme >= 0 && curTheme < names.Length)
+		{
+			GameCanvas.menu.menuSelectedItem = curTheme;
+		}
 	}
 
 	public override bool keyBack()

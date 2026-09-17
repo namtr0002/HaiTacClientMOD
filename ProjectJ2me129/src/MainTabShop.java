@@ -249,6 +249,10 @@ public class MainTabShop extends MainTab {
             }
             super.updatePointer();
             return;
+         } else if (GameCanvas.isPointerSelect) {
+            super.AV = false;
+            GameCanvas.isPointerSelect = false;
+            return;
          }
       }
 
