@@ -1,0 +1,19 @@
+// uses root configuration
+
+sourceSets {
+    main {
+        java {
+            // Include legacy J2ME sources so IDE sees them under the Gradle project
+            srcDirs = [
+                'src/main/java',
+                '../../src'
+            ]
+        }
+        resources {
+            srcDirs = [
+                'src/main/resources'
+            ]
+        }
+    }
+}
+

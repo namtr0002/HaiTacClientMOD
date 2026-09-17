@@ -1,0 +1,74 @@
+private void paintTabDanhHieu(mGraphics g) {
+int paneX = x + 10;
+int paneY = y + 28;
+int paneW = w - 20;
+int paneH = h - 34;
+
+AvMain.paintRect(g, paneX, paneY, paneW, paneH, (byte)0, 1);
+
+// Nút Quay Lại mini
+int backBtnX = paneX + 6;
+int backBtnY = paneY + 4;
+int backBtnW = 60;
+int backBtnH = 16;
+AvMain.paintRect(g, backBtnX, backBtnY, backBtnW, backBtnH, (byte)1, 1);
+mFont.tahoma_7b_black.drawString(g, \"❮ Quay Lại\", backBtnX + backBtnW / 2, backBtnY + 2, 2);
+
+mFont.tahoma_7b_yellow.drawString(g, \"DANH HIỆU NHÂN VẬT\", paneX + paneW / 2, paneY + 5, 2);
+
+int dhCount = (Player.vecDanhHieu != null) ? Player.vecDanhHieu.size() : 0;
+mFont.tahoma_7_white.drawString(g, \"(\" + dhCount + \")\", paneX + paneW - 10, paneY + 5, 1);
+
+if (isWide) {
+int listX = paneX + 6;
+int listY = paneY + 24;
+int listW = (paneW - 18) * 55 / 100;
+int listH = paneH - 30;
+
+AvMain.paintRect(g, listX, listY, listW, listH, (byte)0, 1);
+
+if (danhHieuList != null) {
+g.setClip(listX, listY, listW, listH);
+g.translate(0, -danhHieuList.AC);
+
+int itemH = 38;
+for (int i = 0; i < dhCount; i++) {
+DanhHieuInfo dh = (DanhHieuInfo)Player.vecDanhHieu.elementAt(i);
+if (dh == null) continue;
+
+int itemY = listY + i * itemH;
+boolean isSel = (i == selectedDanhHieuIndex);
+
+AvMain.paintRect(g, listX + 2, itemY + 2, listW - 4, itemH - 4, (byte)(isSel ? 1 : 0), 1);
+if (isSel) {
+g.setColor(0xFFFF00);
+g.drawRect(listX + 1, itemY + 1, listW - 3, itemH - 3);
+if (AvMain.imgNenfocus != null) {
+g.drawRegion(AvMain.imgNenfocus, 2, 2, listW - 4, itemH - 4, 0, listX + 2, itemY + 2, 0);
+}
+}
+
+mFont titleFont = (dh.state == 2) ? mFont.tahoma_7b_green : (isSel ? mFont.tahoma_7b_yellow : mFont.tahoma_7b_white);
+titleFont.drawString(g, dh.name, listX + 8, itemY + 4, 0);
+
+if (dh.state == 2) {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+"}
+{"step_index":348,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-09-04T12:49:06Z","tool_calls":[{"name":"grep_search","args":{"Includes":["DualTabScreen.java"],"Query":"chucNangSubView","SearchPath":"c:/DepLor/HTTH/Team/ProjectJ2me129/src","toolAction":"Searching codebase","toolSummary":"Find chucNangSubView in DualTabScreen.java"}}]}
+{"step_index":349,"source":"MODEL","type":"GENERIC","status":"DONE","created_at":"2026-09-04T12:49:08Z","content":"Created At: 2026-09-04T19:49:08+07:00
+Completed At: 2026-09-04T19:49:08+07:00
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\"}"}
+{"step_index":350,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-09-04T12:49:08Z","tool_calls":[{"name":"grep_search","args":{"Includes":["DualTabScreen.java"],"MatchPerLine":true,"Query":"chucNangSubView","SearchPath":"c:/DepLor/HTTH/Team/ProjectJ2me129/src","toolAction":"Searching codebase","toolSummary":"Find occurrences of chucNangSubView"}}]}
+{"step_index":351,"source":"MODEL","type":"GENERIC","status":"DONE","created_at":"2026-09-04T12:49:10Z","content":"Created At: 2026-09-04T19:49:10+07:00
+Completed At: 2026-09-04T19:49:11+07:00
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":80,\"LineContent\":\"    public int chucNangSubView = 0;\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":429,\"LineContent\":\"        if (chucNangSubView == 0) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":431,\"LineContent\":\"        } else if (chucNangSubView == 1) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":433,\"LineContent\":\"        } else if (chucNangSubView == 2) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":435,\"LineContent\":\"        } else if (chucNangSubView == 3) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":777,\"LineContent\":\"        chucNangSubView = 1;\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":785,\"LineContent\":\"        chucNangSubView = 2;\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":842,\"LineContent\":\"        chucNangSubView = 3;\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":1193,\"LineContent\":\"            if (chucNangSubView == 0) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":1199,\"LineContent\":\"            } else if (chucNangSubView == 1) {\"}
+{\"File\":\"c:\\\\DepLor\\\\HTTH\\\\Team\\\\ProjectJ2me129\\\\src\\\\DualTabScreen.java\",\"LineNumber\":1211,\"LineContent\":\"            } else if (chucNangSubView == 2) {\"}

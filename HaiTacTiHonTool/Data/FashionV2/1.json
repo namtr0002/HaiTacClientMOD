@@ -1,0 +1,658 @@
+{
+  "fashionId": "132",
+  "name": "Thời Trang Katakuri",
+  "genderReq": 0,
+  "parts": [],
+  "defaultSequence": "seq_idle",
+  "category": 0,
+  "sequences": [
+    {
+      "frames": [
+        {
+          "partTransforms": [],
+          "frameIndex": 0,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 1,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 2,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 3,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 4,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 5,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 6,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 7,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 8,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 9,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 10,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 11,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 12,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 13,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 14,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 15,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 16,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 17,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 18,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 19,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 20,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 21,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 22,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 23,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 24,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 25,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 26,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 27,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 28,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 29,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 30,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 31,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 32,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 33,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 34,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 35,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 36,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 37,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 38,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 39,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 40,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 41,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 42,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 43,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 44,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 45,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 46,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 47,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 48,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 49,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 50,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 51,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 52,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 53,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 54,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 55,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 56,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 57,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 58,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 59,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 60,
+          "durationMs": 83
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 61,
+          "durationMs": 83
+        }
+      ],
+      "name": "Idle (Đứng chờ)",
+      "fps": 12,
+      "isLoop": true,
+      "sequenceId": "seq_idle",
+      "events": []
+    },
+    {
+      "frames": [
+        {
+          "partTransforms": [],
+          "frameIndex": 0,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 1,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 2,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 3,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 4,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 5,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 6,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 7,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 8,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 9,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 10,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 11,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 12,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 13,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 14,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 15,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 16,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 17,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 18,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 19,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 20,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 21,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 22,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 23,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 24,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 25,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 26,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 27,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 28,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 29,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 30,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 31,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 32,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 33,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 34,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 35,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 36,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 37,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 38,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 39,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 40,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 41,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 42,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 43,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 44,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 45,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 46,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 47,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 48,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 49,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 50,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 51,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 52,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 53,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 54,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 55,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 56,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 57,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 58,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 59,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 60,
+          "durationMs": 71
+        },
+        {
+          "partTransforms": [],
+          "frameIndex": 61,
+          "durationMs": 71
+        }
+      ],
+      "name": "Attack (Tấn công)",
+      "fps": 14,
+      "isLoop": false,
+      "sequenceId": "seq_attack",
+      "events": []
+    }
+  ],
+  "sprites": [{
+    "spriteId": "placeholder",
+    "atlasPath": "1.png",
+    "x": 2,
+    "width": 64,
+    "y": 2,
+    "pivotY": 0.5,
+    "pivotX": 0.5,
+    "height": 64
+  }]
+}

@@ -1,0 +1,660 @@
+Nghiên cứu tài liệu tìm ra giải pháp gửi Message fake nhưng vẫn đúng định dạng chỉ là fake yêu cầu để server gửi effect auto đến và lưu ảnh databinary datasql(không mã hóa)
+
+CODE KÉO (ĐANG GẶP LỖI KHÔNG KÉO ĐƯỢC BỊ TIMEOUT CHẮC DO GỬI SAI ĐỊNH DẠNG HOẶC GÌ ĐÓ)
+
+// Ageteffauto.java
+import java.nio.file.*;
+import java.io.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import javax.microedition.lcdui.Image;
+import java.util.concurrent.*;
+import java.util.Base64;
+
+public class Ageteffauto {
+    private static final int START_ID = 0;
+    private static final int END_ID = 255;
+    private static final String base = "C:\\ThMadara\\HTTH\\res\\effect_auto\\";
+    private static final String dataPath = base + "data\\";
+    private static final String imgPath = base + "img\\";
+    private static final String sqlPath = base + "sql\\";
+    private static final long TIMEOUT_MS = 5000;
+    private static final long POLL_MS = 20;
+
+    // lưu raw bytes khi server trả về
+    private static final ConcurrentHashMap<Integer, byte[]> received = new ConcurrentHashMap<>();
+
+    public static void run() {
+        try { Files.createDirectories(Paths.get(dataPath)); Files.createDirectories(Paths.get(imgPath)); Files.createDirectories(Paths.get(sqlPath)); } catch (Exception ignored) {}
+        for (int id = START_ID; id <= END_ID; id++) {
+            try {
+                Message m = new Message((byte)-44);
+                m.writer().writeShort(id);
+                m.writer().flush();
+                Session_ME.getInstance().sendMessage(m);
+            } catch (Throwable t) {
+                System.err.println("send fail id " + id);
+                continue;
+            }
+
+            long t0 = System.currentTimeMillis();
+            byte[] dataeff = null;
+            while (System.currentTimeMillis() - t0 < TIMEOUT_MS) {
+                dataeff = received.remove(id);
+                if (dataeff != null) break;
+                try { Thread.sleep(POLL_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+            }
+            if (dataeff == null) { System.out.println("timeout id " + id); continue; }
+
+            try {
+                // lưu .bin
+                try { Files.write(Paths.get(dataPath + id + ".bin"), dataeff); } catch (Exception e) { e.printStackTrace(); }
+
+                // parse và lưu ảnh nếu có (EffectAuto.readData cũng đã tạo MainEffectAuto.hashTemEffAuto)
+                try { EffectAuto.readData(dataeff, true); } catch (Throwable ignored) {}
+                Object o = MainEffectAuto.hashTemEffAuto.get(String.valueOf(id));
+                if (o instanceof MainEffectAuto) {
+                    MainEffectAuto eff = (MainEffectAuto) o;
+                    if (eff.img != null && eff.img.getImageObject() != null) {
+                        BufferedImage bi = toBufferedImage(eff.img.getImageObject());
+                        if (bi != null) {
+                            try { ImageIO.write(bi, "png", Paths.get(imgPath + id + ".png").toFile()); } catch (Exception e) { e.printStackTrace(); }
+                        }
+                    }
+                }
+
+                // lưu SQL
+                String sql = "INSERT INTO effect_auto(id, data_base64) VALUES(" + id + ", '" + Base64.getEncoder().encodeToString(dataeff) + "');";
+                try { Files.write(Paths.get(sqlPath + id + ".sql"), sql.getBytes()); } catch (Exception e) { e.printStackTrace(); }
+
+                System.out.println("saved id " + id);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
+        }
+        System.out.println("done");
+    }
+
+    // được gọi khi có dữ liệu đến (sửa loadDataEff để gọi)
+    public static void onDataReceived(byte[] dataeff) {
+        if (dataeff == null || dataeff.length < 2) return;
+        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(dataeff))) {
+            int id = dis.readShort();
+            received.put(id, dataeff);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static BufferedImage toBufferedImage(Image img) {
+        try {
+            if (img == null) return null;
+            int w = img.getWidth(), h = img.getHeight();
+            if (w <= 0 || h <= 0) return null;
+            BufferedImage b = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+            int[] rgb = new int[w * h];
+            img.getRGB(rgb, 0, w, 0, 0, w, h);
+            b.setRGB(0, 0, w, h, rgb, 0, w);
+            return b;
+        } catch (Throwable t) { return null; }
+    }
+}
+
+
+CODE CLIENT ĐỂ NGHIÊN CỨU TÌM RA NGUYÊN NHÂN GIẢI PHÁP ĐỂ KÉO EFFECT AUTO
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+
+public final class EffectAuto extends MainItemMap {
+   private MainEffectAuto eff;
+   private int nCountReplay = 0;
+   private boolean isPaint = true;
+   private int typeEffect;
+   private int valueEffect;
+   private long timeBegin;
+   private int indexSound = -1;
+   private int timePlaySound = -1;
+   private int tickupdate;
+
+   public EffectAuto(String var1) {
+      super.TypeItem = 1;
+      String[] array = mFont.split(var1, ";");
+      super.IDItem = Short.parseShort(array[0]);
+      super.IDImage = Short.parseShort(array[1]);
+      super.x = Integer.parseInt(array[2]) * LoadMap.wTile;
+      super.y = Integer.parseInt(array[3]) * LoadMap.wTile;
+      super.dx = Integer.parseInt(array[4]);
+      super.dy = Integer.parseInt(array[5]);
+      this.typeEffect = Integer.parseInt(array[6]);
+      this.valueEffect = Integer.parseInt(array[7]);
+      super.wOne = 70;
+      super.hOne = 70;
+      super.ySort = super.y;
+      this.eff = this.loadTemEff(super.IDImage);
+      this.timeBegin = GameCanvas.timeNow;
+      this.isPaint = true;
+   }
+
+   public final void paint(mGraphics g) {
+      if (this.eff != null && this.eff.img != null && this.isPaint) {
+         short num = this.eff.mRunFrame[super.f];
+         int num2 = this.eff.mFrame[num].mpart.length;
+
+         for(int i = 0; i < num2; ++i) {
+            MainPartImage mainPartImage;
+            if ((mainPartImage = (MainPartImage)this.eff.hashImage.get("" + this.eff.mFrame[num].mpart[i].idPartImage)) != null) {
+               g.drawRegion(this.eff.img, mainPartImage.x, mainPartImage.y, mainPartImage.w, mainPartImage.h, 0, super.x + super.dx + this.eff.mFrame[num].mpart[i].x, super.y + super.dy + this.eff.mFrame[num].mpart[i].y, 0);
+            }
+         }
+      }
+
+   }
+
+   public final void update() {
+      if (this.eff != null && this.eff.img != null) {
+         if (super.f >= this.eff.mRunFrame.length - 1) {
+            switch(this.typeEffect) {
+            case 0:
+               ++this.nCountReplay;
+               this.isPaint = false;
+               if (this.nCountReplay >= this.valueEffect) {
+                  this.nCountReplay = 0;
+                  this.isPaint = true;
+                  super.f = 0;
+                  return;
+               }
+               break;
+            case 1:
+               super.f = 0;
+               return;
+            case 2:
+               this.isPaint = false;
+               if (GameCanvas.gameTick % 5 == 0 && (GameCanvas.timeNow - this.timeBegin) / 1000L > (long)this.valueEffect) {
+                  this.timeBegin = GameCanvas.timeNow;
+                  super.f = 0;
+                  this.isPaint = true;
+                  return;
+               }
+               break;
+            case 3:
+               return;
+            case 4:
+               if (CRes.random(this.valueEffect) == 0) {
+                  super.f = 0;
+                  if (this.indexSound >= 0 && CRes.random(this.timePlaySound) == 0 && this.AB()) {
+                     int var10000 = this.indexSound;
+                     float var1 = mSound.volumeSound;
+                     mSound.playSound();
+                     return;
+                  }
+               }
+               break;
+            default:
+               return;
+            }
+         } else {
+            ++super.f;
+         }
+
+      } else {
+         ++this.tickupdate;
+         if (this.tickupdate > 50) {
+            this.tickupdate = 0;
+            this.eff = this.loadTemEff(super.IDImage);
+         }
+
+      }
+   }
+
+   private MainEffectAuto loadTemEff(short id) {
+      MainEffectAuto mainEffectAuto;
+      if ((mainEffectAuto = (MainEffectAuto)MainEffectAuto.hashTemEffAuto.get("" + id)) == null) {
+         MainEffectAuto mainEffectAuto2 = new MainEffectAuto();
+         GlobalService.getInstance().getDataEffAuto(id);
+         mainEffectAuto = mainEffectAuto2;
+         MainEffectAuto.hashTemEffAuto.put(String.valueOf(id), mainEffectAuto2);
+      }
+
+      return mainEffectAuto;
+   }
+
+   public static MainEffectAuto readData(byte[] dataeff, boolean var1) {
+      MainEffectAuto mainEffectAuto = null;
+
+      try {
+         ByteArrayInputStream bais = new ByteArrayInputStream(dataeff);
+         DataInputStream var7;
+         short var2 = (var7 = new DataInputStream(bais)).readShort();
+         byte[] var3 = new byte[var7.readShort()];
+         var7.read(var3);
+         ByteArrayInputStream var9 = new ByteArrayInputStream(var3);
+         DataInputStream var10 = new DataInputStream(var9);
+         byte[] var4 = new byte[var7.available()];
+         var7.read(var4);
+         mainEffectAuto = new MainEffectAuto(var10, var4);
+         MainEffectAuto.hashTemEffAuto.put(String.valueOf(var2), mainEffectAuto);
+      } catch (Exception var5) {
+      }
+
+      return mainEffectAuto;
+   }
+}
+
+import java.io.DataInputStream;
+import java.util.Hashtable;
+
+public final class MainEffectAuto {
+   public static Hashtable hashTemEffAuto = new Hashtable();
+   public Hashtable hashImage = new Hashtable();
+   public MainFrameEff[] mFrame;
+   public short[] mRunFrame;
+   public mImage img;
+
+   public MainEffectAuto() {
+   }
+
+   public MainEffectAuto(DataInputStream var1, byte[] var2) {
+      this.AA(var1);
+      this.img = mImage.AA(var2);
+   }
+
+   private void AA(DataInputStream var1) {
+      try {
+         byte var2 = var1.readByte();
+
+         for(int var3 = 0; var3 < var2; ++var3) {
+            MainPartImage var4 = new MainPartImage(var1.readByte(), var1.readByte(), var1.readByte(), var1.readByte(), var1.readByte());
+            this.hashImage.put("" + var4.ID, var4);
+         }
+
+         short var8 = var1.readShort();
+         this.mFrame = new MainFrameEff[var8];
+
+         for(int var9 = 0; var9 < var8; ++var9) {
+            var2 = var1.readByte();
+            this.mFrame[var9] = new MainFrameEff();
+            this.mFrame[var9].mpart = new Part[var2];
+
+            for(int var5 = 0; var5 < var2; ++var5) {
+               this.mFrame[var9].mpart[var5] = new Part();
+               this.mFrame[var9].mpart[var5].x = var1.readShort();
+               this.mFrame[var9].mpart[var5].y = var1.readShort();
+               this.mFrame[var9].mpart[var5].idPartImage = var1.readByte();
+            }
+         }
+
+         short var10 = var1.readShort();
+         this.mRunFrame = new short[var10];
+
+         for(int var7 = 0; var7 < var10; ++var7) {
+            this.mRunFrame[var7] = var1.readShort();
+         }
+
+         var1.readByte();
+         var1.readByte();
+      } catch (Exception var6) {
+         var6.printStackTrace();
+      }
+   }
+}
+
+public final class Part {
+   public short x;
+   public short y;
+   public byte idPartImage;
+}
+
+import javax.microedition.lcdui.Image;
+
+public final class mImage {
+   public Image image;
+   public int width;
+   public int height;
+
+   public final void setDefault() {
+      if (this.image != null) {
+         this.width = getImageWidth(this.image);
+         this.height = getImageHeight(this.image);
+      }
+
+   }
+
+   public static mImage createImage(String imgpath) {
+      mImage i = new mImage();
+      try {
+         i.image = Image.createImage("/x" + mGraphics.zoomLevel + imgpath);
+      } catch (Exception var2) {
+      }
+      return i.image == null ? null : i;
+   }
+
+   public static mImage createImageNotZoom(String path) {
+      mImage i = new mImage();
+      try {
+         i.image = Image.createImage(path);
+      } catch (Exception e) {
+      }
+      return i.image == null ? null : i;
+   }
+
+   public static mImage AA(byte[] var0) {
+      mImage var1 = new mImage();
+      try {
+         if (var0 != null) {
+            var1.image = Image.createImage(var0, 0, var0.length);
+            return var1;
+         }
+      } catch (Exception var2) {
+      }
+
+      return var1.image == null ? null : var1;
+   }
+
+   public static int getImageWidth(Image var0) {
+      return var0.getWidth() / mGraphics.zoomLevel;
+   }
+
+   public static int getImageHeight(Image var0) {
+      return var0.getHeight() / mGraphics.zoomLevel;
+   }
+   
+   public final int getImageWidth() {
+        return this.image != null ? getImageWidth(this.image) : 0;
+    }
+    public final int getImageHeight() {
+        return this.image != null ? getImageHeight(this.image) : 0;
+    }
+    public final Image getImageObject() {
+        return this.image;
+    }
+
+}
+
+Command Id là -44
+case -44:
+         rmsg = GameCanvas.readMessage;
+         ReadMessenge.loadDataEff(m);
+         return;
+		 
+public static void loadDataEff(Message m) {
+      try {
+         byte[] dataeff = new byte[m.reader().available()];
+         m.reader().read(dataeff);
+         EffectAuto.readData(dataeff, true);
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+   }
+   
+Class Message 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
+public final class Message {
+   public byte command;
+   private ByteArrayOutputStream baos = null;
+   private DataOutputStream dos = null;
+   private ByteArrayInputStream bais = null;
+   private DataInputStream dis = null;
+   public byte isOld = 0;
+
+   public Message() {
+   }
+
+   public Message(byte cmd) {
+      this.command = cmd;
+      this.baos = new ByteArrayOutputStream();
+      this.dos = new DataOutputStream(this.baos);
+   }
+
+   Message(byte cmd, byte[] data) {
+      this.command = cmd;
+      this.bais = new ByteArrayInputStream(data);
+      this.dis = new DataInputStream(this.bais);
+   }
+
+   public final byte[] getData() {
+      return this.baos.toByteArray();
+   }
+
+   public final DataInputStream reader() {
+      return this.dis;
+   }
+
+   public final DataOutputStream writer() {
+      return this.dos;
+   }
+}
+
+
+class session me
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public final class Session_ME implements Class_HQ {
+   private static Session_ME instance = new Session_ME();
+   private DataOutputStream dos;
+   public DataInputStream AA;
+   public static IMessageHandler AB;
+   private TcpClient AN;
+   public boolean AC;
+   public boolean AD;
+   private final Sender sender = new Sender(this);
+   private Thread AP;
+   public Thread AE;
+   private int sendByteCount;
+   public int AF;
+   boolean getKeyComplete;
+   public byte[] key = null;
+   private byte curR;
+   private byte curW;
+   long AI;
+   public static boolean AJ;
+   private static mVector recieveMsg = new mVector();
+   public static int AK = 0;
+
+   public static Session_ME getInstance() {
+      return instance;
+   }
+
+   public final boolean AB() {
+      return this.AC;
+   }
+
+   public static void setHandler(IMessageHandler var0) {
+      AB = var0;
+   }
+
+   public final void connectServer(String host, int port) {
+      if (!this.AC && !this.AD) {
+         this.sender.AA();
+         this.getKeyComplete = false;
+         this.AN = null;
+         this.AP = new Thread(new Class_HU(this, host, port));
+         System.out.println("connect server " + host + ":" + port);
+         this.AP.start();
+         if (LoadMap.specMap == 3) {
+            GameScreen.player.setAutoFire(true);
+         }
+
+      }
+   }
+
+   public static void AB(Message m) {
+      GameMidlet.AE();
+      AB.onMessage(m);
+   }
+
+   public final void sendMessage(Message m) {
+      this.sender.AA(m);
+   }
+
+   private synchronized void doSendMessage(Message m) {
+      byte[] var2 = m.getData();
+
+      try {
+         byte var5;
+         if (this.getKeyComplete) {
+            var5 = this.writeKey(m.command);
+            this.dos.writeByte(var5);
+         } else {
+            this.dos.writeByte(m.command);
+         }
+
+         if (var2 != null) {
+            int var6 = var2.length;
+            if (this.getKeyComplete) {
+               byte var3 = this.writeKey((byte)(var6 >> 8));
+               this.dos.writeByte(var3);
+               var5 = this.writeKey((byte)var6);
+               this.dos.writeByte(var5);
+            } else {
+               this.dos.writeShort(var6);
+            }
+
+            if (this.getKeyComplete) {
+               for(int var7 = 0; var7 < var2.length; ++var7) {
+                  var2[var7] = this.writeKey(var2[var7]);
+               }
+            }
+
+            this.dos.write(var2);
+            this.sendByteCount += 5 + var2.length;
+         } else {
+            this.dos.writeShort(0);
+            this.sendByteCount += 5;
+         }
+
+         this.dos.flush();
+      } catch (IOException var4) {
+         var4.printStackTrace();
+      }
+   }
+
+   private byte readKey(byte result) {
+      byte[] var10000 = this.key;
+      byte b2 = this.curR;
+      this.curR = (byte)(b2 + 1);
+      result = (byte)(var10000[b2] & 255 ^ result & 255);
+      if (this.curR >= this.key.length) {
+         this.curR = (byte)(this.curR % this.key.length);
+      }
+      return result;
+   }
+
+   private byte writeKey(byte var1) {
+      byte[] var10000 = this.key;
+      byte var10003 = this.curW;
+      this.curW = (byte)(var10003 + 1);
+      var1 = (byte)(var10000[var10003] & 255 ^ var1 & 255);
+      if (this.curW >= this.key.length) {
+         this.curW = (byte)(this.curW % this.key.length);
+      }
+
+      return var1;
+   }
+
+   public final void close() {
+      this.cleanNetwork();
+   }
+
+   private void cleanNetwork() {
+      this.key = null;
+      this.curR = 0;
+      this.curW = 0;
+
+      try {
+         this.AC = false;
+         this.AD = false;
+         if (this.AN != null) {
+            this.AN.close();
+            this.AN = null;
+         }
+
+         if (this.dos != null) {
+            this.dos.close();
+            this.dos = null;
+         }
+
+         if (this.AA != null) {
+            this.AA.close();
+            this.AA = null;
+         }
+
+         this.AE = null;
+         if (this.AP != null && this.AP.isAlive()) {
+            this.AP.interrupt();
+            this.AP = null;
+         }
+
+         System.gc();
+      } catch (Exception var2) {
+         var2.printStackTrace();
+      }
+   }
+
+   static TcpClient AA(Session_ME var0) {
+      return var0.AN;
+   }
+
+   static void AA(Session_ME var0, TcpClient var1) {
+      var0.AN = var1;
+   }
+
+   static void AA(Session_ME var0, DataOutputStream var1) {
+      var0.dos = var1;
+   }
+
+   static Sender AB(Session_ME var0) {
+      return var0.sender;
+   }
+
+   static void AA(Session_ME var0, Message var1) {
+      var0.doSendMessage(var1);
+   }
+
+   static void AC(Session_ME var0) {
+      var0.cleanNetwork();
+   }
+
+   static byte AA(Session_ME var0, byte var1) {
+      return var0.readKey(var1);
+   }
+
+   static Message AB(Session_ME var0, byte var1) {
+       try {
+           byte var2 = (var0 = var0).readKey(var0.AA.readByte());
+           byte var3 = var0.readKey(var0.AA.readByte());
+           byte var4 = var0.readKey(var0.AA.readByte());
+           byte var5 = var0.readKey(var0.AA.readByte());
+           int var7;
+           byte[] var8 = new byte[var7 = (var2 & 255) << 24 | (var3 & 255) << 16 | (var4 & 255) << 8 | var5 & 255];
+           int var9 = 0;
+           int var10 = 0;
+           
+           int var6;
+           while(var9 != -1 && var10 < var7) {
+               if ((var9 = var0.AA.read(var8, var10, var7 - var10)) > 0) {
+                   var10 += var9;
+                   var0.AF += var10 + 5;
+                   var6 = instance.AF + instance.sendByteCount;
+                   (new StringBuffer(String.valueOf(var6 / 1024))).append(".").append(var6 % 1024 / 102).append("Kb").toString();
+               }
+           }
+           
+           if (var0.getKeyComplete) {
+               for(var6 = 0; var6 < var8.length; ++var6) {
+                   var8[var6] = var0.readKey(var8[var6]);
+               }
+           }
+           
+           return new Message(var1, var8);
+       } catch (IOException ex) {
+           ex.printStackTrace();
+       }
+       return null;
+   }
+}

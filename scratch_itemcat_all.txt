@@ -1,0 +1,54 @@
+0: public static int getItemCategory(MainItem item) {
+1: 699:         if (item == null) return -1;
+2: 700: 
+3: 701:         // 1: Trang Bị (Trang bị vũ khí, giáp, phụ kiện, thời trang, cánh, thần thú...)
+4: 702:         if (item.typeObject == 3 || item.typeObject == 102 || item.typeObject == 103 || item.typeObject == 107) {
+5: 703:             return 1;
+6: 704:         }
+7: 705: 
+8: 706:         String name = (item.name != null) ? item.name.toLowerCase() : \"\";
+9: 707: 
+10: 708:         // Kiểm tra nếu là Rương / Hộp quà / Túi / Gói chứa đồ trước để không nhầm sang đá
+11: 709:         boolean isChestOrBox = name.startsWith(\"rương\") || name.startsWith(\"ruong\") || 
+12: 710:                                name.startsWith(\"hộp quà\") || name.startsWith(\"hop qua\") || 
+13: 711:                                name.startsWith(\"túi\") || name.startsWith(\"tui\") || 
+14: 712:                                name.startsWith(\"gói\") || name.startsWith(\"goi\");
+15: 713: 
+16: 714:         // 3: Đá & Nguyên Liệu (Gems, Inlaid stones, Upgrade stones, Crafting materials, Ores, Essences)
+17: 715:         if (!isChestOrBox) {
+18: 716:             // a. Các typeObject nguyên liệu chính
+19: 717:             if (item.typeObject == 7 || item.typeObject == 5 || (item instanceof MainMaterial)) {
+20: 718:                 return 3;
+21: 719:             }
+22: 720: 
+23: 721:             // b. BQ (Hp_Mp_Other) của các loại đá khảm / đá thuộc tính / đá nâng cấp
+24: 722:             if (item.typeObject == 4) {
+25: 723:                 if (item.BQ == 12 || item.BQ == 57 || item.BQ == 80 || 
+26: 724:                     item.BQ == 81 || item.BQ == 77 || item.BQ == 27 || 
+27: 725:                     item.BQ == 28 || item.BQ == -16 || item.BQ == -18 || 
+28: 726:                     item.BQ == 66 || item.BQ == 93 ||
+29: 727:                     (item.BQ == 40 && (name.indexOf(\"đá\") >= 0 || name.indexOf(\"da \") >= 0))) {
+30: 728:                     return 3;
+31: 729:                 }
+32: 730: 
+33: 731:                 // ID ranges của các loại đá khảm / hải thạch / nâng cấp
+34: 732:                 if ((item.ID >= 44 && item.ID <= 79) || (item.ID >= 221 && item.ID <= 226) || 
+35: 733:                     (item.ID >= 321 && item.ID <= 327) || (item.ID >= 514 && item.ID <= 516) || 
+36: 734:                     (item.ID >= 644 && item.ID <= 646) || item.ID == 134 || item.ID == 135 || 
+37: 735:                     item.ID == 572 || item.ID == 683) {
+38: 736:                     return 3;
+39: 737:                 }
+40: 738: 
+41: 739:                 // Nhận diện theo tên tiếng Việt mở rộng cho Đá Khảm / Ngọc / Thạch / Nguyên liệu
+42: 740:                 if (name.indexOf(\"đá \") >= 0 || name.indexOf(\"da \") >= 0 || name.startsWith(\"đá\") || name.startsWith(\"da\") ||
+43: 741:                     name.indexOf(\"khảm\") >= 0 || name.indexOf(\"kham\") >= 0 ||
+44: 742:                     name.indexOf(\"ngọc\") >= 0 || name.indexOf(\"ngoc\") >= 0 ||
+45: 743:                     name.indexOf(\"cẩm thạch\") >= 0 || name.indexOf(\"hải thạch\") >= 0 || name.indexOf(\"thạch anh\") >= 0 || 
+46: 744:                     name.indexOf(\"huyết thạch\") >= 0 || name.indexOf(\"hắc thạch\") >= 0 || name.indexOf(\"thạch\") >= 0 ||
+47: 745:                     name.indexOf(\"tinh thể\") >= 0 || name.indexOf(\"tinh the\") >= 0 ||
+48: 746:                     name.indexOf(\"saphia\") >= 0 || name.indexOf(\"sapphire\") >= 0 || name.indexOf(\"topaz\") >= 0 || name.indexOf(\"ruby\") >= 0 ||
+49: 747:                     name.indexOf(\"kim cương\") >= 0 || name.indexOf(\"diamond\") >= 0 ||
+50: 748:                     name.indexOf(\"khoáng\") >= 0 || name.indexOf(\"khoang\") >= 0 || name.indexOf(\"quặng\") >= 0 || 
+51: 749:                     name.indexOf(\"phôi\") >= 0 || name.indexOf(\"phoi\") >= 0 || name.indexOf(\"mảnh \") >= 0 || 
+52: 750:                     name.indexOf(\"nguyên liệu\") >= 0 || name.indexOf(\"nguyen lieu\") >= 0 ||
+53: The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

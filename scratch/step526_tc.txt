@@ -1,0 +1,39 @@
+            case 11: {
+                if (name.length == 1) {
+                   
+                    if (p.level < 70) {
+                        p.getService().send_box_ThongBao_OK("Level chưa đủ, cần cấp 70 trở lên");
+                    }
+                    if (!ZUtil.isnumber(name[0])) {
+                        p.getService().send_box_ThongBao_OK("Số nhập không hợp lệ");
+                        return;
+                    }
+                    long value = Integer.parseInt(name[0]);
+                    if (value <= 0) {
+                        p.getService().send_box_ThongBao_OK("Số nhập không hợp lệ");
+                        return;
+                    }
+                    if (p.clan != null) {
+                        if (value > 2_000_000_000
+                                 || (value + (long) p.clan.get_ngoc()) > 2_000_000_000) {
+                            p.getService().send_box_ThongBao_OK("Số dư quá lớn, hãy thử lại sau");
+                            return;
+                        }
+                        if (p.get_ngoc() < value) {
+                            p.getService().send_box_ThongBao_OK("Không đủ " + value + " ruby");
+                            return;
+                        }
+                        p.update_ngoc(-value);
+                        p.updateMoney();
+                        p.clan.update_ruby((int) value);
+                        for (int i = 0; i < p.clan.members.size(); i++) {
+                            Player p0 = Zone.get_player_by_name_allmap(p.clan.members.get(i).name);
+                            if (p0 != null) {
+                                Clan.send_info(p0, false);
+                            }
+                        }
+                        p.getService().send_box_ThongBao_OK("Góp " + value + " ruby vào quỹ băng thành công");
+                    }
+                }
+                break;
+            }

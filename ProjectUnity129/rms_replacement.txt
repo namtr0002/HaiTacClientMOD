@@ -1,0 +1,168 @@
+	public static sbyte[] loadRMS2(string filename)
+	{
+		if (Thread.CurrentThread.Name == Main.mainThreadName)
+		{
+			return __loadRMS(filename);
+		}
+		return _loadRMS(filename);
+	}
+
+	public static void saveMailCache(string playerName, mVector list)
+	{
+		if (string.IsNullOrEmpty(playerName) || list == null) return;
+		try
+		{
+			DataOutputStream dos = new DataOutputStream();
+			
+			int count = list.size();
+			if (count > 100) count = 100;
+			dos.writeShort((short)count);
+			
+			for (int i = 0; i < count; i++)
+			{
+				ChatDetail cd = (ChatDetail)list.elementAt(i);
+				if (cd == null) continue;
+				
+				dos.writeBoolean(cd.isInvite);
+				if (cd.isInvite)
+				{
+					dos.writeInt(cd.inviteId);
+					dos.writeByte(cd.typeInvite);
+					dos.writeUTF(cd.inviteName != null ? cd.inviteName : "");
+					dos.writeUTF(cd.inviteInfo != null ? cd.inviteInfo : "");
+					dos.writeInt(cd.priceFight);
+					dos.writeInt(cd.typeFight);
+					dos.writeUTF(cd.contentRaw != null ? cd.contentRaw : "");
+					dos.writeLong(cd.receivedTime);
+				}
+				else
+				{
+					dos.writeInt(cd.mailId);
+					dos.writeUTF(cd.name != null ? cd.name : "");
+					dos.writeUTF(cd.mailTitle != null ? cd.mailTitle : "");
+					dos.writeUTF(cd.contentRaw != null ? cd.contentRaw : "");
+					dos.writeBoolean(cd.isClaimed);
+					dos.writeBoolean(cd.isNotReply);
+					dos.writeByte(cd.typeMail);
+					dos.writeLong(cd.receivedTime);
+					
+					int gCount = (cd.mItemgift != null) ? cd.mItemgift.Length : 0;
+					dos.writeByte((sbyte)gCount);
+					if (gCount > 0)
+					{
+						for (int j = 0; j < gCount; j++)
+						{
+							Item_Drop it = cd.mItemgift[j];
+							if (it != null)
+							{
+								dos.writeByte(it.typeObject);
+								dos.writeShort(it.ID);
+								dos.writeUTF(it.name != null ? it.name : "");
+								dos.writeShort(it.IdIcon);
+								dos.writeInt(it.num);
+								dos.writeByte(it.colorName);
+							}
+							else
+							{
+								dos.writeByte((sbyte)0);
+								dos.writeShort((short)-1);
+								dos.writeUTF("");
+								dos.writeShort((short)0);
+								dos.writeInt(0);
+								dos.writeByte((sbyte)0);
+							}
+						}
+					}
+				}
+			}
+			
+			saveRMS("HTTH_MAIL_" + playerName.ToLower(), dos.toByteArray());
+			dos.close();
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	public static mVector loadMailCache(string playerName)
+	{
+		mVector result = new mVector();
+		if (string.IsNullOrEmpty(playerName)) return result;
+		try
+		{
+			sbyte[] data = loadRMS("HTTH_MAIL_" + playerName.ToLower());
+			if (data == null || data.Length == 0) return result;
+			
+			DataInputStream dis = new DataInputStream(data);
+			
+			int count = dis.readShort();
+			for (int i = 0; i < count; i++)
+			{
+				bool isInvite = dis.readBoolean();
+				if (isInvite)
+				{
+					int inviteId = dis.readInt();
+					sbyte typeInvite = dis.readByte();
+					string inviteName = dis.readUTF();
+					string inviteInfo = dis.readUTF();
+					int priceFight = dis.readInt();
+					int typeFight = dis.readInt();
+					string contentRaw = dis.readUTF();
+					long receivedTime = dis.readLong();
+					
+					ChatDetail cd = new ChatDetail(inviteName, (sbyte)1, ChatDetail.CAT_MAIL);
+					cd.setInvite(inviteId, typeInvite, inviteName, inviteInfo, priceFight, typeFight);
+					cd.contentRaw = contentRaw;
+					cd.receivedTime = receivedTime;
+					cd.isNew = false;
+					result.addElement(cd);
+				}
+				else
+				{
+					int mailId = dis.readInt();
+					string sender = dis.readUTF();
+					string title = dis.readUTF();
+					string contentRaw = dis.readUTF();
+					bool isClaimed = dis.readBoolean();
+					bool isNotReply = dis.readBoolean();
+					sbyte typeMail = dis.readByte();
+					long receivedTime = dis.readLong();
+					
+					int gCount = (int)(dis.readByte() & 0xFF);
+					Item_Drop[] gifts = null;
+					if (gCount > 0)
+					{
+						gifts = new Item_Drop[gCount];
+						for (int j = 0; j < gCount; j++)
+						{
+							sbyte gType = dis.readByte();
+							short gId = dis.readShort();
+							string gName = dis.readUTF();
+							short gIcon = dis.readShort();
+							int gNum = dis.readInt();
+							sbyte gColor = dis.readByte();
+							gifts[j] = new Item_Drop(gId, gType, gName, 0, 0, gIcon, gColor);
+							gifts[j].num = gNum;
+						}
+					}
+					
+					ChatDetail cd = new ChatDetail(sender, (sbyte)1, ChatDetail.CAT_MAIL);
+					cd.setMailGift(mailId, title, (sbyte)(isClaimed ? 1 : 0), typeMail, gifts, isNotReply);
+					cd.contentRaw = contentRaw;
+					cd.receivedTime = receivedTime;
+					cd.isNew = false;
+					if (!string.IsNullOrEmpty(contentRaw))
+					{
+						cd.addString(contentRaw, sender, -1);
+					}
+					result.addElement(cd);
+				}
+			}
+			dis.close();
+		}
+		catch (Exception)
+		{
+		}
+		return result;
+	}
+}

@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hải Tặc Tí Hôn - Web Check Icon & Offset (CSDL: haitacz)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1b2640;
+      --bg-header: #080c14;
+      --border: #23304d;
+      --border-accent: #3b82f6;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --accent-gold: #f59e0b;
+      --accent-blue: #3b82f6;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --ok: #10b981;
+      --err: #ef4444;
+      --warn: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 800;
+      font-size: 16px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+    .header-title h1 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .header-title span {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .zoom-selector {
+      display: flex;
+      background: #101626;
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .zoom-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .zoom-btn.active {
+      background: var(--accent-blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Main layout */
+    .app-container {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    /* Sidebar Navigation */
+    aside {
+      width: 280px;
+      background: var(--bg-header);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .nav-group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      padding: 16px 18px 8px;
+      font-weight: 700;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 18px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 13.5px;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+      transition: all 0.15s;
+    }
+    .nav-item:hover {
+      background: rgba(59, 130, 246, 0.08);
+      color: var(--text-main);
+    }
+    .nav-item.active {
+      background: rgba(59, 130, 246, 0.15);
+      color: #fff;
+      border-left-color: var(--accent-blue);
+      font-weight: 600;
+    }
+    .nav-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-count {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 12px;
+      background: #1b253b;
+      font-family: 'Fira Code', monospace;
+    }
+    .nav-count.warn {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* Content Area */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-main);
+      overflow-y: auto;
+    }
+
+    /* Subheader toolbar */
+    .toolbar {
+      padding: 16px 24px;
+      background: #0e1424;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 500px;
+    }
+    .search-box {
+      position: relative;
+      flex: 1;
+    }
+    .search-box input {
+      width: 100%;
+      background: #131b2e;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 9px 14px 9px 36px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-box input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.25);
+    }
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 14px;
+    }
+
+    .filter-pills {
+      display: flex;
+      background: #131b2e;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+    }
+    .filter-pill {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+    .filter-pill.active {
+      background: #1f2d4d;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .offset-formula-badge {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Content body */
+    .content-area {
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* Stats Overview Banner */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 4px;
+      background: var(--accent-blue);
+    }
+    .stat-card.warn::before { background: var(--err); }
+    .stat-card.ok::before { background: var(--ok); }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'Fira Code', monospace;
+      color: #fff;
+    }
+    .stat-sub {
+      font-size: 11.5px;
+      color: var(--text-dim);
+    }
+
+    /* Grid layout for Cards */
+    .items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .item-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .item-card:hover {
+      background: var(--bg-card-hover);
+      border-color: #3b4e7a;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .item-card.missing {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.03);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+    .item-name {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-id {
+      font-size: 11.5px;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      font-family: 'Fira Code', monospace;
+    }
+    .badge-ok {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-missing {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .badge-type {
+      background: #1e293b;
+      color: #94a3b8;
+      border: 1px solid #334155;
+    }
+
+    /* Icon Preview Area */
+    .icon-preview-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #090e1a;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #1c263d;
+    }
+    .icon-slot {
+      width: 72px;
+      height: 72px;
+      background-image: 
+        linear-gradient(45deg, #161f36 25%, transparent 25%), 
+        linear-gradient(-45deg, #161f36 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #161f36 75%), 
+        linear-gradient(-45deg, transparent 75%, #161f36 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+      background-color: #0c1220;
+      border: 1px solid #243250;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .icon-slot img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .icon-slot.missing::after {
+      content: '❌';
+      font-size: 24px;
+    }
+
+    .icon-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: 11.5px;
+      flex: 1;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+    .meta-val {
+      color: #fff;
+      font-weight: 500;
+    }
+    .meta-val.file-target {
+      color: #38bdf8;
+    }
+
+    /* Parts Sub-Icons container */
+    .part-sub-icons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      background: #090e1a;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #1c263d;
+    }
+    .sub-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px;
+      border-radius: 6px;
+      background: #111827;
+      font-family: 'Fira Code', monospace;
+      font-size: 11px;
+    }
+    .sub-thumb {
+      width: 36px;
+      height: 36px;
+      background: #060a12;
+      border: 1px solid #23304d;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .sub-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+    .sub-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+    }
+    .sub-offset {
+      color: #fbbf24;
+      font-size: 10.5px;
+    }
+
+    /* Dual Icons (Skill Main & Mini, Clan Small & Banner) */
+    .dual-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dual-box {
+      background: #090e1a;
+      border: 1px solid #1c263d;
+      border-radius: 8px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .dual-title {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+    .dual-slot {
+      width: 54px;
+      height: 54px;
+      background: #0c1220;
+      border: 1px solid #243250;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .dual-slot img {
+      max-width: 100%;
+      max-height: 100%;
+      image-rendering: pixelated;
+    }
+
+    /* Footer Pagination */
+    .pagination {
+      margin-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .page-info {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: 'Fira Code', monospace;
+    }
+    .page-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .btn {
+      background: #1b2640;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 7px 14px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none;
+    }
+    .btn-action:hover {
+      box-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+    }
+
+    /* Reverse Offset Tool Tab */
+    .reverse-tool-box {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .tool-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tool-header p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .tool-input-row {
+      display: flex;
+      gap: 12px;
+    }
+    .tool-input {
+      flex: 1;
+      background: #090e1a;
+      border: 2px solid #23304d;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-family: 'Fira Code', monospace;
+      color: #fff;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .tool-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    }
+    .tool-results {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .calc-card {
+      background: #0b1120;
+      border: 1px solid #1c263d;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.15s;
+    }
+    .calc-card.matched {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.05);
+    }
+    .calc-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .calc-cat {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .calc-formula {
+      font-family: 'Fira Code', monospace;
+      font-size: 12px;
+      color: #38bdf8;
+    }
+    .calc-matches {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Modal for Canvas Preview */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 600px;
+      width: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 20px;
+      cursor: pointer;
+    }
+    .canvas-container {
+      background-image: 
+        linear-gradient(45deg, #161f36 25%, transparent 25%), 
+        linear-gradient(-45deg, #161f36 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #161f36 75%), 
+        linear-gradient(-45deg, transparent 75%, #161f36 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      background-color: #0c1220;
+      border: 2px dashed #283758;
+      border-radius: 12px;
+      height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    #partCanvas {
+      image-rendering: pixelated;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #23304d;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-left">
+      <div class="logo-badge">⚓ HTTH</div>
+      <div class="header-title">
+        <h1>Icon & Offset Inspector</h1>
+        <span>CSDL: haitacz | Server Data: data/icon</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="zoom-selector">
+        <button class="zoom-btn" onclick="setZoom(1)">Zoom 1</button>
+        <button class="zoom-btn" onclick="setZoom(2)">Zoom 2</button>
+        <button class="zoom-btn" onclick="setZoom(3)">Zoom 3</button>
+        <button class="zoom-btn active" onclick="setZoom(4)">Zoom 4 (HD)</button>
+      </div>
+      <button class="btn btn-action" onclick="refreshData()">🔄 Quét lại</button>
+    </div>
+  </header>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    
+    <!-- Sidebar -->
+    <aside>
+      <div class="nav-group-title">Danh mục Chính</div>
+      <div class="nav-item active" onclick="switchCategory('parts', this)">
+        <div class="nav-label">🧩 <span>Parts (Mảnh/Khung)</span></div>
+        <div class="nav-count" id="count-parts">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('item3', this)">
+        <div class="nav-label">⚔️ <span>Item3 (Trang bị)</span></div>
+        <div class="nav-count" id="count-item3">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('item4', this)">
+        <div class="nav-label">🧪 <span>Item4 (Tiêu hao)</span></div>
+        <div class="nav-count" id="count-item4">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('item7', this)">
+        <div class="nav-label">💎 <span>Item7 (Nguyên liệu)</span></div>
+        <div class="nav-count" id="count-item7">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('item8', this)">
+        <div class="nav-label">🛡️ <span>Item8 (Potion Bang)</span></div>
+        <div class="nav-count" id="count-item8">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('skill', this)">
+        <div class="nav-label">⚡ <span>Skill (Kỹ năng)</span></div>
+        <div class="nav-count" id="count-skill">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('clan_icon', this)">
+        <div class="nav-label">🚩 <span>Clan Icon (Cờ Bang)</span></div>
+        <div class="nav-count" id="count-clan_icon">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('clan_hanhtrinh', this)">
+        <div class="nav-label">🎖️ <span>Hành Trình Bang</span></div>
+        <div class="nav-count" id="count-clan_hanhtrinh">...</div>
+      </div>
+
+      <div class="nav-group-title">Thời trang & Ngoại trang</div>
+      <div class="nav-item" onclick="switchCategory('fashion', this)">
+        <div class="nav-label">👗 <span>Thời trang (Fashion)</span></div>
+        <div class="nav-count" id="count-fashion">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('pet', this)">
+        <div class="nav-label">🐾 <span>Thú cưng (Pet)</span></div>
+        <div class="nav-count" id="count-pet">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('hair', this)">
+        <div class="nav-label">💇 <span>Tiệm Tóc (ItemHair)</span></div>
+        <div class="nav-count" id="count-hair">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('face', this)">
+        <div class="nav-label">🎭 <span>Khuôn Mặt (ItemFace)</span></div>
+        <div class="nav-count" id="count-face">...</div>
+      </div>
+
+      <div class="nav-group-title">Khác & Hiệu ứng</div>
+      <div class="nav-item" onclick="switchCategory('mobs', this)">
+        <div class="nav-label">🐺 <span>Quái vật (Mobs)</span></div>
+        <div class="nav-count" id="count-mobs">...</div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('danhhieu', this)">
+        <div class="nav-label">👑 <span>Danh Hiệu (DanhHieu)</span></div>
+        <div class="nav-count" id="count-danhhieu">...</div>
+      </div>
+
+      <div class="nav-group-title">Công Cụ Tra Cứu</div>
+      <div class="nav-item" onclick="switchCategory('reverse', this)">
+        <div class="nav-label">🔍 <span>Tra Cứu Ngược Offset</span></div>
+      </div>
+      <div class="nav-item" onclick="switchCategory('audit', this)">
+        <div class="nav-label">⚠️ <span>Báo Cáo Thiếu Icon</span></div>
+      </div>
+    </aside>
+
+    <!-- Main View -->
+    <main>
+      <!-- Subheader Toolbar -->
+      <div class="toolbar" id="main-toolbar">
+        <div class="toolbar-left">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Tìm theo ID, Tên, Icon ID, File ID..." oninput="handleSearch()">
+          </div>
+          <div class="filter-pills">
+            <button class="filter-pill active" onclick="setStatusFilter('all', this)">Tất cả</button>
+            <button class="filter-pill" onclick="setStatusFilter('ok', this)">✅ Có ảnh</button>
+            <button class="filter-pill" onclick="setStatusFilter('missing', this)">❌ Thiếu ảnh</button>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <div class="offset-formula-badge" id="offsetFormula">Công thức: Đang tải...</div>
+        </div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-area" id="contentArea">
+        <!-- Dynamic Content injected here -->
+      </div>
+    </main>
+  </div>
+
+  <!-- Canvas Preview Modal for Parts -->
+  <div class="modal-overlay" id="partModal" onclick="closePartModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modalPartTitle">Chi tiết Ghép Part #0</div>
+        <button class="close-btn" onclick="closePartModal()">✕</button>
+      </div>
+      <div class="canvas-container">
+        <canvas id="partCanvas" width="300" height="240"></canvas>
+      </div>
+      <div id="modalSubList" class="part-sub-icons" style="max-height: 200px;"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentCategory = 'parts';
+    let currentZoom = 4;
+    let currentStatus = 'all';
+    let currentSearch = '';
+    let currentPage = 1;
+    let globalStats = {};
+    let offsetMap = {};
+    let searchDebounce = null;
+
+    // Initialize
+    async function init() {
+      await loadStats();
+      await loadCategoryData();
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        globalStats = data.stats || {};
+        offsetMap = data.offset_map || {};
+
+        for (const [k, v] of Object.entries(globalStats)) {
+          const el = document.getElementById(`count-${k}`);
+          if (el) {
+            el.innerText = `${v.found}/${v.total}`;
+            if (v.missing > 0) {
+              el.classList.add('warn');
+              el.title = `${v.missing} icon thiếu file PNG!`;
+            } else {
+              el.classList.remove('warn');
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      }
+    }
+
+    function setZoom(z) {
+      currentZoom = z;
+      document.querySelectorAll('.zoom-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      loadCategoryData();
+    }
+
+    function setStatusFilter(st, btn) {
+      currentStatus = st;
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      currentPage = 1;
+      loadCategoryData();
+    }
+
+    function handleSearch() {
+      clearTimeout(searchDebounce);
+      searchDebounce = setTimeout(() => {
+        currentSearch = document.getElementById('searchInput').value.trim();
+        currentPage = 1;
+        loadCategoryData();
+      }, 250);
+    }
+
+    function switchCategory(cat, el) {
+      currentCategory = cat;
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      if (el) el.classList.add('active');
+      currentPage = 1;
+      document.getElementById('searchInput').value = '';
+      currentSearch = '';
+
+      const toolbar = document.getElementById('main-toolbar');
+      if (cat === 'reverse' || cat === 'audit') {
+        toolbar.style.display = 'none';
+        if (cat === 'reverse') renderReverseTool();
+        else renderAuditReport();
+      } else {
+        toolbar.style.display = 'flex';
+        updateFormulaBadge();
+        loadCategoryData();
+      }
+    }
+
+    function updateFormulaBadge() {
+      const badge = document.getElementById('offsetFormula');
+      const info = offsetMap[currentCategory] || offsetMap[currentCategory + '_main'];
+      if (info) {
+        badge.innerHTML = `📐 Offset: <strong>${info.formula}</strong>`;
+      } else {
+        badge.innerHTML = `📐 Offset: Trực tiếp`;
+      }
+    }
+
+    async function loadCategoryData() {
+      if (currentCategory === 'reverse' || currentCategory === 'audit') return;
+
+      const container = document.getElementById('contentArea');
+      container.innerHTML = `
+        <div style="display:flex; justify-content:center; align-items:center; height:300px; color:var(--text-muted); font-family:'Fira Code';">
+          ⏳ Đang tải dữ liệu ${currentCategory}...
+        </div>
+      `;
+
+      try {
+        const url = `/api/category/${currentCategory}?page=${currentPage}&limit=60&search=${encodeURIComponent(currentSearch)}&status=${currentStatus}&zoom=${currentZoom}`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        renderCategoryContent(data);
+      } catch (err) {
+        container.innerHTML = `<div style="color:var(--err); padding:20px;">Lỗi tải dữ liệu: ${err.message}</div>`;
+      }
+    }
+
+    function renderCategoryContent(data) {
+      const container = document.getElementById('contentArea');
+      const items = data.items || [];
+
+      let statInfo = globalStats[currentCategory] || { total: 0, missing: 0, found: 0 };
+
+      let html = `
+        <div class="stats-row">
+          <div class="stat-card">
+            <span class="stat-label">Tổng Dữ Liệu SQL</span>
+            <span class="stat-value">${statInfo.total}</span>
+            <span class="stat-sub">Bản ghi trong CSDL haitacz</span>
+          </div>
+          <div class="stat-card ok">
+            <span class="stat-label">Đã Có File PNG</span>
+            <span class="stat-value">${statInfo.found}</span>
+            <span class="stat-sub">Hiển thị chuẩn trên client</span>
+          </div>
+          <div class="stat-card ${statInfo.missing > 0 ? 'warn' : 'ok'}">
+            <span class="stat-label">Thiếu File PNG</span>
+            <span class="stat-value">${statInfo.missing}</span>
+            <span class="stat-sub">${statInfo.missing === 0 ? 'Tất cả icon đầy đủ!' : 'Cần bổ sung icon vào data/icon'}</span>
+          </div>
+        </div>
+      `;
+
+      if (items.length === 0) {
+        html += `
+          <div style="text-align:center; padding:60px 20px; color:var(--text-dim); font-family:'Fira Code';">
+            Không tìm thấy bản ghi nào phù hợp với bộ lọc!
+          </div>
+        `;
+        container.innerHTML = html;
+        return;
+      }
+
+      html += `<div class="items-grid">`;
+
+      for (const it of items) {
+        html += renderItemCard(it);
+      }
+
+      html += `</div>`;
+
+      // Pagination
+      html += `
+        <div class="pagination">
+          <div class="page-info">
+            Trang ${data.page} / ${data.pages} (Tổng: ${data.total} bản ghi)
+          </div>
+          <div class="page-controls">
+            <button class="btn" onclick="prevPage()" ${data.page <= 1 ? 'disabled' : ''}>← Trang trước</button>
+            <button class="btn" onclick="nextPage()" ${data.page >= data.pages ? 'disabled' : ''}>Trang sau →</button>
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    function renderItemCard(it) {
+      if (currentCategory === 'parts') {
+        return `
+          <div class="item-card ${it.has_missing ? 'missing' : ''}">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="item-name">Part #${it.id}</span>
+                <span class="item-id">${it.type_label} | ${it.frame_count} frames</span>
+              </div>
+              <span class="badge ${it.exists ? 'badge-ok' : 'badge-missing'}">
+                ${it.exists ? 'OK' : 'Thiếu Icon'}
+              </span>
+            </div>
+
+            <div class="part-sub-icons">
+              ${it.sub_icons.map(s => `
+                <div class="sub-icon-row">
+                  <div class="sub-thumb">
+                    <img src="/api/icon/${s.file_id}?zoom=${currentZoom}" alt="${s.file_id}" onerror="this.style.display='none'">
+                  </div>
+                  <div class="sub-info">
+                    <div>DB: #${s.sub_id} → File: <span style="color:#38bdf8;">${s.file_id}.png</span></div>
+                    <div class="sub-offset">Offset: dx=${s.dx}, dy=${s.dy}</div>
+                  </div>
+                  <span class="badge ${s.exists ? 'badge-ok' : 'badge-missing'}" style="font-size:9px;">
+                    ${s.exists ? 'OK' : 'MISSING'}
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+
+            <button class="btn btn-action" style="font-size:11.5px; padding:6px;" onclick="openPartModal(${it.id})">
+              👁️ Xem Ghép Khung Part
+            </button>
+          </div>
+        `;
+      }
+
+      if (currentCategory === 'skill') {
+        return `
+          <div class="item-card ${!it.exists ? 'missing' : ''}">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="item-name">${it.name || 'Chưa đặt tên'}</span>
+                <span class="item-id">ID: #${it.id} | DB Icon: ${it.icon} | Lv: ${it.lv}</span>
+              </div>
+              <span class="badge ${it.exists ? 'badge-ok' : 'badge-missing'}">
+                ${it.exists ? 'OK' : 'Thiếu'}
+              </span>
+            </div>
+
+            <div class="dual-preview">
+              <div class="dual-box">
+                <span class="dual-title">Main Icon (+4000)</span>
+                <div class="dual-slot ${!it.main_exists ? 'missing' : ''}">
+                  <img src="/api/icon/${it.main_file_id}?zoom=${currentZoom}" onerror="this.style.display='none'">
+                </div>
+                <span style="font-family:'Fira Code'; font-size:10px; color:#38bdf8;">${it.main_file_id}.png</span>
+              </div>
+              <div class="dual-box">
+                <span class="dual-title">Mini Icon (+4500)</span>
+                <div class="dual-slot ${!it.mini_exists ? 'missing' : ''}">
+                  <img src="/api/icon/${it.mini_file_id}?zoom=${currentZoom}" onerror="this.style.display='none'">
+                </div>
+                <span style="font-family:'Fira Code'; font-size:10px; color:#38bdf8;">${it.mini_file_id}.png</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (currentCategory === 'clan_hanhtrinh') {
+        return `
+          <div class="item-card ${!it.exists ? 'missing' : ''}">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="item-name">${it.name}</span>
+                <span class="item-id">ID: #${it.id} | DB Icon: ${it.icon}</span>
+              </div>
+              <span class="badge ${it.exists ? 'badge-ok' : 'badge-missing'}">
+                ${it.exists ? 'OK' : 'Thiếu'}
+              </span>
+            </div>
+
+            <div class="dual-preview">
+              <div class="dual-box">
+                <span class="dual-title">Icon Nhỏ (+7000)</span>
+                <div class="dual-slot ${!it.small_exists ? 'missing' : ''}">
+                  <img src="/api/icon/${it.small_file_id}?zoom=${currentZoom}" onerror="this.style.display='none'">
+                </div>
+                <span style="font-family:'Fira Code'; font-size:10px; color:#38bdf8;">${it.small_file_id}.png</span>
+              </div>
+              <div class="dual-box">
+                <span class="dual-title">Banner Lớn (+22000)</span>
+                <div class="dual-slot ${!it.banner_exists ? 'missing' : ''}">
+                  <img src="/api/icon/${it.banner_file_id}?zoom=${currentZoom}" onerror="this.style.display='none'">
+                </div>
+                <span style="font-family:'Fira Code'; font-size:10px; color:#38bdf8;">${it.banner_file_id}.png</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Default Standard Cards (item3, item4, item7, item8, clan_icon, fashion, pet, etc.)
+      const fid = it.file_id || 0;
+      return `
+        <div class="item-card ${!it.exists ? 'missing' : ''}">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="item-name">${it.name || `ID #${it.id}`}</span>
+              <span class="item-id">ID: #${it.id} ${it.part ? `| Part: #${it.part}` : ''}</span>
+            </div>
+            <span class="badge ${it.exists ? 'badge-ok' : 'badge-missing'}">
+              ${it.exists ? 'OK' : 'Thiếu'}
+            </span>
+          </div>
+
+          <div class="icon-preview-box">
+            <div class="icon-slot ${!it.exists ? 'missing' : ''}">
+              <img src="/api/icon/${fid}?zoom=${currentZoom}" onerror="this.style.display='none'">
+            </div>
+            <div class="icon-meta">
+              <div class="meta-row">
+                <span>Icon DB:</span>
+                <span class="meta-val">${it.icon !== undefined ? it.icon : it.id}</span>
+              </div>
+              <div class="meta-row">
+                <span>File ID:</span>
+                <span class="meta-val file-target">${fid}.png</span>
+              </div>
+              ${it.price !== undefined ? `
+                <div class="meta-row">
+                  <span>Giá Beri:</span>
+                  <span class="meta-val">${Number(it.price).toLocaleString()}</span>
+                </div>
+              ` : ''}
+              ${it.level !== undefined ? `
+                <div class="meta-row">
+                  <span>Cấp yêu cầu:</span>
+                  <span class="meta-val">${it.level}</span>
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        loadCategoryData();
+      }
+    }
+    function nextPage() {
+      currentPage++;
+      loadCategoryData();
+    }
+
+    // Modal Canvas for Part Assembly
+    async function openPartModal(partId) {
+      const modal = document.getElementById('partModal');
+      document.getElementById('modalPartTitle').innerText = `Chi tiết Ghép Part #${partId}`;
+      modal.classList.add('open');
+
+      const canvas = document.getElementById('partCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      try {
+        const res = await fetch(`/api/part_data/${partId}`);
+        const data = await res.json();
+        const subList = document.getElementById('modalSubList');
+
+        subList.innerHTML = data.sub_icons.map(s => `
+          <div class="sub-icon-row">
+            <div class="sub-thumb">
+              <img src="/api/icon/${s.file_id}?zoom=4" alt="${s.file_id}">
+            </div>
+            <div class="sub-info">
+              <div>DB Icon: #${s.sub_id} → <strong>${s.file_id}.png</strong></div>
+              <div class="sub-offset">Tọa độ lệch: dx=${s.dx}, dy=${s.dy}</div>
+            </div>
+            <span class="badge ${s.exists ? 'badge-ok' : 'badge-missing'}">${s.exists ? 'OK' : 'MISSING'}</span>
+          </div>
+        `).join('');
+
+        // Draw on canvas
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        // Draw crosshair center
+        ctx.strokeStyle = '#283758';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0); ctx.lineTo(centerX, canvas.height);
+        ctx.moveTo(0, centerY); ctx.lineTo(canvas.width, centerY);
+        ctx.stroke();
+
+        for (const s of data.sub_icons) {
+          if (!s.exists) continue;
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = `/api/icon/${s.file_id}?zoom=4`;
+          await new Promise((resolve) => {
+            img.onload = () => {
+              // Draw with dx, dy offsets
+              ctx.drawImage(img, centerX + s.dx, centerY + s.dy);
+              resolve();
+            };
+            img.onerror = resolve;
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function closePartModal(e) {
+      if (!e || e.target.id === 'partModal' || e.target.classList.contains('close-btn')) {
+        document.getElementById('partModal').classList.remove('open');
+      }
+    }
+
+    // Reverse Offset Lookup Tool Tab
+    function renderReverseTool() {
+      const container = document.getElementById('contentArea');
+      container.innerHTML = `
+        <div class="reverse-tool-box">
+          <div class="tool-header">
+            <h2>🔍 Tra Cứu & Trừ Offset Ngược (Reverse Offset Calculator)</h2>
+            <p>Nhập bất kỳ ID File Icon nào (ví dụ: <code>10000</code>, <code>3001</code>, <code>2000</code>, <code>4000</code>, <code>7000</code>, <code>20126</code>, <code>23703</code>) hoặc nhập icon ID: Hệ thống sẽ tự động trừ offset tương ứng của từng bảng trong CSDL <strong>haitacz</strong> và tìm kiếm bản ghi khớp!</p>
+          </div>
+
+          <div class="tool-input-row">
+            <input type="number" id="reverseInput" class="tool-input" placeholder="Nhập ID file icon (ví dụ: 10000, 3001, 7000...)" onkeydown="if(event.key==='Enter') executeReverseLookup()">
+            <button class="btn btn-action" onclick="executeReverseLookup()" style="padding:0 24px;">Tra Cứu Ngay</button>
+          </div>
+
+          <div id="reverseOutput" class="tool-results"></div>
+        </div>
+      `;
+    }
+
+    async function executeReverseLookup() {
+      const val = document.getElementById('reverseInput').value.trim();
+      if (!val) return;
+
+      const output = document.getElementById('reverseOutput');
+      output.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">⏳ Đang tính toán và truy vấn CSDL haitacz...</div>`;
+
+      try {
+        const res = await fetch(`/api/reverse_lookup?file_id=${val}`);
+        const data = await res.json();
+
+        let html = `
+          <div style="display:flex; align-items:center; gap:16px; background:#090e1a; padding:16px; border-radius:10px; border:1px solid #1c263d;">
+            <div class="icon-slot ${!data.exists_disk ? 'missing' : ''}" style="width:80px; height:80px;">
+              <img src="/api/icon/${data.file_id}?zoom=4" alt="${data.file_id}">
+            </div>
+            <div>
+              <div style="font-size:16px; font-weight:700;">File: <span style="color:#38bdf8;">${data.file_id}.png</span></div>
+              <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">
+                Trạng thái đĩa: <strong style="color:${data.exists_disk ? '#10b981' : '#ef4444'}">${data.exists_disk ? 'Đã có file trên server' : 'Thiếu file PNG!'}</strong>
+              </div>
+              <div style="font-size:11px; color:var(--text-dim); font-family:'Fira Code'; margin-top:2px;">
+                ${data.resolved_path || 'Không tìm thấy file trên đĩa'}
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size:13px; font-weight:600; text-transform:uppercase; color:var(--text-dim); margin-top:10px;">
+            Kết Quả Phân Tích Offset & Khớp CSDL:
+          </div>
+        `;
+
+        for (const r of data.results) {
+          const isMatched = r.matches_count > 0;
+          html += `
+            <div class="calc-card ${isMatched ? 'matched' : ''}">
+              <div class="calc-left">
+                <div class="calc-cat">${r.category}</div>
+                <div class="calc-formula">Công thức: ${r.formula} → ID/Icon DB: <strong>${r.db_id_or_icon}</strong></div>
+                ${isMatched ? `
+                  <div style="margin-top:6px; font-size:12px; color:#34d399;">
+                    ✅ Tìm thấy <strong>${r.matches_count}</strong> bản ghi khớp trong SQL:
+                    <ul style="margin-left:18px; margin-top:4px;">
+                      ${r.details.map(d => `
+                        <li>ID #${d.id || d.part_id}: <strong>${d.name || d.type_label || 'Bản ghi'}</strong></li>
+                      `).join('')}
+                    </ul>
+                  </div>
+                ` : `
+                  <div class="calc-matches">Không có bản ghi nào sử dụng icon này trong CSDL.</div>
+                `}
+              </div>
+            </div>
+          `;
+        }
+
+        output.innerHTML = html;
+      } catch (err) {
+        output.innerHTML = `<div style="color:var(--err); padding:20px;">Lỗi: ${err.message}</div>`;
+      }
+    }
+
+    // Audit Report Tab
+    function renderAuditReport() {
+      const container = document.getElementById('contentArea');
+      let totalMissing = 0;
+      for (const v of Object.values(globalStats)) {
+        totalMissing += (v.missing || 0);
+      }
+
+      let html = `
+        <div style="max-width:900px; margin:0 auto; display:flex; flex-direction:column; gap:20px;">
+          <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:24px;">
+            <h2 style="font-size:18px; font-weight:700; margin-bottom:8px;">⚠️ Báo Cáo Tổng Hợp Icon Thiếu File</h2>
+            <p style="font-size:13.5px; color:var(--text-muted); line-height:1.6;">
+              Bảng kiểm toán tất cả dữ liệu trong CSDL <strong>haitacz</strong> có ID icon nhưng chưa có file <code>.png</code> trong thư mục <code>HaiTacTiHonServer/data/icon</code>.
+            </p>
+          </div>
+
+          <div class="stats-row">
+            <div class="stat-card ${totalMissing > 0 ? 'warn' : 'ok'}">
+              <span class="stat-label">Tổng Icon Thiếu Toàn Game</span>
+              <span class="stat-value">${totalMissing}</span>
+              <span class="stat-sub">${totalMissing === 0 ? 'Tuyệt vời! Không thiếu icon nào' : 'Cần bổ sung các icon bên dưới'}</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+      `;
+
+      for (const [cat, s] of Object.entries(globalStats)) {
+        if (s.missing > 0) {
+          html += `
+            <div class="calc-card" style="border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.03);">
+              <div>
+                <div style="font-size:15px; font-weight:700; color:#f87171;">Bảng: ${cat.toUpperCase()}</div>
+                <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+                  Thiếu <strong>${s.missing}</strong> / ${s.total} icon
+                </div>
+              </div>
+              <button class="btn btn-action" onclick="switchCategory('${cat}', null); setStatusFilter('missing', document.querySelectorAll('.filter-pill')[2]);">
+                Xem Danh Sách Thiếu →
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      html += `
+          </div>
+        </div>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    async function refreshData() {
+      await loadStats();
+      await loadCategoryData();
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

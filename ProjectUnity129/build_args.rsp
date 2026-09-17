@@ -1,0 +1,17 @@
+/target:library
+/out:c:\DepLor\HTTH\Team\ProjectUnity129\Library\ScriptAssemblies\Assembly-CSharp.dll
+/nostdlib+
+/nowarn:0169,0649,0414,0108,0114,0219,0109,0618,0436
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\mscorlib.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.Core.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.CoreModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.IMGUIModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.AudioModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.ImageConversionModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.InputLegacyModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.TextRenderingModule.dll"
+/r:"C:\Program Files\Unity\Hub\Editor\2022.3.62f3-x86_64\Editor\Data\Managed\UnityEngine\UnityEngine.UnityWebRequestModule.dll"
+@c:\DepLor\HTTH\Team\ProjectUnity129\sources.rsp

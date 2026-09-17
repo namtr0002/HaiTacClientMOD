@@ -1,0 +1,1838 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTH Thần Trang Cinematic Studio v16 — 16 Flawless Anime Skills & 5 Targets</title>
+<link rel="icon" href="data:,">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #070312;
+  color: #e0d6f5;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+}
+
+/* Top Navigation Bar */
+#top-bar {
+  height: 52px;
+  background: linear-gradient(90deg, #110627 0%, #1f0a42 50%, #110627 100%);
+  border-bottom: 1px solid #3d1b70;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.7);
+  z-index: 100;
+}
+.brand-title {
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  background: linear-gradient(90deg, #ffd700, #ff80ab, #00e5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.brand-sub {
+  font-size: 10.5px;
+  color: #9c88be;
+  font-weight: 500;
+  margin-left: 10px;
+}
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.mode-toggle {
+  display: flex;
+  background: #090317;
+  border: 1px solid #3d1b70;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.mode-btn {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  background: transparent;
+  color: #a792c8;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-btn.active {
+  background: linear-gradient(135deg, #7c4dff, #b388ff);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(124, 77, 255, 0.5);
+}
+
+/* Workspace Layout */
+#workspace {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Sidebar - 16 Skills List */
+#sidebar {
+  width: 250px;
+  background: #0c041d;
+  border-right: 1px solid #2d1354;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sidebar-header {
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #a48dc7;
+  border-bottom: 1px solid #210d3f;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #080214;
+}
+.skill-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.skill-list::-webkit-scrollbar { width: 5px; }
+.skill-list::-webkit-scrollbar-thumb { background: #3c1870; border-radius: 4px; }
+.skill-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 7px;
+  background: #14072f;
+  border: 1px solid #28104e;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.skill-card:hover {
+  background: #230d4e;
+  border-color: #6a28a3;
+  transform: translateX(2px);
+}
+.skill-card.active {
+  background: linear-gradient(90deg, #37146e, #200845);
+  border-color: #ffd700;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.28);
+}
+.skill-icon-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  background: #070212;
+  border: 1px solid #4a217a;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+.skill-meta {
+  flex: 1;
+  min-width: 0;
+}
+.skill-meta-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.skill-meta-sub {
+  font-size: 10px;
+  color: #9e8cb8;
+  margin-top: 1px;
+}
+
+/* Main Studio Viewport */
+#main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #05020c;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Stage Header Info Pill */
+#stage-info-bar {
+  height: 40px;
+  background: rgba(12, 5, 29, 0.92);
+  border-bottom: 1px solid #281249;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 10;
+}
+.skill-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.s-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 4px;
+  background: #170a36;
+  border: 1px solid #3c1870;
+  color: #d1c2ec;
+}
+.s-badge.gold { border-color: #ffd700; color: #ffd700; }
+.s-badge.cyan { border-color: #00e5ff; color: #00e5ff; }
+
+/* Canvas Viewport */
+#stage-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, #160a33 0%, #060210 90%);
+}
+canvas#stageCanvas {
+  display: block;
+  image-rendering: pixelated;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.9);
+  border: 1px solid #301358;
+  border-radius: 6px;
+  max-width: 98%;
+  max-height: 98%;
+}
+
+/* HUD Overlays */
+#hud-overlay {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+  z-index: 15;
+}
+.hud-pill {
+  font-family: monospace;
+  font-size: 11px;
+  background: rgba(10, 4, 24, 0.85);
+  border: 1px solid #3d1b70;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: #00e5ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hud-pill b { color: #ffd700; }
+
+/* Inspector View */
+#inspector-container {
+  display: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: #080315;
+}
+.insp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.insp-card {
+  background: #110729;
+  border: 1px solid #2f1454;
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.insp-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffd700;
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+}
+.insp-sub { font-size: 10px; color: #8e7bb0; }
+.insp-preview {
+  background: #05010e;
+  border: 1px solid #200c3b;
+  border-radius: 6px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.insp-preview canvas {
+  max-width: 90%;
+  max-height: 90%;
+  image-rendering: pixelated;
+}
+
+/* Bottom Controls Deck */
+#controls-deck {
+  background: #0c041f;
+  border-top: 1px solid #2d1354;
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.control-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.playback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn {
+  background: #190938;
+  color: #ded1f3;
+  border: 1px solid #3c1970;
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn:hover {
+  background: #2a0f5a;
+  border-color: #ffd700;
+  color: #fff;
+}
+.btn.active {
+  background: #471987;
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+}
+.btn.cast-btn {
+  background: linear-gradient(135deg, #e91e63, #ff5722);
+  border-color: #ffd700;
+  color: #fff;
+  font-weight: 800;
+  padding: 7px 18px;
+  box-shadow: 0 0 14px rgba(233, 30, 99, 0.4);
+}
+
+.timeline-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #070213;
+  border: 1px solid #260f47;
+  padding: 4px 12px;
+  border-radius: 6px;
+  min-width: 280px;
+}
+.timeline-container input[type=range] {
+  flex: 1;
+  accent-color: #ffd700;
+  height: 6px;
+  cursor: pointer;
+}
+.frame-indicator {
+  font-family: monospace;
+  font-size: 11px;
+  color: #ffd700;
+  min-width: 140px;
+  text-align: right;
+}
+</style>
+</head>
+<body>
+
+<!-- Top Navigation -->
+<div id="top-bar">
+  <div class="brand-title">
+    <span>⚔ HTTH THẦN TRANG CINEMATIC STUDIO V16</span>
+    <span class="brand-sub">5 Combat Targets • Zero-Clip VFX • 16 Authentic Pixel Art Heroes</span>
+  </div>
+  <div class="top-actions">
+    <div class="mode-toggle">
+      <button class="mode-btn active" id="modeCombatBtn" onclick="switchMode('combat')">⚔ ĐẤU TRƯỜNG (5 MỤC TIÊU)</button>
+      <button class="mode-btn" id="modeInspectBtn" onclick="switchMode('inspect')">🔍 SOI SPRITESHEET (INSPECTOR)</button>
+    </div>
+    <div class="s-badge gold">ZERO-CLIP OK</div>
+  </div>
+</div>
+
+<!-- Main Workspace -->
+<div id="workspace">
+  <!-- Left Sidebar -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <span>16 KỸ NĂNG THẦN TRANG</span>
+      <span style="color:#ffd700;">SET 10</span>
+    </div>
+    <div class="skill-list" id="skillList"></div>
+  </div>
+
+  <!-- Main Viewport -->
+  <div id="main-view">
+    <!-- Stage Header Bar -->
+    <div id="stage-info-bar">
+      <div class="skill-badge-group">
+        <span class="s-badge gold" id="badgeSkillName">Skill Name</span>
+        <span class="s-badge" id="badgeSetName" style="color:#00e5ff; border-color:#00e5ff;">Set Name</span>
+        <span class="s-badge" id="badgeHeroName">Hero</span>
+        <span class="s-badge" style="color:#ff80ab;">5 Targets (AOE 140px)</span>
+      </div>
+      <div style="font-size:11px; color:#9c88be; display:flex; gap:12px; align-items:center;">
+        <label style="cursor:pointer;"><input type="checkbox" id="chkLetterbox" checked> Điện Ảnh (Letterbox)</label>
+        <label style="cursor:pointer;"><input type="checkbox" id="chkAudio" checked> Âm Thanh VFX</label>
+      </div>
+    </div>
+
+    <!-- Canvas Stage -->
+    <div id="stage-wrapper">
+      <canvas id="stageCanvas" width="960" height="540"></canvas>
+      <!-- HUD Stats -->
+      <div id="hud-overlay">
+        <div class="hud-pill">Frame: <b id="hudFrameVal">0 / 80</b> | Phase: <b id="txtPhase">ANIME INTRO</b></div>
+        <div class="hud-pill">Caster: <b id="txtCasterAction">Tụ Khí Năng Lượng</b></div>
+        <div class="hud-pill">Target: <b id="txtTargetReaction">Đội Hình 5 Hải Quân Phòng Thủ</b></div>
+      </div>
+    </div>
+
+    <!-- Inspector View -->
+    <div id="inspector-container">
+      <div class="insp-grid" id="inspGrid"></div>
+    </div>
+
+    <!-- Controls Deck -->
+    <div id="controls-deck">
+      <div class="control-row">
+        <div class="playback-buttons">
+          <button class="btn" id="btnPlayPause" onclick="togglePlay()">⏸ Tạm Dừng</button>
+          <button class="btn" onclick="restartSkill()">🔄 Diễn Lại</button>
+          <button class="btn" id="btnAuto" onclick="toggleAuto()">⏩ Tự Đổi Kỹ Năng: BẬT</button>
+          <button class="btn" id="btnSlowMo" onclick="toggleSlowMo()">⏱ Slow-Mo (0.4x)</button>
+        </div>
+        <div class="timeline-container">
+          <span style="font-size:11px; font-weight:bold; color:#a48dc7;">Timeline:</span>
+          <input type="range" id="timelineSlider" min="0" max="80" value="0" oninput="onScrub(this.value)">
+          <div class="frame-indicator" id="lblFrame">Frame 0 / 80 (0.0s)</div>
+        </div>
+        <div class="playback-buttons">
+          <button class="btn" onclick="prevSkill()">⏮ Trước</button>
+          <button class="btn" onclick="nextSkill()">⏭ Kế</button>
+          <button class="btn cast-btn" onclick="triggerManualCast()">💥 XUẤT CHIÊU</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SKILLS = [{"id": 4001, "id_index": 4001, "id_2": 4001, "icon": 201, "typeSkill": 1, "typeBuff": 0, "name": "H\u1ecfa Di\u1ec5m Th\u1ea7n Quy\u1ec1n", "typeEffSkill": 4001, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 H\u1ecfa Long Th\u1ea7n Trang gi\u1ea3i ph\u00f3ng bi\u1ec3n l\u1eeda thi\u00eau r\u1ee5i m\u1ee5c ti\u00eau.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[5,150],[10,350],[13,400],[14,300],[29,500]]", "EffSpec": "[2,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Luffy Nika Sun God", "set_name": "H\u1ecfa Long Th\u1ea7n Trang", "element": "H\u1ecfa Th\u1ea7n / Nika Sun God", "color": "#ff5722", "color2": "#ffeb3b", "status_tag": "THI\u00caU \u0110\u1ed0T", "art_prefix": "hoa_diem_than_quyen_clean", "sprite_prefix": "luffy"}, {"id": 4002, "id_index": 4002, "id_2": 4002, "icon": 202, "typeSkill": 1, "typeBuff": 0, "name": "\u0110\u1ea1i Ph\u00fan H\u1ecfa Volcano", "typeEffSkill": 4002, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 H\u1ea3i V\u01b0\u01a1ng Th\u1ea7n Trang tri\u1ec7u h\u1ed3i nham th\u1ea1ch phun tr\u00e0o h\u1ee7y di\u1ec7t.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[2,350],[10,350],[13,400],[14,300],[29,500]]", "EffSpec": "[2,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Akainu (Sakazuki)", "set_name": "H\u1ea3i V\u01b0\u01a1ng Th\u1ea7n Trang", "element": "Nham Th\u1ea1ch / Dung Nham (Magma)", "color": "#d32f2f", "color2": "#ff9800", "status_tag": "NHAM TH\u1ea0CH", "art_prefix": "dai_phun_hoa_clean", "sprite_prefix": "akainu"}, {"id": 4003, "id_index": 4003, "id_2": 4003, "icon": 203, "typeSkill": 1, "typeBuff": 0, "name": "K\u1ef7 B\u0103ng H\u00e0 Tuy\u1ec7t \u0110\u1ed1i", "typeEffSkill": 4003, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 L\u00f4i Th\u1ea7n Th\u1ea7n Trang \u0111\u00f3ng b\u0103ng v\u1ea1n v\u1eadt trong ch\u1edbp m\u1eaft.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[3,350],[10,350],[13,400],[28,10],[29,500]]", "EffSpec": "[3,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Aokiji (Kuzan)", "set_name": "L\u00f4i Th\u1ea7n Th\u1ea7n Trang", "element": "B\u0103ng C\u1ef1c H\u00e0n / B\u0103ng H\u00e0 (Absolute Zero Ice)", "color": "#00b0ff", "color2": "#e0f7fa", "status_tag": "\u0110\u00d3NG B\u0102NG", "art_prefix": "ky_bang_ha_clean", "sprite_prefix": "aokiji"}, {"id": 4004, "id_index": 4004, "id_2": 4004, "icon": 204, "typeSkill": 1, "typeBuff": 0, "name": "B\u00e1t X\u00edch Qu\u1ef3nh Kh\u00fac Ng\u1ecdc", "typeEffSkill": 4004, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Phong Ma Th\u1ea7n Trang ph\u00f3ng m\u01b0a ng\u1ecdc quang t\u1eed t\u1ed1c \u0111\u1ed9 \u00e1nh s\u00e1ng.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[7,150],[10,350],[13,400],[9,200],[29,500]]", "EffSpec": "[4,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Kizaru (Borsalino)", "set_name": "Phong Ma Th\u1ea7n Trang", "element": "Quang T\u1eed / Th\u00e1nh Quang (Holy Light)", "color": "#ffd700", "color2": "#fff59d", "status_tag": "CH\u00d3A M\u1eaeT", "art_prefix": "bat_xich_quynh_khuc_clean", "sprite_prefix": "kizaru"}, {"id": 4005, "id_index": 4005, "id_2": 4005, "icon": 205, "typeSkill": 1, "typeBuff": 0, "name": "H\u1eafc \u00c1m Th\u00f4n Ph\u1ec7 V\u00f4 T\u1eadn", "typeEffSkill": 4005, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 T\u1eed Th\u1ea7n Th\u1ea7n Trang m\u1edf ra l\u1ed7 \u0111en nu\u1ed1t ch\u1eedng m\u1ecdi k\u1ebb th\u00f9, ch\u1eb7n di chuy\u1ec3n m\u1ee5c ti\u00eau.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[2,350],[10,350],[13,400],[29,500],[30,50]]", "EffSpec": "[8,100,35]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "R\u00e2u \u0110en (Blackbeard)", "set_name": "T\u1eed Th\u1ea7n Th\u1ea7n Trang", "element": "H\u1eafc \u00c1m / L\u1ed7 \u0110en H\u01b0 Kh\u00f4ng (Black Hole Void)", "color": "#7b1fa2", "color2": "#212121", "status_tag": "L\u1ed6 \u0110EN NU\u1ed0T CH\u1eecNG", "art_prefix": "hac_am_clean", "sprite_prefix": "blackbeard"}, {"id": 4006, "id_index": 4006, "id_2": 4006, "icon": 206, "typeSkill": 1, "typeBuff": 0, "name": "200 Tri\u1ec7u Volt Th\u1ea7n L\u00f4i", "typeEffSkill": 4006, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 B\u0103ng \u0110\u1ebf Th\u1ea7n Trang gi\u00e1ng s\u1ea5m s\u00e9t 200 tri\u1ec7u volt h\u1ee7y di\u1ec7t.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[5,150],[10,350],[13,400],[28,10],[29,500]]", "EffSpec": "[6,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Enel (Raijin)", "set_name": "B\u0103ng \u0110\u1ebf Th\u1ea7n Trang", "element": "L\u00f4i Th\u1ea7n / 200 Tri\u1ec7u Volt (Thunder God Raijin)", "color": "#00e5ff", "color2": "#ffea00", "status_tag": "T\u00ca LI\u1ec6T", "art_prefix": "than_loi_200m_clean", "sprite_prefix": "enel"}, {"id": 4007, "id_index": 4007, "id_2": 4007, "icon": 207, "typeSkill": 1, "typeBuff": 0, "name": "H\u1ea3i Ch\u1ea5n To\u00e1i \u0110\u1ecba C\u1ea7u", "typeEffSkill": 4007, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Ch\u1ea5n \u0110\u1ed9ng Th\u1ea7n Trang \u0111\u1eadp v\u1ee1 kh\u00f4ng gian t\u1ea1o \u0111\u1ea1i h\u1ea3i ch\u1ea5n kinh thi\u00ean \u0111\u1ed9ng \u0111\u1ecba. K\u00e8m 50% t\u1ef7 l\u1ec7 g\u00e2y Cho\u00e1ng trong 3.0s.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[1,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "R\u00e2u Tr\u1eafng (Whitebeard)", "set_name": "Ch\u1ea5n \u0110\u1ed9ng Th\u1ea7n Trang", "element": "Ch\u1ea5n \u0110\u1ed9ng / R\u1ea1n N\u1ee9t Kh\u00f4ng Gian (Gura Gura Quake)", "color": "#4dd0e1", "color2": "#ff7043", "status_tag": "CHO\u00c1NG CH\u1ea4N \u0110\u1ed8NG", "art_prefix": "hai_chan_toai_dia_clean", "sprite_prefix": "whitebeard"}, {"id": 4008, "id_index": 4008, "id_2": 4008, "icon": 208, "typeSkill": 1, "typeBuff": 0, "name": "ROOM Gamma Knife", "typeEffSkill": 4008, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Kim C\u01b0\u01a1ng Th\u1ea7n Trang ph\u00e2n c\u1eaft v\u00e0 ph\u00e1 h\u1ee7y n\u1ed9i t\u1ea1ng \u0111\u1ed1i th\u1ee7.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[7,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Trafalgar Law", "set_name": "Kim C\u01b0\u01a1ng Th\u1ea7n Trang", "element": "Kh\u00f4ng Gian / Ph\u1eabu Thu\u1eadt \u0110i\u1ec7n T\u1eeb (Ope Ope Room)", "color": "#26a69a", "color2": "#80cbc4", "status_tag": "PH\u00c1 N\u1ed8I T\u1ea0NG", "art_prefix": "room_gamma_knife_clean", "sprite_prefix": "law"}, {"id": 4009, "id_index": 4009, "id_2": 4009, "icon": 209, "typeSkill": 1, "typeBuff": 0, "name": "T\u1eeb Tr\u01b0\u1eddng B\u1ed9c Ph\u00e1 \u0110\u1ea1i Ph\u00e1o", "typeEffSkill": 4009, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 H\u1eafc \u00c1m Th\u1ea7n Trang t\u1ee5 l\u1ef1c t\u1eeb t\u00ednh b\u1eafn \u0111\u1ea1i ph\u00e1o h\u1ee7y di\u1ec7t.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[1,55,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Eustass Kid", "set_name": "H\u1eafc \u00c1m Th\u1ea7n Trang", "element": "T\u1eeb T\u00ednh / \u0110\u1ea1i Ph\u00e1o Ph\u1ebf Li\u1ec7u (Damned Punk Railgun)", "color": "#e91e63", "color2": "#b0bec5", "status_tag": "B\u1ed8C PH\u00c1 T\u1eea TR\u01af\u1edcNG", "art_prefix": "tu_truong_dai_phao_clean", "sprite_prefix": "kid"}, {"id": 4010, "id_index": 4010, "id_2": 4010, "icon": 210, "typeSkill": 1, "typeBuff": 0, "name": "C\u1ed5 \u0110\u1ed9c Ph\u00e1n Quy\u1ebft Venom", "typeEffSkill": 4010, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Quang Minh Th\u1ea7n Trang ph\u00f3ng \u0111\u1ed9c d\u01b0\u1ee3c \u0103n m\u00f2n sinh m\u1ec7nh.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[8,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Magellan", "set_name": "Quang Minh Th\u1ea7n Trang", "element": "C\u1ef1 \u0110\u1ed9c / \u0102n M\u00f2n Axit (Venom Demon Hydra)", "color": "#ab47bc", "color2": "#76ff03", "status_tag": "K\u1ecaCH \u0110\u1ed8C", "art_prefix": "cu_doc_venom_clean", "sprite_prefix": "magellan"}, {"id": 4011, "id_index": 4011, "id_2": 4011, "icon": 211, "typeSkill": 1, "typeBuff": 0, "name": "M\u0169i T\u00ean M\u00ea Ho\u1eb7c Th\u1ea1ch H\u00f3a", "typeEffSkill": 4011, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Tu La Th\u1ea7n Trang h\u00f3a \u0111\u00e1 m\u1ecdi k\u1ebb th\u00f9 tr\u00fang ph\u1ea3i.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[9,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Boa Hancock", "set_name": "Tu La Th\u1ea7n Trang", "element": "M\u00ea Ho\u1eb7c / H\u00f3a \u0110\u00e1 (Mero Mero Slave Arrow)", "color": "#ec407a", "color2": "#f48fb1", "status_tag": "H\u00d3A \u0110\u00c1", "art_prefix": "mui_ten_thach_hoa_clean", "sprite_prefix": "hancock"}, {"id": 4012, "id_index": 4012, "id_2": 4012, "icon": 212, "typeSkill": 1, "typeBuff": 0, "name": "Ph\u01b0\u1ee3ng Ho\u00e0ng B\u1ea5t T\u1eed B\u1ed9c Ph\u00e1", "typeEffSkill": 4012, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Th\u00e1nh Linh Th\u1ea7n Trang tung c\u00e1nh ph\u01b0\u1ee3ng ho\u00e0ng lam h\u1ecfa thi\u00eau r\u1ee5i.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[3,500],[10,350],[13,400],[29,500],[30,50]]", "EffSpec": "[2,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Marco Ph\u01b0\u1ee3ng Ho\u00e0ng", "set_name": "Th\u00e1nh Linh Th\u1ea7n Trang", "element": "Lam H\u1ecfa / B\u1ea5t T\u1eed \u0110i\u1ec3u (Phoenix Blue Fire)", "color": "#29b6f6", "color2": "#ffd54f", "status_tag": "LAM H\u1eceA B\u1ea4T T\u1eec", "art_prefix": "phuong_hoang_bat_tu_clean", "sprite_prefix": "marco"}, {"id": 4013, "id_index": 4013, "id_2": 4013, "icon": 213, "typeSkill": 1, "typeBuff": 0, "name": "\u0110\u1ea1i Ph\u1eadt S\u00f3ng Xung K\u00edch", "typeEffSkill": 4013, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Huy\u1ebft Long Th\u1ea7n Trang ch\u01b0\u1edfng s\u00f3ng xung k\u00edch uy l\u1ef1c v\u00f4 song.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[2,500],[10,350],[13,400],[28,10],[29,500]]", "EffSpec": "[1,55,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Sengoku \u0110\u1ea1i Ph\u1eadt", "set_name": "Huy\u1ebft Long Th\u1ea7n Trang", "element": "Ho\u00e0ng Kim / \u0110\u1ea1i Ph\u1eadt Ch\u01b0\u1edfng (Golden Daibutsu)", "color": "#ffa000", "color2": "#fff176", "status_tag": "CH\u1ea4N \u0110\u1ed8NG PH\u1eacT QUANG", "art_prefix": "dai_phat_clean", "sprite_prefix": "sengoku"}, {"id": 4014, "id_index": 4014, "id_2": 4014, "icon": 214, "typeSkill": 1, "typeBuff": 0, "name": "B\u00e1t Qu\u00e1i C\u1eedu Long Thi\u00ean", "typeEffSkill": 4014, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Ma Th\u1ea7n Th\u1ea7n Trang qu\u00e9t ch\u00f9y s\u1ea5m s\u00e9t b\u00e1ch th\u00fa v\u00f4 \u0111\u1ecbch.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[2,500],[10,350],[13,400],[28,10],[29,500]]", "EffSpec": "[1,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Kaido B\u00e1ch Th\u00fa", "set_name": "Ma Th\u1ea7n Th\u1ea7n Trang", "element": "L\u00f4i Long / H\u1eafc L\u00f4i Ma Th\u1ea7n (Nine Thunder Dragons)", "color": "#5e35b1", "color2": "#00e5ff", "status_tag": "H\u1eaeC L\u00d4I T\u00ca LI\u1ec6T", "art_prefix": "bat_quai_cuu_long_clean", "sprite_prefix": "kaido"}, {"id": 4015, "id_index": 4015, "id_2": 4015, "icon": 215, "typeSkill": 1, "typeBuff": 0, "name": "Long Tr\u1ea3o Vi\u00eam Long To\u00e1i \u0110\u1ecba", "typeEffSkill": 4015, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 Thi\u00ean Th\u1ea7n Th\u1ea7n Trang tr\u1ea3o r\u1ed3ng l\u1eeda ph\u00e1 h\u1ee7y m\u1eb7t \u0111\u1ea5t.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[5,150],[10,350],[13,400],[14,300],[29,500]]", "EffSpec": "[2,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Sabo Qu\u00e2n C\u00e1ch M\u1ea1ng", "set_name": "Thi\u00ean Th\u1ea7n Th\u1ea7n Trang", "element": "H\u1ecfa Long / Long Tr\u1ea3o To\u00e1i \u0110\u1ecba (Dragon Claw Flame)", "color": "#ff6d00", "color2": "#ffab00", "status_tag": "THI\u00caU R\u1ee4I \u0110\u1ecaA CH\u1ea4N", "art_prefix": "long_trao_clean", "sprite_prefix": "sabo"}, {"id": 4016, "id_index": 4016, "id_2": 4016, "icon": 216, "typeSkill": 1, "typeBuff": 0, "name": "V\u1eadn Th\u1ea1ch Thi\u00ean Gi\u00e1ng", "typeEffSkill": 4016, "range": 220, "rangeLan": 140, "nTarget": 5, "damage": 5000, "manaLost": 50, "timeDelay": 3000, "nKick": 1, "info": "Tuy\u1ec7t k\u1ef9 H\u1ed7n \u0110\u1ed9n Th\u1ea7n Trang k\u00e9o thi\u00ean th\u1ea1ch r\u01a1i t\u1ef1 do t\u1eeb v\u0169 tr\u1ee5.", "Lv_RQ": 1, "percentLv": 0, "typeDevil": 0, "option": "[[1,350],[10,350],[13,400],[28,10],[29,500],[30,50]]", "EffSpec": "[1,50,30]", "LvDevilSkill": 0, "phanTramDevilSkill": 0, "char": "Fujitora (Issho)", "set_name": "H\u1ed7n \u0110\u1ed9n Th\u1ea7n Trang", "element": "Tr\u1ecdng L\u1ef1c / Thi\u00ean Th\u1ea1ch V\u0169 Tr\u1ee5 (Gravity Meteor)", "color": "#7c4dff", "color2": "#ea80fc", "status_tag": "\u0110\u00c8 N\u00c9N TR\u1eccNG L\u1ef0C", "art_prefix": "van_thach_thien_giang_clean", "sprite_prefix": "fujitora"}];
+const META = {"4001": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4001_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4001_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4001_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4001_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4001_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4001_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4001_finisher_sheet.png"}}, "4002": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4002_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4002_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4002_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4002_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4002_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4002_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4002_finisher_sheet.png"}}, "4003": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4003_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4003_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4003_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4003_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4003_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4003_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4003_finisher_sheet.png"}}, "4004": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4004_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4004_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_finisher_sheet.png"}}, "4005": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4005_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4005_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4005_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4005_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4005_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4005_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4005_finisher_sheet.png"}}, "4006": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4006_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4006_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4006_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4006_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4006_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4006_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4006_finisher_sheet.png"}}, "4007": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4007_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4007_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4007_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4007_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4007_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4007_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4007_finisher_sheet.png"}}, "4008": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4008_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4008_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4008_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4008_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4008_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4008_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4008_finisher_sheet.png"}}, "4009": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4009_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4009_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4009_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4009_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4009_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4009_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4009_finisher_sheet.png"}}, "4010": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4010_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4010_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_finisher_sheet.png"}}, "4011": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4011_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4011_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_finisher_sheet.png"}}, "4012": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4012_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4012_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4012_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4012_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4012_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4012_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4012_finisher_sheet.png"}}, "4013": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4013_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4013_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_finisher_sheet.png"}}, "4014": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_cast_sheet.png"}, "projectile": {"w": 220, "h": 90, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4014_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4014_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_finisher_sheet.png"}}, "4015": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4015_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4015_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_finisher_sheet.png"}}, "4016": {"cast": {"w": 240, "h": 180, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_cast_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4016_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_projectile_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 10, "anchor": "center", "sheet_x1": "../spritesheets/skill_4016_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_impact_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_aura_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_particles_sheet.png"}, "finisher": {"w": 280, "h": 200, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_finisher_sheet.png"}}};
+// studio_v16_logic.js - HTTH Thần Trang Studio v16 Master Engine
+
+let curSkillIdx = 12;
+let curFrame = 0;
+const TOTAL_FRAMES = 85;
+let isPlaying = true;
+let isAuto = true;
+let isSlowMo = false;
+let curMode = 'combat'; // 'combat' | 'inspect'
+let audioCtx = null;
+let lastTimestamp = 0;
+let frameAccumulator = 0;
+
+// Image cache with fallback
+const imgCache = {};
+function getImg(src) {
+  if (!imgCache[src]) {
+    const img = new Image();
+    img.src = src;
+    img.onerror = () => {
+      // If ../ path fails, try without ../
+      if (src.startsWith('../')) {
+        const alt = src.substring(3);
+        if (!imgCache[alt]) {
+          img.src = alt;
+        }
+      }
+    };
+    imgCache[src] = img;
+  }
+  return imgCache[src];
+}
+
+// Hero sprite configurations
+const HERO_SPRITE_CONFIG = {
+  4001: { prefix: 'characters/luffy_stand_', attackPrefix: 'characters/luffy_attack_', maxStand: 16, maxAttack: 7 },
+  4002: { prefix: 'characters/akainu_', max: 12 },
+  4003: { prefix: 'characters/aokiji_', max: 12 },
+  4004: { prefix: 'characters/kizaru_', max: 12 },
+  4005: { prefix: 'characters/blackbeard_', max: 6 },
+  4006: { prefix: 'characters/enel_', max: 6 },
+  4007: { prefix: 'characters/whitebeard_', max: 12 },
+  4008: { prefix: 'characters/law_', max: 6 },
+  4009: { prefix: 'characters/kid_', max: 6 },
+  4010: { prefix: 'characters/magellan_', max: 6 },
+  4011: { prefix: 'characters/hancock_', max: 6 },
+  4012: { prefix: 'characters/marco_', max: 6 },
+  4013: { prefix: 'characters/sengoku_', max: 6 },
+  4014: { prefix: 'characters/kaido_', max: 6 },
+  4015: { prefix: 'characters/sabo_', max: 12 },
+  4016: { prefix: 'characters/fujitora_', max: 6 }
+};
+
+// Target configurations: 5 Combat Targets
+const TARGET_DEFS = [
+  { id: 0, role: 'Fleet Admiral (Boss)', prefix: 'characters/target_boss_', max: 6, baseX: 700, baseY: 415, scale: 1.15, hpMax: 25000, curHp: 25000 },
+  { id: 1, role: 'Marine Officer A', prefix: 'characters/target_officer_', max: 6, baseX: 610, baseY: 370, scale: 1.0, hpMax: 10000, curHp: 10000 },
+  { id: 2, role: 'Marine Officer B', prefix: 'characters/target_officer_', max: 6, baseX: 620, baseY: 460, scale: 1.0, hpMax: 10000, curHp: 10000 },
+  { id: 3, role: 'Elite Guard A', prefix: 'characters/target_guard_', max: 6, baseX: 780, baseY: 360, scale: 0.95, hpMax: 8000, curHp: 8000 },
+  { id: 4, role: 'Elite Guard B', prefix: 'characters/target_guard_', max: 6, baseX: 790, baseY: 470, scale: 0.95, hpMax: 8000, curHp: 8000 }
+];
+
+// Audio FX synthesizer using Web Audio API
+function playSound(type) {
+  const chk = document.getElementById('chkAudio');
+  if (!chk || !chk.checked) return;
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'cast') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(180, t);
+      osc.frequency.exponentialRampToValueAtTime(520, t + 0.25);
+      gain.gain.setValueAtTime(0.2, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.25);
+      osc.start(t);
+      osc.stop(t + 0.25);
+    } else if (type === 'projectile') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(600, t);
+      osc.frequency.linearRampToValueAtTime(250, t + 0.3);
+      gain.gain.setValueAtTime(0.18, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.3);
+      osc.start(t);
+      osc.stop(t + 0.3);
+    } else if (type === 'impact') {
+      const bufferSize = audioCtx.sampleRate * 0.4;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (audioCtx.sampleRate * 0.08));
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(800, t);
+      filter.frequency.linearRampToValueAtTime(120, t + 0.4);
+      const nGain = audioCtx.createGain();
+      nGain.gain.setValueAtTime(0.35, t);
+      nGain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+      noise.connect(filter);
+      filter.connect(nGain);
+      nGain.connect(audioCtx.destination);
+      noise.start(t);
+    } else if (type === 'thunder') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, t);
+      osc.frequency.exponentialRampToValueAtTime(60, t + 0.35);
+      gain.gain.setValueAtTime(0.25, t);
+      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+      osc.start(t);
+      osc.stop(t + 0.35);
+    }
+  } catch (e) {
+    // browser auto-play policy
+  }
+}
+
+// Preload priority assets first for instant 60fps rendering
+function preloadPriority() {
+  // Preload all 5 targets immediately (18 images total)
+  TARGET_DEFS.forEach(tg => {
+    for (let f = 0; f < tg.max; f++) {
+      getImg(`${tg.prefix}${f}.png`);
+    }
+  });
+
+  // Preload current hero & next hero
+  preloadSkillAssets(curSkillIdx);
+  preloadSkillAssets((curSkillIdx + 1) % SKILLS.length);
+
+  // Preload sidebar icons (16 images)
+  SKILLS.forEach(s => {
+    getImg(`../icons/x2/${s.icon}.png`);
+  });
+}
+
+function preloadSkillAssets(sIdx) {
+  const s = SKILLS[sIdx];
+  if (!s) return;
+  const cfg = HERO_SPRITE_CONFIG[s.id];
+  if (cfg) {
+    const maxF = cfg.max || cfg.maxStand || 6;
+    for (let f = 0; f < maxF; f++) {
+      getImg(`${cfg.prefix}${f}.png`);
+    }
+    if (cfg.attackPrefix) {
+      for (let f = 0; f < (cfg.maxAttack || 7); f++) {
+        getImg(`${cfg.attackPrefix}${f}.png`);
+      }
+    }
+  }
+  const comps = ['cast', 'projectile', 'impact', 'aura', 'particles', 'finisher'];
+  comps.forEach(c => {
+    getImg(`../spritesheets/skill_${s.id}_${c}_sheet.png`);
+  });
+}
+
+// Get Anime Choreography for a specific skill and frame
+function getAnimeChoreography(skill, f) {
+  const sid = skill.id;
+  const cfg = HERO_SPRITE_CONFIG[sid] || { prefix: 'characters/luffy_stand_', max: 6 };
+
+  let phase = "ANIME INTRO / TỤ KHÍ";
+  let casterAction = "Tụ Khí Năng Lượng";
+  let targetReaction = "Đội Hình 5 Hải Quân Phòng Thủ";
+  let shake = 0;
+  let flash = null;
+
+  let casterX = 220;
+  let casterY = 415;
+  let casterAlpha = 1.0;
+  let casterScale = 1.0;
+  let casterRotation = 0;
+  let casterSpriteSrc = '';
+
+  let hf = Math.floor((f / 3) % (cfg.max || cfg.maxStand || 6));
+  casterSpriteSrc = `${cfg.prefix}${hf}.png`;
+
+  // 5 Combat Targets
+  const targets = TARGET_DEFS.map((td, idx) => ({
+    id: td.id,
+    role: td.role,
+    prefix: td.prefix,
+    max: td.max,
+    x: td.baseX,
+    y: td.baseY,
+    scale: td.scale,
+    flinch: false,
+    flinchX: 0,
+    flinchY: 0,
+    status: null,
+    damagePopup: null,
+    src: `${td.prefix}${Math.floor((f / 4 + idx) % td.max)}.png`
+  }));
+
+  const vfx = [];
+
+  switch (sid) {
+    case 4001: { // Luffy Nika Sun God - Hỏa Diễm Thần Quyền
+      if (f < 20) {
+        phase = "HỎA THẦN TỤ LỰC (CHARGING)";
+        casterAction = "Vận Hỏa Long Khí";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: Math.floor(f / 2.5) % 8, scale: 1.2, alpha: 0.85, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 38) {
+        phase = "PHI THÂN TRẢO KHÔNG (LEAPING & GLIDING)";
+        casterAction = "Bay Lên Không Trung Tích Quyền";
+        const prog = (f - 20) / 18;
+        casterX = 220 + prog * 90;
+        casterY = 415 - Math.sin(prog * Math.PI) * 160;
+        casterRotation = -0.15;
+        const af = Math.min(6, Math.floor(prog * 7));
+        casterSpriteSrc = `${cfg.attackPrefix || cfg.prefix}${af}.png`;
+        vfx.push({ cname: 'particles', x: casterX - 30, y: casterY + 20, frame: f % 8, scale: 1.0, alpha: 0.9, onTop: 0 });
+        const pfProg = Math.max(0, (f - 25) / 13);
+        if (pfProg > 0) {
+          const projX = casterX + pfProg * (700 - casterX);
+          const projY = casterY + pfProg * (415 - casterY);
+          vfx.push({ cname: 'projectile', x: projX, y: projY, frame: f % 8, scale: 1.3, alpha: 0.95, onTop: 2 });
+        }
+        if (f === 21) playSound('projectile');
+      } else if (f < 64) {
+        phase = "HỎA DIỄM TOÁI ĐỊA (CATACLYSMIC IMPACT)";
+        casterAction = "Oanh Tạc Đại Quyền Xuống";
+        targetReaction = "Biển Lửa Thiêu Rụi 5 Mục Tiêu!";
+        casterX = 310;
+        casterY = 415;
+        casterSpriteSrc = `${cfg.attackPrefix || cfg.prefix}6.png`;
+        shake = f < 50 ? (50 - f) * 0.6 : 0;
+        if (f === 39) { playSound('impact'); flash = 'rgba(255, 100, 0, 0.4)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 38) / 2) % 10, scale: 1.8, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 430, frame: Math.floor((f - 38) / 1.8) % 12, scale: 1.6, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = Math.sin(f * 2 + idx) * 8;
+          tg.status = 'burn';
+          tg.damagePopup = { val: 5000 + idx * 850, crit: idx === 0, alpha: 1.0 - (f - 38) / 26 };
+        });
+      } else {
+        phase = "HỎA LONG THẦN QUY KỊCH (RECOVERY)";
+        casterAction = "Hạ Thế Tĩnh Lặng";
+        casterX = 220;
+        casterY = 415;
+        casterSpriteSrc = `${cfg.prefix}${Math.floor((f / 4) % 16)}.png`;
+      }
+      break;
+    }
+
+    case 4002: { // Akainu - Đại Phún Hỏa Volcano
+      if (f < 22) {
+        phase = "NHAM THẠCH BẠO PHÁ (MAGMA RISING)";
+        casterAction = "Tụ Khí Nham Thạch";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: Math.floor(f / 2.5) % 8, scale: 1.3, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 40) {
+        phase = "ĐẠI PHÚN HỎA XUẤT THẾ (MAGMA FIST ERUPTION)";
+        casterAction = "Đấm Thẳng Nham Thạch";
+        casterX = 250;
+        const prog = (f - 22) / 18;
+        const projX = casterX + prog * (700 - casterX);
+        vfx.push({ cname: 'projectile', x: projX, y: 410, frame: f % 8, scale: 1.5, alpha: 1.0, onTop: 2 });
+        if (f === 23) playSound('projectile');
+      } else if (f < 64) {
+        phase = "HẢI VƯƠNG THIÊU HỦY (VOLCANIC SEA)";
+        casterAction = "Duy Trì Phun Trào";
+        targetReaction = "Dung Nham Đốt Cháy 5 Mục Tiêu!";
+        casterX = 240;
+        shake = f < 52 ? (52 - f) * 0.5 : 0;
+        if (f === 41) { playSound('impact'); flash = 'rgba(255, 50, 0, 0.4)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 40) / 2) % 10, scale: 1.9, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 425, frame: Math.floor((f - 40) / 1.8) % 12, scale: 1.7, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchY = -Math.sin((f - 40) * 0.4 + idx) * 12;
+          tg.status = 'magma';
+          tg.damagePopup = { val: 5000 + idx * 920, crit: idx === 0, alpha: 1.0 - (f - 40) / 24 };
+        });
+      } else {
+        phase = "NHAM TÀN NGUỘI DẦN (COOLDOWN)";
+        casterAction = "Khoanh Tay Thị Uy";
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4003: { // Aokiji - Kỷ Băng Hà Tuyệt Đối (Ice Age)
+      if (f < 20) {
+        phase = "BĂNG CỰC HÀN KHÍ (ABSOLUTE ZERO CHILL)";
+        casterAction = "Chạm Đất Lan Tỏa Băng Khí";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.2, alpha: 0.85, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 38) {
+        phase = "BĂNG HÀ PHỦ ĐỊA (GLACIAL RUSH)";
+        casterAction = "Phóng Làn Sóng Băng Giá";
+        const prog = (f - 20) / 18;
+        const waveX = casterX + prog * (700 - casterX);
+        vfx.push({ cname: 'projectile', x: waveX, y: 430, frame: f % 8, scale: 1.4, alpha: 0.95, onTop: 0 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 64) {
+        phase = "ĐÓNG BĂNG VẠN VẬT (FROZEN GLACIER)";
+        casterAction = "Tỏa Hàn Khí Tuyệt Đối";
+        targetReaction = "5 Kẻ Thù Bị Đóng Băng Hoàn Toàn!";
+        if (f === 39) { playSound('impact'); flash = 'rgba(180, 240, 255, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 38) / 2) % 10, scale: 1.8, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 38) / 2) % 12, scale: 1.6, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.status = 'frozen';
+          tg.damagePopup = { val: 5000 + idx * 750, crit: idx === 0, alpha: 1.0 - (f - 38) / 26 };
+        });
+      } else {
+        phase = "SƯƠNG BĂNG TAN DẦN (FROST THAW)";
+        casterAction = "Thở Ra Băng Khí";
+      }
+      break;
+    }
+
+    case 4004: { // Kizaru - Bát Xích Quỳnh Khúc Ngọc (Yasakani no Magatama)
+      if (f < 16) {
+        phase = "QUANG TỬ TẬP HỢP (LIGHT CONVERGENCE)";
+        casterAction = "Tụ Hạt Ánh Sáng";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.2, alpha: 0.8, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 48) {
+        phase = "PHI THIÊN BÁT XÍCH NGỌC (AIRBORNE LIGHT BARRAGE)";
+        casterAction = "Bay Lơ Lửng Trên Không Bắn Mưa Ngọc";
+        targetReaction = "Hứng Chịu Hàng Trăm Tia Quang Tử!";
+        casterX = 250;
+        casterY = 220; // Flying high
+        for (let b = 0; b < 3; b++) {
+          const bProg = ((f * 3 + b * 25) % 100) / 100;
+          const px = casterX + bProg * (700 - casterX + (b - 1) * 60);
+          const py = casterY + bProg * (410 - casterY);
+          vfx.push({ cname: 'projectile', x: px, y: py, frame: (f + b) % 8, scale: 0.9, alpha: 0.9, onTop: 2, rotation: 0.4 });
+        }
+        if (f % 6 === 0) playSound('thunder');
+        vfx.push({ cname: 'particles', x: 670 + Math.sin(f) * 80, y: 410 + Math.cos(f) * 40, frame: f % 8, scale: 1.2, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = Math.sin(f * 3 + idx) * 5;
+          tg.status = 'shock';
+          if (f > 30) tg.damagePopup = { val: 5000 + idx * 800, crit: idx === 0, alpha: 0.8 };
+        });
+      } else if (f < 66) {
+        phase = "QUANG TỬ BỘC PHÁ (SUPERNOVA BURST)";
+        casterAction = "Quang Bạo Kết Liễu";
+        targetReaction = "Chấn Động Quang Tử!";
+        casterX = 240;
+        casterY = 320;
+        shake = f < 58 ? (58 - f) * 0.5 : 0;
+        if (f === 49) { playSound('impact'); flash = 'rgba(255, 255, 150, 0.5)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 48) / 1.7) % 10, scale: 2.0, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 48) / 1.5) % 12, scale: 1.8, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.status = 'shock';
+        });
+      } else {
+        phase = "QUANG TỐ GIÁNG THẾ (LIGHTSPEED DESCENT)";
+        casterAction = "Đáp Đất Đút Tay Túi Quần";
+        casterX = 220;
+        casterY = 415;
+      }
+      break;
+    }
+
+    case 4005: { // Blackbeard - Hắc Ám Thôn Phệ Vô Tận (Black Hole)
+      if (f < 20) {
+        phase = "HẮC ÁM PHỦ KÍN (DARKNESS SURGE)";
+        casterAction = "Giải Phóng Hắc Ám Yami";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.3, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 42) {
+        phase = "LỖ ĐEN HÚT MỤC TIÊU (GRAVITATIONAL VORTEX)";
+        casterAction = "Mở Lỗ Đen Nuốt Chửng";
+        targetReaction = "Bị Lực Hút Kéo Mạnh Vào Tâm Lỗ Đen!";
+        vfx.push({ cname: 'projectile', x: 700, y: 415, frame: f % 8, scale: 1.8, alpha: 0.95, onTop: 0 });
+        const prog = (f - 20) / 22;
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = (700 - tg.x) * prog * 0.4;
+          tg.status = 'void';
+        });
+        if (f === 21) playSound('projectile');
+      } else if (f < 66) {
+        phase = "HẮC ÁM BỘC PHÁ (VOID LIBERATION)";
+        casterAction = "Phát Nổ Không Gian Tối";
+        targetReaction = "Nổ Tung Khỏi Lỗ Đen!";
+        shake = f < 54 ? (54 - f) * 0.6 : 0;
+        if (f === 43) { playSound('impact'); flash = 'rgba(120, 20, 180, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 42) / 2) % 10, scale: 2.0, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 42) / 1.8) % 12, scale: 1.8, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.status = 'void';
+          tg.damagePopup = { val: 5000 + idx * 880, crit: idx === 0, alpha: 1.0 - (f - 42) / 24 };
+        });
+      } else {
+        phase = "TỬ THẦN ĐẮC THẮNG (ZEHAHAHA)";
+        casterAction = "Cười Lớn Zehahaha";
+      }
+      break;
+    }
+
+    case 4006: { // Enel - 200 Triệu Volt Thần Lôi (Amaru)
+      if (f < 18) {
+        phase = "LÔI CỔ TỤ ĐIỆN (DRUM CHARGE)";
+        casterAction = "Gõ Trống Lôi Thần";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.2, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 36) {
+        phase = "LÔI LONG PHI THIÊN (RAIJIN ASCENT)";
+        casterAction = "Bay Lên Không Hóa Thần Lôi";
+        const prog = (f - 18) / 18;
+        casterX = 220;
+        casterY = 415 - Math.sin(prog * Math.PI * 0.5) * 120;
+        vfx.push({ cname: 'projectile', x: 220, y: casterY - 30, frame: f % 8, scale: 1.4, alpha: 0.95, onTop: 2 });
+        if (f === 19) playSound('thunder');
+      } else if (f < 62) {
+        phase = "200 TRIỆU VOLT GIÁNG THẾ (JUDGEMENT BOLT)";
+        casterAction = "Phóng Cột Sét Hủy Diệt";
+        targetReaction = "5 Mục Tiêu Tê Liệt Hoàn Toàn!";
+        casterY = 320;
+        shake = f < 48 ? (48 - f) * 0.7 : 0;
+        if (f === 37) { playSound('impact'); flash = 'rgba(0, 230, 255, 0.5)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 36) / 2) % 10, scale: 2.1, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 36) / 1.8) % 12, scale: 1.9, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = (Math.random() - 0.5) * 14;
+          tg.status = 'shock';
+          tg.damagePopup = { val: 5000 + idx * 950, crit: idx === 0, alpha: 1.0 - (f - 36) / 26 };
+        });
+      } else {
+        phase = "LÔI THẦN ĐÁP THẾ (GOD DESCENT)";
+        casterAction = "Hạ Xuống Với Ánh Mắt Khinh Miệt";
+        casterY = 415;
+      }
+      break;
+    }
+
+    case 4007: { // Whitebeard - Hải Chấn Toái Địa Cầu (Gura Gura no Mi)
+      if (f < 20) {
+        phase = "CHẤN QUẢ KHÍ CẦU (SEISMIC BUBBLE)";
+        casterAction = "Tụ Khí Cầu Rạn Nứt Trên Tay";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.3, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 36) {
+        phase = "ĐẬP VỠ KHÔNG GIAN (ATMOSPHERIC CRACK)";
+        casterAction = "Đấm Vỡ Không Gian Tạo Rạn Nứt";
+        casterX = 250;
+        shake = (f - 20) * 0.8;
+        vfx.push({ cname: 'projectile', x: 450, y: 390, frame: f % 8, scale: 1.7, alpha: 0.95, onTop: 2 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 64) {
+        phase = "HẢI CHẤN TOÁI ĐỊA (CATACLYSMIC TSUNAMI QUAKE)";
+        casterAction = "Đại Hải Chấn Sóng Cuộn";
+        targetReaction = "Choáng Váng 3.0s & Địa Chấn Hất Tung!";
+        casterX = 240;
+        shake = f < 52 ? (52 - f) * 0.9 : 0;
+        if (f === 37) { playSound('impact'); flash = 'rgba(77, 208, 225, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 36) / 2) % 10, scale: 2.2, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 425, frame: Math.floor((f - 36) / 1.8) % 12, scale: 1.9, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchY = -18 * Math.sin((f - 36) * 0.3 + idx);
+          tg.status = 'shock';
+          tg.damagePopup = { val: 5000 + idx * 1100, crit: idx === 0, alpha: 1.0 - (f - 36) / 28 };
+        });
+      } else {
+        phase = "SỨC MẠNH VÔ ĐỊCH (STANDS LIKE A MOUNTAIN)";
+        casterAction = "Cắm Đao Trấn Giữ Biển Cả";
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4008: { // Law - ROOM Gamma Knife
+      if (f < 20) {
+        phase = "KHỞI TẠO ROOM (ROOM EXPANSION)";
+        casterAction = "Khai Mở Lãnh Địa ROOM";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.5, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 34) {
+        phase = "SHAMBLES DỊCH CHUYỂN (TELEPORT STRIKE)";
+        casterAction = "Dịch Chuyển Áp Sát Mục Tiêu";
+        casterX = 570;
+        casterY = 410;
+        vfx.push({ cname: 'projectile', x: 620, y: 400, frame: f % 8, scale: 1.3, alpha: 0.95, onTop: 2 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 62) {
+        phase = "GAMMA KNIFE NỘI TẠNG (INTERNAL DESTRUCTION)";
+        casterAction = "Đâm Lưỡi Dao Năng Lượng Điện Từ";
+        targetReaction = "Phá Hủy Nội Tạng & Phân Cắt Không Gian!";
+        casterX = 570;
+        casterY = 410;
+        shake = f < 48 ? (48 - f) * 0.6 : 0;
+        if (f === 35) { playSound('impact'); flash = 'rgba(38, 166, 154, 0.5)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 34) / 2) % 10, scale: 1.9, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 415, frame: Math.floor((f - 34) / 1.8) % 12, scale: 1.7, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = (idx % 2 === 0 ? 1 : -1) * 12;
+          tg.status = 'shock';
+          tg.damagePopup = { val: 5000 + idx * 820, crit: idx === 0, alpha: 1.0 - (f - 34) / 28 };
+        });
+      } else {
+        phase = "DỊCH CHUYỂN VỀ (SHAMBLES RETURN)";
+        casterAction = "Tra Kiếm Vào Bao Tĩnh Lặng";
+        casterX = 220;
+        casterY = 415;
+      }
+      break;
+    }
+
+    case 4009: { // Kid - Từ Trường Bộc Phá Đại Pháo (Damned Punk Railgun)
+      if (f < 22) {
+        phase = "TỤ LỰC TỪ TÍNH (MAGNETIC ACCUMULATION)";
+        casterAction = "Hút Phế Liệu Lắp Đại Pháo";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.3, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 40) {
+        phase = "RAILGUN SIÊU ÁP (DAMNED PUNK CHARGE)";
+        casterAction = "Cuộn Dây Điện Từ Xoay Cực Đại";
+        casterX = 240;
+        const prog = (f - 22) / 18;
+        const bX = casterX + prog * (700 - casterX);
+        vfx.push({ cname: 'projectile', x: bX, y: 405, frame: f % 8, scale: 1.6, alpha: 1.0, onTop: 2 });
+        if (f === 23) playSound('projectile');
+      } else if (f < 64) {
+        phase = "TỪ TRƯỜNG ĐẠI BỘC PHÁ (ELECTROMAGNETIC BURST)";
+        casterAction = "Xuyên Thủng Đội Hình Hải Quân";
+        targetReaction = "Bị Tia Pháo Đẩy Lùi & Bộc Phá!";
+        casterX = 235;
+        shake = f < 52 ? (52 - f) * 0.7 : 0;
+        if (f === 41) { playSound('impact'); flash = 'rgba(233, 30, 99, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 40) / 2) % 10, scale: 2.0, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 40) / 1.8) % 12, scale: 1.8, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = 18;
+          tg.status = 'burn';
+          tg.damagePopup = { val: 5000 + idx * 880, crit: idx === 0, alpha: 1.0 - (f - 40) / 24 };
+        });
+      } else {
+        phase = "XẢ NHIỆT ĐẠI PHÁO (HEAT VENT)";
+        casterAction = "Xả Khói Nóng Cười Ngạo Nghễ";
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4010: { // Magellan - Cổ Độc Phán Quyết Venom (Venom Demon)
+      if (f < 20) {
+        phase = "KỊCH ĐỘC THỨC TỈNH (POISON AWAKENING)";
+        casterAction = "Sôi Sục Kịch Độc Đỏ Tím";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.4, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 38) {
+        phase = "CỰ ĐỘC XUẤT THẾ (HYDRA CHARGE)";
+        casterAction = "Phóng 3 Đầu Rồng Độc Hydra";
+        casterX = 240;
+        const prog = (f - 20) / 18;
+        const hydraX = casterX + prog * (700 - casterX);
+        vfx.push({ cname: 'projectile', x: hydraX, y: 410, frame: f % 8, scale: 1.6, alpha: 0.95, onTop: 2 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 64) {
+        phase = "ĐỘC DƯỢC ĂN MÒN (ACID BATH DECAY)";
+        casterAction = "Hồ Độc Nhấn Chìm";
+        targetReaction = "Trúng Kịch Độc Ăn Mòn Sinh Mệnh!";
+        casterX = 230;
+        shake = f < 50 ? (50 - f) * 0.4 : 0;
+        if (f === 39) { playSound('impact'); flash = 'rgba(171, 71, 188, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 38) / 2) % 10, scale: 1.9, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 425, frame: Math.floor((f - 38) / 1.8) % 12, scale: 1.7, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.status = 'poison';
+          tg.damagePopup = { val: 5000 + idx * 750, crit: idx === 0, alpha: 1.0 - (f - 38) / 26 };
+        });
+      } else {
+        phase = "ĐỘC KHÍ LAN TỎA (TOXIC RESIDUAL)";
+        casterAction = "Thu Cánh Dơi Độc";
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4011: { // Hancock - Mũi Tên Mê Hoặc Thạch Hóa (Slave Arrow)
+      if (f < 18) {
+        phase = "TRÁI TIM QUYẾN RŨ (HEART FORM)";
+        casterAction = "Thổi Nụ Hôn Trái Tim";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.2, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 38) {
+        phase = "MƯA TÊN NỮ THẦN (SLAVE ARROW VOLLEY)";
+        casterAction = "Kéo Dây Cung Bắn Mưa Tên Hóa Đá";
+        targetReaction = "Bị Trúng Hàng Loạt Mũi Tên!";
+        for (let a = 0; a < 3; a++) {
+          const aProg = ((f * 3 + a * 30) % 100) / 100;
+          const ax = casterX + aProg * (700 - casterX + (a - 1) * 50);
+          const ay = 380 + Math.sin(aProg * Math.PI) * -40;
+          vfx.push({ cname: 'projectile', x: ax, y: ay, frame: (f + a) % 8, scale: 1.0, alpha: 0.9, onTop: 2 });
+        }
+        if (f === 19) playSound('projectile');
+      } else if (f < 64) {
+        phase = "HÓA ĐÁ TOÀN DIỆN (PETRIFICATION)";
+        casterAction = "Thưởng Thức Vẻ Đẹp Thạch Hóa";
+        targetReaction = "5 Kẻ Địch Bị Hóa Thành Tượng Đá!";
+        if (f === 39) { playSound('impact'); flash = 'rgba(236, 64, 122, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 38) / 2) % 10, scale: 1.8, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 38) / 1.8) % 12, scale: 1.6, alpha: 0.9, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.status = 'stone';
+          tg.damagePopup = { val: 5000 + idx * 780, crit: idx === 0, alpha: 1.0 - (f - 38) / 26 };
+        });
+      } else {
+        phase = "NGẠO THỊ THIÊN HẠ (EMPRESS GLANCE)";
+        casterAction = "Ngửa Cổ Ngắm Nhìn Tuyệt Đỉnh";
+      }
+      break;
+    }
+
+    case 4012: { // Marco - Phượng Hoàng Bất Tử Bộc Phá (Phoenix Azure Burst)
+      if (f < 18) {
+        phase = "TUNG CÁNH LAM HỎA (PHOENIX WINGS)";
+        casterAction = "Mở Rộng Đôi Cánh Lam Hỏa";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.4, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 38) {
+        phase = "PHI THIÊN OANH PHI (AIR DIVE & SWOOP)";
+        casterAction = "Lượn Cánh Trên Không Lao Xuống";
+        const prog = (f - 18) / 20;
+        casterX = 220 + prog * 350;
+        casterY = 415 - Math.sin(prog * Math.PI) * 190;
+        vfx.push({ cname: 'projectile', x: casterX, y: casterY + 20, frame: f % 8, scale: 1.5, alpha: 0.95, onTop: 2 });
+        if (f === 19) playSound('projectile');
+      } else if (f < 62) {
+        phase = "LAM HỎA BẤT TỬ BẠO PHÁ (AZURE VORTEX BURST)";
+        casterAction = "Đại Bạo Phá Lam Hỏa Phượng Hoàng";
+        targetReaction = "Lam Hỏa Bất Tử Thiêu Rụi 5 Kẻ Thù!";
+        casterX = 570;
+        casterY = 415;
+        shake = f < 50 ? (50 - f) * 0.6 : 0;
+        if (f === 39) { playSound('impact'); flash = 'rgba(41, 182, 246, 0.5)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 38) / 2) % 10, scale: 2.0, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 38) / 1.8) % 12, scale: 1.8, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchY = -12 * Math.sin((f - 38) * 0.4 + idx);
+          tg.status = 'blue_fire';
+          tg.damagePopup = { val: 5000 + idx * 850, crit: idx === 0, alpha: 1.0 - (f - 38) / 24 };
+        });
+      } else {
+        phase = "PHƯỢNG HOÀNG HẠ CÁNH (WING RETREAT)";
+        casterAction = "Bay Về Vị Trí Cũ Khép Cánh";
+        const prog = (f - 62) / 23;
+        casterX = 570 - prog * 350;
+        casterY = 415;
+      }
+      break;
+    }
+
+    case 4013: { // Sengoku - Đại Phật Sóng Xung Kích (Buddha Shockwave)
+      if (f < 20) {
+        phase = "HOÀNG KIM HÓA THÂN (GOLDEN BUDDHA FORM)";
+        casterAction = "Tỏa Ánh Sáng Vàng Hóa Đại Phật";
+        casterScale = 1.0 + (f / 20) * 0.25;
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.6, alpha: 0.95, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 36) {
+        phase = "PHẬT CHƯỞNG TỤ LỰC (SACRED PALM CHARGE)";
+        casterAction = "Giơ Tay Đẩy Đại Phật Chưởng";
+        casterScale = 1.25;
+        casterX = 250;
+        vfx.push({ cname: 'projectile', x: 450, y: 400, frame: f % 8, scale: 1.8, alpha: 1.0, onTop: 2 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 64) {
+        phase = "SÓNG XUNG KÍCH KINH THIÊN (SACRED SHOCKWAVE)";
+        casterAction = "Sóng Xung Kích Vàng Chấn Động Toàn Sân";
+        targetReaction = "Bị Lực Chưởng Phật Đẩy Lùi!";
+        casterScale = 1.25;
+        casterX = 240;
+        shake = f < 52 ? (52 - f) * 0.8 : 0;
+        if (f === 37) { playSound('impact'); flash = 'rgba(255, 215, 0, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 36) / 2) % 10, scale: 2.2, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 36) / 1.8) % 12, scale: 2.0, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = 16;
+          tg.status = 'shock';
+          tg.damagePopup = { val: 5000 + idx * 1050, crit: idx === 0, alpha: 1.0 - (f - 36) / 28 };
+        });
+      } else {
+        phase = "PHẬT QUANG THU HỒI (MANTRA DISSIPATION)";
+        casterAction = "Hạ Tay Uy Nghiêm";
+        casterScale = 1.0;
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4014: { // Kaido - Bát Quái Cửu Long Thiên (Thunder Bagua)
+      if (f < 18) {
+        phase = "BÁ VƯƠNG HẮC LÔI (CONQUEROR HAKI THUNDER)";
+        casterAction = "Tụ Sét Hắc Lôi Quanh Chùy Sắt";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.4, alpha: 0.95, onTop: 0 });
+        if (f === 1) playSound('thunder');
+      } else if (f < 32) {
+        phase = "LƯỚT NHANH TỐC ĐỘ (FLASH DASH LUNGE)";
+        casterAction = "Lướt Thần Tốc Tiếp Cận Mục Tiêu";
+        const prog = (f - 18) / 14;
+        casterX = 220 + prog * 310;
+        casterY = 415;
+        vfx.push({ cname: 'projectile', x: casterX, y: 400, frame: f % 8, scale: 1.5, alpha: 1.0, onTop: 2 });
+        if (f === 19) playSound('projectile');
+      } else if (f < 60) {
+        phase = "BÁT QUÁI THIÊN ĐỊA BỘC PHÁ (BAGUA SMASH)";
+        casterAction = "Vung Chùy Đập Tan Phòng Tuyến";
+        targetReaction = "Hắc Lôi Quật Ngã 5 Mục Tiêu!";
+        casterX = 530;
+        shake = f < 48 ? (48 - f) * 0.9 : 0;
+        if (f === 33) { playSound('impact'); flash = 'rgba(150, 0, 255, 0.5)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 32) / 2) % 10, scale: 2.2, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 32) / 1.8) % 12, scale: 1.9, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchX = 20;
+          tg.status = 'dark_lightning';
+          tg.damagePopup = { val: 5000 + idx * 1150, crit: idx === 0, alpha: 1.0 - (f - 32) / 28 };
+        });
+      } else {
+        phase = "BÁCH THÚ VÔ ĐỊCH (KAIZO DRAGON PRIDE)";
+        casterAction = "Vác Chùy Lên Vai Gầm Thét";
+        const prog = (f - 60) / 25;
+        casterX = 530 - prog * 310;
+      }
+      break;
+    }
+
+    case 4015: { // Sabo - Long Trảo Viêm Long Toái Địa (Dragon Claw Flame)
+      if (f < 18) {
+        phase = "LONG TRẢO THẾ (DRAGON STANCE)";
+        casterAction = "Tụ Hỏa Long Vào Ngón Tay";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.2, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 34) {
+        phase = "PHI THÂN TOÁI ĐỊA (LEAP & SLAM)";
+        casterAction = "Nhảy Lên Cao Giáng Vuốt Xuống";
+        const prog = (f - 18) / 16;
+        casterX = 220 + prog * 160;
+        casterY = 415 - Math.sin(prog * Math.PI) * 140;
+        vfx.push({ cname: 'projectile', x: casterX, y: casterY, frame: f % 8, scale: 1.3, alpha: 0.95, onTop: 2 });
+        if (f === 19) playSound('projectile');
+      } else if (f < 62) {
+        phase = "VIÊM LONG BỘC PHÁ (DRAGON FLAME PILLAR)";
+        casterAction = "Cắm Long Trảo Vỡ Nền Đất";
+        targetReaction = "Rồng Lửa Trỗi Dậy Thiêu Rụi!";
+        casterX = 380;
+        casterY = 415;
+        shake = f < 50 ? (50 - f) * 0.7 : 0;
+        if (f === 35) { playSound('impact'); flash = 'rgba(255, 120, 0, 0.45)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 34) / 2) % 10, scale: 2.0, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 420, frame: Math.floor((f - 34) / 1.8) % 12, scale: 1.8, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchY = -14 * Math.sin((f - 34) * 0.4 + idx);
+          tg.status = 'burn';
+          tg.damagePopup = { val: 5000 + idx * 900, crit: idx === 0, alpha: 1.0 - (f - 34) / 28 };
+        });
+      } else {
+        phase = "QUÂN CÁCH MẠNG CHIẾN THẮNG (SABO HAT ADJUST)";
+        casterAction = "Chỉnh Lại Mũ Ống Lãng Tử";
+        casterX = 220;
+      }
+      break;
+    }
+
+    case 4016: { // Fujitora - Vận Thạch Thiên Giáng (Gravity Meteor Drop)
+      if (f < 20) {
+        phase = "TRỌNG LỰC HƯ KHÔNG (GRAVITY INVOCATION)";
+        casterAction = "Rút Kiếm Kéo Trọng Lực Không Gian";
+        vfx.push({ cname: 'aura', x: casterX, y: casterY, frame: f % 8, scale: 1.3, alpha: 0.9, onTop: 0 });
+        if (f === 1) playSound('cast');
+      } else if (f < 36) {
+        phase = "THIÊN THẠCH LAO XUỐNG (METEOR DESCENT)";
+        casterAction = "Kéo Thiên Thạch Rơi Tự Do Từ Vũ Trụ";
+        targetReaction = "Bóng Đen Thiên Thạch Bao Phủ!";
+        const prog = (f - 20) / 16;
+        const metX = 900 - prog * 200;
+        const metY = -50 + prog * 440;
+        vfx.push({ cname: 'projectile', x: metX, y: metY, frame: f % 8, scale: 2.2, alpha: 1.0, onTop: 2, rotation: 0.8 });
+        if (f === 21) playSound('projectile');
+      } else if (f < 66) {
+        phase = "THIÊN GIÁNG HỦY DIỆT (COSMIC CRATER IMPACT)";
+        casterAction = "Thiên Thạch Va Chạm Tàn Phá Mặt Đất";
+        targetReaction = "Trọng Lực Đè Nén & Nổ Tung!";
+        shake = f < 54 ? (54 - f) * 1.1 : 0;
+        if (f === 37) { playSound('impact'); flash = 'rgba(180, 100, 255, 0.55)'; }
+        vfx.push({ cname: 'impact', x: 700, y: 410, frame: Math.floor((f - 36) / 2) % 10, scale: 2.4, alpha: 1.0, onTop: 2 });
+        vfx.push({ cname: 'finisher', x: 700, y: 425, frame: Math.floor((f - 36) / 1.8) % 12, scale: 2.0, alpha: 0.95, onTop: 2 });
+        targets.forEach((tg, idx) => {
+          tg.flinch = true;
+          tg.flinchY = 12;
+          tg.status = 'void';
+          tg.damagePopup = { val: 5000 + idx * 1200, crit: idx === 0, alpha: 1.0 - (f - 36) / 30 };
+        });
+      } else {
+        phase = "TRA KIẾM VÀO BAO (GRAVITY SWORD SHEATH)";
+        casterAction = "Tra Kiếm Gõ Cốp Bình Thản";
+        casterX = 220;
+      }
+      break;
+    }
+  }
+
+  return {
+    phase,
+    casterAction,
+    targetReaction,
+    shake,
+    flash,
+    caster: {
+      x: casterX,
+      y: casterY,
+      alpha: casterAlpha,
+      scale: casterScale,
+      rotation: casterRotation,
+      src: casterSpriteSrc,
+      prefix: cfg.prefix
+    },
+    targets,
+    vfx
+  };
+}
+
+// Draw combat arena
+function renderCombat(ctx, choreo, skill) {
+  const W = 960;
+  const H = 540;
+
+  ctx.save();
+
+  // Screen shake
+  if (choreo.shake > 0) {
+    const sx = (Math.random() - 0.5) * choreo.shake;
+    const sy = (Math.random() - 0.5) * choreo.shake;
+    ctx.translate(sx, sy);
+  }
+
+  // Clear Canvas
+  ctx.fillStyle = '#060210';
+  ctx.fillRect(0, 0, W, H);
+
+  // Background Arena Battleground
+  drawBattleground(ctx, W, H, skill);
+
+  // Draw Ground VFX (onTop <= 0)
+  drawVfxList(ctx, choreo.vfx.filter(v => v.onTop <= 0), skill);
+
+  // Draw Targets Shadows
+  choreo.targets.forEach(tg => {
+    drawShadow(ctx, tg.x + tg.flinchX, tg.y + tg.flinchY, 40 * tg.scale, 14 * tg.scale);
+  });
+
+  // Draw Caster Shadow
+  drawShadow(ctx, choreo.caster.x, choreo.caster.y, 45 * choreo.caster.scale, 16 * choreo.caster.scale);
+
+  // Draw 5 Targets (facing LEFT toward caster)
+  choreo.targets.forEach(tg => {
+    drawTargetSprite(ctx, tg);
+  });
+
+  // Draw Caster Sprite (facing RIGHT toward targets)
+  drawCasterSprite(ctx, choreo.caster);
+
+  // Draw Front VFX (onTop > 0)
+  drawVfxList(ctx, choreo.vfx.filter(v => v.onTop > 0), skill);
+
+  // Draw Damage Popups
+  choreo.targets.forEach(tg => {
+    if (tg.damagePopup && tg.damagePopup.alpha > 0.05) {
+      drawDamageNumber(ctx, tg.x + tg.flinchX, tg.y + tg.flinchY - 140, tg.damagePopup, skill);
+    }
+  });
+
+  // Screen flash effect
+  if (choreo.flash) {
+    ctx.fillStyle = choreo.flash;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // Cinematic Letterbox (if enabled)
+  const chkLetter = document.getElementById('chkLetterbox');
+  if (chkLetter && chkLetter.checked) {
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, W, 36);
+    ctx.fillRect(0, H - 36, W, 36);
+  }
+
+  ctx.restore();
+}
+
+// Draw Battleground Floor & Perspective
+function drawBattleground(ctx, W, H, skill) {
+  const horGrad = ctx.createLinearGradient(0, 0, 0, 360);
+  horGrad.addColorStop(0, '#04010a');
+  horGrad.addColorStop(1, '#110526');
+  ctx.fillStyle = horGrad;
+  ctx.fillRect(0, 0, W, 360);
+
+  // Distant Marine Fortress Silhouettes
+  ctx.fillStyle = 'rgba(25, 9, 50, 0.6)';
+  ctx.fillRect(100, 240, 140, 120);
+  ctx.fillRect(140, 210, 60, 30);
+  ctx.fillRect(720, 230, 160, 130);
+  ctx.fillRect(770, 190, 60, 40);
+
+  // Floor perspective
+  const floorGrad = ctx.createLinearGradient(0, 340, 0, H);
+  floorGrad.addColorStop(0, '#170836');
+  floorGrad.addColorStop(0.3, '#100524');
+  floorGrad.addColorStop(1, '#080214');
+  ctx.fillStyle = floorGrad;
+  ctx.fillRect(0, 340, W, H - 340);
+
+  // Arena ground lines
+  ctx.strokeStyle = 'rgba(90, 40, 150, 0.25)';
+  ctx.lineWidth = 1;
+  for (let y = 350; y < H; y += 22) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+  for (let x = -200; x < W + 400; x += 120) {
+    ctx.beginPath();
+    ctx.moveTo(x, 340);
+    ctx.lineTo(x + (x - W / 2) * 0.9, H);
+    ctx.stroke();
+  }
+
+  // Combat AOE Ring indicator
+  ctx.save();
+  ctx.strokeStyle = `${skill.color}55`;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.ellipse(700, 415, 140, 60, 0, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+// Draw Elliptical Ground Shadow
+function drawShadow(ctx, x, y, rx, ry) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+  ctx.beginPath();
+  ctx.ellipse(x, y - 2, rx, ry, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+// Draw Caster Hero Sprite with instant fallback
+function drawCasterSprite(ctx, caster) {
+  let img = getImg(caster.src);
+  if (!img.complete || img.naturalWidth === 0) {
+    img = getImg(`${caster.prefix}0.png`);
+  }
+  if (!img.complete || img.naturalWidth === 0) return;
+
+  ctx.save();
+  ctx.translate(caster.x, caster.y);
+  if (caster.rotation) ctx.rotate(caster.rotation);
+  if (caster.scale !== 1.0) ctx.scale(caster.scale, caster.scale);
+  ctx.globalAlpha = caster.alpha !== undefined ? caster.alpha : 1.0;
+
+  ctx.drawImage(img, -80, -185, 160, 200);
+  ctx.restore();
+}
+
+// Draw Target Sprite with Flinching, Elemental Tint, and HP bar
+function drawTargetSprite(ctx, tg) {
+  let img = getImg(tg.src);
+  if (!img.complete || img.naturalWidth === 0) {
+    img = getImg(`${tg.prefix}0.png`);
+  }
+  if (!img.complete || img.naturalWidth === 0) return;
+
+  ctx.save();
+  const tx = tg.x + tg.flinchX;
+  const ty = tg.y + tg.flinchY;
+  ctx.translate(tx, ty);
+
+  // Targets face LEFT toward the caster
+  ctx.scale(-tg.scale, tg.scale);
+
+  // Elemental status filter directly hugging sprite contours (zero rectangle!)
+  if (tg.status === 'burn' || tg.status === 'magma') {
+    ctx.filter = 'drop-shadow(0 0 10px #ff3d00) saturate(220%) brightness(1.1)';
+  } else if (tg.status === 'frozen') {
+    ctx.filter = 'drop-shadow(0 0 12px #00e5ff) hue-rotate(160deg) brightness(1.15)';
+  } else if (tg.status === 'stone') {
+    ctx.filter = 'grayscale(100%) contrast(120%) brightness(0.9)';
+  } else if (tg.status === 'shock') {
+    ctx.filter = 'drop-shadow(0 0 10px #ffd700) brightness(1.25)';
+  } else if (tg.status === 'poison') {
+    ctx.filter = 'drop-shadow(0 0 10px #ab47bc) hue-rotate(270deg)';
+  } else if (tg.status === 'void') {
+    ctx.filter = 'drop-shadow(0 0 10px #7b1fa2) brightness(0.85)';
+  } else if (tg.status === 'blue_fire') {
+    ctx.filter = 'drop-shadow(0 0 10px #00b0ff) saturate(200%)';
+  } else if (tg.status === 'dark_lightning') {
+    ctx.filter = 'drop-shadow(0 0 12px #9c27b0) contrast(150%)';
+  } else {
+    ctx.filter = 'none';
+  }
+
+  // Draw authentic pixel-art sprite
+  ctx.drawImage(img, -80, -185, 160, 200);
+
+  ctx.filter = 'none';
+  ctx.restore();
+
+  // Draw Target HP Bar above head
+  drawTargetHpBar(ctx, tx, ty - 160, tg);
+}
+
+// Draw Target Mini HP Bar
+function drawTargetHpBar(ctx, x, y, tg) {
+  ctx.save();
+  const w = 44;
+  const h = 4;
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+  ctx.fillRect(x - w / 2, y, w, h);
+
+  const hpPct = Math.max(0.2, (tg.flinch ? 0.65 : 0.95));
+  ctx.fillStyle = tg.id === 0 ? '#ffd700' : '#e91e63';
+  ctx.fillRect(x - w / 2 + 1, y + 1, (w - 2) * hpPct, h - 2);
+  ctx.restore();
+}
+
+// Draw Floating Damage Numbers
+function drawDamageNumber(ctx, x, y, popup, skill) {
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, popup.alpha);
+  ctx.font = popup.crit ? '900 22px monospace' : '700 16px monospace';
+  ctx.textAlign = 'center';
+  ctx.strokeStyle = '#000000';
+  ctx.lineWidth = 4;
+
+  const txt = popup.crit ? `CRIT -${popup.val}!` : `-${popup.val}`;
+  ctx.strokeText(txt, x, y);
+
+  ctx.fillStyle = popup.crit ? '#ffd700' : (skill.color || '#ff5722');
+  ctx.fillText(txt, x, y);
+  ctx.restore();
+}
+
+// Draw VFX list from spritesheets
+function drawVfxList(ctx, vfxItems, skill) {
+  const sid = skill.id;
+  vfxItems.forEach(item => {
+    const meta = META[sid] && META[sid][item.cname];
+    if (!meta) return;
+
+    const img = getImg(meta.sheet_x1);
+    if (!img.complete || img.naturalWidth === 0) return;
+
+    const fw = meta.w;
+    const fh = meta.h;
+    const fIdx = Math.max(0, Math.min(meta.frames - 1, item.frame));
+    const sy = fIdx * fh;
+
+    ctx.save();
+    ctx.translate(item.x, item.y);
+    if (item.rotation) ctx.rotate(item.rotation);
+    if (item.scale && item.scale !== 1.0) ctx.scale(item.scale, item.scale);
+    if (item.alpha !== undefined) ctx.globalAlpha = item.alpha;
+
+    if (item.blendMode) {
+      ctx.globalCompositeOperation = item.blendMode;
+    } else {
+      ctx.globalCompositeOperation = 'lighter';
+    }
+
+    let drawX = -fw / 2;
+    let drawY = meta.anchor === 'bottom' ? -fh : -fh / 2;
+
+    ctx.drawImage(img, 0, sy, fw, fh, drawX, drawY, fw, fh);
+    ctx.restore();
+  });
+}
+
+// Inspector Mode Grid Rendering
+function renderInspector() {
+  const container = document.getElementById('inspGrid');
+  if (!container) return;
+
+  const skill = SKILLS[curSkillIdx];
+  const sid = skill.id;
+  const comps = ['cast', 'projectile', 'impact', 'aura', 'particles', 'finisher'];
+
+  if (container.dataset.skillId !== String(sid)) {
+    container.dataset.skillId = String(sid);
+    container.innerHTML = '';
+
+    comps.forEach(cname => {
+      const meta = META[sid] && META[sid][cname];
+      if (!meta) return;
+
+      const card = document.createElement('div');
+      card.className = 'insp-card';
+      card.innerHTML = `
+        <div class="insp-title">
+          <span>${cname.toUpperCase()}</span>
+          <span style="color:#00e5ff;">${meta.frames} Frames</span>
+        </div>
+        <div class="insp-sub">Size: ${meta.w}x${meta.h}px | Anchor: ${meta.anchor}</div>
+        <div class="insp-preview">
+          <canvas id="inspCanvas_${cname}" width="${meta.w}" height="${meta.h}"></canvas>
+        </div>
+        <div style="font-size:10px; color:#a48dc7; display:flex; justify-content:space-between;">
+          <span>Sheet 1x & 2x Available</span>
+          <span id="inspFrameLbl_${cname}">Frame 0</span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  comps.forEach(cname => {
+    const meta = META[sid] && META[sid][cname];
+    if (!meta) return;
+
+    const cvs = document.getElementById(`inspCanvas_${cname}`);
+    if (!cvs) return;
+    const ctx = cvs.getContext('2d');
+    
+    // Transparent Checkerboard
+    ctx.fillStyle = '#080315';
+    ctx.fillRect(0, 0, cvs.width, cvs.height);
+    ctx.fillStyle = '#120726';
+    const sz = 12;
+    for (let y = 0; y < cvs.height; y += sz) {
+      for (let x = (Math.floor(y / sz) % 2 === 0 ? 0 : sz); x < cvs.width; x += sz * 2) {
+        ctx.fillRect(x, y, sz, sz);
+      }
+    }
+
+    const img = getImg(meta.sheet_x1);
+    if (img.complete && img.naturalWidth > 0) {
+      const f = Math.floor(curFrame / 3) % meta.frames;
+      const sy = f * meta.h;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, sy, meta.w, meta.h, 0, 0, meta.w, meta.h);
+
+      const lbl = document.getElementById(`inspFrameLbl_${cname}`);
+      if (lbl) lbl.textContent = `Frame ${f + 1}/${meta.frames}`;
+    }
+  });
+}
+
+// Update DOM HUD and UI
+function updateUI() {
+  const skill = SKILLS[curSkillIdx];
+  const choreo = getAnimeChoreography(skill, curFrame);
+
+  const bName = document.getElementById('badgeSkillName');
+  if (bName) bName.textContent = `${skill.id} - ${skill.name}`;
+  const bSet = document.getElementById('badgeSetName');
+  if (bSet) bSet.textContent = skill.set_name;
+  const bHero = document.getElementById('badgeHeroName');
+  if (bHero) bHero.textContent = skill.char;
+
+  const hudF = document.getElementById('hudFrameVal');
+  if (hudF) hudF.textContent = `${curFrame} / ${TOTAL_FRAMES}`;
+  const txtP = document.getElementById('txtPhase');
+  if (txtP) txtP.textContent = choreo.phase;
+  const txtC = document.getElementById('txtCasterAction');
+  if (txtC) txtC.textContent = choreo.casterAction;
+  const txtT = document.getElementById('txtTargetReaction');
+  if (txtT) txtT.textContent = choreo.targetReaction;
+
+  const slider = document.getElementById('timelineSlider');
+  if (slider) slider.value = curFrame;
+  const lblF = document.getElementById('lblFrame');
+  if (lblF) {
+    const sec = (curFrame / 25).toFixed(2);
+    lblF.textContent = `Frame ${curFrame} / ${TOTAL_FRAMES} (${sec}s)`;
+  }
+
+  document.querySelectorAll('.skill-card').forEach((card, idx) => {
+    if (idx === curSkillIdx) {
+      card.classList.add('active');
+    } else {
+      card.classList.remove('active');
+    }
+  });
+}
+
+// Master Loop
+function mainLoop(timestamp) {
+  if (!lastTimestamp) lastTimestamp = timestamp;
+  const delta = timestamp - lastTimestamp;
+  lastTimestamp = timestamp;
+
+  if (isPlaying) {
+    const speed = isSlowMo ? 0.4 : 1.0;
+    const fps = 25 * speed;
+    frameAccumulator += delta;
+
+    if (frameAccumulator >= 1000 / fps) {
+      curFrame++;
+      frameAccumulator = 0;
+
+      if (curFrame >= TOTAL_FRAMES) {
+        curFrame = 0;
+        if (isAuto) {
+          curSkillIdx = (curSkillIdx + 1) % SKILLS.length;
+          preloadSkillAssets(curSkillIdx);
+          preloadSkillAssets((curSkillIdx + 1) % SKILLS.length);
+        }
+      }
+    }
+  }
+
+  const skill = SKILLS[curSkillIdx];
+  const choreo = getAnimeChoreography(skill, curFrame);
+
+  if (curMode === 'combat') {
+    const cvs = document.getElementById('stageCanvas');
+    if (cvs) {
+      const ctx = cvs.getContext('2d');
+      renderCombat(ctx, choreo, skill);
+    }
+  } else {
+    renderInspector();
+  }
+
+  updateUI();
+  requestAnimationFrame(mainLoop);
+}
+
+// Populate Sidebar with 16 Skill Cards
+function initSidebar() {
+  const list = document.getElementById('skillList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  SKILLS.forEach((s, idx) => {
+    const card = document.createElement('div');
+    card.className = `skill-card ${idx === curSkillIdx ? 'active' : ''}`;
+    card.onclick = () => {
+      curSkillIdx = idx;
+      curFrame = 0;
+      preloadSkillAssets(curSkillIdx);
+      preloadSkillAssets((curSkillIdx + 1) % SKILLS.length);
+      updateUI();
+    };
+
+    card.innerHTML = `
+      <img class="skill-icon-thumb" src="../icons/x2/${s.icon}.png" alt="${s.name}" onerror="this.src='../icons/x1/${s.icon}.png'">
+      <div class="skill-meta">
+        <div class="skill-meta-title">${s.id} - ${s.name}</div>
+        <div class="skill-meta-sub">${s.char}</div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function togglePlay() {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('btnPlayPause');
+  if (btn) btn.textContent = isPlaying ? '⏸ Tạm Dừng' : '▶ Phát';
+}
+
+function restartSkill() {
+  curFrame = 0;
+  isPlaying = true;
+  const btn = document.getElementById('btnPlayPause');
+  if (btn) btn.textContent = '⏸ Tạm Dừng';
+}
+
+function toggleAuto() {
+  isAuto = !isAuto;
+  const btn = document.getElementById('btnAuto');
+  if (btn) {
+    btn.textContent = isAuto ? '⏩ Tự Đổi Kỹ Năng: BẬT' : '⏩ Tự Đổi Kỹ Năng: TẮT';
+    if (isAuto) btn.classList.add('active'); else btn.classList.remove('active');
+  }
+}
+
+function toggleSlowMo() {
+  isSlowMo = !isSlowMo;
+  const btn = document.getElementById('btnSlowMo');
+  if (btn) {
+    if (isSlowMo) btn.classList.add('active'); else btn.classList.remove('active');
+  }
+}
+
+function onScrub(val) {
+  curFrame = parseInt(val, 10);
+  isPlaying = false;
+  const btn = document.getElementById('btnPlayPause');
+  if (btn) btn.textContent = '▶ Phát';
+  updateUI();
+}
+
+function prevSkill() {
+  curSkillIdx = (curSkillIdx - 1 + SKILLS.length) % SKILLS.length;
+  curFrame = 0;
+  preloadSkillAssets(curSkillIdx);
+  updateUI();
+}
+
+function nextSkill() {
+  curSkillIdx = (curSkillIdx + 1) % SKILLS.length;
+  curFrame = 0;
+  preloadSkillAssets(curSkillIdx);
+  updateUI();
+}
+
+function triggerManualCast() {
+  curFrame = 20;
+  isPlaying = true;
+  const btn = document.getElementById('btnPlayPause');
+  if (btn) btn.textContent = '⏸ Tạm Dừng';
+}
+
+function switchMode(mode) {
+  curMode = mode;
+  const btnCombat = document.getElementById('modeCombatBtn');
+  const btnInspect = document.getElementById('modeInspectBtn');
+  const stageWrap = document.getElementById('stage-wrapper');
+  const inspCont = document.getElementById('inspector-container');
+
+  if (mode === 'combat') {
+    if (btnCombat) btnCombat.classList.add('active');
+    if (btnInspect) btnInspect.classList.remove('active');
+    if (stageWrap) stageWrap.style.display = 'flex';
+    if (inspCont) inspCont.style.display = 'none';
+  } else {
+    if (btnCombat) btnCombat.classList.remove('active');
+    if (btnInspect) btnInspect.classList.add('active');
+    if (stageWrap) stageWrap.style.display = 'none';
+    if (inspCont) inspCont.style.display = 'block';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initSidebar();
+  preloadPriority();
+  updateUI();
+  requestAnimationFrame(mainLoop);
+});
+
+</script>
+</body>
+</html>

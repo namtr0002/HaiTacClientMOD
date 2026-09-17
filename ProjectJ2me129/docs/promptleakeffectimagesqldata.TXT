@@ -1,0 +1,1411 @@
+vẫn lỗi không chạy ? tôi đã gọi run rồi mà ? xem lại code server client đi rồi nghiên cứu đi
+SERVER
+case 74: {
+                byte type = m.reader().readByte();
+                short id = m.reader().readShort();
+                Logp.debug("74 type", type, "id", id);
+
+                if (conn.p != null) {
+                    switch (type) {
+                        case 0: // client yêu cầu dữ liệu effect
+                            EffectService.sendEffectData(conn.p, id);
+                            break;
+                        case 1: // gắn effect vào đối tượng (ví dụ mob, player)
+                            // Cái này thường do server chủ động gọi, nhưng nếu client gửi lên thì xử lý tại đây
+                            // Tham số tiếp theo: targetId, time, typeMove, loop
+                            int targetId = m.reader().readShort();
+                            int time = m.reader().readInt();
+                            byte typeMove = m.reader().readByte();
+                            byte loop = m.reader().readByte();
+                            EffectService.attachEffectToPlayer(conn.p, targetId, id, time, typeMove, loop);
+                            break;
+                        case 2: // gỡ effect
+                            int targetIdRemove = m.reader().readShort();
+                            EffectService.removeEffectFromPlayer(conn.p, targetIdRemove, id);
+                            break;
+                        default:
+                            Logp.warn("Unknown effect type: " + type);
+                            break;
+                    }
+                }
+                break;
+            }package effect; 
+
+import engine.network.Message;
+import gameplay.players.Player;
+
+import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+
+/**
+ * EffectService
+ * - Gửi dữ liệu effect & ảnh tới client.
+ * - Sử dụng image cache từ file hoặc từ EffectDAO.CACHE_IMG.
+ */
+public class EffectService {
+
+    private static final Map<Short, byte[]> imageCache = new HashMap<>();
+    private static final String IMAGE_DIR = "data/template/skill";
+
+    public static void sendEffectData(Player p, short effId) {
+        byte[] raw = EffectDAO.CACHE_RAW.get(effId);
+        if (raw == null) {
+            System.err.println("EffectService: raw data for effId=" + effId + " not found!");
+            return;
+        }
+        byte[] img = imageCache.get(effId);
+        if (img == null) img = EffectDAO.CACHE_IMG.get(effId);
+        if (img == null) {
+            img = loadImageFromFile(p.conn.zoomlv,effId);
+            if (img != null) {
+                imageCache.put(effId, img);
+            }
+        }
+        try {
+            Message m = new Message(76);
+            DataOutputStream dos = m.writer();
+            dos.writeByte(0);
+            dos.writeShort(effId);
+            if (raw.length > Short.MAX_VALUE) {
+                dos.writeShort(Short.MAX_VALUE);
+                dos.write(raw, 0, Short.MAX_VALUE);
+            } else {
+                dos.writeShort(raw.length);
+                dos.write(raw);
+            }
+            if (img != null && img.length > 0) {
+                dos.write(img);
+            }
+            dos.flush();
+            p.conn.addmsg(m);
+            m.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void attachEffectToPlayer(Player p, int targetId, short effId, int time, byte typeMove, byte loop) {
+        try {
+            Message m = new Message(76);
+            DataOutputStream dos = m.writer();
+            dos.writeByte(1);
+            dos.writeShort(targetId);
+            dos.writeShort(effId);
+            dos.writeInt(time);
+            dos.writeByte(typeMove);
+            dos.writeByte(loop);
+            dos.flush();
+            p.conn.addmsg(m);
+            m.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void attachEffectToPlayerMAP(Player p, int targetId, short effId, int time, byte typeMove, byte loop) {
+        try {
+            Message m = new Message(76);
+            DataOutputStream dos = m.writer();
+            dos.writeByte(1);
+            dos.writeShort(targetId);
+            dos.writeShort(effId);
+            dos.writeInt(time);
+            dos.writeByte(typeMove);
+            dos.writeByte(loop);
+            dos.flush();
+            p.conn.addmsg(m);
+            m.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeEffectFromPlayer(Player p, int targetId, short effId) {
+        try {
+            Message m = new Message(76);
+            DataOutputStream dos = m.writer();
+            dos.writeByte(2);
+            dos.writeShort(targetId);
+            dos.writeShort(effId);
+            dos.flush();
+            p.conn.addmsg(m);
+            m.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static byte[] loadImageFromFile(byte zoomLevel,short effId) {
+        Path[] paths = new Path[] {
+                Path.of("data","template","skill", effId + ".png"),
+                Path.of("data","template","skill", effId + ".img"),
+                Path.of("data","template","skill","x"+zoomLevel, effId + ".png"),
+                Path.of("data","template","skill","x"+zoomLevel,"img", effId + ".png")
+        };
+        for (Path p : paths) {
+            try {
+                if (Files.exists(p)) return Files.readAllBytes(p);
+            } catch (IOException ignored) {}
+        }
+        Path[] scan = new Path[] {
+                Path.of("data","template","skill"),
+                Path.of("data","template","skill","x"+zoomLevel),
+                Path.of("data","template","skill","x"+zoomLevel,"img")
+        };
+        for (Path base : scan) {
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(base, effId + ".*")) {
+                for (Path x : ds) {
+                    if (Files.isRegularFile(x)) {
+                        try { return Files.readAllBytes(x); } catch (IOException ignored) {}
+                    }
+                }
+            } catch (IOException ignored) {}
+        }
+        return null;
+    }
+}
+package effect;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import engine.kernel.Logp;
+import engine.persistence.DbManager;
+import gameplay.actions.Market;
+
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.file.*;
+import java.sql.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.GZIPInputStream;
+
+/**
+ * EffectDAO
+ * - Ưu tiên load raw binary (file trên disk nếu có), sau đó raw_data từ DB, sau đó mới rebuild từ JSON.
+ * - Đồng thời cố gắng load image bytes (img) từ DB hoặc từ disk (nhiều path).
+ */
+public class EffectDAO {
+
+    public static final Map<Short, byte[]> CACHE_RAW = new ConcurrentHashMap<>();
+    public static final Map<Short, byte[]> CACHE_IMG = new ConcurrentHashMap<>();
+    private static final Gson GSON = new Gson();
+
+    // paths to try for raw data / images (tương đối tới working dir)
+    private static final Path[] RAW_PATHS = new Path[] {
+            Paths.get("data","template","skill"),
+            Paths.get("data","template","skill","x1","data"),
+            Paths.get("data","template","skill","x1"),
+            Paths.get("data","template","skill","data")
+    };
+    private static final Path[] IMG_PATHS = new Path[] {
+            Paths.get("data","template","skill"),
+            Paths.get("data","template","skill","x1"),
+            Paths.get("data","template","skill","x1","img"),
+            Paths.get("data","template","skill","img")
+    };
+
+    public static void load() {
+        CACHE_RAW.clear();
+        CACHE_IMG.clear();
+
+        String sql = "SELECT * FROM effect_data";
+        int rawFromDisk = 0, rawFromDb = 0, rebuilt = 0;
+        try (PreparedStatement ps = DbManager.gI().getConnection().prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                short effId = rs.getShort("eff_id");
+                byte[] raw = null;
+                boolean rawFromDiskFlag = false;
+
+                // 1) Try load raw from disk (file names: effId, effId.data, effId.bin, effId.dat)
+                raw = tryLoadRawFromDisk(effId);
+                if (raw != null) {
+                    CACHE_RAW.put(effId, raw);
+                    rawFromDisk++;
+                    rawFromDiskFlag = true;
+                }
+
+                // 2) If no disk raw, try DB raw_data column
+                if (!rawFromDiskFlag) {
+                    try {
+                        byte[] dbRaw = null;
+                        try { dbRaw = rs.getBytes("raw_data"); } catch (SQLException ignore) { dbRaw = null; }
+                        if (dbRaw != null && dbRaw.length > 0) {
+                            int compressed = 0;
+                            try { compressed = rs.getInt("raw_compressed"); } catch (SQLException ignore) {}
+                            if (compressed == 1) {
+                                try { raw = ungzip(dbRaw); } catch (IOException ex) {
+                                    Logp.warn("EffectDAO: ungzip failed for effId=" + effId + ", using db raw as-is", ex);
+                                    raw = dbRaw;
+                                }
+                            } else {
+                                raw = dbRaw;
+                            }
+                            if (raw != null && raw.length > 0) {
+                                CACHE_RAW.put(effId, raw);
+                                rawFromDb++;
+                            }
+                        }
+                    } catch (Throwable t) {
+                        Logp.warn("EffectDAO: error reading raw_data for effId=" + effId, t);
+                    }
+                }
+
+                // 3) If still no raw, try rebuild from JSON (last resort)
+                if (!CACHE_RAW.containsKey(effId)) {
+                    try {
+                        String imagesJson = safeGetString(rs, "images");
+                        String framesJson = safeGetString(rs, "frames");
+                        String sequencesJson = safeGetString(rs, "sequences");
+                        String charFramesJson = safeGetString(rs, "char_frames");
+                        String splashJson = safeGetString(rs, "splash");
+
+                        boolean hasJson = (imagesJson != null && !imagesJson.isEmpty()) ||
+                                (framesJson != null && !framesJson.isEmpty());
+                        if (hasJson) {
+                            try {
+                                byte[] rebuiltRaw = rebuildRawDataFromParsed(
+                                        effId,
+                                        rs.getInt("num_images"),
+                                        rs.getInt("seq_length"),
+                                        rs.getBoolean("has_extended"),
+                                        imagesJson,
+                                        framesJson,
+                                        sequencesJson,
+                                        charFramesJson,
+                                        splashJson
+                                );
+                                if (rebuiltRaw != null && rebuiltRaw.length > 0) {
+                                    CACHE_RAW.put(effId, rebuiltRaw);
+                                    rebuilt++;
+                                    Logp.info("EffectDAO: rebuilt raw from JSON effId=" + effId + " len=" + rebuiltRaw.length);
+                                }
+                            } catch (Exception ex) {
+                                Logp.warn("EffectDAO: rebuild fail for effId=" + effId, ex);
+                            }
+                        }
+                    } catch (Throwable t) {
+                        Logp.error("EffectDAO: error reading JSON for effId=" + effId, t);
+                    }
+                }
+
+                // 4) Try load image blob from DB (many possible column names)
+                try {
+                    byte[] img = null;
+                    String[] imgCols = new String[]{"img_data","img","image","image_data","image_blob","img_blob"};
+                    for (String c : imgCols) {
+                        try {
+                            byte[] b = rs.getBytes(c);
+                            if (b != null && b.length > 0) { img = b; break; }
+                        } catch (SQLException ignore) {}
+                    }
+                    // If not found in DB, try disk image paths
+                    if (img == null) {
+                        img = tryLoadImageFromDisk(effId);
+                    }
+                    if (img != null && img.length > 0) {
+                        CACHE_IMG.put(effId, img);
+                    }
+                } catch (Throwable t) {
+                    Logp.warn("EffectDAO: error loading image for effId=" + effId, t);
+                }
+
+                if (!CACHE_RAW.containsKey(effId)) {
+                    Logp.error("EffectDAO: no raw for effId=" + effId);
+                }
+            }
+            Logp.info("Load effect_data["+CACHE_RAW.size()+"]");
+        } catch (SQLException e) {
+            Logp.error("EffectDAO: DB error", e);
+        }
+    }
+
+    private static byte[] tryLoadRawFromDisk(short effId) {
+        String[] tryNames = new String[]{"" + effId, effId + ".data", effId + ".dat", effId + ".raw", effId + ".bin"};
+        for (Path base : RAW_PATHS) {
+            for (String name : tryNames) {
+                Path p = base.resolve(name);
+                if (Files.exists(p) && Files.isRegularFile(p)) {
+                    try {
+                        return Files.readAllBytes(p);
+                    } catch (IOException ignored) {}
+                }
+            }
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(base, effId + ".*")) {
+                for (Path x : ds) {
+                    if (Files.isRegularFile(x)) {
+                        try { return Files.readAllBytes(x); } catch (IOException ignored) {}
+                    }
+                }
+            } catch (IOException ignored) {}
+        }
+        return null;
+    }
+
+    private static byte[] tryLoadImageFromDisk(short effId) {
+        String[] tryNames = new String[]{effId + ".png", effId + ".img", effId + ".png.data"};
+        for (Path base : IMG_PATHS) {
+            for (String name : tryNames) {
+                Path p = base.resolve(name);
+                if (Files.exists(p) && Files.isRegularFile(p)) {
+                    try {
+                        return Files.readAllBytes(p);
+                    } catch (IOException ignored) {}
+                }
+            }
+            try (DirectoryStream<Path> ds = Files.newDirectoryStream(base, effId + ".*")) {
+                for (Path x : ds) {
+                    if (Files.isRegularFile(x)) {
+                        try { return Files.readAllBytes(x); } catch (IOException ignored) {}
+                    }
+                }
+            } catch (IOException ignored) {}
+        }
+        return null;
+    }
+
+    private static String safeGetString(ResultSet rs, String col) {
+        try {
+            String v = rs.getString(col);
+            return v == null ? "" : v;
+        } catch (SQLException e) {
+            return "";
+        }
+    }
+
+    private static byte[] ungzip(byte[] gz) throws IOException {
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(gz);
+             GZIPInputStream gis = new GZIPInputStream(bais);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buf = new byte[8192];
+            int r;
+            while ((r = gis.read(buf)) != -1) baos.write(buf, 0, r);
+            return baos.toByteArray();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static byte[] rebuildRawDataFromParsed(short effId,
+                                                   int numImagesParam,
+                                                   int seqLengthParam,
+                                                   boolean hasExtendedFromDb,
+                                                   String imagesJson,
+                                                   String framesJson,
+                                                   String sequencesJson,
+                                                   String charFramesJson,
+                                                   String splashJson) throws IOException {
+
+        Type imageType = new TypeToken<List<Map<String, Number>>>(){}.getType();
+        Type framesType = new TypeToken<List<Map<String, Object>>>(){}.getType();
+        Type seqType = new TypeToken<List<Map<String, Number>>>(){}.getType();
+        Type charType = new TypeToken<List<Map<String, Number>>>(){}.getType();
+        Type splashType = new TypeToken<List<Map<String, Number>>>(){}.getType();
+
+        List<Map<String, Number>> images = (imagesJson != null && !imagesJson.isEmpty())
+                ? GSON.fromJson(imagesJson, imageType) : Collections.emptyList();
+        List<Map<String, Object>> frames = (framesJson != null && !framesJson.isEmpty())
+                ? GSON.fromJson(framesJson, framesType) : Collections.emptyList();
+        List<Map<String, Number>> sequences = (sequencesJson != null && !sequencesJson.isEmpty())
+                ? GSON.fromJson(sequencesJson, seqType) : Collections.emptyList();
+        List<Map<String, Number>> charFrames = (charFramesJson != null && !charFramesJson.isEmpty())
+                ? GSON.fromJson(charFramesJson, charType) : Collections.emptyList();
+        List<Map<String, Number>> splash = (splashJson != null && !splashJson.isEmpty())
+                ? GSON.fromJson(splashJson, splashType) : Collections.emptyList();
+
+        int actualNumImages = images.size();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
+
+        dos.writeByte(Math.min(Math.max(actualNumImages, 0), 255));
+
+        for (Map<String, Number> im : images) {
+            int x = safeInt(im.get("x"), 0);
+            int y = safeInt(im.get("y"), 0);
+            int w = Math.max(1, Math.min(safeInt(im.get("w"), 1), 255));
+            int h = Math.max(1, Math.min(safeInt(im.get("h"), 1), 255));
+            int idx = Math.max(0, Math.min(safeInt(im.get("idx"), 0), 255));
+            dos.writeByte(x & 0xFF);
+            dos.writeByte(y & 0xFF);
+            dos.writeByte(w & 0xFF);
+            dos.writeByte(h & 0xFF);
+            dos.writeByte(idx & 0xFF);
+        }
+
+        int frameCount = frames.size();
+        dos.writeShort(frameCount & 0xFFFF);
+        dos.writeByte(1);
+        for (Map<String, Object> f : frames) {
+            List<Map<String, Number>> parts = (List<Map<String, Number>>) f.getOrDefault("parts", Collections.emptyList());
+            dos.writeByte(parts.size() & 0xFF);
+            for (Map<String, Number> p : parts) {
+                int dx = clampShort(safeInt(p.get("dx"), 0));
+                int dy = clampShort(safeInt(p.get("dy"), 0));
+                int imgId = Math.max(0, Math.min(safeInt(p.get("img_id"), 0), Math.max(0, actualNumImages - 1)));
+                int flip = Math.max(0, Math.min(safeInt(p.get("flip"), 0), 255));
+                int onTop = Math.max(0, Math.min(safeInt(p.get("on_top"), 0), 255));
+                dos.writeShort(dx);
+                dos.writeShort(dy);
+                dos.writeByte(imgId & 0xFF);
+                dos.writeByte(flip & 0xFF);
+                dos.writeByte(onTop & 0xFF);
+            }
+        }
+
+        int seqLen = Math.min(sequences.size(), 255);
+        dos.writeByte(seqLen & 0xFF);
+        for (Map<String, Number> s : sequences) {
+            int frameIdx = safeInt(s.get("frame_idx"), 0);
+            if (frameCount > 0) frameIdx = Math.max(0, Math.min(frameIdx, frameCount - 1));
+            dos.writeShort(frameIdx & 0xFFFF);
+        }
+
+        if (!charFrames.isEmpty()) {
+            dos.writeByte(1);
+            Map<Integer, List<Integer>> grouped = new HashMap<>();
+            for (Map<String, Number> cf : charFrames) {
+                int pt = safeInt(cf.get("part_type"), 0);
+                int fi = Math.max(0, Math.min(safeInt(cf.get("frame_idx"), 0), 255));
+                grouped.computeIfAbsent(pt, k -> new ArrayList<>()).add(fi);
+            }
+            for (int t = 0; t <= 2; t++) {
+                List<Integer> list = grouped.getOrDefault(t, Collections.emptyList());
+                dos.writeByte(list.size() & 0xFF);
+                for (int v : list) dos.writeByte(v & 0xFF);
+            }
+        } else {
+            dos.writeByte(0);
+            dos.writeByte(0);
+            dos.writeByte(0);
+            dos.writeByte(0);
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (i < splash.size()) {
+                Map<String, Number> sp = splash.get(i);
+                int idx = Math.max(0, Math.min(safeInt(sp.get("index_splash"), 0), 255));
+                dos.writeByte(idx & 0xFF);
+            } else {
+                dos.writeByte(0);
+            }
+        }
+
+        dos.flush();
+        return baos.toByteArray();
+    }
+
+    private static int safeInt(Number n, int def) {
+        return (n == null) ? def : n.intValue();
+    }
+
+    private static int clampShort(int v) {
+        return Math.max(Short.MIN_VALUE, Math.min(Short.MAX_VALUE, v));
+    }
+}
+
+CLIENT
+public static void getDataEff(Message m) {
+      try {
+         short id;
+         MainObject mainObject;
+         switch(m.reader().readByte()) {
+         case 0:
+            byte[] data = new byte[m.reader().available()];
+            m.reader().read(data);
+            DataSkillEff.readData(data);
+            return;
+         case 1:
+            id = m.reader().readShort();
+            short id2 = m.reader().readShort();
+            int time = m.reader().readInt();
+            byte typemove = m.reader().readByte();
+            byte loop = m.reader().readByte();
+            if ((mainObject = GameScreen.AA(id)) != null) {
+               mainObject.addDataEff(id2, time, typemove, loop);
+               return;
+            }
+            break;
+         case 2:
+            id = m.reader().readShort();
+            short id3 = m.reader().readShort();
+            if ((mainObject = GameScreen.AA(id)) == null) {
+               break;
+            }
+            mainObject.removeDataEff(id3);
+         default:
+            return;
+         }
+      } catch (Exception var5) {
+      }
+
+   }
+
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+
+public final class DataSkillEff {
+   private byte Frame;
+   private byte AF;
+   private mVector listFrame = new mVector();
+   private SmallImage[] smallImage;
+   private byte[][] AI;
+   private byte[] AJ;
+   private byte[] AK;
+   private byte AL;
+   private boolean isLoadData;
+   public short idEff;
+   public static MyHashTable ALL_EFF_DATA = new MyHashTable();
+   private byte typeupdate;
+   private int AO;
+   private int AP;
+   public byte AC;
+   private int AQ;
+   public boolean AD;
+   private long AR;
+   private long AS;
+
+   static {
+      new MyHashTable();
+   }
+
+   public DataSkillEff(short var1, int var2) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AF = 0;
+      if (var2 == -1) {
+         this.typeupdate = 3;
+      } else if (var2 == 0) {
+         this.typeupdate = 1;
+      } else {
+         this.typeupdate = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.load();
+   }
+
+   public DataSkillEff(short var1, int var2, byte var3, byte var4) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AC = var3;
+      this.AL = var4;
+      if (var2 == -1) {
+         this.typeupdate = 3;
+      } else if (var2 == 0) {
+         this.typeupdate = 1;
+      } else {
+         this.typeupdate = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.load();
+   }
+
+   public DataSkillEff(short var1, int var2, int var3) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AO = var2;
+      this.AP = var3;
+      this.typeupdate = 1;
+      this.load();
+   }
+
+   private void loadData(byte[] var1) {
+      if (var1 != null) {
+         DataInputStream var2 = null;
+
+         try {
+            this.listFrame.removeAllElements();
+            this.smallImage = null;
+            byte var21 = (var2 = new DataInputStream(new ByteArrayInputStream(var1))).readByte();
+            this.smallImage = new SmallImage[var21];
+
+            int var3;
+            for(var3 = 0; var3 < var21; ++var3) {
+               this.smallImage[var3] = new SmallImage(var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte());
+            }
+
+            var3 = 0;
+            int var22 = 10000;
+            short var4 = var2.readShort();
+
+            for(int var5 = 0; var5 < var4; ++var5) {
+               byte var6 = var2.readByte();
+               mVector var7 = new mVector();
+               mVector var8 = new mVector();
+
+               for(int var9 = 0; var9 < var6; ++var9) {
+                  PartFrame var10;
+                  (var10 = new PartFrame(var2.readShort(), var2.readShort(), var2.readByte())).AD = var2.readByte();
+                  var10.AE = var2.readByte();
+                  if (var10.AE == 0) {
+                     var7.addElement(var10);
+                  } else {
+                     var8.addElement(var10);
+                  }
+
+                  if (var3 < CRes.abs(var10.AC)) {
+                     var3 = CRes.abs(var10.AC);
+                  }
+
+                  if (CRes.abs(var10.AC) < var22) {
+                     var22 = CRes.abs(var10.AC);
+                  }
+               }
+
+               this.listFrame.addElement(new FrameEff(var7, var8));
+            }
+
+            short var10000 = this.smallImage[0].w;
+            this.AQ = var22;
+            short var23 = (short)var2.readUnsignedByte();
+            this.AJ = new byte[var23];
+
+            int var25;
+            for(var25 = 0; var25 < var23; ++var25) {
+               this.AJ[var25] = (byte)var2.readShort();
+            }
+
+            var2.readByte();
+            byte var24 = var2.readByte();
+            this.AI[0] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[0][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[1] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[1][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[3] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[3][var25] = var2.readByte();
+            }
+
+            this.isLoadData = true;
+
+            try {
+               this.AK[0] = (byte)(this.AI[0].length - 7);
+               this.AK[1] = (byte)(this.AI[1].length - 7);
+               this.AK[2] = (byte)(this.AI[2].length - 7);
+               this.AK[3] = (byte)(this.AI[3].length - 7);
+            } catch (Exception var18) {
+            }
+
+            this.AK[0] = var2.readByte();
+            this.AK[1] = var2.readByte();
+            this.AK[2] = var2.readByte();
+            this.AK[3] = this.AK[2];
+            return;
+         } catch (Exception var19) {
+         } finally {
+            try {
+               var2.close();
+            } catch (Exception var17) {
+            }
+
+         }
+
+      }
+   }
+
+   private void load() {
+      EffectData effectData;
+      if ((effectData = (EffectData)ALL_EFF_DATA.get(String.valueOf(this.idEff))) == null) {
+         effectData = new EffectData();
+         ALL_EFF_DATA.put(String.valueOf(this.idEff), effectData);
+         GlobalService.getInstance().getDataSkillEff((byte)0, (short)this.idEff);
+      }
+      if (effectData != null && effectData.data != null) {
+         effectData.count = GameCanvas.timeNow / 1000L;
+         this.loadData(effectData.data);
+         this.isLoadData = true;
+      }
+
+   }
+
+   private boolean isHavedata() {
+      if (this.isLoadData) {
+         return true;
+      } else {
+         this.load();
+         return false;
+      }
+   }
+
+   public final void paintTopEff(mGraphics g, int x, int y, int hOne) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff frameEff = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector listPartTop = frameEff.listPartTop;
+
+                  for(int i = 0; i < listPartTop.size(); ++i) {
+                     PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
+                     SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
+                     mImage image;
+                     if ((image = this.getImage()) != null && image.image != null) {
+                        short dx = partFrame.dx;
+                        int num = smallImage.w;
+                        int num2 = smallImage.h;
+                        short num3 = smallImage.x;
+                        short num4 = smallImage.y;
+                        if (num3 > mImage.getImageWidth(image.image)) {
+                           num3 = 0;
+                        }
+
+                        if (num4 > mImage.getImageHeight(image.image)) {
+                           num4 = 0;
+                        }
+
+                        if (num3 + num > mImage.getImageWidth(image.image)) {
+                           num = mImage.getImageWidth(image.image) - num3;
+                        }
+
+                        if (num4 + num2 > mImage.getImageHeight(image.image)) {
+                           num2 = mImage.getImageHeight(image.image) - num4;
+                        }
+
+                        byte var14 = 0;
+                        if (hOne == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        g.drawRegion(image, num3, num4, num, num2, partFrame.AD == 1 ? 2 : 0, x + dx, y + partFrame.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+                  var15.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.idEff).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AA(mGraphics var1) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var2 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var12 = var2.listPartTop;
+
+                  for(int var3 = 0; var3 < var12.size(); ++var3) {
+                     PartFrame var4 = (PartFrame)var12.elementAt(var3);
+                     SmallImage var5 = this.smallImage[var4.idSmallImg];
+                     mImage var6;
+                     if ((var6 = this.getImage()) != null && var6.image != null) {
+                        short var7 = var4.dx;
+                        int var8 = var5.w;
+                        int var9 = var5.h;
+                        short var10 = var5.x;
+                        short var13 = var5.y;
+                        if (var10 > mImage.getImageWidth(var6.image)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.getImageHeight(var6.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.getImageWidth(var6.image)) {
+                           var8 = mImage.getImageWidth(var6.image) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.getImageHeight(var6.image)) {
+                           var9 = mImage.getImageHeight(var6.image) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+                  var11.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.idEff).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AB(mGraphics var1, int var2, int var3, int var4) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var5 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var16 = var5.AB;
+
+                  for(int var6 = 0; var6 < var16.size(); ++var6) {
+                     PartFrame var7 = (PartFrame)var16.elementAt(var6);
+                     SmallImage var8 = this.smallImage[var7.idSmallImg];
+                     mImage var9;
+                     if ((var9 = this.getImage()) != null && var9.image != null) {
+                        short var10 = var7.dx;
+                        int var11 = var8.w;
+                        int var12 = var8.h;
+                        short var13 = var8.x;
+                        short var17 = var8.y;
+                        if (var13 > mImage.getImageWidth(var9.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var17 > mImage.getImageHeight(var9.image)) {
+                           var17 = 0;
+                        }
+
+                        if (var13 + var11 > mImage.getImageWidth(var9.image)) {
+                           var11 = mImage.getImageWidth(var9.image) - var13;
+                        }
+
+                        if (var17 + var12 > mImage.getImageHeight(var9.image)) {
+                           var12 = mImage.getImageHeight(var9.image) - var17;
+                        }
+
+                        byte var14 = 0;
+                        if (var4 == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        var1.drawRegion(var9, var13, var17, var11, var12, var7.AD == 1 ? 2 : 0, var2 + var10, var3 + var7.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void paintBottomEff(mGraphics var1) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var2 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var12 = var2.AB;
+
+                  for(int var3 = 0; var3 < var12.size(); ++var3) {
+                     PartFrame var4 = (PartFrame)var12.elementAt(var3);
+                     SmallImage var5 = this.smallImage[var4.idSmallImg];
+                     mImage var6;
+                     if ((var6 = this.getImage()) != null && var6.image != null) {
+                        short var7 = var4.dx;
+                        int var8 = var5.w;
+                        int var9 = var5.h;
+                        short var10 = var5.x;
+                        short var13 = var5.y;
+                        if (var10 > mImage.getImageWidth(var6.image)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.getImageHeight(var6.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.getImageWidth(var6.image)) {
+                           var8 = mImage.getImageWidth(var6.image) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.getImageHeight(var6.image)) {
+                           var9 = mImage.getImageHeight(var6.image) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+               }
+            }
+
+         }
+      }
+   }
+
+   private mImage getImage() {
+      EffectData var1;
+      (var1 = (EffectData)ALL_EFF_DATA.get(String.valueOf(this.idEff))).count = GameCanvas.timeNow / 1000L;
+      return var1.image;
+   }
+
+   public static EffectData readData(byte[] var0) {
+      EffectData var1 = null;
+      try {
+         ByteArrayInputStream var2 = new ByteArrayInputStream(var0);
+         DataInputStream var8;
+         short var3 = (var8 = new DataInputStream(var2)).readShort();
+         byte[] var4 = new byte[var8.readShort()];
+         var8.read(var4);
+         byte[] var5 = new byte[var8.available()];
+         var8.read(var5);
+         if ((var1 = (EffectData)ALL_EFF_DATA.get(String.valueOf(var3))) != null) {
+            var1.data = var4;
+            var1.image = mImage.AA(var5);
+            var1.count = GameCanvas.timeNow / 1000L;
+         }
+
+         short var10 = var3;
+         byte[] var9 = var0;
+
+         try {
+            CRes.saveRMS("DataSkillEff" + var10, var9);
+         } catch (Exception var6) {
+            var6.printStackTrace();
+         }
+      } catch (Exception var7) {
+      }
+      Ageteff.save(var0); // add this
+      return var1;
+   }
+
+   public final void AA() {
+      if (this.isHavedata()) {
+         if (this.listFrame.size() > 0 || this.AJ.length > 0) {
+            try {
+               switch(this.typeupdate) {
+               case 0:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AD = true;
+                     this.AF = 0;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 1:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                     this.AD = true;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 2:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                  }
+
+                  if (this.AS - System.currentTimeMillis() < 0L) {
+                     this.AD = true;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 3:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     label52: {
+                        if (this.AL > 0) {
+                           if (System.currentTimeMillis() - this.AR <= (long)(this.AL * 1000)) {
+                              break label52;
+                           }
+
+                           this.AR = System.currentTimeMillis();
+                        }
+
+                        this.AF = 0;
+                     }
+                  }
+
+                  if (this.AF < this.AJ.length) {
+                     this.Frame = this.AJ[this.AF];
+                     return;
+                  } else {
+                     this.Frame = -1;
+                     return;
+                  }
+               default:
+               }
+            } catch (Exception var1) {
+            }
+         }
+      }
+   }
+}
+
+case 74:
+      case 76:
+         rmsg = GameCanvas.readMessage;
+         ReadMessenge.getDataEff(m);
+         return;
+TOOL Ở CLIENT 
+import java.io.*;
+import java.util.*;
+
+public class Ageteff {
+    private static final String BASE = "C:\\ThMadara\\HTTH\\res\\effect\\1\\";
+    private static final int MAX_ID = 256;
+    private static boolean AUTO_SAVE = true;
+    
+    public static void run() {
+        System.out.println("Starting Ageteff auto-download and save...");
+        for (short id = 1; id <= MAX_ID; id++) {
+            try {
+                System.out.println("Requesting effect ID: " + id);
+                GlobalService.getInstance().getDataSkillEff((byte) 0, id);
+                Thread.sleep(50);
+            } catch (Exception e) {
+                System.err.println("Error get effId=" + id + " -> " + e.getMessage());
+            }
+        }
+    }
+
+    public static void run(short id) {
+        System.out.println("Requesting single effect ID: " + id);
+        GlobalService.getInstance().getDataSkillEff((byte) 0, id);
+    }
+    
+    public static void setAutoSave(boolean enabled) {
+        AUTO_SAVE = enabled;
+        System.out.println("Auto save " + (enabled ? "enabled" : "disabled"));
+    }
+
+    public static void processEffectData(byte[] payload) {
+        if (!AUTO_SAVE || payload == null || payload.length < 4) return;
+        
+        try {
+            save(payload);
+            System.out.println("Auto-saved effect data successfully");
+        } catch (Exception e) {
+            System.err.println("Auto-save failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void save(byte[] payload) {
+        if (payload == null || payload.length < 4) return;
+        
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(payload));
+        try {
+            short effId = dis.readShort();
+            short len = dis.readShort();
+            if (len <= 0 || effId <= 0) {
+                System.out.println("Skip save invalid effect " + effId + " len=" + len);
+                return;
+            }
+            byte[] raw = new byte[len];
+            dis.readFully(raw);
+            byte[] img = new byte[dis.available()];
+            dis.readFully(img);
+            
+            createDirectories();
+            
+            saveDataFile(effId, raw);
+            
+            byte[] enc = encode(raw);
+            saveEncFile(effId, enc);
+            
+            String ext = isPng(img) ? ".png" : ".img";
+            saveImageFile(effId, img, ext);
+            
+            Hashtable parsed = parseRaw(raw);
+            String sql = buildSql(effId, parsed, raw);
+            if (sql.length() > 0) {
+                saveSqlFile(effId, sql);
+            }
+            
+            System.out.println("Saved effect " + effId + " -> data:" + raw.length + " bytes, img:" + img.length + " bytes" + ext);
+            
+        } catch (Exception e) {
+            System.err.println("Save error: " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try { dis.close(); } catch (Exception ignore) {}
+        }
+    }
+    
+    private static byte[] encode(byte[] raw) {
+        byte[] enc = new byte[raw.length];
+        byte key = (byte)0x5A;
+        for (int i = 0; i < raw.length; i++) {
+            enc[i] = (byte)(raw[i] ^ key);
+        }
+        return enc;
+    }
+    
+    private static void saveEncFile(short effId, byte[] enc) throws IOException {
+        FileOutputStream fos = new FileOutputStream(BASE + "data\\" + effId + ".enc");
+        fos.write(enc);
+        fos.close();
+    }
+    
+    private static String toHex(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            int v = bytes[i] & 0xFF;
+            sb.append((char)((v >>> 4) + ((v >>> 4) > 9 ? 'A' - 10 : '0')));
+            sb.append((char)((v & 0xF) + ((v & 0xF) > 9 ? 'A' - 10 : '0')));
+        }
+        return sb.toString();
+    }
+
+    private static void createDirectories() {
+        new File(BASE + "data").mkdirs();
+        new File(BASE + "img").mkdirs();
+        new File(BASE + "sql").mkdirs();
+    }
+    
+    private static void saveDataFile(short effId, byte[] raw) throws IOException {
+        FileOutputStream fos = new FileOutputStream(BASE + "data\\" + effId + ".data");
+        fos.write(raw);
+        fos.close();
+    }
+    
+    private static void saveImageFile(short effId, byte[] img, String ext) throws IOException {
+        FileOutputStream fos = new FileOutputStream(BASE + "img\\" + effId + ext);
+        fos.write(img);
+        fos.close();
+    }
+    
+    private static void saveSqlFile(short effId, String sql) throws IOException {
+        FileOutputStream fos = new FileOutputStream(BASE + "sql\\" + effId + ".sql");
+        fos.write(sql.getBytes("UTF-8"));
+        fos.close();
+    }
+
+    private static boolean isPng(byte[] img) {
+        if (img.length < 8) return false;
+        return img[0] == (byte)0x89 && img[1] == 'P' && img[2] == 'N' && img[3] == 'G' 
+            && img[4] == 13 && img[5] == 10 && img[6] == 26 && img[7] == 10;
+    }
+
+    private static Hashtable parseRaw(byte[] raw) {
+        if (raw.length == 0) return null;
+        Hashtable result = new Hashtable();
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(raw));
+        try {
+            int numImages = dis.readUnsignedByte();
+            Vector images = new Vector();
+            
+            for (int i = 0; i < numImages; i++) {
+                Hashtable im = new Hashtable();
+                im.put("idx", new Integer(dis.readUnsignedByte()));
+                im.put("x", new Integer(dis.readUnsignedByte()));
+                im.put("y", new Integer(dis.readUnsignedByte()));
+                im.put("w", new Integer(dis.readUnsignedByte()));
+                im.put("h", new Integer(dis.readUnsignedByte()));
+                images.addElement(im);
+            }
+            
+            int numFrames = dis.readUnsignedShort();
+            Vector frames = new Vector();
+            for (int f = 0; f < numFrames; f++) {
+                Hashtable frame = new Hashtable();
+                frame.put("frame_idx", new Integer(f));
+                Vector parts = new Vector();
+                int numParts = dis.readUnsignedByte();
+                
+                for (int p = 0; p < numParts; p++) {
+                    Hashtable part = new Hashtable();
+                    part.put("dx", new Integer(dis.readShort()));
+                    part.put("dy", new Integer(dis.readShort()));
+                    part.put("img_id", new Integer(dis.readUnsignedByte()));
+                    part.put("flip", new Integer(dis.readUnsignedByte()));
+                    part.put("on_top", new Integer(dis.readUnsignedByte()));
+                    parts.addElement(part);
+                }
+                frame.put("parts", parts);
+                frames.addElement(frame);
+            }
+            
+            int seqLen = dis.readUnsignedByte();
+            Vector sequences = new Vector();
+            for (int s = 0; s < seqLen; s++) {
+                Hashtable seq = new Hashtable();
+                seq.put("frame_idx", new Integer(dis.readShort()));
+                sequences.addElement(seq);
+            }
+            
+            dis.readByte();
+            Vector charFrames = new Vector();
+            for (int t = 0; t < 3; t++) {
+                int len = dis.readUnsignedByte();
+                int pt = (t == 2) ? 3 : t;
+                for (int i = 0; i < len; i++) {
+                    Hashtable cf = new Hashtable();
+                    cf.put("part_type", new Integer(pt));
+                    cf.put("frame_idx", new Integer(dis.readUnsignedByte()));
+                    charFrames.addElement(cf);
+                }
+            }
+            
+            try {
+                dis.readInt();
+            } catch (Exception ignore) {}
+            
+            Vector splash = new Vector();
+            for (int i = 0; i < 3; i++) {
+                Hashtable sp = new Hashtable();
+                sp.put("index_splash", new Integer(0));
+                splash.addElement(sp);
+            }
+            
+            result.put("num_images", new Integer(numImages));
+            result.put("seq_length", new Integer(seqLen));
+            result.put("has_extended", new Integer(charFrames.isEmpty() ? 0 : 1));
+            result.put("images", images);
+            result.put("frames", frames);
+            result.put("sequences", sequences);
+            result.put("char_frames", charFrames);
+            result.put("splash", splash);
+            
+            return result;
+        } catch (Exception e) {
+            System.err.println("Parse error: " + e.getMessage());
+            return null;
+        } finally {
+            try { dis.close(); } catch (Exception ignore) {}
+        }
+    }
+
+    private static String buildSql(short effId, Hashtable parsed, byte[] raw) {
+        if (parsed == null) return "";
+        
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE effect_data SET ");
+        sb.append("num_images=").append(parsed.get("num_images")).append(",");
+        sb.append("seq_length=").append(parsed.get("seq_length")).append(",");
+        sb.append("has_extended=").append(parsed.get("has_extended")).append(",");
+        sb.append("images='").append(escapeJson(json(parsed.get("images")))).append("',");
+        sb.append("frames='").append(escapeJson(json(parsed.get("frames")))).append("',");
+        sb.append("sequences='").append(escapeJson(json(parsed.get("sequences")))).append("',");
+        sb.append("char_frames='").append(escapeJson(json(parsed.get("char_frames")))).append("',");
+        sb.append("splash='").append(escapeJson(json(parsed.get("splash")))).append("',");
+        sb.append("raw_data=X'").append(toHex(raw)).append("',");
+        sb.append("raw_compressed=0,");
+        sb.append("parse_ok=1,");
+        sb.append("parse_error=NULL ");
+        sb.append("WHERE eff_id=").append(effId).append(";");
+        
+        return sb.toString();
+    }
+    
+    private static String escapeJson(String json) {
+        if (json == null) return "";
+        return json.replace("'", "\\'").replace("\\", "\\\\");
+    }
+
+    private static String json(Object obj) {
+        if (obj instanceof Vector) {
+            Vector v = (Vector)obj;
+            StringBuffer s = new StringBuffer("[");
+            for (int i = 0; i < v.size(); i++) {
+                if (i > 0) s.append(",");
+                s.append(json(v.elementAt(i)));
+            }
+            return s.append("]").toString();
+        } else if (obj instanceof Hashtable) {
+            Hashtable h = (Hashtable)obj;
+            StringBuffer s = new StringBuffer("{");
+            Enumeration e = h.keys();
+            boolean first = true;
+            while (e.hasMoreElements()) {
+                if (!first) s.append(",");
+                first = false;
+                String k = (String)e.nextElement();
+                s.append("\"").append(k).append("\":");
+                Object val = h.get(k);
+                if (val instanceof Integer) {
+                    s.append(val);
+                } else {
+                    s.append("\"").append(val).append("\"");
+                }
+            }
+            return s.append("}").toString();
+        }
+        return obj != null ? obj.toString() : "null";
+    }
+    
+    public static void saveEffectById(short effId) {
+        System.out.println("Manual save request for effect ID: " + effId);
+        run(effId);
+    }
+    
+    public static void clearAllEffects() {
+        try {
+            File dataDir = new File(BASE + "data");
+            File imgDir = new File(BASE + "img");
+            File sqlDir = new File(BASE + "sql");
+            
+            deleteDirectory(dataDir);
+            deleteDirectory(imgDir);
+            deleteDirectory(sqlDir);
+            
+            System.out.println("Cleared all effect files");
+        } catch (Exception e) {
+            System.err.println("Clear failed: " + e.getMessage());
+        }
+    }
+    
+    private static void deleteDirectory(File dir) {
+        if (dir.exists()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+        }
+    }
+    
+    public static void showStatus() {
+        File dataDir = new File(BASE + "data");
+        File imgDir = new File(BASE + "img");
+        File sqlDir = new File(BASE + "sql");
+        
+        int dataCount = dataDir.exists() ? dataDir.list().length : 0;
+        int imgCount = imgDir.exists() ? imgDir.list().length : 0;
+        int sqlCount = sqlDir.exists() ? sqlDir.list().length : 0;
+        
+        System.out.println("=== Ageteff Status ===");
+        System.out.println("Auto Save: " + (AUTO_SAVE ? "ON" : "OFF"));
+        System.out.println("Data files: " + dataCount);
+        System.out.println("Image files: " + imgCount);
+        System.out.println("SQL files: " + sqlCount);
+        System.out.println("Base path: " + BASE);
+    }
+}

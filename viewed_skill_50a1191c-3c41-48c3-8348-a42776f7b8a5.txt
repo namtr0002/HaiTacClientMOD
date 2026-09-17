@@ -1,0 +1,51 @@
+g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
+
+if (attriList.AD > 0) {
+scrollAttri.setInfo(rightListX + rightListW - 3, rightListY, rightListH, 0xFF8800);
+scrollAttri.setYScrool(attriList.AC, attriList.AD);
+scrollAttri.paint(g);
+}
+}
+}
+
+private void paintTabSkillDual(mGraphics g) {
+int leftPaneW = isWide ? 160 : (w * 45 / 100);
+int leftPaneX = x + 10;
+int leftPaneY = y + 28;
+int leftPaneH = h - 34;
+
+AvMain.paintRect(g, leftPaneX, leftPaneY, leftPaneW, leftPaneH, (byte)0, 1);
+mFont.tahoma_7b_yellow.drawString(g, "DANH SÁCH KỸ NĂNG", leftPaneX + leftPaneW / 2, leftPaneY + 4, 2);
+
+int listX = leftPaneX + 4;
+int listY = leftPaneY + 18;
+int listW = leftPaneW - 8;
+int listH = leftPaneH - 22;
+
+if (skillList != null) {
+g.setClip(listX, listY, listW, listH);
+g.translate(0, -skillList.AC);
+
+if (validSkills != null) {
+for (int i = 0; i < validSkills.size(); i++) {
+Skill_Info sk = (Skill_Info)validSkills.elementAt(i);
+if (sk == null) continue;
+int sy = listY + i * 34;
+boolean isSel = (focusPane == 1 && i == selectedSkillIndex);
+
+AvMain.paintRect(g, listX, sy, listW, 32, (byte)(isSel ? 1 : 0), 3);
+
+// Vẽ icon kỹ năng
+sk.paint(g, listX + 16, sy + 16);
+if (sk.phanTramDevilSkill > 0 && AvMain.imgLvDevilSkill != null) {
+int num5 = sk.phanTramDevilSkill / 5;
+num5 = ((num5 < 20) ? (num5 + 1) : ((num5 != 20) ? 22 : (num5 + 2)));
+g.drawRegion(AvMain.imgLvDevilSkill, 0, 22 - num5, 22, num5, 0, listX + 16, sy + 16 + 11, 33);
+}
+
+// Tên kỹ năng
+String skName = sk.name;
+if (sk.Lv_RQ == Skill_Info.maxLv) {
+skName = sk.name + " " + T.max;
+}
+if (sk.Lv_RQ < 0) {

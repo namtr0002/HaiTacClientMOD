@@ -1,0 +1,3 @@
+# Cấu hình cho Ageticon
+# Mức phóng to icon (1 = mặc định)
+zoomLevel=1

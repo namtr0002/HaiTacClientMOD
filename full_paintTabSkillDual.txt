@@ -1,0 +1,278 @@
+g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
+
+if (attriList.AD > 0) {
+scrollAttri.setInfo(rightListX + rightListW - 3, rightListY, rightListH, 0xFF8800);
+scrollAttri.setYScrool(attriList.AC, attriList.AD);
+scrollAttri.paint(g);
+}
+}
+}
+
+private void paintTabSkillDual(mGraphics g) {
+int leftPaneW = isWide ? 160 : (w * 45 / 100);
+int leftPaneX = x + 10;
+int leftPaneY = y + 28;
+int leftPaneH = h - 34;
+
+AvMain.paintRect(g, leftPaneX, leftPaneY, leftPaneW, leftPaneH, (byte)0, 1);
+mFont.tahoma_7b_yellow.drawString(g, "DANH SÁCH KỸ NĂNG", leftPaneX + leftPaneW / 2, leftPaneY + 4, 2);
+
+int listX = leftPaneX + 4;
+int listY = leftPaneY + 18;
+int listW = leftPaneW - 8;
+int listH = leftPaneH - 22;
+
+if (skillList != null) {
+g.setClip(listX, listY, listW, listH);
+g.translate(0, -skillList.AC);
+
+if (validSkills != null) {
+for (int i = 0; i < validSkills.size(); i++) {
+Skill_Info sk = (Skill_Info)validSkills.elementAt(i);
+if (sk == null) continue;
+int sy = listY + i * 34;
+boolean isSel = (focusPane == 1 && i == selectedSkillIndex);
+
+AvMain.paintRect(g, listX, sy, listW, 32, (byte)(isSel ? 1 : 0), 3);
+
+// Vẽ icon kỹ năng
+sk.paint(g, listX + 16, sy + 16);
+if (sk.phanTramDevilSkill > 0 && AvMain.imgLvDevilSkill != null) {
+int num5 = sk.phanTramDevilSkill / 5;
+num5 = ((num5 < 20) ? (num5 + 1) : ((num5 != 20) ? 22 : (num5 + 2)));
+g.drawRegion(AvMain.imgLvDevilSkill, 0, 22 - num5, 22, num5, 0, listX + 16, sy + 16 + 11, 33);
+}
+
+// Tên kỹ năng
+String skName = sk.name;
+if (sk.Lv_RQ == Skill_Info.maxLv) {
+skName = sk.name + " " + T.max;
+}
+if (sk.Lv_RQ < 0) {
+private void paintTabSkillDual(mGraphics g)
+{
+int leftPaneW = isWide ? 160 : (w * 45 / 100);
+int leftPaneX = x + 10;
+int leftPaneY = y + 28;
+int leftPaneH = h - 34;
+
+AvMain.paintRect(g, leftPaneX, leftPaneY, leftPaneW, leftPaneH, 0, 1);
+mFont.tahoma_7b_yellow.drawString(g, "DANH SÁCH KỸ NĂNG", leftPaneX + leftPaneW / 2, leftPaneY + 4, 2);
+
+int listX = leftPaneX + 4;
+int listY = leftPaneY + 18;
+int listW = leftPaneW - 8;
+int listH = leftPaneH - 22;
+
+if (skillList != null && validSkills != null)
+{
+g.setClip(listX, listY, listW, listH);
+g.saveCanvas();
+g.ClipRec(listX, listY, listW, listH);
+g.translate(0, -skillList.cmx);
+
+for (int i = 0; i < validSkills.size(); i++)
+{
+Skill_Info sk = (Skill_Info)validSkills.elementAt(i);
+if (sk == null) continue;
+
+int sy = listY + i * 34;
+bool isSel = (focusPane == 1 && i == selectedSkillIndex);
+
+AvMain.paintRect(g, listX, sy, listW, 32, (sbyte)(isSel ? 1 : 0), 3);
+
+// Vẽ icon kỹ năng
+sk.paint(g, listX + 16, sy + 16);
+if (sk.phanTramDevilSkill > 0 && AvMain.imgLvDevilSkill != null)
+{
+int num5 = sk.phanTramDevilSkill / 5;
+num5 = ((num5 < 20) ? (num5 + 1) : ((num5 != 20) ? 22 : (num5 + 2)));
+g.drawRegion(AvMain.imgLvDevilSkill, 0, 22 - num5, 22, num5, 0, listX + 16, sy + 16 + 11, 33);
+}
+
+// Tên kỹ năng
+string skName = sk.name;
+if (sk.Lv_RQ == Skill_Info.maxLv)
+{
+skName = sk.name + " " + T.max;
+}
+if (sk.Lv_RQ < 0)
+{
+mFont.tahoma_7b_blue.drawString(g, skName, listX + 36, sy + 2, 0);
+}
+else
+{
+mFont.tahoma_7b_white.drawString(g, skName, listX + 36, sy + 2, 0);
+}
+
+// Dòng phụ: Cấp độ và % tiến trình theo từng loại kỹ năng
+if (sk.typeDevil == 1)
+{
+string dStr = (sk.typeSkill == 1) ? T.devilFruitA : ((sk.typeSkill == 3) ? T.devilFruitP : T.devilFruitB);
+mFont.tahoma_7_green.drawString(g, dStr, listX + 36, sy + 16, 0);
+}
+else if (sk.typeDevil == 2)
+{
+string hStr = (sk.typeSkill == 1) ? T.devilHakiA : ((sk.typeSkill == 3) ? T.devilHakiP : T.devilHakiB);
+mFont.tahoma_7_green.drawString(g, hStr, listX + 36, sy + 16, 0);
+}
+else if (sk.typeSkill == 3 || sk.typeSkill == 2)
+{
+mFont.tahoma_7_green.drawString(g, T.Lv + ": " + sk.Lv_RQ + " " + sk.getStrType(), listX + 36, sy + 16, 0);
+}
+else if (sk.Lv_RQ >= Skill_Info.maxLv)
+{
+mFont.tahoma_7_green.drawString(g, T.maxLv, listX + 36, sy + 16, 0);
+}
+else
+{
+string lvStr = T.Lv + ": " + sk.Lv_RQ;
+mFont.tahoma_7_green.drawString(g, lvStr, listX + 36, sy + 16, 0);
+int lvW = mFont.tahoma_7_green.getWidth(lvStr);
+int barX = listX + 36 + lvW + 4;
+int barW = listW - (36 + lvW + 8);
+if (barW >= 36)
+{
+Interface_Game.PaintHPMP(g, 3, sk.percentLv, 100, barX, sy + 17, 0, 8, barW, 1, isflip: false, 0, isUpdateEff: false, 0);
+}
+else
+{
+mFont.tahoma_7_green.drawString(g, "+" + MainItem.strGetPercent(sk.percentLv, 1), barX, sy + 16, 0);
+}
+}
+
+if (isSel)
+{
+g.setColor(0xFFFF00);
+g.drawRect(listX - 1, sy - 1, listW + 1, 33);
+if (AvMain.imgNenfocus != null)
+{
+g.drawRegion(AvMain.imgNenfocus, 2, 2, listW, 32, 0, listX, sy, 0);
+}
+}
+}
+
+mGraphics.resetTransAndroid(g);
+g.restoreCanvas();
+GameCanvas.resetTrans(g);
+
+if (skillList.cmxLim > 0)
+{
+scrollSkill.setInfo(listX + listW - 3, listY, listH, 0xFF8800);
+scrollSkill.setYScrool(skillList.cmx, skillList.cmxLim);
+scrollSkill.paint(g);
+}
+}
+
+int rightPaneX = leftPaneX + leftPaneW + 6;
+int rightPaneY = y + 28;
+int rightPaneW = w - leftPaneW - (isWide ? 20 : 16);
+int rightPaneH = h - 34;
+
+AvMain.paintRect(g, rightPaneX, rightPaneY, rightPaneW, rightPaneH, 0, 1);
+
+if (selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size())
+{
+Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+if (curSk != null)
+{
+// 1. Header: Icon + Tên + Nhãn phân loại
+curSk.paint(g, rightPaneX + 22, rightPaneY + 22);
+if (curSk.phanTramDevilSkill > 0 && AvMain.imgLvDevilSkill != null)
+{
+int num5 = curSk.phanTramDevilSkill / 5;
+num5 = ((num5 < 20) ? (num5 + 1) : ((num5 != 20) ? 22 : (num5 + 2)));
+g.drawRegion(AvMain.imgLvDevilSkill, 0, 22 - num5, 22, num5, 0, rightPaneX + 22, rightPaneY + 22 + 11, 33);
+}
+
+string sName = curSk.name;
+if (curSk.Lv_RQ == Skill_Info.maxLv) sName += " " + T.max;
+mFont.tahoma_7b_yellow.drawString(g, sName, rightPaneX + 42, rightPaneY + 8, 0);
+
+// Tag loại kỹ năng
+string tagType = "[Chiêu Chủ Động]";
+if (curSk.typeDevil == 1)
+{
+tagType = "[Ác Quỷ - " + ((curSk.typeSkill == 1) ? "Chủ động" : ((curSk.typeSkill == 3) ? "Nội tại" : "Hỗ trợ")) + "]";
+}
+else if (curSk.typeDevil == 2)
+{
+tagType = "[Haki - " + ((curSk.typeSkill == 1) ? "Chủ động" : ((curSk.typeSkill == 3) ? "Nội tại" : "Hỗ trợ")) + "]";
+}
+else if (curSk.typeSkill == 2)
+{
+tagType = "[Chiêu Hỗ Trợ - " + (curSk.typeBuff < T.mTacdung.Length ? T.mTacdung[curSk.typeBuff] : "Buff") + "]";
+}
+else if (curSk.typeSkill == 3)
+{
+tagType = "[Chiêu Nội Tại - Bị động]";
+}
+else if (curSk.typeSkill == 6)
+{
+tagType = "[Kỹ Năng Nghề]";
+}
+mFont.tahoma_7_green.drawString(g, tagType, rightPaneX + 42, rightPaneY + 22, 0);
+
+int curDetailY = rightPaneY + 40;
+
+// 2. Cấp độ & % Tiến trình
+if (curSk.typeDevil == 1 || curSk.typeDevil == 2)
+{
+mFont.tahoma_7_white.drawString(g, "Cấp độ kỹ năng: " + curSk.Lv_RQ, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+if (curSk.LvDevilSkill > 0 || curSk.phanTramDevilSkill > 0)
+{
+string devilLabel = (curSk.typeDevil == 1) ? T.lvDevil : "Cấp Haki: ";
+mFont.tahoma_7_green.drawString(g, devilLabel + curSk.LvDevilSkill + "  (+" + curSk.phanTramDevilSkill + "%)", rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+}
+else if (curSk.typeSkill == 3 || curSk.typeSkill == 2)
+{
+mFont.tahoma_7_white.drawString(g, "Cấp độ kỹ năng: " + curSk.Lv_RQ, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+else
+{
+if (curSk.Lv_RQ >= Skill_Info.maxLv)
+{
+mFont.tahoma_7_green.drawString(g, "Cấp độ: " + curSk.Lv_RQ + "/" + Skill_Info.maxLv + " (" + T.maxLv + ")", rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+else
+{
+string progressText = "Cấp: " + curSk.Lv_RQ + "/" + Skill_Info.maxLv + "  (Tiến trình: " + MainItem.strGetPercent(curSk.percentLv, 1) + ")";
+mFont.tahoma_7_white.drawString(g, progressText, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+// Vẽ thanh tiến trình %
+int pBarW = rightPaneW - 28;
+if (pBarW > 10)
+{
+Interface_Game.PaintHPMP(g, 3, curSk.percentLv, 100, rightPaneX + 14, curDetailY, 0, 9, pBarW, 1, isflip: false, 0, isUpdateEff: false, 0);
+curDetailY += 13;
+}
+}
+}
+
+// 3. Thông số chiến đấu cơ bản
+if (curSk.damage > 0)
+{
+mFont.tahoma_7_white.drawString(g, T.damage + ": " + curSk.damage, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+if (curSk.manaLost > 0)
+{
+mFont.tahoma_7_white.drawString(g, T.manalost + ": " + curSk.manaLost, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+if (curSk.timeDelay > 0)
+{
+string delayStr = (curSk.timeDelay / 1000) + "," + (curSk.timeDelay % 1000 / 100) + "s";
+mFont.tahoma_7_white.drawString(g, T.delay + ": " + delayStr, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}
+if (curSk.nTarget > 1)
+{
+mFont.tahoma_7_white.drawString(g, T.target + ": " + curSk.nTarget, rightPaneX + 14, curDetailY, 0);
+curDetailY += 14;
+}

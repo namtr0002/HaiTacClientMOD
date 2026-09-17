@@ -1,0 +1,51 @@
+return;
+}
+if (GameCanvas.isKeyPressed(1)) {
+selectedHieuUngIndex--;
+GameCanvas.ClearkeyMove(1);
+} else if (GameCanvas.isKeyPressed(3)) {
+selectedHieuUngIndex++;
+GameCanvas.ClearkeyMove(3);
+}
+if (selectedHieuUngIndex < 0) selectedHieuUngIndex = 0;
+if (selectedHieuUngIndex >= totalEff) selectedHieuUngIndex = totalEff - 1;
+selectedHieuUngInfo = (HieuUngInfo)HieuUngManager.vecHieuUng.elementAt(selectedHieuUngIndex);
+
+if (hieuUngList != null) {
+int itemH = 34;
+int itemY = selectedHieuUngIndex * itemH;
+if (itemY < hieuUngList.AC) hieuUngList.AB = itemY;
+if (itemY + itemH > hieuUngList.AC + hieuUngList.maxH) hieuUngList.AB = itemY + itemH - hieuUngList.maxH;
+}
+updateSoftKeys();
+}
+}
+}
+
+public void paint(mGraphics g) {
+if (super.mainScreen != null) {
+super.mainScreen.paint(g);
+}
+GameCanvas.resetTrans(g);
+g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
+
+this.AD(g, x, y, w, h, 0);
+
+if (Interface_Game.imgHoavan != null) {
+g.drawImage(Interface_Game.imgHoavan, x + 6, y + 6, 0);
+g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 2, x + w - 29, y + 6, 0);
+g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 1, x + 6, y + h - 29, 0);
+g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 3, x + w - 29, y + h - 29, 0);
+}
+
+if (GameCanvas.isTouch && cmdClose != null) {
+cmdClose.paint(g, cmdClose.xCmd, cmdClose.yCmd);
+}
+
+paintTopNavTabs(g);
+
+try {
+if (curMainTab == 0) paintTabEquipAndInven(g);
+else if (curMainTab == 1) paintTabTiemNangAndInfo(g);
+else if (curMainTab == 2) paintTabSkillDual(g);
+else if (curMainTab == 3) paintTabQuestDual(g);

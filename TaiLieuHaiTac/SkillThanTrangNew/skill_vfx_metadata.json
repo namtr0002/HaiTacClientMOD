@@ -1,0 +1,352 @@
+{
+  "4004": {
+    "cast": {
+      "w": 280,
+      "h": 240,
+      "frames": 12,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4004_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_cast_sheet.png"
+    },
+    "projectile": {
+      "w": 240,
+      "h": 90,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4004_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_projectile_sheet.png"
+    },
+    "impact": {
+      "w": 280,
+      "h": 280,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4004_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_impact_sheet.png"
+    },
+    "aura": {
+      "w": 200,
+      "h": 120,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4004_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_aura_sheet.png"
+    },
+    "particles": {
+      "w": 140,
+      "h": 160,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4004_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_particles_sheet.png"
+    },
+    "finisher": {
+      "w": 400,
+      "h": 300,
+      "frames": 16,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4004_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4004_finisher_sheet.png"
+    }
+  },
+  "4010": {
+    "cast": {
+      "w": 240,
+      "h": 180,
+      "frames": 11,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4010_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_cast_sheet.png"
+    },
+    "impact": {
+      "w": 240,
+      "h": 240,
+      "frames": 13,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4010_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_impact_sheet.png"
+    },
+    "projectile": {
+      "w": 180,
+      "h": 80,
+      "frames": 6,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4010_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_projectile_sheet.png"
+    },
+    "particles": {
+      "w": 80,
+      "h": 140,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4010_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_particles_sheet.png"
+    },
+    "aura": {
+      "w": 100,
+      "h": 100,
+      "frames": 8,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4010_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_aura_sheet.png"
+    },
+    "finisher": {
+      "w": 260,
+      "h": 140,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4010_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4010_finisher_sheet.png"
+    }
+  },
+  "4011": {
+    "cast": {
+      "w": 280,
+      "h": 240,
+      "frames": 12,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4011_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_cast_sheet.png"
+    },
+    "projectile": {
+      "w": 240,
+      "h": 90,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4011_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_projectile_sheet.png"
+    },
+    "impact": {
+      "w": 280,
+      "h": 280,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4011_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_impact_sheet.png"
+    },
+    "aura": {
+      "w": 200,
+      "h": 120,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4011_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_aura_sheet.png"
+    },
+    "particles": {
+      "w": 140,
+      "h": 160,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4011_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_particles_sheet.png"
+    },
+    "finisher": {
+      "w": 400,
+      "h": 300,
+      "frames": 16,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4011_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4011_finisher_sheet.png"
+    }
+  },
+  "4013": {
+    "cast": {
+      "w": 280,
+      "h": 240,
+      "frames": 12,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4013_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_cast_sheet.png"
+    },
+    "projectile": {
+      "w": 240,
+      "h": 90,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4013_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_projectile_sheet.png"
+    },
+    "impact": {
+      "w": 280,
+      "h": 280,
+      "frames": 12,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4013_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_impact_sheet.png"
+    },
+    "aura": {
+      "w": 200,
+      "h": 120,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4013_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_aura_sheet.png"
+    },
+    "particles": {
+      "w": 140,
+      "h": 160,
+      "frames": 10,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4013_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_particles_sheet.png"
+    },
+    "finisher": {
+      "w": 400,
+      "h": 300,
+      "frames": 16,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4013_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4013_finisher_sheet.png"
+    }
+  },
+  "4014": {
+    "cast": {
+      "w": 240,
+      "h": 180,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4014_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_cast_sheet.png"
+    },
+    "impact": {
+      "w": 240,
+      "h": 240,
+      "frames": 8,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4014_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_impact_sheet.png"
+    },
+    "projectile": {
+      "w": 180,
+      "h": 80,
+      "frames": 6,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4014_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_projectile_sheet.png"
+    },
+    "particles": {
+      "w": 90,
+      "h": 140,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4014_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_particles_sheet.png"
+    },
+    "aura": {
+      "w": 120,
+      "h": 100,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4014_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_aura_sheet.png"
+    },
+    "finisher": {
+      "w": 260,
+      "h": 160,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4014_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4014_finisher_sheet.png"
+    }
+  },
+  "4015": {
+    "cast": {
+      "w": 240,
+      "h": 180,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4015_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_cast_sheet.png"
+    },
+    "impact": {
+      "w": 240,
+      "h": 240,
+      "frames": 8,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4015_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_impact_sheet.png"
+    },
+    "projectile": {
+      "w": 180,
+      "h": 80,
+      "frames": 6,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4015_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_projectile_sheet.png"
+    },
+    "particles": {
+      "w": 90,
+      "h": 140,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4015_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_particles_sheet.png"
+    },
+    "aura": {
+      "w": 120,
+      "h": 100,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4015_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_aura_sheet.png"
+    },
+    "finisher": {
+      "w": 260,
+      "h": 160,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4015_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4015_finisher_sheet.png"
+    }
+  },
+  "4016": {
+    "cast": {
+      "w": 240,
+      "h": 180,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4016_cast_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_cast_sheet.png"
+    },
+    "impact": {
+      "w": 240,
+      "h": 240,
+      "frames": 8,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4016_impact_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_impact_sheet.png"
+    },
+    "projectile": {
+      "w": 180,
+      "h": 80,
+      "frames": 6,
+      "anchor": "center",
+      "sheet_x1": "../spritesheets/skill_4016_projectile_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_projectile_sheet.png"
+    },
+    "particles": {
+      "w": 90,
+      "h": 140,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4016_particles_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_particles_sheet.png"
+    },
+    "aura": {
+      "w": 120,
+      "h": 100,
+      "frames": 6,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4016_aura_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_aura_sheet.png"
+    },
+    "finisher": {
+      "w": 260,
+      "h": 160,
+      "frames": 8,
+      "anchor": "bottom",
+      "sheet_x1": "../spritesheets/skill_4016_finisher_sheet.png",
+      "sheet_x2": "../spritesheets_x2/skill_4016_finisher_sheet.png"
+    }
+  }
+}

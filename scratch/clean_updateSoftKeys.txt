@@ -1,0 +1,1 @@
+public void updateSoftKeys()' in txt:\n            print(f'Found in conv: {conv}')\n            idx = txt.find('public void updateSoftKeys()')\n            end = txt.find('

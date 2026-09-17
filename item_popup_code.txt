@@ -1,0 +1,27 @@
+\t\t\tif (showH < 30) showH = 30;
+
+\t\t\tint infoX, infoY;
+\t\t\tif (GameCanvas.isTouch && itemTouchX > 0 && itemTouchY > 0)
+\t\t\t{
+\t\t\t\tinfoX = itemTouchX + 10;
+\t\t\t\tif (infoX + infoW > x + w - 8) infoX = itemTouchX - infoW - 10;
+\t\t\t\tif (infoX < x + 8) infoX = x + 8;
+\t\t\t\tinfoY = itemTouchY - showH / 2;
+\t\t\t\tif (infoY + showH + 24 > y + h - 6) infoY = y + h - 6 - showH - 24;
+\t\t\t\tif (infoY < y + 28) infoY = y + 28;
+\t\t\t}
+\t\t\telse
+\t\t\t{
+\t\t\t\tinfoX = x + 10;
+\t\t\t\tinfoY = y + 28 + (h - 34 - showH - 24) / 2;
+\t\t\t\tif (infoY < y + 28) infoY = y + 28;
+\t\t\t}
+
+\t\t\tMainTab.paintInfoEveryWhere(g, selectedPetInfo, null, 0, infoX, infoY, infoW, showH, false, null, 0);
+
+\t\t\tif (GameCanvas.isTouch)
+\t\tif (questList != null && curMainTab == 3)
+\t\t{
+\t\t\tquestList.update_Pos_UP_DOWN();
+\t\t}
+\t\tif (curMainTab

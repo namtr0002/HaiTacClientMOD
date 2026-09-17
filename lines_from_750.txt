@@ -1,0 +1,34 @@
+750:                     name.indexOf(\"nguyên liệu\") >= 0 || name.indexOf(\"nguyen lieu\") >= 0 ||
+751:                     name.indexOf(\"bùa đục\") >= 0 || name.indexOf(\"kìm tháo\") >= 0 || name.indexOf(\"đục lỗ\") >= 0 || 
+752:                     name.indexOf(\"hộ mệnh\") >= 0 || name.indexOf(\"may mắn\") >= 0 || name.indexOf(\"cường hóa\") >= 0 || 
+753:                     name.indexOf(\"nâng cấp\") >= 0 || name.indexOf(\"bảo hiểm\") >= 0) {
+754:                     return 3;
+755:                 }
+756:             }
+757:         }
+758: 
+759:         // 4: Khác (Rương thường, Rương xịn, Pháo, Đèn, Poke, Rương đồ, Thẻ/Vé, Trứng, Danh hiệu, Bùa...)
+760:         if (isChestOrBox ||
+761:             item.typeObject == 105 || item.typeObject == 110 || item.typeObject == 100 || item.typeObject == 104 || item.typeObject == -8 ||
+762:             (item.typeObject == 4 && (item.BQ == 3 || item.BQ == 4 || item.BQ == 5 || 
+763:                                       item.BQ == 6 || item.BQ == 8 || item.BQ == 9 || 
+764:                                       item.BQ == 10 || item.BQ == 11 || item.BQ == 15 || 
+765:                                       item.BQ == 16 || item.BQ == 40 || item.BQ == 84 || 
+766:                                       item.BQ == 100 || item.BQ >= 96))) {
+767:             return 4;
+768:         }
+769: 
+770:         // 2: Dược Phẩm (Bình HP/MP, thức ăn, trái ác quỷ, bùa buff, thuốc bang...)
+771:         if (item.typeObject == 8 || item.typeObject == 9 || (item.typeObject == 4 && (item.BQ == 1 || item.BQ == 2 || item.BQ == 7 || item.BQ == 13 || item.BQ == 14)) || (item instanceof Potion)) {
+772:             return 2;
+773:         }
+774: 
+775:         // Mặc định còn lại thuộc nhóm Khác
+776:         return 4;
+777:     }
+778: 
+779:     public void updateFilteredItems() {
+780:         filteredItems.removeAllElements();
+781:         if (Player.vecInventory == null) return;
+782: 
+783:         for (int i = 0; i < Player.v

@@ -1,0 +1,1483 @@
+Đọc code client C# và viết comment tên biến hàm bên cạnh đúng chuẩn để tôi khác tự refactor 
+C#
+using System;
+
+// Token: 0x0200005D RID: 93
+public class DataSkillEff
+{
+	// Token: 0x06000417 RID: 1047 RVA: 0x000292F3 File Offset: 0x000274F3
+	public DataSkillEff(short idEff, sbyte[] data)
+	{
+	}
+
+	// Token: 0x06000418 RID: 1048 RVA: 0x0002932C File Offset: 0x0002752C
+	public DataSkillEff(short idEff, int time)
+	{
+		this.idEff = idEff;
+		this.f = 0;
+		if (time == -1)
+		{
+			this.typeupdate = 3;
+		}
+		else if (time == 0)
+		{
+			this.typeupdate = 1;
+		}
+		else
+		{
+			this.typeupdate = 2;
+			this.timelive = mSystem.currentTimeMillis() + (long)time;
+		}
+		this.load();
+	}
+
+	// Token: 0x06000419 RID: 1049 RVA: 0x000293B0 File Offset: 0x000275B0
+	public DataSkillEff(short idEff, int time, bool changeFlip)
+	{
+		this.idEff = idEff;
+		this.f = 0;
+		if (time == -1)
+		{
+			this.typeupdate = 3;
+		}
+		else if (time == 0)
+		{
+			this.typeupdate = 1;
+		}
+		else
+		{
+			this.typeupdate = 2;
+			this.timelive = mSystem.currentTimeMillis() + (long)time;
+		}
+		this.load(changeFlip);
+	}
+
+	// Token: 0x0600041A RID: 1050 RVA: 0x00029434 File Offset: 0x00027634
+	public DataSkillEff(short idEff, int time, sbyte typemove, sbyte loop)
+	{
+		this.idEff = idEff;
+		this.typeMove = typemove;
+		this.waitLoop = loop;
+		if (time == -1)
+		{
+			this.typeupdate = 3;
+		}
+		else if (time == 0)
+		{
+			this.typeupdate = 1;
+		}
+		else
+		{
+			this.typeupdate = 2;
+			this.timelive = mSystem.currentTimeMillis() + (long)time;
+		}
+		this.load();
+	}
+
+	// Token: 0x0600041B RID: 1051 RVA: 0x000294C0 File Offset: 0x000276C0
+	public DataSkillEff(short idEff, int time, sbyte typemove, sbyte loop, bool changeFlip)
+	{
+		this.idEff = idEff;
+		this.typeMove = typemove;
+		this.waitLoop = loop;
+		if (time == -1)
+		{
+			this.typeupdate = 3;
+		}
+		else if (time == 0)
+		{
+			this.typeupdate = 1;
+		}
+		else
+		{
+			this.typeupdate = 2;
+			this.timelive = mSystem.currentTimeMillis() + (long)time;
+		}
+		this.load(changeFlip);
+	}
+
+	// Token: 0x0600041C RID: 1052 RVA: 0x00029550 File Offset: 0x00027750
+	public DataSkillEff(short ideff, int x, int y)
+	{
+		this.idEff = ideff;
+		this.x = x;
+		this.y = y;
+		this.typeupdate = 1;
+		this.load();
+	}
+
+	// Token: 0x0600041D RID: 1053 RVA: 0x000295B4 File Offset: 0x000277B4
+	public DataSkillEff(short ideff, int x, int y, bool changeFlip)
+	{
+		this.idEff = ideff;
+		this.x = x;
+		this.y = y;
+		this.typeupdate = 1;
+		this.load(changeFlip);
+	}
+
+	// Token: 0x0600041E RID: 1054 RVA: 0x0002961C File Offset: 0x0002781C
+	public void loadData(sbyte[] array)
+	{
+		if (array == null)
+		{
+			return;
+		}
+		DataInputStream dataInputStream = null;
+		try
+		{
+			bool flag = true;
+			this.listFrame.removeAllElements();
+			this.smallImage = null;
+			dataInputStream = new DataInputStream(new ByteArrayInputStream(array));
+			int num = (int)dataInputStream.readByte();
+			this.smallImage = new SmallImage[num];
+			for (int i = 0; i < num; i++)
+			{
+				this.smallImage[i] = new SmallImage(dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte());
+			}
+			int num2 = 0;
+			int num3 = 10000;
+			int num4 = (int)dataInputStream.readShort();
+			for (int j = 0; j < num4; j++)
+			{
+				sbyte b = dataInputStream.readByte();
+				mVector mVector = new mVector();
+				mVector mVector2 = new mVector();
+				for (int k = 0; k < (int)b; k++)
+				{
+					PartFrame partFrame = new PartFrame((int)dataInputStream.readShort(), (int)dataInputStream.readShort(), (int)dataInputStream.readByte());
+					if (flag)
+					{
+						partFrame.flip = dataInputStream.readByte();
+						partFrame.onTop = dataInputStream.readByte();
+					}
+					if (partFrame.onTop == 0)
+					{
+						mVector.addElement(partFrame);
+					}
+					else
+					{
+						mVector2.addElement(partFrame);
+					}
+					if (num2 < CRes.abs((int)partFrame.dy))
+					{
+						num2 = CRes.abs((int)partFrame.dy);
+					}
+					if (CRes.abs((int)partFrame.dy) < num3)
+					{
+						num3 = CRes.abs((int)partFrame.dy);
+					}
+				}
+				this.listFrame.addElement(new FrameEff(mVector, mVector2));
+			}
+			this.fw = (int)this.smallImage[0].w;
+			this.min = num3;
+			this.fh = (int)((short)num2);
+			short num5;
+			if (flag)
+			{
+				num5 = (short)dataInputStream.readUnsignedByte();
+			}
+			else
+			{
+				num5 = dataInputStream.readShort();
+			}
+			this.sequence = new sbyte[(int)num5];
+			for (int l = 0; l < (int)num5; l++)
+			{
+				this.sequence[l] = (sbyte)dataInputStream.readShort();
+			}
+			if (flag)
+			{
+				dataInputStream.readByte();
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[0] = new sbyte[(int)num5];
+				for (int m = 0; m < (int)num5; m++)
+				{
+					this.frameChar[0][m] = dataInputStream.readByte();
+				}
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[1] = new sbyte[(int)num5];
+				for (int n = 0; n < (int)num5; n++)
+				{
+					this.frameChar[1][n] = dataInputStream.readByte();
+				}
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[3] = new sbyte[(int)num5];
+				for (int num6 = 0; num6 < (int)num5; num6++)
+				{
+					this.frameChar[3][num6] = dataInputStream.readByte();
+				}
+			}
+			this.isLoadData = true;
+			try
+			{
+				this.indexSplash[0] = (sbyte)(this.frameChar[0].Length - 7);
+				this.indexSplash[1] = (sbyte)(this.frameChar[1].Length - 7);
+				this.indexSplash[2] = (sbyte)(this.frameChar[2].Length - 7);
+				this.indexSplash[3] = (sbyte)(this.frameChar[3].Length - 7);
+			}
+			catch (Exception)
+			{
+			}
+			this.indexSplash[0] = dataInputStream.readByte();
+			this.indexSplash[1] = dataInputStream.readByte();
+			this.indexSplash[2] = dataInputStream.readByte();
+			this.indexSplash[3] = this.indexSplash[2];
+		}
+		catch (Exception)
+		{
+		}
+		finally
+		{
+			try
+			{
+				dataInputStream.close();
+			}
+			catch (Exception)
+			{
+			}
+		}
+	}
+
+	// Token: 0x0600041F RID: 1055 RVA: 0x000299C8 File Offset: 0x00027BC8
+	public void loadData(sbyte[] array, bool changeFlip)
+	{
+		if (array == null)
+		{
+			return;
+		}
+		DataInputStream dataInputStream = null;
+		try
+		{
+			bool flag = true;
+			this.listFrame.removeAllElements();
+			this.smallImage = null;
+			dataInputStream = new DataInputStream(new ByteArrayInputStream(array));
+			int num = (int)dataInputStream.readByte();
+			this.smallImage = new SmallImage[num];
+			for (int i = 0; i < num; i++)
+			{
+				this.smallImage[i] = new SmallImage(dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte());
+			}
+			int num2 = 0;
+			int num3 = 10000;
+			int num4 = (int)dataInputStream.readShort();
+			for (int j = 0; j < num4; j++)
+			{
+				sbyte b = dataInputStream.readByte();
+				mVector mVector = new mVector();
+				mVector mVector2 = new mVector();
+				for (int k = 0; k < (int)b; k++)
+				{
+					PartFrame partFrame = new PartFrame((int)dataInputStream.readShort(), (int)dataInputStream.readShort(), (int)dataInputStream.readByte());
+					if (flag)
+					{
+						partFrame.flip = dataInputStream.readByte();
+						partFrame.onTop = dataInputStream.readByte();
+						if (changeFlip)
+						{
+							partFrame.flip = ((partFrame.flip == 0) ? 1 : 0);
+						}
+					}
+					if (partFrame.onTop == 0)
+					{
+						mVector.addElement(partFrame);
+					}
+					else
+					{
+						mVector2.addElement(partFrame);
+					}
+					if (num2 < CRes.abs((int)partFrame.dy))
+					{
+						num2 = CRes.abs((int)partFrame.dy);
+					}
+					if (CRes.abs((int)partFrame.dy) < num3)
+					{
+						num3 = CRes.abs((int)partFrame.dy);
+					}
+				}
+				this.listFrame.addElement(new FrameEff(mVector, mVector2));
+			}
+			this.fw = (int)this.smallImage[0].w;
+			this.min = num3;
+			this.fh = (int)((short)num2);
+			short num5;
+			if (flag)
+			{
+				num5 = (short)dataInputStream.readUnsignedByte();
+			}
+			else
+			{
+				num5 = dataInputStream.readShort();
+			}
+			this.sequence = new sbyte[(int)num5];
+			for (int l = 0; l < (int)num5; l++)
+			{
+				this.sequence[l] = (sbyte)dataInputStream.readShort();
+			}
+			if (flag)
+			{
+				dataInputStream.readByte();
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[0] = new sbyte[(int)num5];
+				for (int m = 0; m < (int)num5; m++)
+				{
+					this.frameChar[0][m] = dataInputStream.readByte();
+				}
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[1] = new sbyte[(int)num5];
+				for (int n = 0; n < (int)num5; n++)
+				{
+					this.frameChar[1][n] = dataInputStream.readByte();
+				}
+				num5 = (short)dataInputStream.readByte();
+				this.frameChar[3] = new sbyte[(int)num5];
+				for (int num6 = 0; num6 < (int)num5; num6++)
+				{
+					this.frameChar[3][num6] = dataInputStream.readByte();
+				}
+			}
+			this.isLoadData = true;
+			try
+			{
+				this.indexSplash[0] = (sbyte)(this.frameChar[0].Length - 7);
+				this.indexSplash[1] = (sbyte)(this.frameChar[1].Length - 7);
+				this.indexSplash[2] = (sbyte)(this.frameChar[2].Length - 7);
+				this.indexSplash[3] = (sbyte)(this.frameChar[3].Length - 7);
+			}
+			catch (Exception)
+			{
+			}
+			this.indexSplash[0] = dataInputStream.readByte();
+			this.indexSplash[1] = dataInputStream.readByte();
+			this.indexSplash[2] = dataInputStream.readByte();
+			this.indexSplash[3] = this.indexSplash[2];
+		}
+		catch (Exception)
+		{
+		}
+		finally
+		{
+			try
+			{
+				dataInputStream.close();
+			}
+			catch (Exception)
+			{
+			}
+		}
+	}
+
+	// Token: 0x06000420 RID: 1056 RVA: 0x00029D8C File Offset: 0x00027F8C
+	public DataSkillEff(sbyte[] array)
+	{
+		this.loadData(array);
+	}
+
+	// Token: 0x06000421 RID: 1057 RVA: 0x00029DC9 File Offset: 0x00027FC9
+	public DataSkillEff(sbyte[] array, bool changeFlip)
+	{
+		this.loadData(array, changeFlip);
+	}
+
+	// Token: 0x06000422 RID: 1058 RVA: 0x00029E08 File Offset: 0x00028008
+	public void load(bool changeFlip)
+	{
+		EffectData effectData = (EffectData)DataSkillEff.ALL_EFF_DATA.get(this.idEff.ToString() ?? "");
+		if (effectData == null)
+		{
+			effectData = new EffectData();
+			DataSkillEff.ALL_EFF_DATA.put(this.idEff.ToString() ?? "", effectData);
+			GlobalService.gI().getDataSkillEFf(0, this.idEff);
+		}
+		if (effectData != null && effectData.data != null)
+		{
+			effectData.count = GameCanvas.timeNow / 1000L;
+			this.loadData(effectData.data, changeFlip);
+			this.isLoadData = true;
+		}
+	}
+
+	// Token: 0x06000423 RID: 1059 RVA: 0x00029EA4 File Offset: 0x000280A4
+	public void load()
+	{
+		EffectData effectData = (EffectData)DataSkillEff.ALL_EFF_DATA.get(this.idEff.ToString() ?? "");
+		if (effectData == null)
+		{
+			effectData = new EffectData();
+			DataSkillEff.ALL_EFF_DATA.put(this.idEff.ToString() ?? "", effectData);
+			GlobalService.gI().getDataSkillEFf(0, this.idEff);
+		}
+		if (effectData != null && effectData.data != null)
+		{
+			effectData.count = GameCanvas.timeNow / 1000L;
+			this.loadData(effectData.data);
+			this.isLoadData = true;
+		}
+	}
+
+	// Token: 0x06000424 RID: 1060 RVA: 0x00029F3E File Offset: 0x0002813E
+	public bool isHavedata()
+	{
+		if (this.isLoadData)
+		{
+			return true;
+		}
+		this.load();
+		return false;
+	}
+
+	// Token: 0x06000425 RID: 1061 RVA: 0x00029F54 File Offset: 0x00028154
+	public void paintTopEff(mGraphics g, int x, int y, int hOne)
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if (this.typeupdate == 3 && this.Frame == -1)
+		{
+			return;
+		}
+		if ((int)this.Frame < this.listFrame.size())
+		{
+			FrameEff frameEff = (FrameEff)this.listFrame.elementAt((int)this.Frame);
+			try
+			{
+				mVector listPartTop = frameEff.listPartTop;
+				for (int i = 0; i < listPartTop.size(); i++)
+				{
+					PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
+					SmallImage smallImage = this.smallImage[(int)partFrame.idSmallImg];
+					mImage image = this.getImage();
+					if (image != null && image.image != null)
+					{
+						int dx = (int)partFrame.dx;
+						int num = (int)smallImage.w;
+						int num2 = (int)smallImage.h;
+						int num3 = (int)smallImage.x;
+						int num4 = (int)smallImage.y;
+						if (num3 > mImage.getImageWidth(image.image))
+						{
+							num3 = 0;
+						}
+						if (num4 > mImage.getImageHeight(image.image))
+						{
+							num4 = 0;
+						}
+						if (num3 + num > mImage.getImageWidth(image.image))
+						{
+							num = mImage.getImageWidth(image.image) - num3;
+						}
+						if (num4 + num2 > mImage.getImageHeight(image.image))
+						{
+							num2 = mImage.getImageHeight(image.image) - num4;
+						}
+						int num5 = 0;
+						if (hOne == 62 && this.min >= 50)
+						{
+							num5 = -8;
+						}
+						g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, (float)(x + dx), (float)(y + (int)partFrame.dy + num5), 0);
+					}
+				}
+			}
+			catch (Exception)
+			{
+				mSystem.println(" loi tai e  " + this.idEff.ToString());
+			}
+		}
+	}
+
+	// Token: 0x06000426 RID: 1062 RVA: 0x0002A11C File Offset: 0x0002831C
+	public void paintTopEff(mGraphics g)
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if (this.typeupdate == 3 && this.Frame == -1)
+		{
+			return;
+		}
+		if ((int)this.Frame < this.listFrame.size())
+		{
+			FrameEff frameEff = (FrameEff)this.listFrame.elementAt((int)this.Frame);
+			try
+			{
+				mVector listPartTop = frameEff.listPartTop;
+				for (int i = 0; i < listPartTop.size(); i++)
+				{
+					PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
+					SmallImage smallImage = this.smallImage[(int)partFrame.idSmallImg];
+					mImage image = this.getImage();
+					if (image != null && image.image != null)
+					{
+						int dx = (int)partFrame.dx;
+						int num = (int)smallImage.w;
+						int num2 = (int)smallImage.h;
+						int num3 = (int)smallImage.x;
+						int num4 = (int)smallImage.y;
+						if (num3 > mImage.getImageWidth(image.image))
+						{
+							num3 = 0;
+						}
+						if (num4 > mImage.getImageHeight(image.image))
+						{
+							num4 = 0;
+						}
+						if (num3 + num > mImage.getImageWidth(image.image))
+						{
+							num = mImage.getImageWidth(image.image) - num3;
+						}
+						if (num4 + num2 > mImage.getImageHeight(image.image))
+						{
+							num2 = mImage.getImageHeight(image.image) - num4;
+						}
+						g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, (float)(this.x + dx), (float)(this.y + (int)partFrame.dy), 0);
+					}
+				}
+			}
+			catch (Exception)
+			{
+				mSystem.outloi(" loi tai e  " + this.idEff.ToString());
+			}
+		}
+	}
+
+	// Token: 0x06000427 RID: 1063 RVA: 0x0002A2D4 File Offset: 0x000284D4
+	public void paint(mGraphics g)
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if ((int)this.Frame < this.listFrame.size())
+		{
+			FrameEff frameEff = (FrameEff)this.listFrame.elementAt((int)this.Frame);
+			try
+			{
+				mVector listPartPaint = frameEff.getListPartPaint();
+				for (int i = 0; i < listPartPaint.size(); i++)
+				{
+					PartFrame partFrame = (PartFrame)listPartPaint.elementAt(i);
+					SmallImage smallImage = this.smallImage[(int)partFrame.idSmallImg];
+					mImage image = this.getImage();
+					if (image != null && image.image != null)
+					{
+						int dx = (int)partFrame.dx;
+						int num = (int)smallImage.w;
+						int num2 = (int)smallImage.h;
+						int num3 = (int)smallImage.x;
+						int num4 = (int)smallImage.y;
+						if (num3 > mImage.getImageWidth(image.image))
+						{
+							num3 = 0;
+						}
+						if (num4 > mImage.getImageHeight(image.image))
+						{
+							num4 = 0;
+						}
+						if (num3 + num > mImage.getImageWidth(image.image))
+						{
+							num = mImage.getImageWidth(image.image) - num3;
+						}
+						if (num4 + num2 > mImage.getImageHeight(image.image))
+						{
+							num2 = mImage.getImageHeight(image.image) - num4;
+						}
+						g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, (float)(this.x + dx), (float)(this.y + (int)partFrame.dy), 0);
+					}
+				}
+			}
+			catch (Exception)
+			{
+			}
+		}
+	}
+
+	// Token: 0x06000428 RID: 1064 RVA: 0x0002A460 File Offset: 0x00028660
+	public void paintBottomEff(mGraphics g, int x, int y, int hOne)
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if (this.typeupdate == 3 && this.Frame == -1)
+		{
+			return;
+		}
+		if ((int)this.Frame < this.listFrame.size())
+		{
+			FrameEff frameEff = (FrameEff)this.listFrame.elementAt((int)this.Frame);
+			try
+			{
+				mVector listPartBottom = frameEff.listPartBottom;
+				for (int i = 0; i < listPartBottom.size(); i++)
+				{
+					PartFrame partFrame = (PartFrame)listPartBottom.elementAt(i);
+					SmallImage smallImage = this.smallImage[(int)partFrame.idSmallImg];
+					mImage image = this.getImage();
+					if (image != null && image.image != null)
+					{
+						int dx = (int)partFrame.dx;
+						int num = (int)smallImage.w;
+						int num2 = (int)smallImage.h;
+						int num3 = (int)smallImage.x;
+						int num4 = (int)smallImage.y;
+						if (num3 > mImage.getImageWidth(image.image))
+						{
+							num3 = 0;
+						}
+						if (num4 > mImage.getImageHeight(image.image))
+						{
+							num4 = 0;
+						}
+						if (num3 + num > mImage.getImageWidth(image.image))
+						{
+							num = mImage.getImageWidth(image.image) - num3;
+						}
+						if (num4 + num2 > mImage.getImageHeight(image.image))
+						{
+							num2 = mImage.getImageHeight(image.image) - num4;
+						}
+						int num5 = 0;
+						if (hOne == 62 && this.min >= 50)
+						{
+							num5 = -8;
+						}
+						g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, (float)(x + dx), (float)(y + (int)partFrame.dy + num5), 0);
+					}
+				}
+			}
+			catch (Exception)
+			{
+			}
+		}
+	}
+
+	// Token: 0x06000429 RID: 1065 RVA: 0x0002A60C File Offset: 0x0002880C
+	public void paintBottomEff(mGraphics g)
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if (this.typeupdate == 3 && this.Frame == -1)
+		{
+			return;
+		}
+		if ((int)this.Frame < this.listFrame.size())
+		{
+			FrameEff frameEff = (FrameEff)this.listFrame.elementAt((int)this.Frame);
+			try
+			{
+				mVector listPartBottom = frameEff.listPartBottom;
+				for (int i = 0; i < listPartBottom.size(); i++)
+				{
+					PartFrame partFrame = (PartFrame)listPartBottom.elementAt(i);
+					SmallImage smallImage = this.smallImage[(int)partFrame.idSmallImg];
+					mImage image = this.getImage();
+					if (image != null && image.image != null)
+					{
+						int dx = (int)partFrame.dx;
+						int num = (int)smallImage.w;
+						int num2 = (int)smallImage.h;
+						int num3 = (int)smallImage.x;
+						int num4 = (int)smallImage.y;
+						if (num3 > mImage.getImageWidth(image.image))
+						{
+							num3 = 0;
+						}
+						if (num4 > mImage.getImageHeight(image.image))
+						{
+							num4 = 0;
+						}
+						if (num3 + num > mImage.getImageWidth(image.image))
+						{
+							num = mImage.getImageWidth(image.image) - num3;
+						}
+						if (num4 + num2 > mImage.getImageHeight(image.image))
+						{
+							num2 = mImage.getImageHeight(image.image) - num4;
+						}
+						g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, (float)(this.x + dx), (float)(this.y + (int)partFrame.dy), 0);
+					}
+				}
+			}
+			catch (Exception)
+			{
+			}
+		}
+	}
+
+	// Token: 0x0600042A RID: 1066 RVA: 0x0002A7A8 File Offset: 0x000289A8
+	public void setFrame(int fr)
+	{
+		this.Frame = (sbyte)fr;
+	}
+
+	// Token: 0x0600042B RID: 1067 RVA: 0x0002A7B2 File Offset: 0x000289B2
+	public mImage getImage()
+	{
+		EffectData effectData = (EffectData)DataSkillEff.ALL_EFF_DATA.get(this.idEff.ToString() ?? "");
+		effectData.count = GameCanvas.timeNow / 1000L;
+		return effectData.img;
+	}
+
+	// Token: 0x0600042C RID: 1068 RVA: 0x0002A7F0 File Offset: 0x000289F0
+	public static EffectData readData(sbyte[] dataeff, bool isSave)
+	{
+		EffectData effectData = null;
+		try
+		{
+			DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(dataeff));
+			short id = dataInputStream.readShort();
+			sbyte[] data = new sbyte[(int)dataInputStream.readShort()];
+			dataInputStream.read(ref data);
+			sbyte[] dataImg = new sbyte[dataInputStream.available()];
+			dataInputStream.read(ref dataImg);
+			effectData = (EffectData)DataSkillEff.ALL_EFF_DATA.get(id.ToString() ?? "");
+			if (effectData != null)
+			{
+				effectData.setData(data, dataImg);
+				effectData.count = GameCanvas.timeNow / 1000L;
+			}
+			DataSkillEff.saveDataSkillEff(dataeff, id);
+		}
+		catch (Exception)
+		{
+		}
+		return effectData;
+	}
+
+	// Token: 0x0600042D RID: 1069 RVA: 0x0002A894 File Offset: 0x00028A94
+	public static void saveDataSkillEff(sbyte[] dataSave, short id)
+	{
+		try
+		{
+			CRes.saveRMS("DataSkillEff" + id.ToString(), dataSave);
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	// Token: 0x0600042E RID: 1070 RVA: 0x0002A8D0 File Offset: 0x00028AD0
+	public void setLoop(int loop)
+	{
+		this.loop = loop;
+	}
+
+	// Token: 0x0600042F RID: 1071 RVA: 0x0002A8DC File Offset: 0x00028ADC
+	public void update()
+	{
+		if (!this.isHavedata())
+		{
+			return;
+		}
+		if (this.listFrame.size() <= 0 && this.sequence.Length == 0)
+		{
+			return;
+		}
+		try
+		{
+			switch (this.typeupdate)
+			{
+			case 0:
+				this.f += 1;
+				if ((int)this.f > this.sequence.Length)
+				{
+					if (!this.canremove)
+					{
+						this.wantDestroy = true;
+					}
+					this.f = 0;
+				}
+				this.Frame = this.sequence[(int)this.f];
+				break;
+			case 1:
+				this.f += 1;
+				if ((int)this.f > this.sequence.Length)
+				{
+					this.f = 0;
+					this.wantDestroy = true;
+				}
+				this.Frame = this.sequence[(int)this.f];
+				break;
+			case 2:
+				this.f += 1;
+				if ((int)this.f > this.sequence.Length)
+				{
+					this.f = 0;
+				}
+				if (this.timelive - mSystem.currentTimeMillis() < 0L)
+				{
+					this.wantDestroy = true;
+				}
+				this.Frame = this.sequence[(int)this.f];
+				break;
+			case 3:
+				this.f += 1;
+				if ((int)this.f > this.sequence.Length)
+				{
+					if (this.waitLoop > 0)
+					{
+						if (mSystem.currentTimeMillis() - this.lasttime > (long)((int)this.waitLoop * 1000))
+						{
+							this.lasttime = mSystem.currentTimeMillis();
+							this.f = 0;
+						}
+					}
+					else
+					{
+						this.f = 0;
+					}
+				}
+				if ((int)this.f < this.sequence.Length)
+				{
+					this.Frame = this.sequence[(int)this.f];
+				}
+				else
+				{
+					this.Frame = -1;
+				}
+				break;
+			}
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	// Token: 0x04000471 RID: 1137
+	public sbyte Frame;
+
+	// Token: 0x04000472 RID: 1138
+	public sbyte f;
+
+	// Token: 0x04000473 RID: 1139
+	public long timeremove;
+
+	// Token: 0x04000474 RID: 1140
+	public long timeGetBack;
+
+	// Token: 0x04000475 RID: 1141
+	public mVector listFrame = new mVector();
+
+	// Token: 0x04000476 RID: 1142
+	public mVector listAnima = new mVector();
+
+	// Token: 0x04000477 RID: 1143
+	public SmallImage[] smallImage;
+
+	// Token: 0x04000478 RID: 1144
+	public sbyte[][] frameChar = new sbyte[4][];
+
+	// Token: 0x04000479 RID: 1145
+	public sbyte[] sequence;
+
+	// Token: 0x0400047A RID: 1146
+	public int fw;
+
+	// Token: 0x0400047B RID: 1147
+	public int fh;
+
+	// Token: 0x0400047C RID: 1148
+	public sbyte[] indexSplash = new sbyte[4];
+
+	// Token: 0x0400047D RID: 1149
+	private int loop;
+
+	// Token: 0x0400047E RID: 1150
+	public sbyte waitLoop;
+
+	// Token: 0x0400047F RID: 1151
+	public bool isLoadData;
+
+	// Token: 0x04000480 RID: 1152
+	public short idEff;
+
+	// Token: 0x04000481 RID: 1153
+	public bool canremove;
+
+	// Token: 0x04000482 RID: 1154
+	public static MyHashTable ALL_EFF_DATA = new MyHashTable();
+
+	// Token: 0x04000483 RID: 1155
+	public static MyHashTable ALL_IMAGE_EFF_DATA = new MyHashTable();
+
+	// Token: 0x04000484 RID: 1156
+	public sbyte typeupdate;
+
+	// Token: 0x04000485 RID: 1157
+	public const sbyte NORMAL = 0;
+
+	// Token: 0x04000486 RID: 1158
+	public const sbyte REMOVE_BY_FRAME = 1;
+
+	// Token: 0x04000487 RID: 1159
+	public const sbyte REMOVE_BY_TIME = 2;
+
+	// Token: 0x04000488 RID: 1160
+	public const sbyte NO_REMOVE = 3;
+
+	// Token: 0x04000489 RID: 1161
+	public int x;
+
+	// Token: 0x0400048A RID: 1162
+	public int y;
+
+	// Token: 0x0400048B RID: 1163
+	public sbyte typeMove;
+
+	// Token: 0x0400048C RID: 1164
+	public const sbyte CHOANG = 1;
+
+	// Token: 0x0400048D RID: 1165
+	public const sbyte BIENHINH = 2;
+
+	// Token: 0x0400048E RID: 1166
+	public bool isbuff;
+
+	// Token: 0x0400048F RID: 1167
+	private int min;
+
+	// Token: 0x04000490 RID: 1168
+	public bool wantDestroy;
+
+	// Token: 0x04000491 RID: 1169
+	private long lasttime;
+
+	// Token: 0x04000492 RID: 1170
+	private long timelive;
+}
+
+
+
+JAVA
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+
+public final class DataSkillEff {
+   private byte AE;
+   private byte AF;
+   private mVector AG = new mVector();
+   private Class_EZ[] AH;
+   private byte[][] AI;
+   private byte[] AJ;
+   private byte[] AK;
+   private byte AL;
+   private boolean AM;
+   public short AA;
+   public static MyHashTable AB = new MyHashTable();
+   private byte AN;
+   private int AO;
+   private int AP;
+   public byte AC;
+   private int AQ;
+   public boolean AD;
+   private long AR;
+   private long AS;
+
+   static {
+      new MyHashTable();
+   }
+
+   public DataSkillEff(short var1, int var2) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.AA = 0;
+      this.AN = 0;
+      this.AQ = 0;
+      this.AA = var1;
+      this.AF = 0;
+      if (var2 == -1) {
+         this.AN = 3;
+      } else if (var2 == 0) {
+         this.AN = 1;
+      } else {
+         this.AN = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.AB();
+   }
+
+   public DataSkillEff(short var1, int var2, byte var3, byte var4) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.AA = 0;
+      this.AN = 0;
+      this.AQ = 0;
+      this.AA = var1;
+      this.AC = var3;
+      this.AL = var4;
+      if (var2 == -1) {
+         this.AN = 3;
+      } else if (var2 == 0) {
+         this.AN = 1;
+      } else {
+         this.AN = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.AB();
+   }
+
+   public DataSkillEff(short var1, int var2, int var3) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.AA = 0;
+      this.AN = 0;
+      this.AQ = 0;
+      this.AA = var1;
+      this.AO = var2;
+      this.AP = var3;
+      this.AN = 1;
+      this.AB();
+   }
+
+   private void AB(byte[] var1) {
+      if (var1 != null) {
+         DataInputStream var2 = null;
+
+         try {
+            this.AG.AB();
+            this.AH = null;
+            byte var21 = (var2 = new DataInputStream(new ByteArrayInputStream(var1))).readByte();
+            this.AH = new Class_EZ[var21];
+
+            int var3;
+            for(var3 = 0; var3 < var21; ++var3) {
+               this.AH[var3] = new Class_EZ(var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte());
+            }
+
+            var3 = 0;
+            int var22 = 10000;
+            short var4 = var2.readShort();
+
+            for(int var5 = 0; var5 < var4; ++var5) {
+               byte var6 = var2.readByte();
+               mVector var7 = new mVector();
+               mVector var8 = new mVector();
+
+               for(int var9 = 0; var9 < var6; ++var9) {
+                  Class_BZ var10;
+                  (var10 = new Class_BZ(var2.readShort(), var2.readShort(), var2.readByte())).AD = var2.readByte();
+                  var10.AE = var2.readByte();
+                  if (var10.AE == 0) {
+                     var7.AA(var10);
+                  } else {
+                     var8.AA(var10);
+                  }
+
+                  if (var3 < Class_CL.AD(var10.AC)) {
+                     var3 = Class_CL.AD(var10.AC);
+                  }
+
+                  if (Class_CL.AD(var10.AC) < var22) {
+                     var22 = Class_CL.AD(var10.AC);
+                  }
+               }
+
+               this.AG.AA(new Class_BT(var7, var8));
+            }
+
+            short var10000 = this.AH[0].AC;
+            this.AQ = var22;
+            short var23 = (short)var2.readUnsignedByte();
+            this.AJ = new byte[var23];
+
+            int var25;
+            for(var25 = 0; var25 < var23; ++var25) {
+               this.AJ[var25] = (byte)var2.readShort();
+            }
+
+            var2.readByte();
+            byte var24 = var2.readByte();
+            this.AI[0] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[0][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[1] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[1][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[3] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[3][var25] = var2.readByte();
+            }
+
+            this.AM = true;
+
+            try {
+               this.AK[0] = (byte)(this.AI[0].length - 7);
+               this.AK[1] = (byte)(this.AI[1].length - 7);
+               this.AK[2] = (byte)(this.AI[2].length - 7);
+               this.AK[3] = (byte)(this.AI[3].length - 7);
+            } catch (Exception var18) {
+            }
+
+            this.AK[0] = var2.readByte();
+            this.AK[1] = var2.readByte();
+            this.AK[2] = var2.readByte();
+            this.AK[3] = this.AK[2];
+            return;
+         } catch (Exception var19) {
+         } finally {
+            try {
+               var2.close();
+            } catch (Exception var17) {
+            }
+
+         }
+
+      }
+   }
+
+   private void AB() {
+      Class_BM var1;
+      if ((var1 = (Class_BM)AB.AA(String.valueOf(this.AA))) == null) {
+         var1 = new Class_BM();
+         AB.put(String.valueOf(this.AA), var1);
+         Class_IA.AA().AF((byte)0, (short)this.AA);
+      }
+
+      if (var1 != null && var1.AA != null) {
+         var1.AB = GameCanvas.BC / 1000L;
+         this.AB(var1.AA);
+         this.AM = true;
+      }
+
+   }
+
+   private boolean AC() {
+      if (this.AM) {
+         return true;
+      } else {
+         this.AB();
+         return false;
+      }
+   }
+
+   public final void AA(mGraphics var1, int var2, int var3, int var4) {
+      if (this.AC()) {
+         if (this.AN != 3 || this.AE != -1) {
+            if (this.AE < this.AG.AA()) {
+               Class_BT var5 = (Class_BT)this.AG.AA(this.AE);
+
+               try {
+                  mVector var16 = var5.AA;
+
+                  for(int var6 = 0; var6 < var16.AA(); ++var6) {
+                     Class_BZ var7 = (Class_BZ)var16.AA(var6);
+                     Class_EZ var8 = this.AH[var7.AA];
+                     mImage var9;
+                     if ((var9 = this.AD()) != null && var9.AA != null) {
+                        short var10 = var7.AB;
+                        int var11 = var8.AC;
+                        int var12 = var8.AD;
+                        short var13 = var8.AA;
+                        short var17 = var8.AB;
+                        if (var13 > mImage.AA(var9.AA)) {
+                           var13 = 0;
+                        }
+
+                        if (var17 > mImage.AB(var9.AA)) {
+                           var17 = 0;
+                        }
+
+                        if (var13 + var11 > mImage.AA(var9.AA)) {
+                           var11 = mImage.AA(var9.AA) - var13;
+                        }
+
+                        if (var17 + var12 > mImage.AB(var9.AA)) {
+                           var12 = mImage.AB(var9.AA) - var17;
+                        }
+
+                        byte var14 = 0;
+                        if (var4 == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        var1.drawRegion(var9, var13, var17, var11, var12, var7.AD == 1 ? 2 : 0, var2 + var10, var3 + var7.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+                  var15.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.AA).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AA(mGraphics var1) {
+      if (this.AC()) {
+         if (this.AN != 3 || this.AE != -1) {
+            if (this.AE < this.AG.AA()) {
+               Class_BT var2 = (Class_BT)this.AG.AA(this.AE);
+
+               try {
+                  mVector var12 = var2.AA;
+
+                  for(int var3 = 0; var3 < var12.AA(); ++var3) {
+                     Class_BZ var4 = (Class_BZ)var12.AA(var3);
+                     Class_EZ var5 = this.AH[var4.AA];
+                     mImage var6;
+                     if ((var6 = this.AD()) != null && var6.AA != null) {
+                        short var7 = var4.AB;
+                        int var8 = var5.AC;
+                        int var9 = var5.AD;
+                        short var10 = var5.AA;
+                        short var13 = var5.AB;
+                        if (var10 > mImage.AA(var6.AA)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.AB(var6.AA)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.AA(var6.AA)) {
+                           var8 = mImage.AA(var6.AA) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.AB(var6.AA)) {
+                           var9 = mImage.AB(var6.AA) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+                  var11.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.AA).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AB(mGraphics var1, int var2, int var3, int var4) {
+      if (this.AC()) {
+         if (this.AN != 3 || this.AE != -1) {
+            if (this.AE < this.AG.AA()) {
+               Class_BT var5 = (Class_BT)this.AG.AA(this.AE);
+
+               try {
+                  mVector var16 = var5.AB;
+
+                  for(int var6 = 0; var6 < var16.AA(); ++var6) {
+                     Class_BZ var7 = (Class_BZ)var16.AA(var6);
+                     Class_EZ var8 = this.AH[var7.AA];
+                     mImage var9;
+                     if ((var9 = this.AD()) != null && var9.AA != null) {
+                        short var10 = var7.AB;
+                        int var11 = var8.AC;
+                        int var12 = var8.AD;
+                        short var13 = var8.AA;
+                        short var17 = var8.AB;
+                        if (var13 > mImage.AA(var9.AA)) {
+                           var13 = 0;
+                        }
+
+                        if (var17 > mImage.AB(var9.AA)) {
+                           var17 = 0;
+                        }
+
+                        if (var13 + var11 > mImage.AA(var9.AA)) {
+                           var11 = mImage.AA(var9.AA) - var13;
+                        }
+
+                        if (var17 + var12 > mImage.AB(var9.AA)) {
+                           var12 = mImage.AB(var9.AA) - var17;
+                        }
+
+                        byte var14 = 0;
+                        if (var4 == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        var1.drawRegion(var9, var13, var17, var11, var12, var7.AD == 1 ? 2 : 0, var2 + var10, var3 + var7.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AB(mGraphics var1) {
+      if (this.AC()) {
+         if (this.AN != 3 || this.AE != -1) {
+            if (this.AE < this.AG.AA()) {
+               Class_BT var2 = (Class_BT)this.AG.AA(this.AE);
+
+               try {
+                  mVector var12 = var2.AB;
+
+                  for(int var3 = 0; var3 < var12.AA(); ++var3) {
+                     Class_BZ var4 = (Class_BZ)var12.AA(var3);
+                     Class_EZ var5 = this.AH[var4.AA];
+                     mImage var6;
+                     if ((var6 = this.AD()) != null && var6.AA != null) {
+                        short var7 = var4.AB;
+                        int var8 = var5.AC;
+                        int var9 = var5.AD;
+                        short var10 = var5.AA;
+                        short var13 = var5.AB;
+                        if (var10 > mImage.AA(var6.AA)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.AB(var6.AA)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.AA(var6.AA)) {
+                           var8 = mImage.AA(var6.AA) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.AB(var6.AA)) {
+                           var9 = mImage.AB(var6.AA) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+               }
+            }
+
+         }
+      }
+   }
+
+   private mImage AD() {
+      Class_BM var1;
+      (var1 = (Class_BM)AB.AA(String.valueOf(this.AA))).AB = GameCanvas.BC / 1000L;
+      return var1.AC;
+   }
+
+   public static Class_BM AA(byte[] var0) {
+      Class_BM var1 = null;
+
+      try {
+         ByteArrayInputStream var2 = new ByteArrayInputStream(var0);
+         DataInputStream var8;
+         short var3 = (var8 = new DataInputStream(var2)).readShort();
+         byte[] var4 = new byte[var8.readShort()];
+         var8.read(var4);
+         byte[] var5 = new byte[var8.available()];
+         var8.read(var5);
+         if ((var1 = (Class_BM)AB.AA(String.valueOf(var3))) != null) {
+            var1.AA = var4;
+            var1.AC = mImage.AA(var5);
+            var1.AB = GameCanvas.BC / 1000L;
+         }
+
+         short var10 = var3;
+         byte[] var9 = var0;
+
+         try {
+            Class_CL.AA("DataSkillEff" + var10, var9);
+         } catch (Exception var6) {
+            var6.printStackTrace();
+         }
+      } catch (Exception var7) {
+      }
+
+      return var1;
+   }
+
+   public final void AA() {
+      if (this.AC()) {
+         if (this.AG.AA() > 0 || this.AJ.length > 0) {
+            try {
+               switch(this.AN) {
+               case 0:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AD = true;
+                     this.AF = 0;
+                  }
+
+                  this.AE = this.AJ[this.AF];
+                  return;
+               case 1:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                     this.AD = true;
+                  }
+
+                  this.AE = this.AJ[this.AF];
+                  return;
+               case 2:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                  }
+
+                  if (this.AS - System.currentTimeMillis() < 0L) {
+                     this.AD = true;
+                  }
+
+                  this.AE = this.AJ[this.AF];
+                  return;
+               case 3:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     label52: {
+                        if (this.AL > 0) {
+                           if (System.currentTimeMillis() - this.AR <= (long)(this.AL * 1000)) {
+                              break label52;
+                           }
+
+                           this.AR = System.currentTimeMillis();
+                        }
+
+                        this.AF = 0;
+                     }
+                  }
+
+                  if (this.AF < this.AJ.length) {
+                     this.AE = this.AJ[this.AF];
+                     return;
+                  } else {
+                     this.AE = -1;
+                     return;
+                  }
+               default:
+               }
+            } catch (Exception var1) {
+            }
+         }
+      }
+   }
+}

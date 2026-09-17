@@ -1,0 +1,289 @@
+		else if (focusPane == 0)
+		{
+			// Left Grid: 8 Equipment Slots
+			if (selectedEquipIndex < 0) selectedEquipIndex = 0;
+
+			if (GameCanvas.keyMove(2))
+			{
+				GameCanvas.ClearkeyMove(2);
+				if (selectedEquipIndex % 2 == 0)
+				{
+					selectedEquipIndex++;
+					MainItem eq = (MainItem)GameScreen.player.hashEquip.get(selectedEquipIndex.ToString());
+					selectItem(eq, 0, 0);
+				}
+				else
+				{
+					focusPane = 1; // Sang Hành Trang
+					int row = selectedEquipIndex / 2;
+					int leftPaneW = isWide ? 160 : (w * 45 / 100);
+					int rightPaneW = w - leftPaneW - (isWide ? 20 : 16);
+					int gridW = rightPaneW - 8;
+					int cols = gridW / 30;
+					if (cols < 1) cols = 1;
+					selectedInvenIndex = row * cols;
+					if (selectedInvenIndex >= filteredItems.size()) selectedInvenIndex = filteredItems.size() - 1;
+					if (selectedInvenIndex >= 0 && selectedInvenIndex < filteredItems.size())
+					{
+						MainItem it = (MainItem)filteredItems.elementAt(selectedInvenIndex);
+						selectItem(it, 0, 0);
+					}
+					updateSoftKeys();
+					return;
+				}
+			}
+			else if (GameCanvas.keyMove(0))
+			{
+				GameCanvas.ClearkeyMove(0);
+				if (selectedEquipIndex % 2 == 1)
+				{
+					selectedEquipIndex--;
+					MainItem eq = (MainItem)GameScreen.player.hashEquip.get(selectedEquipIndex.ToString());
+					selectItem(eq, 0, 0);
+				}
+			}
+			else if (GameCanvas.keyMove(1))
+			{
+				GameCanvas.ClearkeyMove(1);
+				if (selectedEquipIndex >= 2)
+				{
+					selectedEquipIndex -= 2;
+					MainItem eq = (MainItem)GameScreen.player.hashEquip.get(selectedEquipIndex.ToString());
+					selectItem(eq, 0, 0);
+				}
+				else
+				{
+					focusPane = 2; // Jump up to Top Nav Tabs
+					updateSoftKeys();
+					return;
+				}
+			}
+			else if (GameCanvas.keyMove(3))
+			{
+				GameCanvas.ClearkeyMove(3);
+				if (selectedEquipIndex <= 5)
+				{
+					selectedEquipIndex += 2;
+					MainItem eq = (MainItem)GameScreen.player.hashEquip.get(selectedEquipIndex.ToString());
+					selectItem(eq, 0, 0);
+				}
+				else
+				{
+					focusPane = 1; // Xuống cuối đồ thì nhảy sang Hành Trang
+					if (selectedInvenIndex < 0 && filteredItems.size() > 0) selectedInvenIndex = 0;
+					if (selectedInvenIndex >= 0 && selectedInvenIndex < filteredItems.size())
+					{
+						MainItem it = (MainItem)filteredItems.elementAt(selectedInvenIndex);
+						selectItem(it, 0, 0);
+					}
+					updateSoftKeys();
+					return;
+				}
+			}
+		}
+	}
+
+	private void handleKeypadTab1()
+	{
+		if (focusPane == 0)
+		{
+			// Left Table: Scroll full stats list
+			if (GameCanvas.keyMove(1) && infoList != null && infoList.cmx <= 0)
+			{
+				GameCanvas.ClearkeyMove(1);
+				focusPane = 2; // Jump up to Top Nav Tabs
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(1) && infoList != null)
+			{
+				GameCanvas.ClearkeyMove(1);
+				infoList.cmtoX -= 18;
+				if (infoList.cmtoX < 0) infoList.cmtoX = 0;
+			}
+			if (GameCanvas.keyMove(3) && infoList != null)
+			{
+				GameCanvas.ClearkeyMove(3);
+				infoList.cmtoX += 18;
+				if (infoList.cmtoX > infoList.cmxLim) infoList.cmtoX = infoList.cmxLim;
+			}
+
+			// Key 6 / Right moves to Tiềm Năng
+			if (GameCanvas.keyMove(2))
+			{
+				GameCanvas.ClearkeyMove(2);
+				focusPane = 1;
+				selectedAttIndex = 0;
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(0))
+			{
+				GameCanvas.ClearkeyMove(0);
+				switchTab(curMainTab - 1);
+				return;
+			}
+		}
+		else if (focusPane == 1)
+		{
+			// Right Table: Potential Cards
+			int maxAtt = (Player.mAttribute != null && Player.mAttribute.Length > 0) ? Player.mAttribute.Length : 5;
+			bool keyMoved = false;
+
+			if (GameCanvas.keyMove(1) && selectedAttIndex == 0)
+			{
+				GameCanvas.ClearkeyMove(1);
+				focusPane = 2; // Jump up to Top Nav Tabs
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(1)) { selectedAttIndex--; GameCanvas.ClearkeyMove(1); keyMoved = true; }
+			if (GameCanvas.keyMove(3)) { selectedAttIndex++; GameCanvas.ClearkeyMove(3); keyMoved = true; }
+			if (selectedAttIndex < 0) selectedAttIndex = maxAtt - 1;
+			if (selectedAttIndex >= maxAtt) selectedAttIndex = 0;
+
+			// Auto scroll attriList ONLY when user presses key
+			if (keyMoved && attriList != null)
+			{
+				int targetY = 0;
+				for (int i = 0; i < selectedAttIndex; i++)
+				{
+					Main_Attribute att = (Player.mAttribute != null && i < Player.mAttribute.Length) ? Player.mAttribute[i] : null;
+					targetY += getAttriCardHeight(att, i) + 4;
+				}
+				Main_Attribute curAtt = (Player.mAttribute != null && selectedAttIndex < Player.mAttribute.Length) ? Player.mAttribute[selectedAttIndex] : null;
+				int curH = getAttriCardHeight(curAtt, selectedAttIndex);
+				int rightListH = (h - 34) - 24;
+				if (targetY < attriList.cmx) attriList.cmtoX = targetY;
+				if (targetY + curH > attriList.cmx + rightListH) attriList.cmtoX = targetY + curH - rightListH;
+			}
+
+			// Key 4 / Left moves to Chỉ Số
+			if (GameCanvas.keyMove(0))
+			{
+				GameCanvas.ClearkeyMove(0);
+				focusPane = 0;
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(2))
+			{
+				GameCanvas.ClearkeyMove(2);
+				switchTab(curMainTab + 1);
+				return;
+			}
+		}
+	}
+
+	private void handleKeypadTab2()
+	{
+		int total = validSkills.size();
+		if (total > 0 && focusPane == 1)
+		{
+			bool keyMoved = false;
+			if (GameCanvas.keyMove(1) && selectedSkillIndex == 0)
+			{
+				GameCanvas.ClearkeyMove(1);
+				focusPane = 2;
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(1)) { selectedSkillIndex--; GameCanvas.ClearkeyMove(1); keyMoved = true; }
+			if (GameCanvas.keyMove(3)) { selectedSkillIndex++; GameCanvas.ClearkeyMove(3); keyMoved = true; }
+			if (GameCanvas.keyMove(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
+			if (GameCanvas.keyMove(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
+			if (selectedSkillIndex < 0) selectedSkillIndex = 0;
+			if (selectedSkillIndex >= total) selectedSkillIndex = total - 1;
+
+			if (keyMoved && skillList != null)
+			{
+				int slotY = selectedSkillIndex * 34;
+				if (slotY < skillList.cmx) skillList.cmtoX = slotY;
+				if (slotY + 34 > skillList.cmx + (h - 56)) skillList.cmtoX = slotY + 34 - (h - 56);
+			}
+			updateSoftKeys();
+		}
+	}
+
+	private void handleKeypadTab3()
+	{
+		int total = (Player.vecQuest != null) ? Player.vecQuest.size() : 0;
+		if (total > 0 && focusPane == 1)
+		{
+			bool keyMoved = false;
+			if (GameCanvas.keyMove(1) && selectedQuestIndex == 0)
+			{
+				GameCanvas.ClearkeyMove(1);
+				focusPane = 2;
+				updateSoftKeys();
+				return;
+			}
+			if (GameCanvas.keyMove(1)) { selectedQuestIndex--; GameCanvas.ClearkeyMove(1); keyMoved = true; }
+			if (GameCanvas.keyMove(3)) { selectedQuestIndex++; GameCanvas.ClearkeyMove(3); keyMoved = true; }
+			if (GameCanvas.keyMove(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
+			if (GameCanvas.keyMove(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
+			if (selectedQuestIndex < 0) selectedQuestIndex = 0;
+			if (selectedQuestIndex >= total) selectedQuestIndex = total - 1;
+
+			if (keyMoved && questList != null)
+			{
+				int slotY = selectedQuestIndex * 34;
+				if (slotY < questList.cmx) questList.cmtoX = slotY;
+				if (slotY + 34 > questList.cmx + (h - 56)) questList.cmtoX = slotY + 34 - (h - 56);
+			}
+			updateSoftKeys();
+		}
+	}
+
+	private void handleKeypadTab4()
+	{
+		if (chucNangSubView == 0)
+		{
+			int count = getFeatureItemCount();
+			if (focusPane == 1 && count > 0)
+			{
+				bool keyMoved = false;
+				if (GameCanvas.keyMove(1) && selectedChucNangIndex == 0)
+				{
+					GameCanvas.ClearkeyMove(1);
+					focusPane = 2;
+					updateSoftKeys();
+					return;
+				}
+				if (GameCanvas.keyMove(1))
+				{
+					selectedChucNangIndex--;
+					GameCanvas.ClearkeyMove(1);
+					keyMoved = true;
+				}
+				else if (GameCanvas.keyMove(3))
+				{
+					selectedChucNangIndex++;
+					GameCanvas.ClearkeyMove(3);
+					keyMoved = true;
+				}
+				else if (GameCanvas.keyMove(0))
+				{
+					GameCanvas.ClearkeyMove(0);
+					switchTab(curMainTab - 1);
+					return;
+				}
+				else if (GameCanvas.keyMove(2))
+				{
+					GameCanvas.ClearkeyMove(2);
+					switchTab(curMainTab + 1);
+					return;
+				}
+				if (selectedChucNangIndex < 0) selectedChucNangIndex = 0;
+				if (selectedChucNangIndex >= count) selectedChucNangIndex = count - 1;
+
+				if (featureMenuList != null)
+				{
+					int itemH = 38;
+					int itemY = selectedChucNangIndex * itemH;
+					if (itemY < featureMenuList.cmx) featureMenuList.cmtoX = itemY;
+					if (itemY + itemH > featureMenuList.cmx + featureMenuList.maxH) featureMenuList.cmtoX = itemY + itemH - featureMenuList.maxH;
+				}
+				updateSoftKeys();
+			}
+		}

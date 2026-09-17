@@ -1,0 +1,80 @@
+private void doPrimaryAction()
+\t{
+\t\tif (curMainTab == 0)
+\t\t{
+\t\t\tif (focusPane == 0 && selectedEquipIndex >= 0)
+\t\t\t{
+\t\t\t\tint leftPaneW = isWide ? 160 : (w * 45 / 100);
+\t\t\t\tint pX = x + 10;
+\t\t\t\tint leftSlotX = pX + 8;
+\t\t\t\tint rightSlotX = pX + leftPaneW - 26 - 8;
+\t\t\t\tint startSlotY = y + 28 + 26;
+\t\t\t\tint slotGapY = 28;
+\t\t\t\tint row = selectedEquipIndex / 2;
+\t\t\t\tbool isLeft = (selectedEquipIndex % 2 == 0);
+\t\t\t\tint px = isLeft ? (leftSlotX + 13) : (rightSlotX + 13);
+\t\t\t\tint py = startSlotY + row * slotGapY + 13;
+\t\t\t\tchangeEquip(selectedEquipIndex, px, py);
+\t\t\t\treturn;
+\t\t\t}
+
+\t\t\tMainItem cur = (selectedItemInfo != null) ? selectedItemInfo : null;
+\t\t\tif (cur == null && focusPane == 1 && selectedInvenIndex >= 0 && selectedInvenIndex < filteredItems.size())
+\t\t\t{
+\t\t\t\tcur = (MainItem)filteredItems.elementAt(selectedInvenIndex);
+\t\t\t}
+
+\t\t\tif (cur != null)
+\t\t\t{
+\t\t\t\tif (GameCanvas.tabInven == null)
+\t\t\t\t{
+\t\t\t\t\tGameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, 0, MainTab.xTab);
+\t\t\t\t\tGameCanvas.tabInven.initCmd();
+\t\t\t\t}
+\t\t\t\tGameCanvas.tabInven.itemCur = cur;
+\t\t\t\tGameCanvas.tabInven.IdSelect = Player.vecInventory.indexOf(cur);
+\t\t\t\tmVector mActions = cur.getActionInven(0);
+\t\t\t\tif (mActions != null && mActions.size() > 0)
+\t\t\t\t{
+\t\t\t\t\tiCommand primaryCmd = (iCommand)mActions.elementAt(0);
+\t\t\t\t\tprimaryCmd.perform();
+\t\t\t\t\tTabScreen.isRefresh = true;
+\t\t\t\t}
+\t\t\t}
+\t\t}
+\t\telse if (curMainTab == 1)
+\t\t{
+\t\t\taddPotentialPoint(selectedAttIndex);
+\t\t}
+\t\telse if (curMainTab == 2)
+\t\t{
+\t\t\topenSkillHotkeyMenu();
+\t\t}
+\t\telse if (curMainTab == 3)
+\t\t{
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+"}
+{"step_index":38,"source":"MODEL","type":"PLANNER_RESPONSE","status":"DONE","created_at":"2026-09-02T10:00:10Z","tool_calls":[{"name":"view_file","args":{"AbsolutePath":"c:/DepLor/HTTH/Team/ProjectUnity129/Assets/Scripts/Assembly-CSharp/DualTabScreen.cs","EndLine":3100,"StartLine":2950,"toolAction":"View DualTabScreen paint methods","toolSummary":"Read DualTabScreen.cs paint tab 0"}}]}
+{"step_index":39,"source":"MODEL","type":"GENERIC","status":"DONE","created_at":"2026-09-02T10:00:16Z","content":"Created At: 2026-09-02T17:00:16+07:00
+Completed At: 2026-09-02T17:00:16+07:00
+File Path: `file:///c:/DepLor/HTTH/Team/ProjectUnity129/Assets/Scripts/Assembly-CSharp/DualTabScreen.cs`
+Total Lines: 5264
+Total Bytes: 153158
+Showing lines 2950 to 3100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+\t\t\tif (focusPane == 1 && selectedItemInfo.typeObject == 3)
+\t\t\t{
+\t\t\t\tinfoSS = MainItem.getInfoSS(selectedItemInfo);
+\t\t\t}
+
+\t\t\tMainTab.paintInfoEveryWhere(g, selectedItemInfo, infoSS, 0, infoX, infoY, infoW, showH, false, null, 0);
+
+\t\t\tif (GameCanvas.isTouch)
+\t\t\t{
+\t\t\t\tint btnY = infoY + showH + 3;
+\t\t\t\tif (btnY + 18 <= y + h - 4 || spaceLeft >= infoW + 6 || spaceRight >= infoW + 6)
+\t\t\t\t{
+\t\t\t\t\tif (focusPane == 0)
+\t\t\t\t\t{
+\t\t\t\t\t\tAvMain.paintRect(g, infoX, btnY, 60, 18, 1, 1);
+\t\t\t\t\t\tmFont.tahoma_7b_black.drawString(g, \"Đổi\", infoX + 30, btnY + 3, 

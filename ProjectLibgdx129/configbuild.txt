@@ -1,0 +1,6 @@
+#zoomlevel=1
+#screen_w=230
+#screen_h=240
+zoomlevel=4
+pc_screen_w=40%
+pc_screen_h=40%

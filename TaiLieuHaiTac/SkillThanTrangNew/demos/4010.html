@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill 4010 — Cự Độc Phán Quyết Venom X | Chi Tiết VFX & Spritesheets</title>
+<style>
+:root {
+  --bg-deep: #080410;
+  --bg-card: #120b22;
+  --border: #2e1d4e;
+  --border-glow: #4d2f85;
+  --accent: #ffd700;
+  --cyan: #00e5ff;
+  --text-main: #f5f0ff;
+  --text-sub: #a694c4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background: var(--bg-deep); color: var(--text-main); padding: 24px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+.header { max-width: 1040px; width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+.header h1 { font-size: 22px; color: var(--accent); letter-spacing: 1px; }
+.header p { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+.back-btn { background: #261644; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-glow); transition: all 0.15s; }
+.back-btn:hover { background: #3d2170; border-color: var(--accent); color: var(--accent); }
+
+.main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1040px; width: 100%; }
+@media(max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+.card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Canvas Player */
+#player-wrap { position: relative; width: 100%; background: radial-gradient(circle, #1a0e33 0%, #080410 80%); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; }
+canvas#previewCanvas { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.player-controls { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.ctrl-btn { padding: 6px 14px; background: #22143d; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-size: 11px; cursor: pointer; }
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Spritesheets Grid */
+.sheet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sheet-card { background: #0a0614; border: 1px solid var(--border); border-radius: 6px; padding: 10px; text-align: center; }
+.sheet-card img { max-height: 80px; width: auto; object-fit: contain; image-rendering: pixelated; margin-bottom: 6px; }
+.sheet-title { font-size: 11px; font-weight: 600; color: #fff; }
+.sheet-sub { font-size: 10px; color: var(--cyan); margin-top: 2px; }
+
+/* Specs */
+.stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.stat-row span.val { color: var(--accent); font-weight: 600; }
+.icon-box { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+.icon-box img { border: 1px solid var(--accent); border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>[ SKILL 4010 — Cự Độc Phán Quyết Venom X ]</h1>
+    <p>Thần Trang Bộ Tuyệt Kỹ | Poison / Hydra Acid (Magellan)</p>
+  </div>
+  <a href="index.html" class="back-btn">← Master Showcase</a>
+</div>
+
+<div class="main-grid">
+  <!-- Left Column -->
+  <div>
+    <!-- Live Canvas Player -->
+    <div class="card">
+      <h2>MÔ PHỎNG CHIÊU THỨC THỜI GIAN THỰC (CANVAS 60 FPS)</h2>
+      <div id="player-wrap">
+        <canvas id="previewCanvas" width="600" height="300"></canvas>
+      </div>
+      <div class="player-controls">
+        <button class="ctrl-btn" id="btnPlay">▶ Play / Pause</button>
+        <button class="ctrl-btn" id="btnLoop">↺ Loop: ON</button>
+        <span id="frameText" style="font-size: 11px; color: var(--accent); margin-left: auto;">Frame 0 / 60</span>
+      </div>
+      <p style="font-size: 12px; color: var(--text-sub); line-height: 1.6; margin-top: 10px;">Phán quyết Cự Độc triệu hoán đại xà vương Hydra phun nọc độc ăn mòn mặt đất, gây trúng độc sâu và sát thương liên tục đa tầng.</p>
+    </div>
+
+    <!-- Spritesheets -->
+    <div class="card">
+      <h2>BỘ 6 SPRITESHEETS VERTICAL STRIP (CHUẨN FRAMEIMAGE)</h2>
+      <div class="sheet-grid">
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_cast_sheet.png" alt="Cast">
+          <div class="sheet-title">Cast / Tụ Lực</div>
+          <div class="sheet-sub">levelPaint: 1</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_projectile_sheet.png" alt="Projectile">
+          <div class="sheet-title">Projectile / Đạn</div>
+          <div class="sheet-sub">levelPaint: 1</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_impact_sheet.png" alt="Impact">
+          <div class="sheet-title">Impact / Va Chạm</div>
+          <div class="sheet-sub">levelPaint: 1</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_particles_sheet.png" alt="Particles">
+          <div class="sheet-title">Particles / Mảnh Vụn</div>
+          <div class="sheet-sub">levelPaint: 1</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_aura_sheet.png" alt="Aura">
+          <div class="sheet-title">Aura / Ma Trận</div>
+          <div class="sheet-sub">levelPaint: -1</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4010_finisher_sheet.png" alt="Finisher">
+          <div class="sheet-title">Finisher / Dư Chấn</div>
+          <div class="sheet-sub">levelPaint: 1</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <div class="card">
+      <h2>ICON THẦN TRANG CHUẨN</h2>
+      <div class="icon-box">
+        <div>
+          <img src="../icons/88x88/4010.png" width="88" height="88" alt="88x88">
+          <div style="font-size: 10px; color: var(--text-sub); text-align: center; margin-top: 4px;">88×88 (Zoom 4)</div>
+        </div>
+        <div>
+          <img src="../icons/44x44/4010_mini.png" width="44" height="44" alt="44x44">
+          <div style="font-size: 10px; color: var(--text-sub); text-align: center; margin-top: 4px;">44×44 (In-game)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>THÔNG SỐ ĐẶC TẢ KỸ NĂNG</h2>
+      <div class="stat-row"><span>Mã Skill:</span> <span class="val">ID 4010</span></div>
+      <div class="stat-row"><span>Phạm Vi Đánh:</span> <span class="val">220px</span></div>
+      <div class="stat-row"><span>Bán Kính Nổ AOE:</span> <span class="val">160px</span></div>
+      <div class="stat-row"><span>Mục Tiêu Tối Đa:</span> <span class="val">7 mục tiêu</span></div>
+      <div class="stat-row"><span>Tốc Độ Hoạt Họa:</span> <span class="val">20 FPS (Game-tick)</span></div>
+      <div class="stat-row"><span>Rung Màn Hình:</span> <span class="val">timeVibrateScreen = 20</span></div>
+      <div class="stat-row"><span>Tầng Vẽ Kỹ Năng:</span> <span class="val">Level -1 & Level 1</span></div>
+      <div class="stat-row"><span>Trạng Thái Kiểm Thử:</span> <span class="val" style="color: #00e676;">PASSED (42 Sheets)</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const sid = 4010;
+const canvas = document.getElementById('previewCanvas');
+const ctx = canvas.getContext('2d');
+const SW = 600, SH = 300;
+let frame = 0, playing = true, looping = true;
+
+const sheets = {};
+['cast','projectile','impact','particles','aura','finisher'].forEach(c => {
+  const img = new Image();
+  img.src = `../spritesheets/skill_${sid}_${c}_sheet.png`;
+  sheets[c] = img;
+});
+
+function draw() {
+  ctx.fillStyle = '#0a0515';
+  ctx.fillRect(0, 0, SW, SH);
+  ctx.strokeStyle = '#321d54';
+  ctx.beginPath(); ctx.moveTo(0, SH*0.78); ctx.lineTo(SW, SH*0.78); ctx.stroke();
+
+  const cx1 = SW * 0.25, cx2 = SW * 0.75, cy = SH * 0.78;
+
+  // Silhouettes
+  ctx.fillStyle = '#603099';
+  ctx.beginPath(); ctx.ellipse(cx1, cy, 14, 5, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(cx2, cy, 14, 5, 0, 0, Math.PI*2); ctx.fill();
+
+  // Phase sequence
+  if (frame <= 18) {
+    if (sheets.aura.complete) ctx.drawImage(sheets.aura, 0, (frame%6)*48, sheets.aura.width, 48, cx1-48, cy-36, 96, 48);
+    if (frame <= 16 && sheets.cast.complete) ctx.drawImage(sheets.cast, 0, Math.floor(frame/16*5)*64, sheets.cast.width, 64, cx1-48, cy-70, 96, 96);
+  }
+  if (frame >= 15 && frame <= 34) {
+    const prog = (frame - 15) / 19;
+    const px = cx1 + prog * (cx2 - cx1);
+    if (sheets.projectile.complete) ctx.drawImage(sheets.projectile, 0, Math.floor(prog*5)*sheets.projectile.width/2, sheets.projectile.width, sheets.projectile.width/2, px-50, cy-45, 100, 50);
+  }
+  if (frame >= 33 && frame <= 48) {
+    const prog = (frame - 33) / 15;
+    if (sheets.impact.complete) ctx.drawImage(sheets.impact, 0, Math.floor(prog*7)*sheets.impact.width, sheets.impact.width, sheets.impact.width, cx2-60, cy-100, 120, 120);
+    if (sheets.particles.complete) ctx.drawImage(sheets.particles, 0, Math.floor(prog*5)*sheets.particles.width, sheets.particles.width, sheets.particles.width, cx2-50, cy-70, 100, 100);
+  }
+  if (frame >= 44 && frame <= 60) {
+    const prog = (frame - 44) / 16;
+    if (sheets.finisher.complete) ctx.drawImage(sheets.finisher, 0, Math.floor(prog*7)*sheets.finisher.width, sheets.finisher.width, sheets.finisher.width, cx2-80, cy-140, 160, 160);
+  }
+}
+
+function loop() {
+  if (playing) {
+    frame++;
+    if (frame > 60) frame = looping ? 0 : 60;
+    document.getElementById('frameText').textContent = `Frame ${frame} / 60`;
+  }
+  draw();
+  setTimeout(() => requestAnimationFrame(loop), 50);
+}
+requestAnimationFrame(loop);
+
+document.getElementById('btnPlay').onclick = () => { playing = !playing; };
+document.getElementById('btnLoop').onclick = () => { looping = !looping; document.getElementById('btnLoop').textContent = `↺ Loop: ${looping ? 'ON' : 'OFF'}`; };
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+Created At: 2026-09-13T15:07:56+07:00
+Completed At: 2026-09-13T15:07:58+07:00
+File Path: `file:///c:/DepLor/HTTH/Team/ProjectUnity129/Assets/Scripts/Assembly-CSharp/DualTabScreen.cs`
+Total Lines: 5925
+Total Bytes: 175376
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: using System;
+2: 
+3: public class DualTabScreen : MainScreen
+4: {
+5: 	public static DualTabScreen instance;
+6: 
+7: 	public static readonly string[] TAB_NAMES = new string[] { "Trang Bị & Túi", "Tiềm Năng", "Kỹ Năng", "Nhiệm Vụ", "Chức Năng" };
+8: 	public static readonly string[] TAB_NAMES_MEDIUM = new string[] { "Túi Đồ", "T.Năng", "K.Năng", "N.Vụ", "C.Năng" };
+9: 	public static readonly string[] TAB_NAMES_SHORT = new string[] { "Túi", "T.Năng", "K.Năng", "N.Vụ", "C.Năng" };
+10: 	public static readonly short[] TAB_ICON_IDS = new short[] { 200, 202, 203, 204, 206 };
+11: 	public static readonly short[] TAB_ICON_SEL_IDS = new short[] { 230, 232, 233, 234, 236 };
+12: 	public static readonly string[] FILTER_NAMES = new string[] { "Tất Cả", "Trang Bị", "Dược Phẩm", "Đá/NL", "Khác" };
+13: 	public static readonly string[] FILTER_NAMES_SHORT = new string[] { "Tất", "T.Bị", "Dược", "Đá", "Khác" };
+14: 	public const int SLOTS_PER_TAB = 126;
+15: 
+16: 	public int x;
+17: 	public int y;
+18: 	public int w;
+19: 	public int h;
+20: 	public int maxWShow;
+21: 
+22: 	public bool isWide;
+23: 	public int curMainTab = 0;
+24: 	public int curInvenFilter = 0;
+25: 	public int curInvenPage = 0;
+26: 
+27: 	public bool[] isTabInitialized = new bool[5];
+28: 	public bool[] isTabDirty = new bool[5];
+29: 
+30: 	public iCommand cmdClose;
+31: 	public iCommand cmdAction;
+32: 	public iCommand cmdMenuAction;
+33: 
+34: 	// Focus: 0 = Left Pane (Equip / Stats), 1 = Right/Content (Inven / Potential / Skills / Quests / Pets / ChucNang), 2 = Top Nav Tabs, 3 = Filter Bar (Tab 0)
+35: 	public int focusPane = 1;
+36: 
+37: 	// Scroll helpers
+38: 	public Scroll scrollInven = new Scroll();
+39: 	public Scroll scrollInfo = new Scroll();
+40: 	public Scroll scrollAttri = new Scroll();
+41: 	public Scroll scrollSkill = new Scroll();
+42: 	public Scroll scrollQuest = new Scroll();
+43: 	public Scroll scrollPet = new Scroll();
+44: 	public Scroll scrollLeftStat = new Scroll();
+45: 	public Scroll scrollDanhHieu = new Scroll();
+46: 	public Scroll scrollFeatureMenu = new Scroll();
+47: 
+48: 	// Tab 0: Inventory & Left Stat Box & Equip Paging
+49: 	public ListNew invenList;
+50: 	public ListNew leftStatList;
+51: 	public mVector filteredItems = new mVector();
+52: 	public int selectedInvenIndex = -1;
+53: 	public int selectedEquipIndex = -1;
+54: 	public MainItem selectedItemInfo = null;
+55: 	public int itemTouchX = 0;
+56: 	public int itemTouchY = 0;
+57: 
+58: 	public int equipSubTab = 0; // 0: Trang Bị Thường (0..7), 1: Thần Trang (8..15)
+59: 	public int equipScrollY = 0;
+60: 	public int equipToY = 0;
+61: 	public bool isDraggingEquip = false;
+62: 	public int equipDragStartY = 0;
+63: 	public int equipDragStartScrollY = 0;
+64: 	public const int EQUIP_PAGE_H = 116;
+65: 
+66: 	// Tab 1: Tiềm Năng & Thông Tin
+67: 	public ListNew infoList;
+68: 	public ListNew attriList;
+69: 	public int selectedAttIndex = 0;
+70: 	public int timeFocusAtt = 0;
+71: 
+72: 	// Tab 2: Kỹ Năng
+73: 	public ListNew skillList;
+74: 	public ListNew skillDetailList;
+75: 	public Scroll scrollSkillDetail = new Scroll();
+76: 	public mVector validSkills = new mVector();
+77: 	public int selectedSkillIndex = 0;
+78: 
+79: 	// Tab 3: Nhiệm Vụ
+80: 	public ListNew questList;
+81: 	public int selectedQuestIndex = 0;
+82: 
+83: 	// Tab 4: Chức Năng (0: Menu Lựa Chọn, 1: Danh Hiệu, 2: Thú Cưng)
+84: 	public int chucNangSubView = 0;
+85: 	public int selectedChucNangIndex = 0;
+86: 	public ListNew featureMenuList;
+87: 	public ListNew danhHieuList;
+88: 	public int selectedDanhHieuIndex = 0;
+89: 	public DanhHieuInfo selectedDanhHieuInfo = null;
+90: 	public DataSkillEff previewTitleEff = null;
+91: 	public short lastPreviewTitleEffId = -1;
+92: 	public ListNew petList;
+93: 	public int selectedPetIndex = -1;
+94: 	public MainItem selectedPetInfo = null;
+95: 	private static readonly string[] SHORT_ATT_NAMES = new string[] { "S.Mạnh", "P.Thủ", "T.Lực", "T.Thần", "N.Nhẹn" };
+96: 
+97: 	public static DualTabScreen gI()
+98: 	{
+99: 		if (instance == null)
+100: 		{
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

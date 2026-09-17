@@ -1,0 +1,1725 @@
+nghiên cứu làm công cụ get sql map 
+sql tôi đang dùng như này
+INSERT INTO `maps` (`id`, `name`, `mobs`, `maxzone`, `maxplayer`, `boat`, `typeViewPlayer`, `b`, `specMap`, `vgos`, `data`, `MapBack`, `id_eff_map`, `level`, `typeChangeMap`, `mPosMapTrain`, `strTimeChange`) VALUES (0, 'Bãi biển hoang sơ', '[[44,408,240],[44,456,336],[44,576,216],[44,720,240],[179,768,336],[44,840,216],[44,600,312],[44,200,300]]', 20, 15, '[]', 0, 1, 0, '[[1,1056,288,24,252]]', '[[45,17,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,10,9,10,10,10,9,9,10,10,9,10,10,9,10,10,10,9,10,10,10,9,9,10,10,10,9,10,10,9,10,10,9,10,10,10,9,9,10,10,9,10,10,9,10,10,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,7,7,7,7,7,7,6,7,7,7,7,7,7,7,7,7,6,7,7,7,7,7,7,7,6,7,6,7,7,7,7,6,7,7,7,7,6,7,7,7,6,7,7,7,7,7,7,7,6,7,7,7,7,7,6,7,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,6,7,7,7,7,6,7,6,7,7,7,6,7,6,7,7,7,6,7,6,7,6,7,7,6,7,6,7,7,6,7,7,7,6,6,7,6,7,7,6,6,7,6,7,6,7,7,6,7,7,6,7,7,7,7,7,7,7,7,6,7,6,7,7,7,7,6,7,7,7,7,6,7,7,7,7,6,6,7,7,7,7,6,7,7,6,7,7,6,7,6,7,7,6,6,7,6,7,7,6,7,6,6,6,7,7,6,6,6,7,6,7,6,7,6,6,7,6,6,7,7,6,7,7,7,6,7,6,7,6,7,7,6,6,7,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,5,5,4,5,4,4,4,5,4,5,4,4,5,5,5,4,5,4,4,5,4,4,4,5,4,4,4,5,4,4,4,4,5,5,4,4,4,5,5,4,5,5,4,4,5],[0,19,0,11,0,8,0,8,0,11,0,9,0,15,0,11,0,38,0,8,0,11,0,31,0,15,0,12,0,36,0,13,0,12,0,18,0,8,0,12,0,34,0,7,0,13,0,42,0,15,0,7,0,6,0,8,0,8,0,3,0,8,0,8,0,1,0,15,0,9,0,4,0,14,0,8,0,40,0,8,0,18,0,3,0,7,0,18,0,12,0,7,0,18,0,20,0,7,0,18,0,29,0,7,0,18,0,38,0,7,0,11,0,22,0,14,0,0]]', '[1,260,1080,408]', 5, 3, 2, '[]', ''); 
+
+CODE SERVER
+package gameplay.world.maps;
+
+import engine.kernel.Logp;
+import engine.persistence.DbManager;
+import monster.MobTemplate;
+import monster.Mob;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+
+public class MapTemplate {
+    public static List<MapTemplate> ENTRYS;
+
+    // --- template fields ---
+    public int id;
+    public String name;
+    public List<npcs.Npc> npcs; // will be filled later by NpcTemplate.load()
+    public List<Vgo> vgos;
+    public byte max_zone;
+    public byte max_player;
+    public byte[][] data;
+    public byte IDBack;
+    public int HBack;
+    public List<Boat_In_Map> list_boat;
+    public short maxW;
+    public short maxH;
+    public byte type_view_p;
+    public byte b;
+    public byte specMap;
+    public byte id_eff_map;
+    public byte level;
+    public byte typeChangeMap;
+    public byte[][] mPosMapTrain;
+    public String strTimeChange;
+
+    // public counter so Manager can pick it up after load()
+    public static int index_mob_counter = 1;
+
+    /**
+     * Load map templates AND build Map[] zones + create Mob instances.
+     * IMPORTANT: Call this AFTER MobTemplate.ENTRYS has been populated.
+     */
+    public static void load() {
+        try (Connection conn = DbManager.gI().getConnection();
+             PreparedStatement ps = conn.prepareStatement("SELECT * FROM maps");
+             ResultSet rs = ps.executeQuery()) {
+
+            ENTRYS = new ArrayList<>();
+            if (gameplay.world.maps.Map.ENTRYS == null) {
+                gameplay.world.maps.Map.ENTRYS = new ArrayList<>();
+            }
+//            if (monster.Mob.ENTRYS == null) {
+//                monster.Mob.ENTRYS = new HashMap<>();
+//            }
+
+            while (rs.next()) {
+                short id_map = rs.getShort("id");
+                File f = new File("data/map/" + id_map);
+                if (!f.exists()) {
+                    // skip maps without local map data
+                    continue;
+                }
+
+                MapTemplate map_temp = new MapTemplate();
+                map_temp.id = id_map;
+                map_temp.name = rs.getString("name");
+                map_temp.max_zone = rs.getByte("maxzone");
+                map_temp.max_player = rs.getByte("maxplayer");
+
+                // initialize npcs list now (will be filled later by NpcTemplate.load())
+                map_temp.npcs = new ArrayList<>();
+
+                // --- Boat ---
+                map_temp.list_boat = new ArrayList<>();
+                try {
+                    JSONArray js_boat = (JSONArray) JSONValue.parse(rs.getString("boat"));
+                    if (js_boat != null) {
+                        for (Object obj : js_boat) {
+                            JSONArray jsArr = (JSONArray) obj;
+                            Boat_In_Map boat = new Boat_In_Map();
+                            boat.x = Short.parseShort(jsArr.get(0).toString());
+                            boat.y = Short.parseShort(jsArr.get(1).toString());
+                            map_temp.list_boat.add(boat);
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                // --- Vgo ---
+                map_temp.vgos = new ArrayList<>();
+                try {
+                    JSONArray js_vgo = (JSONArray) JSONValue.parse(rs.getString("vgos"));
+                    if (js_vgo != null) {
+                        for (Object obj : js_vgo) {
+                            JSONArray jsArr = (JSONArray) obj;
+                            Vgo vgo = new Vgo();
+                            vgo.id_map_go = Short.parseShort(jsArr.get(0).toString());
+                            vgo.xold = Short.parseShort(jsArr.get(1).toString());
+                            vgo.yold = Short.parseShort(jsArr.get(2).toString());
+                            vgo.xnew = Short.parseShort(jsArr.get(3).toString());
+                            vgo.ynew = Short.parseShort(jsArr.get(4).toString());
+                            if (vgo.id_map_go != -1) {
+                                map_temp.vgos.add(vgo);
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                // --- data ---
+                try {
+                    JSONArray js_data = (JSONArray) JSONValue.parse(rs.getString("data"));
+                    if (js_data != null) {
+                        map_temp.data = new byte[js_data.size()][];
+                        for (int i = 0; i < js_data.size(); i++) {
+                            JSONArray jsRow = (JSONArray) js_data.get(i);
+                            map_temp.data[i] = new byte[jsRow.size()];
+                            for (int j = 0; j < jsRow.size(); j++) {
+                                map_temp.data[i][j] = Byte.parseByte(jsRow.get(j).toString());
+                            }
+                        }
+                    } else {
+                        map_temp.data = new byte[0][0];
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    map_temp.data = new byte[0][0];
+                }
+
+                // --- MapBack ---
+                try {
+                    JSONArray js_back = (JSONArray) JSONValue.parse(rs.getString("MapBack"));
+                    if (js_back != null && js_back.size() >= 4) {
+                        map_temp.IDBack = Byte.parseByte(js_back.get(0).toString());
+                        map_temp.HBack = Short.parseShort(js_back.get(1).toString());
+                        map_temp.maxW = Short.parseShort(js_back.get(2).toString());
+                        map_temp.maxH = Short.parseShort(js_back.get(3).toString());
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                // misc
+                map_temp.type_view_p = rs.getByte("typeViewPlayer");
+                map_temp.b = rs.getByte("b");
+                map_temp.specMap = rs.getByte("specMap");
+                map_temp.id_eff_map = rs.getByte("id_eff_map");
+                map_temp.level = rs.getByte("level");
+                map_temp.typeChangeMap = rs.getByte("typeChangeMap");
+
+                // mPosMapTrain
+                try {
+                    JSONArray js_train = (JSONArray) JSONValue.parse(rs.getString("mPosMapTrain"));
+                    if (js_train != null) {
+                        map_temp.mPosMapTrain = new byte[js_train.size()][];
+                        for (int i = 0; i < js_train.size(); i++) {
+                            JSONArray jsRow = (JSONArray) js_train.get(i);
+                            map_temp.mPosMapTrain[i] = new byte[jsRow.size()];
+                            for (int j = 0; j < jsRow.size(); j++) {
+                                map_temp.mPosMapTrain[i][j] = Byte.parseByte(jsRow.get(j).toString());
+                            }
+                        }
+                    } else {
+                        map_temp.mPosMapTrain = new byte[0][0];
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    map_temp.mPosMapTrain = new byte[0][0];
+                }
+
+                map_temp.strTimeChange = rs.getString("strTimeChange");
+
+                // --- build Map[] zones and mobs for this template ---
+                gameplay.world.maps.Map[] zones = new gameplay.world.maps.Map[Math.max(0, map_temp.max_zone)];
+                for (int z = 0; z < zones.length; z++) {
+                    zones[z] = new gameplay.world.maps.Map();
+                    zones[z].zone_id = (byte) z;
+                    zones[z].template = map_temp;
+                }
+
+                // parse mobs JSON and create mobs per zone and slot
+                try {
+                    String mobsJson = rs.getString("mobs");
+                    JSONArray js_mobs = null;
+                    if (mobsJson != null && !mobsJson.isEmpty()) {
+                        js_mobs = (JSONArray) JSONValue.parse(mobsJson);
+                    }
+
+                    if (js_mobs == null || js_mobs.size() == 0) {
+                        for (int z = 0; z < zones.length; z++) {
+                            zones[z].list_mob = new int[0];
+                        }
+                    } else {
+                        for (int z = 0; z < zones.length; z++) {
+                            zones[z].list_mob = new int[js_mobs.size()];
+                            for (int i = 0; i < js_mobs.size(); i++) {
+                                try {
+                                    JSONArray js2 = (JSONArray) JSONValue.parse(js_mobs.get(i).toString());
+                                    int mobTemplateIndex = Integer.parseInt(js2.get(0).toString());
+                                    if (MobTemplate.ENTRYS == null ||
+                                            mobTemplateIndex < 0 ||
+                                            mobTemplateIndex >= MobTemplate.ENTRYS.size()) {
+                                        zones[z].list_mob[i] = -1;
+                                        continue;
+                                    }
+                                    Mob m = new Mob();
+                                    m.mob_template = MobTemplate.ENTRYS.get(mobTemplateIndex);
+                                    m.x = Short.parseShort(js2.get(1).toString());
+                                    m.y = Short.parseShort(js2.get(2).toString());
+                                    m.hp_max = m.mob_template.hp_max;
+                                    m.hp = m.hp_max;
+                                    m.level = m.mob_template.level;
+                                    m.isdie = false;
+                                    m.id_target = -1;
+                                    m.index = index_mob_counter;
+                                    m.map = zones[z];
+                                    m.boss_info = null;
+
+                                    monster.Mob.ENTRYS.put(index_mob_counter, m);
+                                    zones[z].list_mob[i] = index_mob_counter;
+                                    index_mob_counter++;
+                                } catch (Exception inner) {
+                                    inner.printStackTrace();
+                                    zones[z].list_mob[i] = -1;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    for (int z = 0; z < zones.length; z++) {
+                        zones[z].list_mob = new int[0];
+                    }
+                }
+
+                // add into templates and map instances
+                ENTRYS.add(map_temp);
+                gameplay.world.maps.Map.ENTRYS.add(zones);
+            }
+
+            // fix link vgo → map_go (needs Map.ENTRYS populated)
+            for (MapTemplate t : ENTRYS) {
+                if (t.vgos == null) continue;
+                for (Vgo vgo : t.vgos) {
+                    vgo.map_go = gameplay.world.maps.Map.get_map_by_id(vgo.id_map_go);
+                    if (vgo.map_go == null) {
+                        vgo.map_go = gameplay.world.maps.Map.get_map_by_id(1);
+                    }
+                }
+            }
+            Logp.info("Load map ["+ENTRYS.size()+"]");
+//            System.out.println("Load maps OK, total = " + (ENTRYS != null ? ENTRYS.size() : 0)
+//                    + ", mobs index next = " + index_mob_counter);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("Error loading maps: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Helper: find MapTemplate by id (used by NpcTemplate)
+     */
+    public static MapTemplate getById(int mapId) {
+        if (ENTRYS == null) return null;
+        for (MapTemplate t : ENTRYS) {
+            if (t.id == mapId) return t;
+        }
+        return null;
+    }
+}
+public void sendDataMap(Player p) {
+        try {
+            Message m = new Message(0);
+            m.writer().writeShort(this.template.id);
+            m.writer().writeByte(this.zone_id);
+            m.writer().writeByte(this.template.type_view_p);
+            m.writer().writeShort(p.x);
+            m.writer().writeShort(p.y);
+            m.writer().writeInt(p.body.get_hp_max(true));
+            m.writer().writeInt(p.hp);
+            m.writer().writeInt(p.body.get_mp_max(true));
+            m.writer().writeInt(p.mp);
+            m.writer().writeByte(this.template.b);
+            m.writer().writeByte(this.template.specMap);
+            if (this.template.b == 1) {
+                m.writer().writeInt(this.template.data[0].length);
+                m.writer().write(this.template.data[0]);
+                m.writer().writeInt(this.template.data[1].length);
+                m.writer().write(this.template.data[1]);
+                m.writer().writeByte(this.template.vgos.size());
+                for (int i = 0; i < this.template.vgos.size(); i++) {
+                    m.writer().writeUTF(this.template.vgos.get(i).map_go[0].template.name);
+                    m.writer().writeShort(this.template.vgos.get(i).xold);
+                    m.writer().writeShort(this.template.vgos.get(i).yold);
+                }
+            }
+            m.writer().writeByte(this.template.IDBack);
+            m.writer().writeShort(this.template.HBack);
+            m.writer().writeByte(this.template.id_eff_map);
+            m.writer().writeByte(this.template.level);
+            m.writer().writeByte(this.template.typeChangeMap);
+            if (this.template.specMap == 3) {
+                m.writer().writeByte(this.template.mPosMapTrain.length);
+                for (int i = 0; i < this.template.mPosMapTrain.length; i++) {
+                    for (int j = 0; j < this.template.mPosMapTrain[i].length; j++) {
+                        m.writer().writeByte(this.template.mPosMapTrain[i][j]);
+                    }
+                }
+                m.writer().writeUTF(this.template.strTimeChange);
+            }
+            m.writer().writeUTF(this.template.name);
+            p.conn.addmsg(m);
+            m.cleanup();
+        } catch (IOException ex) {
+            Logger.getLogger(Map.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+    }
+public void goto_map(Player p) throws IOException {
+        if (p.conn != null) {
+            this.enter_map(p);
+            this.sendDataMap(p);
+            //
+            boolean send_move = true;
+            for (int i = 0; i < DataTemplate.mSea.length; i++) {
+                if (DataTemplate.mSea[i][0] == this.template.id) {
+                    send_move = false;
+                    break;
+                }
+            }
+            if (send_move) {
+                Message mmove = new Message(1);
+                mmove.writer().writeByte(0);
+                mmove.writer().writeShort(p.index_map);
+                mmove.writer().writeShort(p.x);
+                mmove.writer().writeShort(p.y);
+                p.list_msg_cache.add(mmove);
+                mmove.cleanup();
+            }
+            // conn.p.map.enter_zone(conn.p);
+            if (Map.is_map_save_revival(this.template.id)) {
+                p.id_map_save = this.template.id;
+                p.time_can_hs = 7;
+            }
+        }
+    }
+case 0: {
+                if (conn.p != null) {
+                    // int id_map_change =
+                    m.reader().readShort();
+                    // byte action_change =
+                    m.reader().readByte();
+                    // System.out.println(id_map_change);
+                    // System.out.println(action_change);
+                    while (conn.p.list_msg_cache.size() > 0) {
+                        try {
+                            Message m_send = conn.p.list_msg_cache.take();
+                            conn.addmsg(m_send);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Service.getThanhTich(conn.p, conn.p);
+                    conn.p.map.send_in4_obj_inmap(conn.p);
+                    conn.p.wait_change_map = false;
+                    //
+                    if (conn.p.map.template.id == 1000) {// map wait pvp
+                        Pvp.show_table(conn.p);
+                    }
+                    if (conn.p.map.map_pvp != null) {// map pvp
+                        Pvp.show_info(conn.p, 0, 0, 0, 3);
+                    }
+                    conn.p.map.change_flag(conn.p, conn.p.type_pk);
+                    Service.update_PK(conn.p, conn.p, false);
+                    // weather
+                    conn.p.map.send_weather(conn.p);
+                    // ship pet
+                    if (conn.p.ship_pet != null && conn.p.ship_pet.map == null) {
+                        conn.p.ship_pet.map = conn.p.map;
+                        conn.p.ship_pet.id_map_save = conn.p.map.template.id;
+                        conn.p.ship_pet.x = conn.p.x;
+                        conn.p.ship_pet.y = conn.p.y;
+                        Message m_local = new Message(1);
+                        m_local.writer().writeByte(0);
+                        m_local.writer().writeShort(conn.p.ship_pet.index_map);
+                        m_local.writer().writeShort(conn.p.ship_pet.x);
+                        m_local.writer().writeShort(conn.p.ship_pet.y);
+                        for (int j = 0; j < conn.p.map.players.size(); j++) {
+                            Player p0 = conn.p.map.players.get(j);
+                            p0.conn.addmsg(m_local);
+                        }
+                        m_local.cleanup();
+                    }
+                    if (Map.is_map_dungeon(conn.p.map.template.id) && conn.p.dungeon != null) {
+                        Service.send_time_cool_down(conn.p, conn.p.dungeon.time, "Thời gian", 2);
+                    } else if (conn.p.map.template.id == 9999 && conn.p.map.clan_resource != null) {
+                        Service.send_time_cool_down(conn.p, conn.p.map.clan_resource.time,
+                                "Thời gian", 2);
+                    } else if (conn.p.map.template.id == 81
+                            && conn.p.map.map_little_garden != null) { // pho ban khong
+                        // lo
+                        LittleGardens.send_info(conn.p);
+                        Service.send_time_cool_down(conn.p, conn.p.map.map_little_garden.time,
+                                "Thời gian", 2);
+                    } else if (conn.p.map.template.id == 984) { // pho ban thu thach ve than
+                        conn.p.map.update_boat(conn.p, conn.p, false);
+                        //
+                        Red_Line.init_key_TTVT(conn.p);
+                    } else if (conn.p.map.map_pvp != null && conn.p.map.map_pvp.type_map == 1) { // map
+                        // sieu
+                        // hang
+                        conn.p.update_info_to_all();
+                    } else if (conn.p.map.template.id == 119) { // phong cho truy na
+                        Wanted.show_table(conn.p);
+                        Service.Wanted(conn.p, false);
+                        Wanted_Chest.send_box(conn.p);
+                    } else if (conn.p.map.map_LienTang != null) { // lien tang
+                        for (int i = 0; i < conn.p.map.map_LienTang.mobs.size(); i++) {
+                            Mob mob = conn.p.map.map_LienTang.mobs.get(i);
+                            if (!mob.isdie) {
+                                Message m_local = new Message(1);
+                                m_local.writer().writeByte(1);
+                                m_local.writer().writeShort(mob.index);
+                                m_local.writer().writeShort(mob.x);
+                                m_local.writer().writeShort(mob.y);
+                                conn.p.conn.addmsg(m_local);
+                                m_local.cleanup();
+                            }
+                        }
+                        Service.send_time_cool_down(conn.p, conn.p.map.map_LienTang.time,
+                                "Tầng " + (conn.p.map.template.id - 9989), 0);
+                        if (conn.p.isdie) {
+                            Service.use_potion(conn.p, 0, conn.p.body.get_hp_max(true));
+                            Service.use_potion(conn.p, 1, conn.p.body.get_mp_max(true));
+                            conn.p.isdie = false;
+                        }
+                    } else if (conn.p.map.map_SieuLienTang != null) { // sieu lien tang
+                        for (int i = 0; i < conn.p.map.map_SieuLienTang.mobs.size(); i++) {
+                            Mob mob = conn.p.map.map_SieuLienTang.mobs.get(i);
+                            if (!mob.isdie) {
+                                Message m_local = new Message(1);
+                                m_local.writer().writeByte(1);
+                                m_local.writer().writeShort(mob.index);
+                                m_local.writer().writeShort(mob.x);
+                                m_local.writer().writeShort(mob.y);
+                                conn.p.conn.addmsg(m_local);
+                                m_local.cleanup();
+                            }
+                        }
+                        Service.send_time_cool_down(conn.p, conn.p.map.map_SieuLienTang.time,
+                                "Tầng " + (conn.p.map.template.id - 9899), 0);
+                        if (conn.p.isdie) {
+                            Service.use_potion(conn.p, 0, conn.p.body.get_hp_max(true));
+                            Service.use_potion(conn.p, 1, conn.p.body.get_mp_max(true));
+                            conn.p.isdie = false;
+                        }
+                    } else if (conn.p.map.map_ThuThachVeThan != null
+                            && conn.p.map.map_ThuThachVeThan.type == 2) { // ttvt
+                        for (int i = 0; i < conn.p.map.map_ThuThachVeThan.mobs.size(); i++) {
+                            Mob mob = conn.p.map.map_ThuThachVeThan.mobs.get(i);
+                            if (!mob.isdie) {
+                                Message m_local = new Message(1);
+                                m_local.writer().writeByte(1);
+                                m_local.writer().writeShort(mob.index);
+                                m_local.writer().writeShort(mob.x);
+                                m_local.writer().writeShort(mob.y);
+                                conn.p.conn.addmsg(m_local);
+                                m_local.cleanup();
+                            }
+                        }
+                        Service.send_time_cool_down(conn.p, conn.p.map.map_ThuThachVeThan.time_state,
+                                "Tầng " + (conn.p.map.template.id - 9912), 0);
+                        if (conn.p.isdie) {
+                            Service.use_potion(conn.p, 0, conn.p.body.get_hp_max(true));
+                            Service.use_potion(conn.p, 1, conn.p.body.get_mp_max(true));
+                            conn.p.isdie = false;
+                        }
+                    } else if (conn.p.map.map_Hang != null) { // hang dong
+                        for (int i = 0; i < conn.p.map.map_Hang.mobs.size(); i++) {
+                            Mob mob = conn.p.map.map_Hang.mobs.get(i);
+                            if (!mob.isdie) {
+                                Message m_local = new Message(1);
+                                m_local.writer().writeByte(1);
+                                m_local.writer().writeShort(mob.index);
+                                m_local.writer().writeShort(mob.x);
+                                m_local.writer().writeShort(mob.y);
+                                conn.p.conn.addmsg(m_local);
+                                m_local.cleanup();
+                            }
+                        }
+                        Service.send_time_cool_down(conn.p, conn.p.map.map_Hang.time,
+                                "Hang " + (conn.p.map.map_Hang.level), 0);
+                        if (conn.p.isdie) {
+                            Service.use_potion(conn.p, 0, conn.p.body.get_hp_max(true));
+                            Service.use_potion(conn.p, 1, conn.p.body.get_mp_max(true));
+                            conn.p.isdie = false;
+                        }
+                    } else if (conn.p.map.vuonCam != null) { // vuoncam
+                        Service.send_hp_map(conn.p, conn.p.map.vuonCam.hp, conn.p.map.vuonCam.hpMax);
+                    }
+                    if (conn.p.giftTTVT != null && conn.p.giftTTVT.size() > 0) {
+                        Service.send_gift(conn.p, 1, "Hoàn thành thử thách vệ thần", "Phần thưởng", conn.p.giftTTVT,
+                                true);
+                        conn.p.giftTTVT.clear();
+                        conn.p.giftTTVT = null;
+                    }
+                    if (ChiemDao.getClanTop(conn.p.map.template.id) != null) {
+                        Message mm = new Message(63);
+                        mm.writer().writeShort(ChiemDao.getClanTop(conn.p.map.template.id).id);
+                        mm.writer().writeShort(ChiemDao.getClanTop(conn.p.map.template.id).icon);
+                        mm.writer().writeUTF(ChiemDao.getClanTop(conn.p.map.template.id).name);
+                        mm.writer().writeUTF(ChiemDao.getClanTop(conn.p.map.template.id).name);
+                        mm.writer().writeShort(ChiemDao.getClanTop(conn.p.map.template.id).level);
+                        mm.writer().writeByte(4);
+                        mm.writer().writeByte(4);
+                        mm.writer().writeInt(1);
+                        conn.addmsg(mm);
+                        mm.cleanup();
+                    }
+                    if ((conn.p.map.template.id >= 303 && conn.p.map.template.id <= 306)) {
+                        conn.p.map.change_flag(conn.p, -1);
+                    }
+                    Player p0 = conn.p;
+                    for (int i12 = 0; i12 < p0.fashion.size(); i12++) {
+                        if ((p0.fashion.get(i12).id == 126) && p0.fashion.get(i12).is_use) {
+                            Message m3 = new Message(-47);
+                            m3.writer().writeByte(8);
+                            m3.writer().writeByte(4);
+                            conn.addmsg(m3);
+                            m3.cleanup();
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+
+
+CODE CLIENT
+public final void ChangeMap(Message m) {
+      try {
+         actionChangeMap = 0;
+         GameCanvas.loadmap.idLastMap = GameCanvas.loadmap.idMap;
+         short num;
+         if (setMapSea(num = m.reader().readShort())) {
+            this.idMapLuu = num;
+            this.msgLuu = m;
+            isNondata = false;
+         } else {
+            this.readChangeMapNew(m, num);
+         }
+      } catch (Exception var3) {
+         var3.printStackTrace();
+      }
+   }
+private static boolean setMapSea(int id) {
+      if (LoadMap.mSea != null) {
+         for(int i = 0; i < LoadMap.mSea.length; ++i) {
+            if (LoadMap.mSea[i][1] == id && LoadMap.mSea[i][0] == GameCanvas.loadmap.idLastMap) {
+               GameScreen.player.addEffBuff((byte)(LoadMap.mSea[i][2] - 1), LoadMap.mSea[i][3], LoadMap.mSea[i][4]);
+               return true;
+            }
+         }
+      }
+
+      return false;
+   }
+public final void readChangeMapNew(Message m, short idmap) {
+      try {
+         GameCanvas.loadMapScr.Show();
+         GameScreen.RemoveLoadMap();
+         DataMap dataMap = new DataMap();
+         GameCanvas.loadmap.idMap = idmap;
+         Interface_Game.nameMap = "";
+         GameCanvas.loadMapScr.area = m.reader().readByte();
+         byte typeViewPlayer = m.reader().readByte();
+         GameScreen.player.posTransRoad = null;
+         GameScreen.player.x = m.reader().readShort();
+         GameScreen.player.y = m.reader().readShort();
+         GameScreen.player.toX = GameScreen.player.x;
+         GameScreen.player.toY = GameScreen.player.y;
+         GameScreen.player.maxHp = m.reader().readInt();
+         GameScreen.player.Hp = m.reader().readInt();
+         GameScreen.player.maxMp = m.reader().readInt();
+         GameScreen.player.Mp = m.reader().readInt();
+         byte b = m.reader().readByte();
+         if (LoadMap.specMap == 3) {
+            GameScreen.player.isBeginTrain = false;
+         } else if (LoadMap.specMap == 4) {
+            SaveRms var10000 = GameCanvas.saveRms;
+            SaveRms.loadHotKey(SaveRms.datahotKeySkill);
+         }
+
+         if ((LoadMap.specMap = m.reader().readByte()) == 1 && check_IDMap_PVP()) {
+            GameScreen.tickPvP = 60;
+         }
+
+         if (b == 1) {
+            LoadMap.isOnlineMap = true;
+            int num = m.reader().readInt();
+            byte[] array = null;
+            if (num > 0) {
+               array = new byte[num];
+               m.reader().read(array);
+            }
+
+            dataMap.setDataMap(array);
+            GameCanvas.loadmap.loadmap(array);
+            num = m.reader().readInt();
+            array = null;
+            if (num > 0) {
+               array = new byte[num];
+               m.reader().read(array);
+            }
+
+            dataMap.setDataItemMap(array);
+            GameCanvas.loadMapScr.mItemMap = array;
+            LoadMap.vecPointChange.removeAllElements();
+            byte var8 = m.reader().readByte();
+            dataMap.vecPointMap.removeAllElements();
+
+            for(num = 0; num < var8; ++num) {
+               Point point;
+               label183: {
+                  (point = new Point()).name = m.reader().readUTF();
+                  point.x = m.reader().readShort();
+                  point.y = m.reader().readShort();
+                  dataMap.vecPointMap.addElement(point);
+                  if (GameCanvas.loadmap.idMap != 158 && GameCanvas.loadmap.idMap != 160 && GameCanvas.loadmap.idMap != 162 && GameCanvas.loadmap.idMap != 164 && GameCanvas.loadmap.idMap != 166 || point.y >= GameCanvas.loadmap.mapH * LoadMap.wTile - 115) {
+                     if (GameCanvas.loadmap.idMap == 157 || GameCanvas.loadmap.idMap == 159 || GameCanvas.loadmap.idMap == 161 || GameCanvas.loadmap.idMap == 163 || GameCanvas.loadmap.idMap == 165 || (GameCanvas.loadmap.idMap >= 167 && GameCanvas.loadmap.idMap <= 176 || GameCanvas.loadmap.idMap == 190) && point.y <= 72) {
+                        continue;
+                     }
+
+                     if (point.x < 115) {
+                        point.dis = 0;
+                        point.x2 = point.x - 8;
+                        point.y2 = point.y - 18;
+                        point.f = 0;
+                        point.vx = -1;
+                        break label183;
+                     }
+
+                     if (point.x > GameCanvas.loadmap.mapW * LoadMap.wTile - 115) {
+                        point.dis = 1;
+                        point.f = 1;
+                        point.x2 = point.x + 8;
+                        point.y2 = point.y - 18;
+                        point.vx = 1;
+                        break label183;
+                     }
+
+                     if (point.y > GameCanvas.loadmap.mapH * LoadMap.wTile - 115 || GameCanvas.loadmap.idMap == 191) {
+                        point.dis = 3;
+                        point.f = 2;
+                        point.x2 = point.x;
+                        point.y2 = point.y - 20;
+                        point.vy = 1;
+                        break label183;
+                     }
+                  }
+
+                  point.y -= 10;
+                  point.dis = 2;
+                  point.f = 2;
+                  point.x2 = point.x;
+                  point.y2 = point.y + 10;
+                  point.vy = -1;
+               }
+
+               LoadMap.vecPointChange.addElement(point);
+            }
+         }
+
+         if (b == 0) {
+            LoadMap.isOnlineMap = false;
+            if (LoadMap.specMap == 5) {
+               LoadRedLine(false);
+            } else if (LoadMap.specMap == 8) {
+               MapGotoSky.setPos();
+            } else if (LoadMap.specMap == 12) {
+               MapGotoGod.setPos();
+            }
+         }
+
+         LoadMapScreen.IDBack = m.reader().readByte();
+         LoadMapScreen.HBack = m.reader().readShort();
+         dataMap.IDBack = LoadMapScreen.IDBack;
+         dataMap.HBack = LoadMapScreen.HBack;
+         LoadMapScreen.isNextMap = true;
+         if (b == 1) {
+            GameCanvas.gameScr.setTypeViewPlayer(typeViewPlayer);
+         }
+
+         byte b3 = m.reader().readByte();
+         byte level = m.reader().readByte();
+         LoadMapScreen.typeChangeMap = m.reader().readByte();
+         if (b3 >= 0 && !GameCanvas.lowGraphic) {
+            GameScreen.effMap = new Effect_Map(b3, level);
+         } else {
+            GameScreen.effMap = null;
+         }
+
+         if (LoadMap.specMap == 3) {
+            GlobalService.getInstance().Get_Xp_Map_Train((byte)0);
+            Player.AutoFireCur = Player.typeAutoFireMain;
+            MainObject.mPosMapTrain = mSystem.new_M_Int(b3 = m.reader().readByte(), 2);
+            int var14 = 0;
+
+            while(true) {
+               if (var14 >= b3) {
+                  Player.strTimeChange = m.reader().readUTF();
+                  break;
+               }
+
+               for(int i1 = 0; i1 < 2; ++i1) {
+                  MainObject.mPosMapTrain[var14][i1] = m.reader().readByte();
+               }
+               ++var14;
+            }
+         }
+
+         Interface_Game.nameMap = m.reader().readUTF();
+         dataMap.nameMap = Interface_Game.nameMap;
+         DataMap.hashDataMap.put("" + idmap, dataMap);
+         if (LoadMap.specMap == 4) {
+            GameScreen.player.boatSea = new Boat(GameScreen.player.ID, GameScreen.player.x, GameScreen.player.y, 0, (byte)GameScreen.player.type_left_right);
+            GameScreen.player.setSpeed(4, 3);
+            GameScreen.player.vySea = 4;
+            if (!GameCanvas.lowGraphic) {
+               GameScreen.effSea = new Effect_Map((byte)4, (byte)0);
+               return;
+            }
+         } else if (LoadMap.isOnlineMap && LoadMap.specMap != 5 && LoadMap.specMap != 8) {
+            GameScreen.player.boatSea = null;
+            GameScreen.player.setSpeed(7, 7);
+            GameScreen.effSea = null;
+            return;
+         }
+      } catch (Exception var9) {
+         GlobalService.getInstance().AG();
+         var9.printStackTrace();
+      }
+
+   }
+
+private static boolean check_IDMap_PVP() {
+      return GameCanvas.loadmap.idMap == 58 || GameCanvas.loadmap.idMap == 59 || GameCanvas.loadmap.idMap == 109 || GameCanvas.loadmap.idMap == 119 || GameCanvas.loadmap.idMap == 120 || GameCanvas.loadmap.idMap == 121 || GameCanvas.loadmap.idMap == 123;
+   }
+
+   public static void LoadRedLine(boolean isFinish) {
+      MapOff_RedLine.setTypeMoveredLine((byte)0);
+      GameCanvas.loadMapScr.mItemMap = null;
+      MainScreen.cameraMain.xCam = 0;
+      MainScreen.cameraMain.yCam = 0;
+      MapOff_RedLine.xHardCodeMapRedLine = MotherCanvas.w / 3;
+      if (isFinish) {
+         MapOff_RedLine.isFinish = true;
+         MapOff_RedLine.AL = MotherCanvas.h / 5 * 3;
+         MapOff_RedLine.AN = 8;
+         GameScreen.player.x = 0;
+         GameScreen.player.y = MapOff_RedLine.AL + 20;
+      } else {
+         MapOff_RedLine.isFinish = false;
+         MapOff_RedLine.AL = MotherCanvas.h / 5 << 2;
+         MapOff_RedLine.AN = 6;
+         GameScreen.player.x = MapOff_RedLine.xHardCodeMapRedLine;
+         GameScreen.player.y = MapOff_RedLine.AL;
+      }
+
+      GameScreen.player.Dir = 2;
+      GameScreen.player.type_left_right = 2;
+      GameScreen.player.boatSea = new Boat(GameScreen.player.ID, GameScreen.player.x, GameScreen.player.y, 0, (byte)GameScreen.player.type_left_right);
+      GameScreen.player.boatSea.AA(GameScreen.player.BO, GameScreen.player.typePirate);
+      Player.SF = false;
+      Player.SG = 0;
+      GameScreen.player.SC = 2;
+      GameScreen.player.SB = 2;
+      MapOff_RedLine.AG = 0;
+      MapOff_RedLine.AH = MapOff_RedLine.AL - 40;
+      MapOff_RedLine.AB.removeAllElements();
+      MapOff_RedLine.AC.removeAllElements();
+      MapOff_RedLine.AD.removeAllElements();
+      MapOff_RedLine.AE.removeAllElements();
+      MapOff_RedLine.AF.removeAllElements();
+      int var1 = MotherCanvas.w / 24 + 4;
+
+      int var2;
+      for(var2 = 0; var2 < var1; ++var2) {
+         Point var3;
+         (var3 = new Point()).x = var2 * 24;
+         if (isFinish) {
+            var3.y = var2 * 5;
+         } else {
+            var3.y = -(var2 * 5);
+         }
+
+         var3.frame = CRes.random(7);
+         MapOff_RedLine.AB.addElement(var3);
+      }
+
+      for(var2 = 0; var2 < MotherCanvas.w / 24 + 2; ++var2) {
+         for(int var5 = 0; var5 <= (MotherCanvas.h - MapOff_RedLine.AH + var2 * 10 + 6) / 24; ++var5) {
+            Point var4;
+            (var4 = new Point()).x = var2 * 24;
+            if (isFinish) {
+               var4.y = var2 * 5 - 6 + var5 * 24;
+            } else {
+               var4.y = -var2 * 5 - 6 + var5 * 24;
+            }
+
+            var4.frame = CRes.random(7);
+            if (CRes.random(10) == 0) {
+               var4.AX = true;
+            }
+
+            MapOff_RedLine.AC.addElement(var4);
+         }
+      }
+
+   }
+
+public final void getData(Message m) {
+      try {
+         int var3;
+         byte var4;
+         ByteArrayInputStream bais;
+         int j;
+         byte b;
+         byte b4;
+         byte[] var26;
+         switch(m.reader().readByte()) {
+         case 2:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               MainItem.AA(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataAttri");
+               break;
+            } catch (Exception var15) {
+               var15.printStackTrace();
+               return;
+            }
+         case 3://
+            this.Get_Skill_Player(m);
+            return;
+         case 4:
+            LoadMap.mLockMap = new byte[b = m.reader().readByte()];
+
+            for(var3 = 0; var3 < b; ++var3) {
+               LoadMap.mLockMap[var3] = m.reader().readByte();
+            }
+
+            return;
+         case 5:
+            FZ(m);
+            return;
+         case 6:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               LoadMap.AA(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataNameMap");
+               break;
+            } catch (Exception var14) {
+               return;
+            }
+         case 7:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               MainQuest.AA(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataNamePotionquest");
+               break;
+            } catch (Exception var13) {
+               return;
+            }
+         case 8:
+            TabInventory.priceItemSell = m.reader().readShort();
+            TabInventory.maxPriceItemSell = m.reader().readShort();
+            TabInventory.CU = m.reader().readShort();
+            return;
+         case 9:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               LoadMap.AB(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataItemMap");
+               break;
+            } catch (Exception var12) {
+               return;
+            }
+         case 10:
+            LoadMap.mMapLang = new short[b4 = m.reader().readByte()];
+
+            for(j = 0; j < b4; ++j) {
+               LoadMap.mMapLang[j] = m.reader().readShort();
+            }
+
+            return;
+         case 11:
+            b = m.reader().readByte();
+
+            for(var3 = 0; var3 < b; ++var3) {
+               MainMaterial var27 = new MainMaterial(m.reader().readByte(), m.reader().readUTF(), m.reader().readByte(), m.reader().readByte(), m.reader().readInt(), m.reader().readShort(), m.reader().readByte());
+               MainItem.hashMaterialTem.put("" + var27.ID, var27);
+            }
+            GlobalService.AB = true;
+            return;
+         case 12:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               MainDataUpgrade.LoadDataUpgrade(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataUpgradeSave");
+               break;
+            } catch (Exception var11) {
+               return;
+            }
+         case 13:
+            LoadMap.mSea = new short[b4 = m.reader().readByte()][];
+            for(int i = 0; i < b4; ++i) {
+               LoadMap.mSea[i] = new short[6];
+
+               for(j = 0; j < LoadMap.mSea[i].length; ++j) {
+                  LoadMap.mSea[i][j] = m.reader().readShort();
+               }
+            }
+
+            return;
+         case 15:
+            m = m;
+
+            try {
+               var26 = new byte[m.reader().available()];
+               m.reader().read(var26);
+               bais = new ByteArrayInputStream(var26);
+               CatalogyMonster.AA(new DataInputStream(bais), true);
+               SaveRms.saveData(var26, "dataMon");
+               break;
+            } catch (Exception var16) {
+               var16.printStackTrace();
+               return;
+            }
+         case 17:
+            GameCanvas.clockServer = m.reader().readLong() - GameCanvas.timeNow;
+            return;
+         case 18:
+            Get_Potion_Tem(m, (byte)8);
+            return;
+         case 19:
+            ScreenUpgrade.BH = new short[var4 = m.reader().readByte()];
+
+            for(j = 0; j < var4; ++j) {
+               ScreenUpgrade.BH[j] = m.reader().readShort();
+            }
+
+            ScreenUpgrade.BI = new short[b = m.reader().readByte()];
+
+            for(int var9 = 0; var9 < b; ++var9) {
+               ScreenUpgrade.BI[var9] = m.reader().readShort();
+            }
+
+            return;
+         case 21:
+            if (m.reader().readByte() == 0) {
+               GameScreen.h12plus = 0;
+               Interface_Game.AD();
+            } else {
+               GameScreen.h12plus = 12;
+               Interface_Game.AD();
+            }
+
+            Interface_Game var10000 = GameScreen.interfaceGame;
+            Interface_Game.AC();
+            return;
+         case 22:
+            byte var18;
+            if ((var18 = m.reader().readByte()) == 1) {
+               GameScreen.isShowNameXpArena = true;
+               return;
+            }
+
+            if (var18 == 0) {
+               GameScreen.isShowNameSUPER_BOSS = false;
+               return;
+            }
+
+            if (var18 == 2) {
+               GameScreen.isShowNameWW = true;
+               return;
+            }
+            break;
+         case 23:
+            FZ(m);
+            return;
+         case 25:
+            Get_Potion_Tem(m, (byte)4);
+            return;
+         case 26:
+            GlobalService.AC = true;
+            b = m.reader().readByte();
+
+            for(var3 = 0; var3 < b; ++var3) {
+               String var23 = m.reader().readUTF();
+               MainItem.CD.put("" + var3, var23);
+            }
+
+            return;
+         case 27:
+            if (m.reader().readByte() == 1) {
+               GameScreen.IZ = true;
+               return;
+            }
+
+            GameScreen.IZ = false;
+            return;
+         case 28:
+            Update_Potion_Tem(m, (byte)4);
+            return;
+         case 29:
+            Update_Potion_Tem(m, (byte)4);
+            return;
+         case 30:
+            T.mEffSpec = new String[var4 = m.reader().readByte()];
+
+            for(j = 0; j < var4; ++j) {
+               T.mEffSpec[j] = m.reader().readUTF();
+            }
+
+            return;
+         case 31:
+            short var2;
+            MainObject.dataEffHair = new DataHairServer[var2 = m.reader().readShort()];
+
+            for(var3 = 0; var3 < var2; ++var3) {
+               MainObject.dataEffHair[var3] = new DataHairServer();
+               MainObject.dataEffHair[var3].id = m.reader().readInt();
+               MainObject.dataEffHair[var3].idIcon = m.reader().readInt();
+            }
+
+            short var22;
+            if ((var22 = m.reader().readShort()) <= 0) {
+               break;
+            }
+
+            MainObject.PA = new DataHairServer[var22];
+
+            for(j = 0; j < var22; ++j) {
+               MainObject.PA[j] = new DataHairServer();
+               MainObject.PA[j].id = m.reader().readInt();
+               MainObject.PA[j].AC = m.reader().readUTF();
+            }
+         case 14:
+         case 16:
+         case 20:
+         case 24:
+         default:
+            return;
+         }
+      } catch (Exception var17) {
+         (new StringBuffer("info hair e::")).append(var17.getMessage()).toString();
+      }
+
+   }
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+
+public final class LoadMap {
+   public static mVector vecPointChange = new mVector("Loadmap.vecPointChange");
+   public static MyHashTable hashMapItem = new MyHashTable();
+   public static mVector[] AC = new mVector[6];
+   private static mVector BE = new mVector();
+   public static byte[] mLockMap;
+   public static short[] mMapLang;
+   public static short[][] mSea;
+   public static int[] mTranPointChangeMap = new int[]{5, 4, 1, 0};
+   public int idMap;
+   public int mapW;
+   public int mapH;
+   public int limitW;
+   public int limitH;
+   private int BF;
+   public int maxX;
+   public int maxY;
+   public int maxWMap;
+   public int maxHMap;
+   public int idLastMap;
+   public static int idTile = -1;
+   public static int wTile = 24;
+   private int[] BG;
+   public int[] AT;
+   private byte[][] BH;
+   private static MainImage imgTile;
+   private static MainImage imgTileWater;
+   public static int timeVibrateScreen = 0;
+   public static int AV = 0;
+   public static int AW = 0;
+   public static byte AX = 0;
+   public static byte specMap = 0;
+   public static byte AZ;
+   public static byte BA;
+   private static String[] mNameMap = new String[]{"aa", "bb", "cc", "dd", "ee", "ff"};
+   public static String[] BB;
+   public static boolean isOnlineMap = true;
+   private int fStand;
+   private int fWater;
+   public static int BD = 0;
+   private int BN;
+   private int BO;
+
+   public LoadMap() {
+      this.maxX = MotherCanvas.w / wTile + 1;
+      this.maxY = MotherCanvas.h / wTile + 1;
+
+      for(int i = 0; i < AC.length; ++i) {
+         AC[i] = new mVector();
+      }
+
+   }
+
+   public final void loadmap(byte[] var1) {
+      try {
+         ByteArrayInputStream var5 = new ByteArrayInputStream(var1);
+         DataInputStream var6 = new DataInputStream(var5);
+         this.mapW = var6.readByte();
+         this.mapH = var6.readByte();
+         byte num = var6.readByte();
+         if (idTile != num) {
+            idTile = num;
+            imgTile = null;
+            imgTileWater = null;
+            this.fWater = mLockMap[idTile << 1];
+            this.fStand = mLockMap[(idTile << 1) + 1];
+            ObjectData.getImageOther((short)idTile, (short)20);
+            if (idTile != 11 && idTile != 14) {
+               if (LoadMapScreen.isMapSky != 0) {
+                  LoadMapScreen.isMapSky = 0;
+                  LoadImageStatic.loadImageEffBoat();
+               }
+
+               LoadMapScreen.isMapSky = 0;
+            } else {
+               if (LoadMapScreen.isMapSky != 1) {
+                  LoadMapScreen.isMapSky = 1;
+                  LoadImageStatic.loadImageEffBoat();
+               }
+
+               LoadMapScreen.isMapSky = 1;
+            }
+         }
+
+         this.maxWMap = this.mapW * wTile;
+         this.maxHMap = this.mapH * wTile;
+         this.limitW = this.maxWMap - MotherCanvas.w;
+         this.limitH = this.maxHMap - MotherCanvas.h;
+         MainScreen.cameraMain.setAll(this.limitW, this.limitH, GameScreen.player.x - MotherCanvas.hw, GameScreen.player.y - MotherCanvas.hh);
+         this.BG = new int[this.mapW * this.mapH];
+         this.AT = new int[this.mapW * this.mapH];
+         this.BH = new byte[this.mapW][];
+
+         int var7;
+         for(var7 = 0; var7 < this.mapW; ++var7) {
+            this.BH[var7] = new byte[this.mapH];
+         }
+
+         this.BF = this.mapW * this.mapH;
+
+         for(var7 = 0; var7 < this.mapW * this.mapH; ++var7) {
+            byte var3 = var6.readByte();
+            this.BG[var7] = var3;
+            if (var3 < this.fStand && var3 != 0) {
+               if (var3 >= this.fWater) {
+                  this.AT[var7] = 2;
+               } else {
+                  this.AT[var7] = 0;
+               }
+            } else {
+               this.AT[var7] = 1;
+            }
+         }
+
+      } catch (Exception var4) {
+         var4.printStackTrace();
+      }
+   }
+
+   public final void load_ItemMap(byte[] var1) {
+      for(int var2 = 0; var2 < AC.length; ++var2) {
+         AC[var2].removeAllElements();
+      }
+
+      try {
+         ByteArrayInputStream var10 = new ByteArrayInputStream(var1);
+         DataInputStream var12;
+         short var11 = (var12 = new DataInputStream(var10)).readShort();
+
+         int var3;
+         for(var3 = 0; var3 < var11; ++var3) {
+            Class_CF var5;
+            if ((var5 = AA(var12.readShort())) == null) {
+               var12.readShort();
+               var12.readShort();
+            } else {
+               short var6 = var12.readShort();
+               short var7 = var12.readShort();
+               if (!GameCanvas.isLowGraOrWP_PvP() || var5.AC == 2 || var5.AF.length > 0 || !var5.AG) {
+                  Class_CD var8 = new Class_CD(var5.AD, var5.AE, var5.CD, var5.CE, var5.AF, var5.AC);
+                  if (var5.AE == 312) {
+                     var8.AA = 0;
+                     if (var3 % 4 == 0) {
+                        var8.AA = 1;
+                     }
+                  }
+
+                  this.AA(var6, var7, var5.AF);
+                  var8.AB(var6 * wTile, var7 * wTile);
+                  if (var5.AC == -1) {
+                     BE.addElement(var8);
+                  } else {
+                     var8.AA();
+                     if (var5.AC != 6) {
+                        AC[var5.AC].addElement(var8);
+                     }
+                  }
+               }
+            }
+         }
+
+         short var13;
+         if (!GameCanvas.isLowGraOrWP_PvP() && (var13 = var12.readShort()) > 0) {
+            for(int var4 = 0; var4 < var13; ++var4) {
+               byte var14 = var12.readByte();
+               String var15 = "";
+
+               for(int var16 = 0; var16 < var14; ++var16) {
+                  var15 = var15 + (char)var12.readByte();
+               }
+
+               var14 = var12.readByte();
+               String var17 = "";
+
+               for(int var18 = 0; var18 < var14; ++var18) {
+                  var17 = var17 + (char)var12.readByte();
+               }
+
+               AC[3].addElement(GameScreen.AA(var15, var17));
+            }
+         }
+
+         for(var3 = 0; var3 < AC.length; ++var3) {
+            CRes.quickSort(AC[var3]);
+         }
+
+      } catch (Exception var9) {
+         var9.printStackTrace();
+      }
+   }
+
+   public final void paint(mGraphics var1) {
+      int var2 = MainScreen.cameraMain.xCam / wTile - 1;
+      int var3 = MainScreen.cameraMain.yCam / wTile - 1;
+      if (var2 < 0) {
+         var2 = 0;
+      }
+
+      if (var3 < 0) {
+         var3 = 0;
+      }
+
+      int var4 = var2 + this.maxX + 2;
+      int var5 = var3 + this.maxY + 2;
+      if (var4 > this.mapW) {
+         var4 = this.mapW;
+      }
+
+      if (var5 > this.mapH) {
+         var5 = this.mapH;
+      }
+
+      if ((imgTileWater == null || imgTileWater.img == null) && !GameCanvas.lowGraphic) {
+         imgTileWater = ObjectData.getImageOther((short)idTile, (short)70);
+      }
+
+      if (imgTile != null && imgTile.img != null) {
+         for(var2 = var2; var2 < var4; ++var2) {
+            for(int var6 = var3; var6 < var5; ++var6) {
+               int var7;
+               if ((var7 = var6 * this.mapW + var2) < this.BG.length) {
+                  var7 = this.BG[var7] - 1;
+                  if (!GameCanvas.lowGraphic && idTile == 3 && var7 >= 35 && var7 <= 37 && GameCanvas.gameTick % 14 < 7) {
+                     byte var9 = 0;
+                     if (GameCanvas.gameTick / 14 % 2 == 0) {
+                        var9 = 3;
+                     }
+
+                     if (imgTileWater != null && imgTileWater.img != null) {
+                        var1.drawRegion(imgTileWater.img, (var9 + var7 - 35) / 10 * wTile, (var9 + var7 - 35) % 10 * wTile, wTile, wTile, 0, var2 * wTile, var6 * wTile, 0);
+                     }
+                  } else if (!GameCanvas.lowGraphic && var7 >= this.fWater - 1 && var7 < this.fStand - 1 && GameCanvas.gameTick % 14 < 7 && idTile != 3) {
+                     int var8 = 0;
+                     if (GameCanvas.gameTick / 14 % 2 == 0) {
+                        var8 = this.fStand - this.fWater;
+                     }
+
+                     if (imgTileWater != null && imgTileWater.img != null) {
+                        var1.drawRegion(imgTileWater.img, (var8 + var7 - (this.fWater - 1)) / 10 * wTile, (var8 + var7 - (this.fWater - 1)) % 10 * wTile, wTile, wTile, 0, var2 * wTile, var6 * wTile, 0);
+                     }
+                  } else if (var7 >= 0 && imgTile != null && imgTile.img != null) {
+                     var1.drawRegion(imgTile.img, var7 / 10 * wTile, var7 % 10 * wTile, wTile, wTile, 0, var2 * wTile, var6 * wTile, 0);
+                  }
+               }
+            }
+         }
+
+      } else {
+         imgTile = ObjectData.getImageOther((short)idTile, (short)20);
+         var1.setColor(-1331884);
+         var1.fillRect(MainScreen.cameraMain.xCam, MainScreen.cameraMain.yCam, MotherCanvas.w, MotherCanvas.h);
+      }
+   }
+
+   public final int AA(int var1, int var2) {
+      int var3;
+      return (var3 = var2 / wTile * this.mapW + var1 / wTile) <= this.BF && var1 >= 0 && var1 < this.limitW + MotherCanvas.w && var2 >= 0 && var2 < this.limitH + MotherCanvas.h ? this.AT[var3] : 1;
+   }
+
+   public final int AB(int var1, int var2) {
+      return var2 / wTile * this.mapW + var1 / wTile;
+   }
+
+   private static Class_CF AA(short var0) {
+      Class_CF var1;
+      if ((var1 = (Class_CF)hashMapItem.get("" + var0)) == null) {
+         (var1 = new Class_CF(var0)).AG = false;
+         hashMapItem.put("" + var0, var1);
+         GlobalService.getInstance().AH((byte)98, (short)var0);
+         if (BD == 0) {
+            BD = 1000;
+         }
+
+         ++BD;
+      }
+
+      return var1;
+   }
+
+   private void AA(int var1, int var2, int[][] var3) {
+      try {
+         for(int var4 = 0; var4 < var3.length; ++var4) {
+            if (var1 + var3[var4][0] >= 0 && var1 + var3[var4][0] < this.mapW && var2 + var3[var4][1] >= 0 && var2 + var3[var4][1] < this.mapH) {
+               this.AT[(var2 + var3[var4][1]) * this.mapW + var1 + var3[var4][0]] = 1;
+            }
+         }
+
+      } catch (Exception var5) {
+         var5.printStackTrace();
+      }
+   }
+
+   public static byte AA() {
+      return (byte)(AX + 1);
+   }
+
+   public static boolean AA(int var0) {
+      return var0 == -1 || var0 == 1;
+   }
+
+   public final short[] AA(int var1, int var2, int var3, int var4, int var5, MainObject var6) {
+      return this.AA(var1, var2, var3, var4, var5, var6, 0);
+   }
+
+   private short[] AA(int var1, int var2, int var3, int var4, int var5, MainObject var6, int var7) {
+      if (MainObject.getDistance(var1 * wTile, var2 * wTile, var3 * wTile, var4 * wTile) <= wTile) {
+         return null;
+      } else if (var1 >= 0 && var2 >= 0 && var1 < wTile * this.mapW && var2 < wTile * this.mapH) {
+         this.BN = 0;
+         this.BO = 0;
+         var1 -= this.BN;
+         var2 -= this.BO;
+         var3 -= this.BN;
+         var4 -= this.BO;
+
+         int var8;
+         int var9;
+         for(var7 = 0; var7 < GameCanvas.loadmap.BH.length; ++var7) {
+            for(var8 = 0; var8 < GameCanvas.loadmap.BH[var7].length; ++var8) {
+               if ((var9 = (this.BO + var8) * GameCanvas.loadmap.mapW + this.BN + var7) < GameCanvas.loadmap.AT.length - 1) {
+                  if (var6.typeActionBoat != 0 || GameCanvas.loadmap.AT[var9] != 1 && GameCanvas.loadmap.AT[var9] != -1) {
+                     GameCanvas.loadmap.BH[var7][var8] = 0;
+                  } else {
+                     GameCanvas.loadmap.BH[var7][var8] = -1;
+                  }
+               }
+            }
+         }
+
+         int var11;
+         int var12;
+         int var13;
+         if (specMap == 4) {
+            label257:
+            for(var7 = 0; var7 < GameScreen.vecPlayers.size(); ++var7) {
+               MainObject var23;
+               if ((var23 = (MainObject)GameScreen.vecPlayers.elementAt(var7)) != var6 && var23.boatSea != null && var23.boatSea.ID == var23.ID) {
+                  var23.boatSea.AI();
+                  var9 = var23.boatSea.AY;
+                  var8 = var23.boatSea.AX;
+                  int var19 = var23.boatSea.AW;
+                  int var18 = var23.boatSea.AV;
+                  LoadMap var17 = this;
+                  int var10 = 0;
+
+                  while(true) {
+                     while(true) {
+                        if (var10 > var8) {
+                           continue label257;
+                        }
+
+                        var11 = 0;
+
+                        while(var11 <= var9) {
+                           var12 = var18 - var8 / 2 + var10;
+                           var13 = var19 - var9 / 2 + var11;
+                           if (var11 != var9 && var11 + 24 > var9) {
+                              if (var11 + 24 > var9) {
+                                 var11 = var9;
+                              }
+                           } else {
+                              var11 += 24;
+                           }
+
+                           if (var12 >= 0 && var12 < var17.maxWMap && var13 >= 0 && var13 < var17.maxHMap) {
+                              var17.BH[var12 / 24][var13 / 24] = -1;
+                           }
+                        }
+
+                        if (var10 != var8 && var10 + 24 > var8) {
+                           if (var10 + 24 > var8) {
+                              var10 = var8;
+                           }
+                        } else {
+                           var10 += 24;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+
+         var8 = var1;
+         var9 = var2;
+         short var21 = (short)var1;
+         short var24 = (short)var2;
+         GameCanvas.loadmap.BH[var1][var2] = 1;
+         short var22 = 2;
+         var13 = GameCanvas.loadmap.BH.length;
+         int var14 = GameCanvas.loadmap.BH[0].length;
+         int var15 = 0;
+
+         do {
+            ++var15;
+            if (var15 > 1000) {
+               return new short[var5 + 1];
+            }
+
+            var11 = -1;
+            var12 = -1;
+            if (var8 + 1 < var13 && GameCanvas.loadmap.BH[var8 + 1][var9] == 0) {
+               GameCanvas.loadmap.BH[var8 + 1][var9] = (byte)var22;
+               var11 = var8 + 1;
+               var12 = var9;
+            }
+
+            if (var8 - 1 >= 0 && GameCanvas.loadmap.BH[var8 - 1][var9] == 0) {
+               GameCanvas.loadmap.BH[var8 - 1][var9] = (byte)var22;
+               if (var11 == -1 || CRes.AA(var11, var12, var3, var4) > CRes.AA(var8 - 1, var9, var3, var4)) {
+                  var11 = var8 - 1;
+                  var12 = var9;
+               }
+            }
+
+            if (var9 + 1 < var14 && GameCanvas.loadmap.BH[var8][var9 + 1] == 0) {
+               GameCanvas.loadmap.BH[var8][var9 + 1] = (byte)var22;
+               if (var11 == -1 || CRes.AA(var11, var12, var3, var4) > CRes.AA(var8, var9 + 1, var3, var4)) {
+                  var11 = var8;
+                  var12 = var9 + 1;
+               }
+            }
+
+            if (var9 - 1 >= 0 && GameCanvas.loadmap.BH[var8][var9 - 1] == 0) {
+               GameCanvas.loadmap.BH[var8][var9 - 1] = (byte)var22;
+               if (var11 == -1 || CRes.AA(var11, var12, var3, var4) > CRes.AA(var8, var9 - 1, var3, var4)) {
+                  var11 = var8;
+                  var12 = var9 - 1;
+               }
+            }
+
+            byte var16 = -1;
+            if (var11 != -1) {
+               var16 = 0;
+               var8 = var11;
+               var9 = var12;
+            } else {
+               var9 = 1000;
+               var8 = 1000;
+            }
+
+            for(short var25 = 0; var25 < var13; ++var25) {
+               for(short var26 = 0; var26 < var14; ++var26) {
+                  if (GameCanvas.loadmap.BH[var25][var26] > 1) {
+                     byte[][] var29 = GameCanvas.loadmap.BH;
+                     if ((var25 + 1 < var29.length && var29[var25 + 1][var26] == 0 ? true : (var25 - 1 >= 0 && var29[var25 - 1][var26] == 0 ? true : (var26 + 1 < var29[var25].length && var29[var25][var26 + 1] == 0 ? true : var26 - 1 >= 0 && var29[var25][var26 - 1] == 0))) && GameCanvas.loadmap.BH[var25][var26] + CRes.AA(var25, var26, var3, var4) < var22 + CRes.AA(var8, var9, var3, var4)) {
+                        var8 = var25;
+                        var9 = var26;
+                        var22 = GameCanvas.loadmap.BH[var25][var26];
+                        var16 = 0;
+                     }
+                  }
+               }
+            }
+
+            if (var8 == var3 && var9 == var4) {
+               if (var22 >= 127) {
+                  return new short[var5 + 1];
+               }
+
+               int var28 = 0;
+               short[] var27 = new short[var22];
+
+               try {
+                  while(true) {
+                     var27[var28] = (short)((var8 << 8) + var9);
+                     if (var8 + 1 < var13 && GameCanvas.loadmap.BH[var8 + 1][var9] == GameCanvas.loadmap.BH[var8][var9] - 1) {
+                        var8 = (short)(var8 + 1);
+                     } else if (var8 - 1 >= 0 && GameCanvas.loadmap.BH[var8 - 1][var9] == GameCanvas.loadmap.BH[var8][var9] - 1) {
+                        var8 = (short)(var8 - 1);
+                     } else if (var9 + 1 < var14 && GameCanvas.loadmap.BH[var8][var9 + 1] == GameCanvas.loadmap.BH[var8][var9] - 1) {
+                        var9 = (short)(var9 + 1);
+                     } else if (var9 - 1 >= 0 && GameCanvas.loadmap.BH[var8][var9 - 1] == GameCanvas.loadmap.BH[var8][var9] - 1) {
+                        var9 = (short)(var9 - 1);
+                     }
+
+                     if (var8 == var21 && var9 == var24) {
+                        var27[var22 - 1] = (short)((var1 << 8) + var2);
+                        return var27;
+                     }
+
+                     ++var28;
+                  }
+               } catch (Exception var20) {
+                  return new short[var5 + 1];
+               }
+            }
+
+            if (var16 != 0) {
+               return new short[var5 + 1];
+            }
+         } while(++var22 <= var5);
+
+         return new short[var22];
+      } else {
+         return null;
+      }
+   }
+
+   public final void AA(int var1, int var2, int var3, int var4) {
+      for(int var5 = 0; var5 < var3 / 24; ++var5) {
+         for(int var6 = 0; var6 < var4 / 24; ++var6) {
+            int var7 = var1 - var3 / 2 + var5 * 24 + 13;
+            int var8 = var2 - var4 / 2 + var6 * 24 + 13;
+            if (var7 >= 0 && var7 < this.maxWMap && var8 >= 0 && var8 < this.maxHMap) {
+               this.AT[var8 / 24 * this.mapW + var7 / 24] = 1;
+            }
+         }
+      }
+
+   }
+
+   public final boolean mapLang() {
+      for(int var1 = 0; var1 < mMapLang.length; ++var1) {
+         if (this.idMap == mMapLang[var1]) {
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   public static void AA(DataInputStream var0, boolean var1) {
+      if (var0 == null) {
+         GlobalService.getInstance().get_DATA((byte)6);
+      } else {
+         try {
+            short var2;
+            mNameMap = new String[var2 = var0.readShort()];
+
+            for(int var3 = 0; var3 < var2; ++var3) {
+               mNameMap[var3] = var0.readUTF();
+            }
+
+            if (var1) {
+               SaveRms.AA(GlobalService.AG = var0.readShort(), "VerdataNameMap");
+            }
+
+            var0.close();
+         } catch (Exception var4) {
+         }
+      }
+   }
+
+   public static String AB(int var0) {
+      return var0 >= mNameMap.length ? "" : mNameMap[var0];
+   }
+
+   public static void AB(DataInputStream var0, boolean var1) {
+      try {
+         short var11 = var0.readShort();
+
+         for(short var2 = 0; var2 < var11; ++var2) {
+            short var3 = var0.readShort();
+            byte var6 = var0.readByte();
+            short var4 = var0.readShort();
+            short var5 = var0.readShort();
+            byte var7;
+            int[][] var8 = new int[var7 = var0.readByte()][];
+
+            for(int var9 = 0; var9 < var7; ++var9) {
+               var8[var9] = new int[2];
+               var8[var9][0] = var0.readByte();
+               var8[var9][1] = var0.readByte();
+            }
+
+            hashMapItem.put("" + var2, new Class_CF(var2, var3, var4, var5, var8, var6));
+         }
+
+         SaveRms.AA(GlobalService.AJ = var0.readShort(), "VerdataItemMap");
+         var0.close();
+      } catch (Exception var10) {
+         var10.printStackTrace();
+      }
+   }
+
+   public static void AA(DataInputStream var0) {
+      try {
+         short var4 = var0.readShort();
+         short var1 = var0.readShort();
+         byte var5 = var0.readByte();
+         short var2 = var0.readShort();
+         short var3 = var0.readShort();
+         byte var6;
+         int[][] var7 = new int[var6 = var0.readByte()][];
+
+         for(int var8 = 0; var8 < var6; ++var8) {
+            var7[var8] = new int[2];
+            var7[var8][0] = var0.readByte();
+            var7[var8][1] = var0.readByte();
+         }
+
+         hashMapItem.put("" + var4, new Class_CF(var4, var1, var2, var3, var7, var5));
+         var0.close();
+      } catch (Exception var9) {
+      }
+   }
+
+   public final void AC() {
+      for(int var1 = 0; var1 < BE.size(); ++var1) {
+         Class_CD var2;
+         Class_CF var3;
+         if ((var3 = AA((var2 = (Class_CD)BE.elementAt(var1)).AD)).AG) {
+            if (!GameCanvas.isLowGraOrWP_PvP() || var3.AC == 2 || var3.AF.length > 0) {
+               Class_CD var4 = new Class_CD(var2.AD, var3.AE, var3.CD, var3.CE, var3.AF, var3.AC);
+               this.AA(var2.x / 24, var2.y / 24, var3.AF);
+               var4.AB(var2.x, var2.y);
+               var4.AA();
+               if (var3.AE == 312) {
+                  var4.AA = 0;
+                  if (var1 % 4 == 0) {
+                     var4.AA = 1;
+                  }
+               }
+
+               if (var4.AC != 6) {
+                  AC[var4.AC].addElement(var4);
+               }
+            }
+
+            BE.removeElement(var1);
+            --var1;
+         }
+      }
+
+   }
+
+   public static byte AA(byte var0) {
+      return (byte)(var0 + 1);
+   }
+}

@@ -1,0 +1,13 @@
+    public static String formatMoneyShort(long val) {
+        if (val >= 1000000000L) {
+            return (val / 1000000000L) + "," + (val % 1000000000L / 100000000L) + "B";
+        } else if (val >= 1000000L) {
+            return (val / 1000000L) + "," + (val % 1000000L / 100000L) + "M";
+        } else if (val >= 10000L) {
+            return (val / 1000L) + "k";
+        } else {
+            return String.valueOf(val);
+        }
+    }
+
+    public static int getItemCategory(MainItem item) {

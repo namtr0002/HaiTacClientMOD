@@ -1,0 +1,1 @@
+"import os\n\nbase = r\"c:\\DepLor\\HTTH\\Team\\HaiTacTiHonServer\\data\"\nprint(\"=== SERVER DATA SCAN ===\")\nfor root, dirs, files in os.walk(base):\n    # Only show directories that contain files\n    if files:\n        rel = os.path.relpath(root, base)\n        print(f\"{rel}: {len(files)} files\")\n"

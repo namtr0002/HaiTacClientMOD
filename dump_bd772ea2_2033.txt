@@ -1,0 +1,1281 @@
+<USER_REQUEST>
+đẩy xcode mới nhất lên github action build ipa cho tôi đi
+========================================================
+  PUSH XCODE PROJECT LEN GITHUB DE BUILD IPA
+========================================================
+
+[1/4] Kiem tra va khoi tao Git LFS...
+Updated Git hooks.
+Git LFS initialized.
+
+[2/4] Dang add cac file cau hinh va Xcode project...
+fatal: pathspec '.gitattributes' did not match any files
+fatal: pathspec '.gitignore' did not match any files
+warning: could not open directory 'ProjectUnity129/.github/workflows/': No such file or directory
+fatal: pathspec '.github/workflows/build_ipa.yml' did not match any files
+
+[3/4] Dang commit...
+On branch master
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   ../.gitignore
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/core/ServerEventManager.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/database/DungeonSessionCache.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/event/SuKienGioTo.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/event/SuKienHe.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/event/SuKienVuLan.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/BaoVePhaoDai.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/ChiemDao.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/DauTruongTuDo.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/Map_Lien_Tang.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/ThuLinhBienKhoi.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/TranChienKhongLo.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/map/zones/TranChienLon.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/model/Player.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/main/java/zabstracts/AbsDungeon.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193411/manifest.json
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193933/main/java/model/Player.java
+        deleted:    ../HaiTacTiHonServer/src/.backup_icons_20260828_193933/manifest.json
+        modified:   ../HaiTacTiHonServer/src/main/java/ability/Ability.java
+        modified:   ../HaiTacTiHonServer/src/main/java/ability/AbilityCustom.java
+        modified:   ../HaiTacTiHonServer/src/main/java/ability/AbilityTemplateManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/achievement/ArchiDaily.java
+        modified:   ../HaiTacTiHonServer/src/main/java/achievement/ArchiPrivatePass.java
+        modified:   ../HaiTacTiHonServer/src/main/java/achievement/NamiPassManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Chat.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/ChiemDaoMenu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/ChuyenHoa.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/DanhHieu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/DungeonGiftMenu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Friend.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/GiftChoice.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/HanhTrinh.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Market.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Pvp.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/QuaTop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Sudo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/TimedDungeonManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Trade.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/TraoQuaTop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Upgrade_Skin.java
+        modified:   ../HaiTacTiHonServer/src/main/java/activities/Wanted.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/BossReward.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/BossTheGioi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/Buggi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/Kurol.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/Lucci.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuAlong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuCrocodile.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuMr3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuSmoker.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuThanEnel.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SieuWapol.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/SuperBossManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/boss/Zoombie.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/AttackAround.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/AttackMonster.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/AttackTarget.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/Bot.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotChiemDao.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotDauTruongTuDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotFactory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotKhongLoMapNgoai.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotLobbyManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotPVP.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotThuLinhBienKhoi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotTranChienKhongLo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/BotTruyNa.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/MoveAround.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/MoveToTarget.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/SmartMovement.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotBangHaiTac.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotDb.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotMarket.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotNameGenerator.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotPlayerManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/BotPlayerReal.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/GameAnalyzer.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotBrain.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotClanMissionController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotCombatController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotEquipmentController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotInventoryController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotMovementController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotPersistenceController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotPvpCacheManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotPvpQueueController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/BotSocialController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/nextgen/AntiStuckEngine.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/nextgen/goals/GoalPvP.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/nextgen/goals/GoalShopInventory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/botplayer/ai/nextgen/goals/GoalTransportCargo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/mercenary/MercenaryBot.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/mercenary/MercenaryManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/bot/mercenary/MercenaryTemplate.java
+        modified:   ../HaiTacTiHonServer/src/main/java/clan/Clan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/clan/ClanHanhTrinhIcon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/clan/ClanMember.java
+        modified:   ../HaiTacTiHonServer/src/main/java/clan/ClanService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/AdminPanelFrame.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/GlobalChatService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/MailService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/Manager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/MenuController.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/PanelManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/RewardService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/SaveData.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/ServerEventManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/ServerManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/Start.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/TaiXiu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/TopGift.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/ZCollection.java
+        modified:   ../HaiTacTiHonServer/src/main/java/core/ZUtil.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/CacheManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/DbManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/DbResultRow.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/DungeonSessionCache.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/IDManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/RandomCollection.java
+        modified:   ../HaiTacTiHonServer/src/main/java/database/TemplateCache.java
+        modified:   ../HaiTacTiHonServer/src/main/java/effect/DataEffect.java
+        modified:   ../HaiTacTiHonServer/src/main/java/effect/DataEffectAuto.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/Event.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/EventData.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/EventManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKien20Thang10.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKien20Thang11.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKien30Thang4.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKien8Thang3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienBigMom.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienDauTruongRucLua2026.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienGioTo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienHalloween.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienHe.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienKinhKibi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienNoel.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienTet.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienTetThieuNhi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienThatTich.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienTrongCay.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienTrungThu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienValentine.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienVuLan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/SuKienWano.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/BigMom.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/DauTruongBotArena.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/DoiTruongHuyenThoai.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/DuaBeThieuNhi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/KaidoRong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/KingHoaTai.java
+        modified:   ../HaiTacTiHonServer/src/main/java/event/eboss/SantaNoel.java
+        modified:   ../HaiTacTiHonServer/src/main/java/functions/PhoBanKhongLoTick.java
+        modified:   ../HaiTacTiHonServer/src/main/java/functions/ThuLinhBienKhoiTick.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/BossRewardHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/DiemDanhHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/DungeonRewardHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/EventHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/HistoryManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/ItemPickupHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/RechargeHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/ShopLimitHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/SudoHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/TopRewardHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/VongQuayOcSenHistory.java
+        modified:   ../HaiTacTiHonServer/src/main/java/historys/zLog.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/Item.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/Join_Item.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/Rebuild_Item.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/Split_Item.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/UpgradeDial.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/UpgradeItem.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/UpgradeSuperItem.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/CheTaoDial.java
+        deleted:    ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/DangHoaTriAn.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepBoHoaRucRo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepBoHoaTinhYeu.java
+        deleted:    ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepBoSenHong.java
+        deleted:    ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepBoSenTrang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepDaSieuCap.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopDaKham.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopKimCuongDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopKimCuongTim.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopQuaDacBiet.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopQuaThuong1.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopQuaThuong2.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopQuaThuong3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepHopQuaThuong4.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepMamBac.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepMamVang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepManhTrangBi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepRuongChienThang807.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/GhepSuKien.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapCongCheTac.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapDucLo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapDucLoDial.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapHoanMy.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapKhamNgoc.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapKichAn.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapKyNangAcQuy.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapRuongAcQuy.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapThaoNgoc.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/TrangTriCayThongThuong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/TrangTriCayThongVip.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/LeaveItemMap.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/MapBossInfo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/MapCanGoTo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/MapManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/MapService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/MapTemplate.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/Npc.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/Zone.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/BaoVePhaoDai.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/BetFight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/ChiemDao.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/DauTruongTuDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/Fight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/FriendlyFight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/MapAiDon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/MapDaoKhoBau.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/MapPvp.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/MapTranChienKhongLo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/Map_Hang_Dong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/Map_Lien_Tang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/Map_Mr3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/Map_Sieu_Lien_Tang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/PhoBanThuThachVeThan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/PvpBang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/PvpBangMapFight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/SieuHangFight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/ThuLinhBienKhoi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/TranChienKhongLo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/TranChienLon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/VuonCam.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/WantedDungeon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/map/zones/WantedFight.java
+        modified:   ../HaiTacTiHonServer/src/main/java/mob/Mob.java
+        modified:   ../HaiTacTiHonServer/src/main/java/mob/MobBoss.java
+        modified:   ../HaiTacTiHonServer/src/main/java/mob/MobElite.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/Buff.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/ClientInput.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/ClientYesNo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/DauGia.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/DeTu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/EventLuckyWheel.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/ListNapHangNgay.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/ListTichNap.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/ListTichNapSuKien.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/Pet.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/Player.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/TichLuyCongDon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/TichTieuRuby.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/TichTieuRubySuKien.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/UseItem.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/VongQuay.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/VongQuayNami.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/Wanted_Chest.java
+        modified:   ../HaiTacTiHonServer/src/main/java/model/YesNoDialog.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/GlobalThreadManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/Message.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/MessageHandler.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/NoService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/Service.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/Session.java
+        modified:   ../HaiTacTiHonServer/src/main/java/network/SessionManager.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/Ranked.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopAnSocola.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBanhChung.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBanhKeoThieuNhi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBatPokemon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBigMom.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBoHoa.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBoSenHong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBoSenTrang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopBongBongThieuNhi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopCaoThu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopCauDuyenThatTich.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopChiemDao.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopClan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopDauTruongTuDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopDenKeoQuan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopDotPhao.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopDuDoanTranDau.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopDungBanh.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGhepHuyHieu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGhepKinhKibi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGioHoa.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGioTo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGioToBoss.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGoiHopQua2010.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGoiSocola.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopGomTraiCay.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHalloweenHQMQ.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHalloweenNap.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHoaDangWano.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHoaHongTrang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHopKimCuongDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHopKimCuongTim.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopHopQuaDacBiet2010.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopLongDen.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopMoBoHoaVuLan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopMoRuongKinhKibi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopNauCheDauDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopNoelTrangTri.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopPVP.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopTieuDietKaido.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopTrieuHoiDoiTruong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopTrongCay.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopVeTuoiTho.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopWanted.java
+        modified:   ../HaiTacTiHonServer/src/main/java/rank/TopWorldWar.java
+        modified:   ../HaiTacTiHonServer/src/main/java/skill/Skill_Template.java
+        modified:   ../HaiTacTiHonServer/src/main/java/skill/Skill_info.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/DaThanThoaiShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/LimitShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/MaterialShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/PotionShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/StoneShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/store/TrashShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ClanHanhTrinhIcon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/DataTemplate.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/FriendTemp.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/GiftBox.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/GiftTemplate.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/InfoMemList.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemBag47.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemDauGia.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemFashion.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemFashionP.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemHair.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemMarket.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemOptionTemplate.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemSell.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemTemplate3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/ItemTemplate8.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/Item_wear.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/Option.java
+        modified:   ../HaiTacTiHonServer/src/main/java/template/PotionMarket.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsBoss.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsCheTao.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsDungeon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsListTichNap.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsRanked.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsService.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsShop.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsTableTickOption.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zabstracts/AbsTichTieuRuby.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/AdminSystemMenu.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/MenuHoanMyKichAn.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/MenuHoatDong.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/MenuVanChuyenHang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/SubMenuKhoaBaoVe.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/SubMenuSanTrum.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/SubMenuTeleport.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/SubMenuWorldWar.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/dymanics/DymanicMercenary.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/dymanics/DymanicTranChienLon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/dymanics/DynamicEventTopGift.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/dymanics/DynamicNamiPass.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/dymanics/DynamicTopGift.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcDungeon.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcGarp.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcGym.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcHuongDan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcJohny.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcMihaw.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcNami.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcPaule.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcPudding.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcRubin.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcRuongDo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcTeleport.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcThongTin.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcTruongLang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcWipper.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcZosaku.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcBePudding.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcBiNgoMa.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcBoaHancockVuLan.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcChiHang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcDauBepSanjiBigMom.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcGarpChienThang.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcLucciGioTo.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcOTsuruWano.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcOngGiaNoel.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcSanjiValentine.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcSuGia8Thang3.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcSuGiaKibi.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcSuGiaMuaHe.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcSuGiaTet.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcThayRayleigh.java
+        modified:   ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/event/NpcTrongCay.java
+        modified:   ../HaiTacTiHonServer/src/test/java/TestEventConfigLoad.java
+        modified:   ../ProjectJ2me129/src/AThMadaraFunc.java
+        modified:   ../ProjectJ2me129/src/AThMadaraMOD.java
+        modified:   ../ProjectJ2me129/src/Ageticon.java
+        modified:   ../ProjectJ2me129/src/Agetmap.java
+        modified:   ../ProjectJ2me129/src/AutoUseItem.java
+        modified:   ../ProjectJ2me129/src/CRes.java
+        modified:   ../ProjectJ2me129/src/ChatDetail.java
+        modified:   ../ProjectJ2me129/src/ChatTabScreen.java
+        modified:   ../ProjectJ2me129/src/Clan_Screen.java
+        modified:   ../ProjectJ2me129/src/Class_AK.java
+        modified:   ../ProjectJ2me129/src/Class_AL.java
+        modified:   ../ProjectJ2me129/src/Class_BN.java
+        modified:   ../ProjectJ2me129/src/Class_CP.java
+        modified:   ../ProjectJ2me129/src/Class_DW.java
+        modified:   ../ProjectJ2me129/src/Class_EB.java
+        modified:   ../ProjectJ2me129/src/Class_ET.java
+        modified:   ../ProjectJ2me129/src/Class_FD.java
+        modified:   ../ProjectJ2me129/src/Class_FH.java
+        modified:   ../ProjectJ2me129/src/Class_FI.java
+        modified:   ../ProjectJ2me129/src/Class_GO.java
+        modified:   ../ProjectJ2me129/src/Class_GU.java
+        modified:   ../ProjectJ2me129/src/Class_HU.java
+        modified:   ../ProjectJ2me129/src/Class_IO.java
+        modified:   ../ProjectJ2me129/src/DataSkillEff.java
+        modified:   ../ProjectJ2me129/src/DelaySkill.java
+        modified:   ../ProjectJ2me129/src/DualTabScreen.java
+        modified:   ../ProjectJ2me129/src/EffectData.java
+        modified:   ../ProjectJ2me129/src/Effect_Skill.java
+        modified:   ../ProjectJ2me129/src/FrameEff.java
+        modified:   ../ProjectJ2me129/src/FrameImage.java
+        modified:   ../ProjectJ2me129/src/FristLoginScreen.java
+        modified:   ../ProjectJ2me129/src/GameCanvas.java
+        modified:   ../ProjectJ2me129/src/GameMidlet.java
+        modified:   ../ProjectJ2me129/src/GameScreen.java
+        modified:   ../ProjectJ2me129/src/GlobalMessageHandler.java
+        modified:   ../ProjectJ2me129/src/GlobalService.java
+        modified:   ../ProjectJ2me129/src/Hotkey.java
+        deleted:    ../ProjectJ2me129/src/HuaThanh.java
+        modified:   ../ProjectJ2me129/src/HuyHieuClanScreen.java
+        modified:   ../ProjectJ2me129/src/InfoMemList.java
+        modified:   ../ProjectJ2me129/src/Interface_Game.java
+        modified:   ../ProjectJ2me129/src/Item.java
+        modified:   ../ProjectJ2me129/src/ListChar_Screen.java
+        modified:   ../ProjectJ2me129/src/ListNew.java
+        modified:   ../ProjectJ2me129/src/LoadImageStatic.java
+        modified:   ../ProjectJ2me129/src/LoadMap.java
+        modified:   ../ProjectJ2me129/src/LoadMapScreen.java
+        modified:   ../ProjectJ2me129/src/LoginScreen.java
+        modified:   ../ProjectJ2me129/src/MainBuff.java
+        modified:   ../ProjectJ2me129/src/MainEffect.java
+        modified:   ../ProjectJ2me129/src/MainEvent.java
+        modified:   ../ProjectJ2me129/src/MainItem.java
+        modified:   ../ProjectJ2me129/src/MainMonster.java
+        modified:   ../ProjectJ2me129/src/MainObject.java
+        modified:   ../ProjectJ2me129/src/MainPlayer.java
+        modified:   ../ProjectJ2me129/src/MainSkill.java
+        modified:   ../ProjectJ2me129/src/MainTab.java
+        modified:   ../ProjectJ2me129/src/MainTabShop.java
+        modified:   ../ProjectJ2me129/src/MaxLevelAttribute.java
+        modified:   ../ProjectJ2me129/src/Menu.java
+        modified:   ../ProjectJ2me129/src/MenuMeScr.java
+        modified:   ../ProjectJ2me129/src/ModernUI.java
+        modified:   ../ProjectJ2me129/src/MonsterWalk.java
+        modified:   ../ProjectJ2me129/src/MotherCanvas.java
+        modified:   ../ProjectJ2me129/src/MsgArchiDaily.java
+        modified:   ../ProjectJ2me129/src/MsgArea.java
+        modified:   ../ProjectJ2me129/src/MsgAutoFire.java
+        modified:   ../ProjectJ2me129/src/MsgAutoSell.java
+        modified:   ../ProjectJ2me129/src/MsgDialog.java
+        modified:   ../ProjectJ2me129/src/MsgOtherCharInfo.java
+        modified:   ../ProjectJ2me129/src/MsgShowGift.java
+        modified:   ../ProjectJ2me129/src/MsgUpdateHeart.java
+        modified:   ../ProjectJ2me129/src/MyHashTable.java
+        modified:   ../ProjectJ2me129/src/ObjectData.java
+        modified:   ../ProjectJ2me129/src/PartFrame.java
+        modified:   ../ProjectJ2me129/src/Plash.java
+        modified:   ../ProjectJ2me129/src/Player.java
+        modified:   ../ProjectJ2me129/src/PlayerListServer.java
+        modified:   ../ProjectJ2me129/src/Point.java
+        modified:   ../ProjectJ2me129/src/Point_Focus.java
+        modified:   ../ProjectJ2me129/src/QuickMenu.java
+        modified:   ../ProjectJ2me129/src/ReadMessenge.java
+        modified:   ../ProjectJ2me129/src/SaveImageRMS.java
+        modified:   ../ProjectJ2me129/src/SaveRms.java
+        modified:   ../ProjectJ2me129/src/ScreenUpgrade.java
+        modified:   ../ProjectJ2me129/src/Sender.java
+        modified:   ../ProjectJ2me129/src/Session_ME.java
+        modified:   ../ProjectJ2me129/src/Skill_Info.java
+        modified:   ../ProjectJ2me129/src/SkinUpgradeScreen.java
+        modified:   ../ProjectJ2me129/src/Sudo_Screen.java
+        modified:   ../ProjectJ2me129/src/TabChest.java
+        modified:   ../ProjectJ2me129/src/TabEquip.java
+        modified:   ../ProjectJ2me129/src/TabInfo.java
+        modified:   ../ProjectJ2me129/src/TabInventory.java
+        modified:   ../ProjectJ2me129/src/TabScreen.java
+        modified:   ../ProjectJ2me129/src/TabShop.java
+        modified:   ../ProjectJ2me129/src/TabSkill.java
+        modified:   ../ProjectJ2me129/src/UpdateServer.java
+        modified:   ../ProjectJ2me129/src/iCommand.java
+        modified:   ../ProjectJ2me129/src/infoShow.java
+        modified:   ../ProjectJ2me129/src/mGraphics.java
+        modified:   ../ProjectJ2me129/src/mImage.java
+        modified:   ../ProjectJ2me129/src/x1/bg/axe.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b00.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b01.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b03.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b100.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b11.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b110.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b112.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b114.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b120.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b131.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b133.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b135.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b141.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b150.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b160.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b165.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b172.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b182.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b187.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b188.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b20.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b22.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b40.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b40_n.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b50.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b60.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b60_n.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b71.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b72.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b74.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b80.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b85.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b90.png
+        modified:   ../ProjectJ2me129/src/x1/bg/b93.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boateff.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boateff2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boateff3.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boateff4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boatfar.png
+        modified:   ../ProjectJ2me129/src/x1/bg/boatnear.png
+        modified:   ../ProjectJ2me129/src/x1/bg/chong.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud11.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud21.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud22.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud31.png
+        modified:   ../ProjectJ2me129/src/x1/bg/cloud32.png
+        modified:   ../ProjectJ2me129/src/x1/bg/eff_sky1.png
+        modified:   ../ProjectJ2me129/src/x1/bg/eff_sky2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/eff_sky3.png
+        modified:   ../ProjectJ2me129/src/x1/bg/eff_sky4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/flower.png
+        modified:   ../ProjectJ2me129/src/x1/bg/flowerdao.png
+        modified:   ../ProjectJ2me129/src/x1/bg/flowermai.png
+        modified:   ../ProjectJ2me129/src/x1/bg/flowerphao.png
+        modified:   ../ProjectJ2me129/src/x1/bg/leaf.png
+        modified:   ../ProjectJ2me129/src/x1/bg/login10.png
+        modified:   ../ProjectJ2me129/src/x1/bg/login4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/login5.png
+        modified:   ../ProjectJ2me129/src/x1/bg/login6.png
+        modified:   ../ProjectJ2me129/src/x1/bg/login9.png
+        modified:   ../ProjectJ2me129/src/x1/bg/nui2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/nui3.png
+        modified:   ../ProjectJ2me129/src/x1/bg/nui4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/nui6.png
+        modified:   ../ProjectJ2me129/src/x1/bg/rain.png
+        modified:   ../ProjectJ2me129/src/x1/bg/redline0.png
+        modified:   ../ProjectJ2me129/src/x1/bg/redline1.png
+        modified:   ../ProjectJ2me129/src/x1/bg/redline2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/redline4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea0.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea1.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea3.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea4fly.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sea6.png
+        modified:   ../ProjectJ2me129/src/x1/bg/ship.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky0.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky1.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky10.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky11.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky2.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky3.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky4.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky5.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky6.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky7.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky8.png
+        modified:   ../ProjectJ2me129/src/x1/bg/sky9.png
+        modified:   ../ProjectJ2me129/src/x1/bg/snow.png
+        modified:   ../ProjectJ2me129/src/x1/bg/star.png
+        modified:   ../ProjectJ2me129/src/x1/bg/thunder.png
+        modified:   ../ProjectJ2me129/src/x1/interface/03.png
+        modified:   ../ProjectJ2me129/src/x1/interface/04.png
+        modified:   ../ProjectJ2me129/src/x1/interface/1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/1_wanted.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_duoi_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_duoi_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_duoi_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_duoi_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_giay_tren_phai.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_giua_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_giua_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_giua_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_giua_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_phai_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_phai_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_phai_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_phai_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_phai_5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_trai_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_trai_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_trai_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_trai_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_trai_5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_tren_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_tren_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_tren_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/4_tren_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/arrowlist.png
+        modified:   ../ProjectJ2me129/src/x1/interface/automphp.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bannerruong0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga11.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga13.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga15.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga16.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga17.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga18.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga25.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bga9.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgb8.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bgc7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/border.png
+        modified:   ../ProjectJ2me129/src/x1/interface/borderclan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordercombo.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordernoti.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordernoti2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordernoti3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordernoti4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/bordernum.png
+        modified:   ../ProjectJ2me129/src/x1/interface/borderwanted.png
+        modified:   ../ProjectJ2me129/src/x1/interface/button0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/button_tiemnang.png
+        modified:   ../ProjectJ2me129/src/x1/interface/chat2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/chatclan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/chatpopup0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/chatpopup1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/check.png
+        modified:   ../ProjectJ2me129/src/x1/interface/coloritem.png
+        modified:   ../ProjectJ2me129/src/x1/interface/coloruniform.png
+        modified:   ../ProjectJ2me129/src/x1/interface/complete.png
+        modified:   ../ProjectJ2me129/src/x1/interface/diavongquay0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/diavongquay1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/diavongquay2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/donateclan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/effcur.png
+        modified:   ../ProjectJ2me129/src/x1/interface/effupgrade.png
+        modified:   ../ProjectJ2me129/src/x1/interface/eye.png
+        modified:   ../ProjectJ2me129/src/x1/interface/hand.png
+        modified:   ../ProjectJ2me129/src/x1/interface/hinhnhan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/hoavan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/hotkey.png
+        modified:   ../ProjectJ2me129/src/x1/interface/huyhieu0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/huyhieu1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/huyhieu2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/huyhieu3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconcheck.png
+        modified:   ../ProjectJ2me129/src/x1/interface/icondie.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconfocus.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconmphp.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconmphp2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconpk.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconpk2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconplus.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconserver.png
+        modified:   ../ProjectJ2me129/src/x1/interface/icontop.png
+        modified:   ../ProjectJ2me129/src/x1/interface/icontrade.png
+        modified:   ../ProjectJ2me129/src/x1/interface/icontrade2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconupgrade.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconwanted.png
+        modified:   ../ProjectJ2me129/src/x1/interface/iconxp.png
+        modified:   ../ProjectJ2me129/src/x1/interface/infoclass.png
+        modified:   ../ProjectJ2me129/src/x1/interface/infolock.png
+        modified:   ../ProjectJ2me129/src/x1/interface/infostar.png
+        modified:   ../ProjectJ2me129/src/x1/interface/khung_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/law7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/levelup.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lgv_e.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lock.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol11.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol12.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lol5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lucky5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/lvdevilskill.png
+        modified:   ../ProjectJ2me129/src/x1/interface/match.png
+        modified:   ../ProjectJ2me129/src/x1/interface/match_e.png
+        modified:   ../ProjectJ2me129/src/x1/interface/mess2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/money.png
+        modified:   ../ProjectJ2me129/src/x1/interface/muiten.png
+        modified:   ../ProjectJ2me129/src/x1/interface/new.png
+        modified:   ../ProjectJ2me129/src/x1/interface/numwanted.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/paper_7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/papern7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/plus12.png
+        modified:   ../ProjectJ2me129/src/x1/interface/plus12_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/plusclan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvp2_e.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvp3_e.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvpnew3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvpobjdef.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvpok.png
+        modified:   ../ProjectJ2me129/src/x1/interface/pvpvs.png
+        modified:   ../ProjectJ2me129/src/x1/interface/roomw2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/roomw3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/roomw4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/safe.png
+        modified:   ../ProjectJ2me129/src/x1/interface/selected_hand.png
+        modified:   ../ProjectJ2me129/src/x1/interface/shadow2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/shadow3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/slot.png
+        modified:   ../ProjectJ2me129/src/x1/interface/starmatch.png
+        modified:   ../ProjectJ2me129/src/x1/interface/statusonline.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tab1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tabclan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tf1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/thanhtich0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/thanhtich1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/thong_thao.png
+        modified:   ../ProjectJ2me129/src/x1/interface/thong_thao_2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/timepvp2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/timepvpsmall2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt01.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt03.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt04.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt06.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt09.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt10.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt11.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt12.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt13.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt14.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt15.png
+        modified:   ../ProjectJ2me129/src/x1/interface/tt16.png
+        modified:   ../ProjectJ2me129/src/x1/interface/two_tab.png
+        modified:   ../ProjectJ2me129/src/x1/interface/typecay.png
+        modified:   ../ProjectJ2me129/src/x1/interface/u_hoavan.png
+        modified:   ../ProjectJ2me129/src/x1/interface/waiting.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted0.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted1.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted10.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted11.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted12.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted13.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted14.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted15.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted16.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted17.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted2.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted3.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted4.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted5.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted6.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted7.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted8.png
+        modified:   ../ProjectJ2me129/src/x1/interface/wanted9.png
+        modified:   ../ProjectJ2me129/src/x1/interface/xclose.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_black.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_blue.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_brown.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_green.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_orange.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_red.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_violet.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_white.png
+        modified:   ../ProjectJ2me129/src/x1/mfont/tahoma_7b_yellow.png
+        modified:   ../ProjectJ2me129/src/x1/point/Mini_menu.png
+        modified:   ../ProjectJ2me129/src/x1/point/closetab.png
+        modified:   ../ProjectJ2me129/src/x1/point/closetab3.png
+        modified:   ../ProjectJ2me129/src/x1/point/other_0.png
+        modified:   ../ProjectJ2me129/src/x1/point/other_3.png
+        modified:   ../ProjectJ2me129/src/x1/point/other_4.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_0.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_1.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_10.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_11.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_12.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_14.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_2.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_3.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_4.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_5.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_6.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_7.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_8.png
+        modified:   ../ProjectJ2me129/src/x1/point/quick_9.png
+        modified:   ../ProjectJ2me129/src/x1/test_eff/skill1/eff1.png
+        modified:   ../ProjectJ2me129/src/x1/test_eff/skill1/eff2.png
+        modified:   ../ProjectJ2me129/src/x1/test_eff/skill1/eff3.png
+        modified:   ../ProjectJ2me129/src/x1/test_eff/skill2/eff.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/backinfo.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/bgnum.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/bgnum2.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/combo.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/delayskill.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/eff_inmap0.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/infonew.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/nenfocus.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/shadow.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/shadow2.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/shadow3.png
+        modified:   ../ProjectJ2me129/src/x1/w_interface/shadowsmall.png
+        modified:   Assets/Scripts/Assembly-CSharp/AThMadaraFunc.cs
+        modified:   Assets/Scripts/Assembly-CSharp/AThMadaraMOD.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ArrayCast.cs
+        modified:   Assets/Scripts/Assembly-CSharp/AuctionScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/AutoUseItem.cs
+        modified:   Assets/Scripts/Assembly-CSharp/AvMain.cs
+        modified:   Assets/Scripts/Assembly-CSharp/CRes.cs
+        modified:   Assets/Scripts/Assembly-CSharp/CatalogyMonster.cs
+        modified:   Assets/Scripts/Assembly-CSharp/CharPartInfo.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ChatDetail.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ChatTabScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ChatTextField.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Clan_Chat.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Clan_Cup.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Clan_Screen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Cmd_Message.cs
+        modified:   Assets/Scripts/Assembly-CSharp/CreateChar_Screen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/DataOutputStream.cs
+        modified:   Assets/Scripts/Assembly-CSharp/DataQuest.cs
+        modified:   Assets/Scripts/Assembly-CSharp/DataSkillEff.cs
+        modified:   Assets/Scripts/Assembly-CSharp/DelaySkill.cs
+        modified:   Assets/Scripts/Assembly-CSharp/DualTabScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/EffectData.cs
+        modified:   Assets/Scripts/Assembly-CSharp/EffectNum.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Effect_Map.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Effect_Skill.cs
+        modified:   Assets/Scripts/Assembly-CSharp/FrameImage.cs
+        modified:   Assets/Scripts/Assembly-CSharp/FristLoginScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GameCanvas.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GameMidlet.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GameScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GlobalLogicHandler.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GlobalMessageHandler.cs
+        modified:   Assets/Scripts/Assembly-CSharp/GlobalService.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Hotkey.cs
+        modified:   Assets/Scripts/Assembly-CSharp/HuyHieuClanScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Image.cs
+        modified:   Assets/Scripts/Assembly-CSharp/InfoMemList.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Interface_Game.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Item.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ItemFashion.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Item_Skill_Eff.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ListChar_Screen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ListNew.cs
+        modified:   Assets/Scripts/Assembly-CSharp/LoadImageStatic.cs
+        modified:   Assets/Scripts/Assembly-CSharp/LoadMap.cs
+        modified:   Assets/Scripts/Assembly-CSharp/LoadMapScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/LoginScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Main.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainBuff.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainEffect.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainEvent.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainImage.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainItem.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainMonster.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainObject.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainPlayer.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainSkill.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainTab.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MainTabShop.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MapBackGround.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MapGotoGod.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MapGotoSky.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MapOff_RedLine.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Menu.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MenuMeScr.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ModernUI.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MonsterWalk.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MotherCanvas.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgArea.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgAutoFire.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgAutoGetItem.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgAutoMPHP.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgDialog.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgDialogTrangTri.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgListItem.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgOtherCharInfo.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgShowGift.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgSound.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MsgUpdateHeart.cs
+        modified:   Assets/Scripts/Assembly-CSharp/MyAudioClip.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Net.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ObjectData.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Plash.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Player.cs
+        modified:   Assets/Scripts/Assembly-CSharp/PlayerListServer.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Point.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Point_Focus.cs
+        modified:   Assets/Scripts/Assembly-CSharp/QuickMenu.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ReadMessenge.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Rms.cs
+        modified:   Assets/Scripts/Assembly-CSharp/SaveRms.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ScaleGUI.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ScreenMaxLevel.cs
+        modified:   Assets/Scripts/Assembly-CSharp/ScreenUpgrade.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Session_ME.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Skill_Info.cs
+        modified:   Assets/Scripts/Assembly-CSharp/SkinUpgradeScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/SmallImage.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Start_Skill.cs
+        modified:   Assets/Scripts/Assembly-CSharp/Sudo_Chat.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabChest.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabEquip.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabInfo.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabInventory.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabShop.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabSkill.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TabSuDo.cs
+        modified:   Assets/Scripts/Assembly-CSharp/TradeScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/UpdateImageScreen.cs
+        modified:   Assets/Scripts/Assembly-CSharp/UpdateServer.cs
+        modified:   Assets/Scripts/Assembly-CSharp/iCommand.cs
+        modified:   Assets/Scripts/Assembly-CSharp/iOSPlugins.cs
+        modified:   Assets/Scripts/Assembly-CSharp/infoShow.cs
+        modified:   Assets/Scripts/Assembly-CSharp/mFont.cs
+        modified:   Assets/Scripts/Assembly-CSharp/mGraphics.cs
+        modified:   Assets/Scripts/Assembly-CSharp/mImage.cs
+        modified:   Assets/Scripts/Assembly-CSharp/mSound.cs
+        modified:   Assets/Scripts/Assembly-CSharp/myReader.cs
+        modified:   Assets/Scripts/Assembly-CSharp/myWriter.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/AThMadaraMOD.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/CharPartInfo.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/CreateChar_Screen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/DataQuest.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Effect_Skill.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/FrameImage.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/FristLoginScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/GameCanvas.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/GameMidlet.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/GameScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/GlobalService.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Hotkey.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Image.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Interface_Game.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Item.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Item_Skill_Eff.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/ListChar_Screen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/LoadMap.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/LoadMapScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/LoginScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Main.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainBuff.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainImage.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainItem.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainObject.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainPlayer.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainSkill.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MainTab.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MapBackGround.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MapGotoGod.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MapGotoSky.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MapOff_RedLine.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MotherCanvas.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/MsgOtherCharInfo.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/ObjectData.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Plash.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Player.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/ReadMessenge.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Rms.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/SaveRms.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/ScreenUpgrade.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Session_ME.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/SkinUpgradeScreen.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/SmallImage.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/Start_Skill.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/TabChest.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/TabInventory.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/TabShop.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/TabSkill.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/infoShow.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/mGraphics.cs
+        modified:   ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/mImage.cs
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        ../.gitattributes
+        ../.github/
+        ../.vs/
+        ../BotZaloChat-main/
+        ../ClientManager/
+        ../DOCS_J2ME_ANALYSIS_REPORT.md
+        ../DOCS_SERVER_COMBAT_MAP_REPORT.md
+        ../DOCS_SERVER_CORE_NETWORK_REPORT.md
+        ../DOCS_SERVER_ECONOMY_ITEM_DUPE_REPORT.md
+        ../DOCS_TONG_HOP_TOAN_DIEN_HTTH.md
+        ../DOCS_UNITY_NETWORK_SYNC_REPORT.md
+        ../DOCS_UNITY_UI_MOD_REPORT.md
+        ../HaiTacTiHonServer/.cache/
+        ../HaiTacTiHonServer/.idea/
+        ../HaiTacTiHonServer/.sourcez/
+        ../HaiTacTiHonServer/build.bat
+        ../HaiTacTiHonServer/build_log.txt
+        ../HaiTacTiHonServer/build_ultimate.bat
+        ../HaiTacTiHonServer/config.properties
+        ../HaiTacTiHonServer/data/
+        ../HaiTacTiHonServer/encodetool/
+        ../HaiTacTiHonServer/pom.xml
+        ../HaiTacTiHonServer/release/
+        ../HaiTacTiHonServer/run.bat
+        ../HaiTacTiHonServer/scratch/
+        ../HaiTacTiHonServer/src/main/java/activities/AutoManager.java
+        ../HaiTacTiHonServer/src/main/java/boss/BossAndWildManager.java
+        ../HaiTacTiHonServer/src/main/java/bot/BotBalanceEngine.java
+        ../HaiTacTiHonServer/src/main/java/event/shop/
+        ../HaiTacTiHonServer/src/main/java/functions/BaoVePhaoDaiTick.java
+        ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapTachThanTrang.java
+        ../HaiTacTiHonServer/src/main/java/itemz/rebuilds/NangCapThanTrang.java
+        ../HaiTacTiHonServer/src/main/java/model/ActiveBuff.java
+        ../HaiTacTiHonServer/src/main/java/model/ListTichNapTuan.java
+        ../HaiTacTiHonServer/src/main/java/model/PlayerAutoSettings.java
+        ../HaiTacTiHonServer/src/main/java/model/ThanTrangConfig.java
+        ../HaiTacTiHonServer/src/main/java/model/TichTieuTong.java
+        ../HaiTacTiHonServer/src/main/java/model/TichTieuTuan.java
+        ../HaiTacTiHonServer/src/main/java/network/KeyServerValidator.java
+        ../HaiTacTiHonServer/src/main/java/store/ClanShop.java
+        ../HaiTacTiHonServer/src/main/java/template/ClanIcon.java
+        ../HaiTacTiHonServer/src/main/java/template/ThanTrangConfig.java
+        ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/AutoSystemMenu.java
+        ../HaiTacTiHonServer/src/main/java/zinterfaces/menus/npcs/NpcSoHuuDao.java
+        ../HaiTacTiHonServer/src/test/java/ApplyThanTrangSkillDb.java
+        ../HaiTacTiHonServer/src/test/java/GenerateThanTrangIcons.java
+        ../HaiTacTiHonServer/src/test/java/TestBotEquipThanTrang.java
+        ../HaiTacTiHonServer/src/test/java/TestDialStats.java
+        ../HaiTacTiHonServer/src/test/java/TestMasterTaskVerification.java
+        ../HaiTacTiHonServer/src/test/java/TestMessageHandlerCmd74.java
+        ../HaiTacTiHonServer/src/test/java/TestServerCommandsIPC.java
+        ../HaiTacTiHonServer/src/test/java/TestSkillDamageCalculation.java
+        ../HaiTacTiHonServer/src/test/java/TestTestPhaseAndMails.java
+        ../HaiTacTiHonServer/src/test/java/TestThanTrangBalance.java
+        ../HaiTacTiHonServer/src/test/java/TestThanTrangHotKeySync.java
+        ../HaiTacTiHonServer/src/test/java/network/
+        ../HaiTacTiHonServer/src50.zip
+        ../HaiTacTiHonTool/
+        ../Luffy_ThanTrang.png
+        ../META-INF/
+        ../Nami_ThanTrang.png
+        ../NewEffect/
+        ../Others/
+        ../ProjectJ2me129/HaiTacTiHon129.jad
+        ../ProjectJ2me129/OBF.txt
+        ../ProjectJ2me129/OBF_ULTIMATE.txt
+        ../ProjectJ2me129/ProGuard.bat
+        ../ProjectJ2me129/ProGuardVIP.pro
+        ../ProjectJ2me129/ProGuard_Ultimate.pro
+        ../ProjectJ2me129/build.xml
+        ../ProjectJ2me129/build_ultimate.bat
+        ../ProjectJ2me129/check_str_len.py
+        ../ProjectJ2me129/check_strings.py
+        ../ProjectJ2me129/dist/
+        ../ProjectJ2me129/encodetool/
+        ../ProjectJ2me129/manifest.mf
+        ../ProjectJ2me129/nbproject/
+        ../ProjectJ2me129/proguard-7.6.0/
+        ../ProjectJ2me129/sources.rsp
+        ../ProjectJ2me129/sources_j2me.rsp
+        ../ProjectJ2me129/src/DanhHieuInfo.java
+        ../ProjectJ2me129/src/KeyAuthManager.java
+        ../ProjectJ2me129/src/TitleActionBtn.java
+        ../ProjectJ2me129/src/x1/point/quick_16.png
+        ../ProjectJ2me129/test_str_filter.py
+        ../ProjectLibgdx129/
+        .vs/
+        .vsconfig
+        Assembly-CSharp.dll
+        Assets/Editor.meta
+        Assets/Editor/
+        Assets/LightingSettings.meta
+        Assets/LightingSettings/
+        Assets/OPS.meta
+        Assets/OPS/
+        Assets/Plugins.meta
+        Assets/Plugins/
+        Assets/Resources.meta
+        Assets/Resources/
+        Assets/Scenes.meta
+        Assets/Scenes/
+        Assets/Scripts.meta
+        Assets/Scripts/Assembly-CSharp/DanhHieuInfo.cs
+        Assets/Scripts/Assembly-CSharp/DanhHieuInfo.cs.meta
+        Assets/Scripts/Assembly-CSharp/KeyAuthManager.cs
+        Assets/Scripts/Assembly-CSharp/KeyAuthManager.cs.meta
+        Assets/Scripts/Assembly-CSharp/MsgNamiPass.cs
+        Assets/Scripts/Assembly-CSharp/MsgNamiPass.cs.meta
+        Assets/Scripts1934892026.zip
+        Assets/Scripts1934892026.zip.meta
+        Assets/Shader.meta
+        Assets/Shader/
+        Assets/hs.unity
+        Assets/hs.unity.meta
+        Builds/
+        Packages/
+        ProjectSettings/
+        ProjectUnity129.zip
+        UpgradeLog.htm
+        build_all_platforms.bat
+        build_android.bat
+        build_args.rsp
+        build_ios.bat
+        build_pc.bat
+        fix.py
+        push_xcode_ios.bat
+        scratch_diff.txt
+        sources.rsp
+        unity_compile_log.txt
+        ../Sanji_ThanTrang.png
+        ../THIET_KE_VA_DAT_TEN_THAN_TRANG_ONE_PIECE.md
+        ../ThanTrang_Assets/
+        ../Usopp_ThanTrang.png
+        ../Zoro_ThanTrang.png
+        ../__pycache__/
+        ../_backup_before_thantrang/
+        ../analyze_atlas.py
+        ../apply_thantrang.sql
+        ../build_and_deploy_enel_god.py
+        ../build_and_deploy_nika_gear5.py
+        ../build_anime_daibutsu_12f.py
+        ../build_daibutsu_12f.py
+        ../build_daibutsu_4013_master_v3.py
+        ../build_daibutsu_4013_master_v4.py
+        ../build_enel_giant_vfx.py
+        ../build_gemini_daibutsu_vfx.py
+        ../build_sengoku_daibutsu_master.py
+        ../build_sengoku_daibutsu_v2.py
+        ../build_sengoku_ultimate_standard.py
+        ../check_deployed.py
+        ../check_ids.py
+        ../deploy_enel_lightning.py
+        ../diff_effect.txt
+        ../diff_effect_now.txt
+        ../final_crop_enel.py
+        ../fix_crop_aura_spark.py
+        ../fix_spark_only.py
+        ../gen_blackhole_icon_4005.py
+        ../gen_buddha_effects.py
+        ../gen_data.py
+        ../gen_render_buffs_effects.py
+        ../gen_render_character.py
+        ../gen_render_skills.py
+        ../gen_sengoku_daibutsu_parts.py
+        ../gen_thantrang_batch1.py
+        ../gen_thantrang_batch2.py
+        ../gen_thantrang_batch3.py
+        ../generate_master_docs.py
+        ../haitacz.sql
+        ../make_sql.py
+        ../patch_lotus_palm.py
+        ../preview/
+        ../push_xcode_ios.bat
+        ../rebuild_enel_all.py
+        ../resize_all_icons_standard.py
+        ../scratch/
+        ../scratch_diff_effect.txt
+        ../scratch_diff_upgrade.txt
+        ../scratch_gen.py
+        ../scratch_read_docs.py
+        ../sources.rsp
+        ../src/
+        ../sync_event_settings.sql
+        ../test.txt
+        ../test_here.py
+        ../test_write.txt
+        ../verify_enel.py
+        ../xuat_db_haitacz.bat
+        ../z/HTTH129New (1).zip
+        ../z/ProjectGameJava.zip
+        ../z/ProjectHaiTacTiHonJ2ME129_1772025.zip
+        ../z/ProjectUnity129MOD.zip
+        ../z/ProjectUnity129MOD/.vs/
+        ../z/ProjectUnity129MOD/.vscode/
+        ../z/ProjectUnity129MOD/Assets/Editor.meta
+        ../z/ProjectUnity129MOD/Assets/Editor/
+        ../z/ProjectUnity129MOD/Assets/LightingSettings.meta
+        ../z/ProjectUnity129MOD/Assets/LightingSettings/
+        ../z/ProjectUnity129MOD/Assets/Resources.meta
+        ../z/ProjectUnity129MOD/Assets/Resources/
+        ../z/ProjectUnity129MOD/Assets/Scripts.meta
+        ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/KeyAuthManager.cs
+        ../z/ProjectUnity129MOD/Assets/Scripts/Assembly-CSharp/KeyAuthManager.cs.meta
+        ../z/ProjectUnity129MOD/Assets/hs.unity
+        ../z/ProjectUnity129MOD/Assets/hs.unity.meta
+        ../z/ProjectUnity129MOD/ClearBuildCache.bat
+        ../z/ProjectUnity129MOD/ClearBuildCache.ps1
+        ../z/ProjectUnity129MOD/Docs/
+        ../z/ProjectUnity129MOD/Packages/
+        ../z/ProjectUnity129MOD/ProjectSettings/
+        ../z/ProjectUnity129MOD/SrcJ2ME/
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+[4/4] Dang push len GitHub...
+fatal: No configured push destination.
+Either specify the URL from the command-line or configure a remote repository using
+
+    git remote add <name> <url>
+
+and then push using the remote name
+
+    git push <name>
+
+
+[CHU Y] Neu chua co Remote URL, hay chay:
+  git remote add origin https://github.com/USER/REPO.git
+  git push -u origin main
+Press any key to continue . . .
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-13T20:13:50+07:00.
+</ADDITIONAL_METADATA>

@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+MIDlet-1: Hai Tac Ti Hon 129, /icon.png, GameMidlet
+MIDlet-Name: Hai Tac Ti Hon 129
+MIDlet-Vendor: Teamobi
+MIDlet-Version: 1.2.9
+MicroEdition-Configuration: CLDC-1.1
+MicroEdition-Profile: MIDP-2.0
+

@@ -1,0 +1,35 @@
+﻿# Backup and large archives
+*.zip
+*.7z
+*.tar.gz
+_BACKUP_UI_REWORK/
+_BACKUP_UI_REDESIGN_MASTER/
+_SCRATCH_UI_REWORK/
+
+# Unity temporary and build caches
+ProjectUnity129/Library/
+ProjectUnity129/Temp/
+ProjectUnity129/obj/
+ProjectUnity129/Builds/
+ProjectUnity129/Logs/
+ProjectUnity129/UserSettings/
+ProjectUnity129/.vs/
+
+# J2ME build directories
+ProjectJ2me129/build/
+ProjectJ2me129/dist/
+ProjectJ2me129/test_build/
+ProjectJ2me129/test_clean_build/
+
+# Maven targets
+HaiTacTiHonServer/target/
+HaiTacTiHonTool/target/
+ClientManager/target/
+
+# Massive server binary cache (backed up in physical archive)
+HaiTacTiHonServer/data/
+
+# Python cache & logs
+*.pyc
+__pycache__/
+*.log

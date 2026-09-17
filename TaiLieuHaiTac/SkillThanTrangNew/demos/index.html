@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Thần Trang VFX — Ultra-Cinematic Studio v7</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+:root {
+  --bg-deep: #05020c;
+  --bg-sidebar: #090414;
+  --bg-panel: #0f0720;
+  --border: #221038;
+  --border-glow: #441d75;
+  --accent: #ffd700;
+  --accent-glow: rgba(255, 215, 0, 0.4);
+  --cyan: #00e5ff;
+  --text-main: #f5edff;
+  --text-dim: #9886b4;
+}
+body { background: var(--bg-deep); color: var(--text-main); height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+/* Top Navigation Bar */
+#top-bar {
+  height: 46px; background: #0c051a; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0;
+}
+.brand-title { font-size: 13px; font-weight: 900; letter-spacing: 1.5px; background: linear-gradient(90deg, #ffd700, #ff80ab, #00e5ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.brand-sub { font-size: 10.5px; color: var(--text-dim); margin-left: 10px; }
+.top-badges { display: flex; gap: 6px; align-items: center; }
+.t-badge { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 12px; background: rgba(68, 29, 117, 0.3); border: 1px solid var(--border-glow); color: #cbb8e8; }
+.t-badge.active-elem { border-color: var(--accent); color: var(--accent); background: rgba(255, 215, 0, 0.12); }
+
+/* Main Workspace Layout */
+#workspace { display: flex; flex: 1; overflow: hidden; }
+
+/* Left Sidebar (Skill Selection) */
+#sidebar {
+  width: 250px; min-width: 250px; background: var(--bg-sidebar); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.side-header { padding: 10px 14px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 800; color: #846ca7; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
+.skill-list { overflow-y: auto; flex: 1; padding: 8px; }
+.skill-card {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 5px;
+  border-radius: 6px; cursor: pointer; border: 1px solid transparent; background: rgba(255,255,255,0.02);
+  transition: all 0.15s ease;
+}
+.skill-card:hover { background: rgba(68, 29, 117, 0.25); border-color: rgba(68, 29, 117, 0.5); }
+.skill-card.active {
+  background: linear-gradient(90deg, rgba(68, 29, 117, 0.6) 0%, rgba(30, 12, 54, 0.4) 100%);
+  border-color: var(--accent); box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+}
+.sk-icon { width: 34px; height: 34px; border-radius: 6px; border: 1px solid var(--border-glow); object-fit: cover; flex-shrink: 0; background: #000; }
+.sk-meta { display: flex; flex-direction: column; min-width: 0; }
+.sk-top { display: flex; align-items: center; gap: 5px; }
+.sk-id { font-size: 9px; font-weight: 800; color: #ffd700; background: #261142; padding: 1px 4px; border-radius: 3px; }
+.sk-hk { font-size: 8.5px; font-weight: 700; color: #846ca7; font-family: monospace; }
+.sk-name { font-size: 11.5px; font-weight: 700; color: #eae0f8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.sk-char { font-size: 9.5px; color: #9c89b8; }
+
+/* Main Stage Container */
+#main-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #030108; }
+
+/* Dual Mode Tabs */
+.tabs-bar {
+  height: 38px; background: #0c051a; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; gap: 8px;
+}
+.mode-tab {
+  padding: 6px 14px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; color: #9886b4; transition: all 0.15s ease;
+}
+.mode-tab:hover { color: #f5edff; background: #1c0e35; }
+.mode-tab.on { background: #2a114d; border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+
+/* Center Stage Viewport */
+#viewport-container {
+  flex: 1; display: flex; align-items: center; justify-content: center; position: relative;
+  overflow: hidden; background: radial-gradient(circle at center, #110722 0%, #030108 85%);
+}
+canvas#stageCanvas {
+  display: block; image-rendering: pixelated;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.95), 0 0 35px rgba(68, 29, 117, 0.35);
+  border: 1px solid var(--border); border-radius: 8px; max-width: 96%; max-height: 96%;
+}
+#fps-badge { position: absolute; top: 12px; right: 18px; font-family: monospace; font-size: 10px; color: #00e5ff; background: rgba(0,0,0,0.6); padding: 2px 6px; border-radius: 4px; pointer-events: none; }
+
+/* Bottom Controls */
+#controls-panel {
+  background: #0a0416; border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 8px 16px; gap: 6px; flex-shrink: 0;
+}
+.ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; flex-wrap: wrap; }
+.ctrl-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.btn {
+  background: #18092e; color: #dcd0f0; border: 1px solid #371a5c; padding: 4px 10px;
+  border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s ease;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.btn:hover { background: #2d1452; border-color: var(--accent); color: #fff; }
+.btn.on { background: #451b7a; border-color: var(--accent); color: var(--accent); box-shadow: 0 0 8px rgba(255,215,0,0.25); }
+.btn.cast-btn { background: linear-gradient(135deg, #7c4dff, #ff4081); border-color: #ffd700; color: #fff; font-weight: 800; padding: 5px 14px; box-shadow: 0 0 12px rgba(255,64,129,0.4); }
+
+.timeline-bar {
+  display: flex; align-items: center; gap: 10px; width: 100%; background: #0e051f;
+  padding: 5px 12px; border-radius: 6px; border: 1px solid var(--border);
+}
+input[type=range] { flex: 1; accent-color: var(--accent); height: 5px; cursor: pointer; }
+.frame-info { font-family: monospace; font-size: 11px; color: var(--accent); min-width: 200px; text-align: right; }
+
+.phase-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 4px; width: 100%; }
+.phase-btn {
+  padding: 4px 2px; font-size: 9.5px; text-align: center; border-radius: 4px;
+  background: #130626; border: 1px solid var(--border); color: #a491c4; cursor: pointer; transition: all 0.15s;
+}
+.phase-btn:hover { background: #260d4a; color: #fff; }
+.phase-btn.on { background: #371466; border-color: #ffd700; color: #ffd700; font-weight: 700; }
+
+.toggles-group { display: flex; gap: 12px; font-size: 10.5px; color: var(--text-dim); flex-wrap: wrap; align-items: center; }
+.toggles-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+
+/* Inspector Mode Overlay */
+#inspector-panel {
+  display: none; width: 100%; background: #080312; border-top: 1px solid var(--border);
+  padding: 10px 16px; flex-direction: column; gap: 8px; flex-shrink: 0;
+}
+.insp-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.insp-btn {
+  padding: 4px 9px; font-size: 10.5px; border-radius: 4px; background: #15082a; border: 1px solid #331757;
+  color: #c7b5e4; cursor: pointer; transition: all 0.15s; font-weight: 600;
+}
+.insp-btn.on { background: #3c166e; border-color: var(--cyan); color: var(--cyan); }
+
+/* Resource Cards Grid at Bottom */
+#resourceCards {
+  height: 92px; background: #080312; border-top: 1px solid var(--border);
+  display: flex; padding: 6px 14px; gap: 8px; overflow-x: auto; flex-shrink: 0;
+}
+.r-card {
+  min-width: 130px; background: #0e051c; border: 1px solid #23113d; border-radius: 6px;
+  padding: 5px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.15s;
+}
+.r-card:hover { border-color: var(--accent); transform: translateY(-2px); background: #16082c; }
+.r-card.active { border-color: var(--cyan); background: #1b0a36; }
+.r-card img { height: 42px; max-width: 100%; object-fit: contain; image-rendering: pixelated; margin-bottom: 3px; }
+.r-card .r-name { font-size: 9.5px; font-weight: 700; color: #dfd0f5; text-transform: uppercase; }
+.r-card .r-dim { font-size: 8.5px; color: var(--cyan); font-family: monospace; }
+</style>
+</head>
+<body>
+
+<div id="top-bar">
+  <div style="display:flex; align-items:center;">
+    <div class="brand-title">HAITACTIHON • SKILL THẦN TRANG CINEMATIC STUDIO</div>
+    <div class="brand-sub">ART & VFX SANDBOX v7 (HD MASTER RESOLUTION)</div>
+  </div>
+  <div class="top-badges">
+    <div class="t-badge" id="b-id">SKILL 4004</div>
+    <div class="t-badge active-elem" id="b-elem">Holy Light</div>
+    <div class="t-badge" id="b-aoe">AOE 160px</div>
+    <div class="t-badge" id="b-dmg">DMG 4,850</div>
+    <div class="t-badge" id="b-status" style="border-color:#ff4081; color:#ff80ab;">STATUS: CHÓA MẮT</div>
+  </div>
+</div>
+
+<div id="workspace">
+  <!-- Left Sidebar -->
+  <div id="sidebar">
+    <div class="side-header">
+      <span>7 SKILL THẦN TRANG</span>
+      <span style="color:var(--accent);">SET 10</span>
+    </div>
+    <div class="skill-list" id="skillList"></div>
+  </div>
+
+  <!-- Main View -->
+  <div id="main-view">
+    <div class="tabs-bar">
+      <button class="mode-tab on" id="tabCombat">⚔ COMBAT SIMULATOR (5 TARGETS)</button>
+      <button class="mode-tab" id="tabInspect">🔍 VFX SPRITE INSPECTOR</button>
+      <div style="flex:1;"></div>
+      <button class="btn cast-btn" id="btnCast">TUNG SKILL [SPACE]</button>
+    </div>
+
+    <!-- Viewport -->
+    <div id="viewport-container">
+      <canvas id="stageCanvas" width="900" height="480"></canvas>
+      <div id="fps-badge">60 FPS</div>
+    </div>
+
+    <!-- Controls Panel -->
+    <div id="controls-panel">
+      <div class="timeline-bar">
+        <button class="btn" id="btnPlay">Play</button>
+        <button class="btn" id="btnPause">Pause</button>
+        <button class="btn" id="btnPrev">-1f</button>
+        <button class="btn" id="btnNext">+1f</button>
+        <button class="btn" id="btnReset">Restart</button>
+        <input type="range" id="frameSlider" min="0" max="72" value="0">
+        <div class="frame-info" id="frameInfo">Frame 00/72 - Idle</div>
+      </div>
+
+      <div class="phase-grid" id="phaseGrid">
+        <button class="phase-btn on" data-f="0">P0:Idle<br>0-4</button>
+        <button class="phase-btn" data-f="5">P1:Charge<br>5-11</button>
+        <button class="phase-btn" data-f="12">P2:Summon<br>12-20</button>
+        <button class="phase-btn" data-f="21">P3:Roar<br>21-25</button>
+        <button class="phase-btn" data-f="26">P4:Travel<br>26-34</button>
+        <button class="phase-btn" data-f="35">P5:IMPACT<br>35-46</button>
+        <button class="phase-btn" data-f="47">P6:Ground<br>47-57</button>
+        <button class="phase-btn" data-f="58">P7:Burst<br>58-65</button>
+        <button class="phase-btn" data-f="66">P8:Reset<br>66-72</button>
+      </div>
+
+      <div class="ctrl-row">
+        <div class="ctrl-group">
+          <span style="font-size:10px; color:#9886b4; font-weight:700;">TỐC ĐỘ:</span>
+          <button class="btn speed-btn" data-s="0.25">0.25x</button>
+          <button class="btn speed-btn" data-s="0.5">0.5x</button>
+          <button class="btn speed-btn on" data-s="1">1x</button>
+          <button class="btn speed-btn" data-s="1.5">1.5x</button>
+          <button class="btn speed-btn" data-s="2">2x</button>
+        </div>
+
+        <div class="toggles-group">
+          <label><input type="checkbox" id="chkRange" checked> Range Circle</label>
+          <label><input type="checkbox" id="chkDmg" checked> Damage Num</label>
+          <label><input type="checkbox" id="chkShake" checked> Screen Shake</label>
+          <label><input type="checkbox" id="chkLoop" checked> Auto Loop</label>
+          <label><input type="checkbox" id="chkParticles" checked> Particle FX</label>
+          <label><input type="checkbox" id="chkGlow" checked> Bloom Glow</label>
+          <label><input type="checkbox" id="chkSFX" checked> Audio SFX</label>
+          <label><input type="checkbox" id="chkHD"> x2 HD</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inspector Toolbar (Shown in Inspector Tab) -->
+    <div id="inspector-panel">
+      <div class="insp-row">
+        <div class="ctrl-group">
+          <span style="font-size:11px; font-weight:700; color:var(--cyan); margin-right:6px;">COMPONENT:</span>
+          <button class="insp-btn on" data-c="cast">Cast</button>
+          <button class="insp-btn" data-c="projectile">Projectile</button>
+          <button class="insp-btn" data-c="impact">Impact</button>
+          <button class="insp-btn" data-c="particles">Particles / Burst</button>
+          <button class="insp-btn" data-c="aura">Aura</button>
+          <button class="insp-btn" data-c="finisher">Finisher / AOE</button>
+        </div>
+
+        <div class="ctrl-group">
+          <label><input type="checkbox" id="inspCrosshair" checked> Crosshair</label>
+          <label><input type="checkbox" id="inspBBox" checked> Bounding Box</label>
+          <label><input type="checkbox" id="inspFullStrip"> Full Strip View</label>
+          <span id="inspStats" style="font-size:10px; color:var(--cyan); margin-left:10px; font-family:monospace;">Frame 1/6 (240x180)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom 6 Resource Cards -->
+    <div id="resourceCards"></div>
+  </div>
+</div>
+
+<script>
+// ===== METADATA INJECTED FROM BACKEND =====
+const SKILLS = [{"id": 4004, "name": "Bát Xích Quỳnh Khúc Ngọc X", "char": "Kizaru (Borsalino)", "element": "Thần Thánh / Ánh Sáng (Holy Light)", "color": "#ffd700", "color2": "#fff59d", "badge": "Crystal / Sacred Laser", "dmg": "4,850", "aoe": "160px", "status": "CHÓA MẮT (HOLY STUN)", "status_tag": "CHÓA MẮT", "desc": "Tụ linh lực ánh sáng cực độ bắn chùm tia laser thần thánh xuyên phá liên hoàn kẻ địch, gây choáng mù."}, {"id": 4010, "name": "Cự Độc Phán Quyết Venom X", "char": "Magellan (Tổng Trưởng Ngục)", "element": "Cự Độc / Ăn Mòn (Venom Demon)", "color": "#9c27b0", "color2": "#76ff03", "badge": "Hydra Demon / Acid AOE", "dmg": "5,000", "aoe": "180px", "status": "KỊCH ĐỘC (DEADLY POISON)", "status_tag": "TRÚNG ĐỘC", "desc": "Triệu hồi Tam Đầu Độc Long Hydra phóng cự độc phán quyết, tạo đầm lầy axit kịch độc thiêu rụi mục tiêu."}, {"id": 4011, "name": "Mũi Tên Mê Hoặc Thạch Hóa X", "char": "Boa Hancock (Nữ Hoàng Hải Tặc)", "element": "Mê Hoặc / Hóa Đá (Slave Arrow)", "color": "#ff4081", "color2": "#f48fb1", "badge": "Love Heart / Petrification", "dmg": "4,600", "aoe": "150px", "status": "HÓA ĐÁ (PETRIFICATION)", "status_tag": "HÓA ĐÁ", "desc": "Bắn mưa Mũi Tên Trái Tim xuyên thủng tâm trí, biến toàn bộ kẻ trúng chiêu thành tượng đá vĩnh cửu."}, {"id": 4013, "name": "Đại Phật Sóng Xung Kích X", "char": "Sengoku (Đức Phật Vàng)", "element": "Kim Cương / Sóng Xung Kích (Daibutsu Shockwave)", "color": "#ffb300", "color2": "#ffe082", "badge": "Golden Buddha Palm", "dmg": "5,200", "aoe": "200px", "status": "CHẤN ĐỘNG (CONCUSSION)", "status_tag": "CHẤN ĐỘNG", "desc": "Hóa thân Đại Phật Hoàng Kim phóng chưởng kình sóng xung kích cấp độ động đất hất văng toàn bộ chiến trường."}, {"id": 4014, "name": "Bát Quái Cửu Long Thiên X", "char": "Kaido (Bách Thú)", "element": "Lôi Long / Hắc Lôi (Thunder Dragon)", "color": "#7c4dff", "color2": "#00e5ff", "badge": "Nine Thunder Dragons", "dmg": "5,500", "aoe": "220px", "status": "TÊ LIỆT (PARALYZED)", "status_tag": "TÊ LIỆT", "desc": "Khai mở thiên lôi triệu hồi Lôi Long uốn lượn giáng bão sét tím hủy diệt, làm tê liệt toàn thân địch thủ."}, {"id": 4015, "name": "Long Trảo Viêm Long Toái Địa X", "char": "Sabo (Tổng Tham Mưu Quân Cách Mạng)", "element": "Hỏa Long / Long Trảo (Flame Dragon)", "color": "#ff3d00", "color2": "#ff9100", "badge": "Dragon Claw Inferno", "dmg": "5,100", "aoe": "190px", "status": "THIÊU ĐỐT (INFERNO BURN)", "status_tag": "THIÊU ĐỐT", "desc": "Tụ hỏa long trảo cào rách mặt đất bộc phát dung nham rực cháy, thiêu rụi mọi lớp phòng ngự."}, {"id": 4016, "name": "Vận Thạch Thiên Giáng X", "char": "Fujitora (Hổ Tím Issho)", "element": "Trọng Lực / Thiên Thạch (Gravity Singularity)", "color": "#651fff", "color2": "#ea80fc", "badge": "Meteor Crater Singularity", "dmg": "5,400", "aoe": "210px", "status": "ĐÈ NÉN TRỌNG LỰC (CRUSH)", "status_tag": "TRỌNG LỰC", "desc": "Vận dụng trọng lực cực đại kéo thiên thạch khổng lồ từ vũ trụ đâm sụp mặt đất, tạo hố đen điểm kỳ dị nuốt chửng kẻ địch."}];
+const META = {"4004": {"cast": {"w": 280, "h": 240, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_cast_sheet.png"}, "projectile": {"w": 240, "h": 90, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4004_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_projectile_sheet.png"}, "impact": {"w": 280, "h": 280, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4004_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_impact_sheet.png"}, "aura": {"w": 200, "h": 120, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_aura_sheet.png"}, "particles": {"w": 140, "h": 160, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_particles_sheet.png"}, "finisher": {"w": 400, "h": 300, "frames": 16, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4004_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4004_finisher_sheet.png"}}, "4010": {"cast": {"w": 240, "h": 180, "frames": 11, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_cast_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 13, "anchor": "center", "sheet_x1": "../spritesheets/skill_4010_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_impact_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 6, "anchor": "center", "sheet_x1": "../spritesheets/skill_4010_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_projectile_sheet.png"}, "particles": {"w": 80, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_particles_sheet.png"}, "aura": {"w": 100, "h": 100, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4010_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_aura_sheet.png"}, "finisher": {"w": 260, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4010_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4010_finisher_sheet.png"}}, "4011": {"cast": {"w": 280, "h": 240, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_cast_sheet.png"}, "projectile": {"w": 240, "h": 90, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4011_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_projectile_sheet.png"}, "impact": {"w": 280, "h": 280, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4011_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_impact_sheet.png"}, "aura": {"w": 200, "h": 120, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_aura_sheet.png"}, "particles": {"w": 140, "h": 160, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_particles_sheet.png"}, "finisher": {"w": 400, "h": 300, "frames": 16, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4011_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4011_finisher_sheet.png"}}, "4013": {"cast": {"w": 280, "h": 240, "frames": 12, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_cast_sheet.png"}, "projectile": {"w": 240, "h": 90, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4013_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_projectile_sheet.png"}, "impact": {"w": 280, "h": 280, "frames": 12, "anchor": "center", "sheet_x1": "../spritesheets/skill_4013_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_impact_sheet.png"}, "aura": {"w": 200, "h": 120, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_aura_sheet.png"}, "particles": {"w": 140, "h": 160, "frames": 10, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_particles_sheet.png"}, "finisher": {"w": 400, "h": 300, "frames": 16, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4013_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4013_finisher_sheet.png"}}, "4014": {"cast": {"w": 240, "h": 180, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_cast_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4014_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_impact_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 6, "anchor": "center", "sheet_x1": "../spritesheets/skill_4014_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_projectile_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_particles_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_aura_sheet.png"}, "finisher": {"w": 260, "h": 160, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4014_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4014_finisher_sheet.png"}}, "4015": {"cast": {"w": 240, "h": 180, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_cast_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4015_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_impact_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 6, "anchor": "center", "sheet_x1": "../spritesheets/skill_4015_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_projectile_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_particles_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_aura_sheet.png"}, "finisher": {"w": 260, "h": 160, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4015_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4015_finisher_sheet.png"}}, "4016": {"cast": {"w": 240, "h": 180, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_cast_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_cast_sheet.png"}, "impact": {"w": 240, "h": 240, "frames": 8, "anchor": "center", "sheet_x1": "../spritesheets/skill_4016_impact_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_impact_sheet.png"}, "projectile": {"w": 180, "h": 80, "frames": 6, "anchor": "center", "sheet_x1": "../spritesheets/skill_4016_projectile_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_projectile_sheet.png"}, "particles": {"w": 90, "h": 140, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_particles_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_particles_sheet.png"}, "aura": {"w": 120, "h": 100, "frames": 6, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_aura_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_aura_sheet.png"}, "finisher": {"w": 260, "h": 160, "frames": 8, "anchor": "bottom", "sheet_x1": "../spritesheets/skill_4016_finisher_sheet.png", "sheet_x2": "../spritesheets_x2/skill_4016_finisher_sheet.png"}}};
+
+let curSkillIdx = 0;
+let curMode = "combat"; // "combat" | "inspect"
+let inspComp = "cast";
+let animFrame = 0;
+let isPlaying = true;
+let playSpeed = 1.0;
+let lastTimestamp = 0;
+let loadedImages = {};
+
+// ===== AUDIO SYNTHESIZER =====
+let actx = null;
+function getAudio() {
+  if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if(actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function playSfx(type) {
+  if(!document.getElementById('chkSFX').checked) return;
+  try {
+    const a = getAudio();
+    const now = a.currentTime;
+    const osc = a.createOscillator();
+    const gain = a.createGain();
+    osc.connect(gain); gain.connect(a.destination);
+
+    if(type === 'charge') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(140, now);
+      osc.frequency.exponentialRampToValueAtTime(560, now + 0.4);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.4);
+      osc.start(now); osc.stop(now + 0.4);
+    } else if(type === 'launch') {
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(650, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.25);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.25);
+      osc.start(now); osc.stop(now + 0.25);
+    } else if(type === 'impact') {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.55);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.55);
+      osc.start(now); osc.stop(now + 0.55);
+    } else if(type === 'finisher') {
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(25, now + 0.8);
+      gain.gain.setValueAtTime(0.32, now);
+      gain.gain.linearRampToValueAtTime(0, now + 0.8);
+      osc.start(now); osc.stop(now + 0.8);
+    }
+  } catch(e) {}
+}
+
+// ===== SPRITE LOADER =====
+function getImage(src) {
+  if(loadedImages[src]) return loadedImages[src];
+  const img = new Image();
+  img.src = src;
+  loadedImages[src] = img;
+  return img;
+}
+
+// Preload all sprites
+for(const s of SKILLS) {
+  const sm = META[s.id];
+  if(sm) {
+    for(const c in sm) {
+      getImage(sm[c].sheet_x1);
+      getImage(sm[c].sheet_x2);
+    }
+  }
+}
+const magellanImg = getImage('4010_magellan_caster.png');
+
+// ===== CANVAS CONTEXT =====
+const cv = document.getElementById('stageCanvas');
+const ctx = cv.getContext('2d');
+const CST = { x: 175, y: 310 };
+const TGTS = [
+  { x: 610, y: 305 },
+  { x: 550, y: 272 },
+  { x: 570, y: 338 },
+  { x: 660, y: 276 },
+  { x: 650, y: 334 }
+];
+const DCOLS = ['#3949ab', '#e53935', '#43a047', '#fb8c00', '#8e24aa'];
+let targetStates = TGTS.map(() => ({ hp: 1, flinch: false, status: false }));
+
+// ===== PARTICLES & SHOCKWAVES =====
+let particles = [];
+let shockwaves = [];
+
+function spawnP(x, y, count, opts) {
+  if(!document.getElementById('chkParticles').checked) return;
+  for(let i=0; i<count; i++) {
+    const ang = Math.random() * Math.PI * 2;
+    const spd = (opts.sp || 5) * (0.3 + Math.random() * 0.7);
+    particles.push({
+      x: x + (Math.random() - 0.5) * (opts.rx || 10),
+      y: y + (Math.random() - 0.5) * (opts.ry || 10),
+      vx: (opts.vx !== undefined ? opts.vx : Math.cos(ang) * spd),
+      vy: (opts.vy !== undefined ? opts.vy : Math.sin(ang) * spd),
+      col: opts.col || '#ffd700',
+      col2: opts.col2 || '#fff',
+      sz: (opts.sz || 4) * (0.6 + Math.random() * 0.8),
+      life: opts.life || 25,
+      maxLife: opts.life || 25,
+      gravity: opts.gravity !== undefined ? opts.gravity : 0.05,
+      drag: opts.drag || 0.94,
+      type: opts.type || 'glow'
+    });
+  }
+}
+
+function addShockwave(x, y, col, maxR, th, life) {
+  shockwaves.push({ x, y, col, r: 0, maxR, th, life, maxLife: life });
+}
+
+function updatePhysics() {
+  // Particles
+  for(let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.vy += p.gravity;
+    p.vx *= p.drag; p.vy *= p.drag;
+    p.x += p.vx; p.y += p.vy;
+    p.life--;
+    if(p.life <= 0) particles.splice(i, 1);
+  }
+  // Shockwaves
+  for(let i = shockwaves.length - 1; i >= 0; i--) {
+    const sw = shockwaves[i];
+    sw.life--;
+    if(sw.life <= 0) { shockwaves.splice(i, 1); continue; }
+    const t = 1 - sw.life / sw.maxLife;
+    sw.r = sw.maxR * Math.pow(t, 0.5);
+  }
+}
+
+function drawPhysics() {
+  // Shockwaves (2.5D perspective ellipse)
+  for(const sw of shockwaves) {
+    const a = sw.life / sw.maxLife;
+    ctx.save();
+    ctx.globalAlpha = a * 0.85;
+    ctx.strokeStyle = sw.col;
+    ctx.lineWidth = sw.th * a;
+    if(document.getElementById('chkGlow').checked) {
+      ctx.shadowColor = sw.col; ctx.shadowBlur = 18 * a;
+    }
+    ctx.beginPath();
+    ctx.ellipse(sw.x, sw.y, sw.r, sw.r * 0.38, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Particles
+  for(const p of particles) {
+    const a = Math.max(0, p.life / p.maxLife);
+    ctx.save();
+    ctx.globalAlpha = a;
+    if(p.type === 'glow') {
+      const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.sz);
+      g.addColorStop(0, p.col);
+      g.addColorStop(0.5, p.col2 + '88');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.sz, 0, Math.PI * 2); ctx.fill();
+    } else {
+      ctx.fillStyle = p.col;
+      ctx.beginPath(); ctx.ellipse(p.x, p.y, p.sz * 0.4, p.sz, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
+}
+
+// ===== DRAW THEMED ARENAS =====
+function drawArena(skill, f) {
+  const sid = skill.id;
+  if(sid === 4004) { // Kizaru - Holy Cathedral
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#151000'); sky.addColorStop(1, '#2c2005');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    ctx.save(); ctx.globalAlpha = 0.14 + Math.sin(f*0.1)*0.04;
+    ctx.fillStyle = '#fff59d';
+    for(let bx = 120; bx < 850; bx += 140) {
+      ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx + 90, 220); ctx.lineTo(bx + 40, 220); ctx.lineTo(bx - 30, 0); ctx.fill();
+    }
+    ctx.restore();
+  } else if(sid === 4010) { // Magellan - Impel Down
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#07011a'); sky.addColorStop(1, '#14082e');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    ctx.strokeStyle = '#1d0e34'; ctx.lineWidth = 2.5;
+    for(let bx = 60; bx < 880; bx += 60) { ctx.beginPath(); ctx.moveTo(bx, 0); ctx.lineTo(bx, 185); ctx.stroke(); }
+    for(const tx of [45, 855]) {
+      const fl = 10 + Math.sin(f * 0.9 + tx) * 4;
+      const fg = ctx.createRadialGradient(tx, 150, 0, tx, 150, fl);
+      fg.addColorStop(0, '#ffee00'); fg.addColorStop(0.5, '#ff5722'); fg.addColorStop(1, 'transparent');
+      ctx.save(); ctx.fillStyle = fg; ctx.beginPath(); ctx.ellipse(tx, 150, 6, fl, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    }
+  } else if(sid === 4011) { // Boa Hancock - Amazon Lily
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#1a0515'); sky.addColorStop(1, '#320b28');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    ctx.save(); ctx.globalAlpha = 0.45; ctx.fillStyle = '#ff80ab';
+    for(let i = 0; i < 14; i++) {
+      const px = (i * 68 + f * 1.5) % cv.width;
+      const py = (i * 26 + Math.sin(f * 0.05 + i) * 18) % 200;
+      ctx.beginPath(); ctx.ellipse(px, py, 3, 5, Math.PI/4, 0, Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  } else if(sid === 4013) { // Sengoku - Golden Altar
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#1c1303'); sky.addColorStop(1, '#3b2908');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    const hg = ctx.createRadialGradient(cv.width/2, 100, 10, cv.width/2, 100, 160);
+    hg.addColorStop(0, 'rgba(255, 215, 0, 0.28)'); hg.addColorStop(1, 'transparent');
+    ctx.fillStyle = hg; ctx.fillRect(0, 0, cv.width, 220);
+  } else if(sid === 4014) { // Kaido - Onigashima Thunder Roof
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#0a0518'); sky.addColorStop(1, '#1b0d36');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    if(f >= 12 && f <= 40 && f % 3 === 0) {
+      ctx.fillStyle = 'rgba(124, 77, 255, 0.22)'; ctx.fillRect(0, 0, cv.width, cv.height);
+    }
+  } else if(sid === 4015) { // Sabo - Colosseum Arena
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#1c0702'); sky.addColorStop(1, '#381005');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    for(const bx of [100, 800]) {
+      const fl = 12 + Math.sin(f * 0.8 + bx) * 5;
+      const fg = ctx.createRadialGradient(bx, 155, 0, bx, 155, fl);
+      fg.addColorStop(0, '#ffff00'); fg.addColorStop(0.4, '#ff3d00'); fg.addColorStop(1, 'transparent');
+      ctx.save(); ctx.fillStyle = fg; ctx.beginPath(); ctx.ellipse(bx, 155, 8, fl, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+    }
+  } else if(sid === 4016) { // Fujitora - Meteor Crater
+    const sky = ctx.createLinearGradient(0, 0, 0, 220);
+    sky.addColorStop(0, '#060114'); sky.addColorStop(1, '#170630');
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, cv.width, 220);
+    ctx.fillStyle = '#ea80fc';
+    for(let i = 0; i < 10; i++) {
+      const sx = (i * 105 + 25) % cv.width;
+      const sy = 35 + (i * 19) % 110;
+      ctx.fillRect(sx, sy, 2, 2);
+    }
+  }
+
+  // Horizon Ledge
+  ctx.fillStyle = '#110820'; ctx.fillRect(0, 185, cv.width, 15);
+
+  // 2.5D Perspective Ground Floor
+  const flG = ctx.createLinearGradient(0, 200, 0, cv.height);
+  flG.addColorStop(0, '#120924'); flG.addColorStop(0.5, '#0b0518'); flG.addColorStop(1, '#05020c');
+  ctx.fillStyle = flG; ctx.fillRect(0, 200, cv.width, cv.height - 200);
+
+  // Grid Lines converging to horizon (450, 200)
+  const VP = { x: 450, y: 200 };
+  ctx.strokeStyle = 'rgba(70, 32, 110, 0.35)'; ctx.lineWidth = 1;
+  for(let xi = -350; xi <= 950; xi += 70) {
+    ctx.beginPath(); ctx.moveTo(xi, 200); ctx.lineTo(VP.x + (xi - VP.x) * 2.8, cv.height + 150); ctx.stroke();
+  }
+  for(let yi = 200; yi <= cv.height; yi += 38) {
+    const t = (yi - 200) / (cv.height - 200);
+    const wd = 50 + t * 800;
+    ctx.beginPath(); ctx.moveTo(VP.x - wd, yi); ctx.lineTo(VP.x + wd, yi); ctx.stroke();
+  }
+
+  // Range Circle on ground
+  if(document.getElementById('chkRange').checked) {
+    ctx.save();
+    ctx.strokeStyle = skill.color + '55';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([7, 6]);
+    ctx.beginPath();
+    ctx.ellipse(TGTS[0].x, TGTS[0].y, 145, 58, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = skill.color + '0a'; ctx.fill();
+    ctx.restore();
+  }
+
+  // Dynamic Lighting Flash across ground
+  if(f >= 5 && f <= 18) {
+    const g = ctx.createRadialGradient(CST.x, CST.y, 0, CST.x, CST.y, 140);
+    g.addColorStop(0, skill.color + '26'); g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, cv.width, cv.height);
+  } else if(f >= 35 && f <= 48) {
+    const g = ctx.createRadialGradient(TGTS[0].x, TGTS[0].y, 0, TGTS[0].x, TGTS[0].y, 250);
+    g.addColorStop(0, skill.color + '4a'); g.addColorStop(1, 'transparent');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, cv.width, cv.height);
+  }
+}
+
+// ===== DRAW CASTER HERO =====
+function drawCaster(skill, f) {
+  const x = CST.x, y = CST.y;
+  const bob = Math.sin(f * 0.35) * 2;
+  const sid = skill.id;
+
+  ctx.save();
+  // Shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.beginPath(); ctx.ellipse(x, y + 2, 28, 8, 0, 0, Math.PI * 2); ctx.fill();
+
+  if(sid === 4010 && magellanImg && magellanImg.complete && magellanImg.naturalWidth > 0) {
+    let mf = 0;
+    if(f >= 5 && f <= 11) mf = 1;      // charge
+    else if(f >= 12 && f <= 34) mf = 2; // attack
+    else if(f >= 35 && f <= 46) mf = 3; // recoil
+    const fw = 180, fh = 180, ax = 90, ay = 175;
+    ctx.drawImage(magellanImg, 0, mf * fh, fw, fh, x - ax, y - ay + bob, fw, fh);
+  } else {
+    // Stylized Character Silhouette with distinct action poses
+    const isCharging = (f >= 5 && f <= 20);
+    const isAttacking = (f >= 21 && f <= 45);
+
+    const bg = ctx.createLinearGradient(x - 20, y - 60 + bob, x + 20, y);
+    bg.addColorStop(0, skill.color); bg.addColorStop(1, '#1b0d2e');
+    ctx.fillStyle = bg;
+
+    ctx.beginPath();
+    ctx.moveTo(x - 16, y - 50 + bob);
+    ctx.lineTo(x + 16, y - 50 + bob);
+    ctx.lineTo(x + 18, y - 6 + bob);
+    ctx.lineTo(x - 18, y - 6 + bob);
+    ctx.closePath(); ctx.fill();
+
+    ctx.fillStyle = '#ffd180';
+    ctx.beginPath(); ctx.arc(x, y - 58 + bob, 11, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = skill.color;
+    ctx.beginPath(); ctx.arc(x + 4, y - 59 + bob, 2.5, 0, Math.PI * 2); ctx.fill();
+
+    ctx.strokeStyle = skill.color; ctx.lineWidth = 3;
+    if(isAttacking) {
+      ctx.beginPath(); ctx.moveTo(x + 12, y - 38 + bob); ctx.lineTo(x + 38, y - 42 + bob); ctx.stroke();
+    } else if(isCharging) {
+      ctx.beginPath(); ctx.moveTo(x + 10, y - 35 + bob); ctx.lineTo(x + 24, y - 50 + bob); ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.moveTo(x + 12, y - 36 + bob); ctx.lineTo(x + 18, y - 20 + bob); ctx.stroke();
+    }
+  }
+
+  // Hero Nameplate
+  ctx.font = 'bold 11px sans-serif';
+  ctx.fillStyle = skill.color;
+  ctx.textAlign = 'center';
+  ctx.fillText(skill.char, x, y - 84 + bob);
+
+  ctx.restore();
+}
+
+// ===== DRAW REACTIVE COMBAT DUMMY =====
+function drawDummy(idx, skill, f) {
+  const t = TGTS[idx];
+  const st = targetStates[idx];
+  const sid = skill.id;
+
+  ctx.save();
+  const flinchOffset = st.flinch ? Math.sin(f * 3.5) * 8 : 0;
+  const tx = t.x + flinchOffset;
+  const ty = t.y;
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.beginPath(); ctx.ellipse(tx, ty + 3, 18, 5, 0, 0, Math.PI * 2); ctx.fill();
+
+  let isPetrified = (sid === 4011 && st.status);
+  let isPoisoned = (sid === 4010 && st.status);
+  let isBurned = (sid === 4015 && st.status);
+  let isParalyzed = (sid === 4014 && st.status);
+  let isCrushed = (sid === 4016 && st.status);
+
+  let baseCol = DCOLS[idx % 5];
+  let headCol = '#ffcc80';
+
+  if(st.flinch) {
+    baseCol = '#ffffff'; headCol = '#ffffff';
+  } else if(isPetrified) {
+    baseCol = '#757575'; headCol = '#9e9e9e'; // SOLID STONE GRAY
+  } else if(isPoisoned) {
+    baseCol = '#4a148c'; headCol = '#ce93d8'; // TOXIC PURPLE
+  } else if(isBurned) {
+    baseCol = '#bf360c'; headCol = '#ffab91'; // CHARRED ORANGE
+  }
+
+  const scaleY = isCrushed ? 0.76 : 1.0;
+  const offsetY = isCrushed ? 9 : 0;
+
+  ctx.save();
+  ctx.translate(tx, ty + offsetY);
+  ctx.scale(1.0, scaleY);
+
+  // Body Trapezoid
+  const bg = ctx.createLinearGradient(0, -42, 0, -8);
+  bg.addColorStop(0, baseCol); bg.addColorStop(1, '#1b0f2a');
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.moveTo(-12, -42); ctx.lineTo(12, -42);
+  ctx.lineTo(15, -8); ctx.lineTo(-15, -8);
+  ctx.closePath(); ctx.fill();
+
+  ctx.strokeStyle = st.flinch ? '#fff' : 'rgba(0,0,0,0.4)';
+  ctx.lineWidth = 1; ctx.stroke();
+
+  // Belt
+  ctx.fillStyle = '#3e2723'; ctx.fillRect(-12, -22, 24, 4);
+
+  // Head
+  ctx.fillStyle = headCol;
+  ctx.beginPath(); ctx.arc(0, -50, 11, 0, Math.PI * 2); ctx.fill();
+  ctx.stroke();
+
+  // Eyes
+  ctx.fillStyle = isPoisoned ? '#76ff03' : (isPetrified ? '#424242' : '#222');
+  ctx.beginPath(); ctx.arc(-4, -51, 2, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(4, -51, 2, 0, Math.PI * 2); ctx.fill();
+
+  // Elemental Visual Status Overlays
+  if(isPetrified) {
+    // Stone Cracks
+    ctx.strokeStyle = '#333333'; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(-7, -42); ctx.lineTo(-1, -30); ctx.lineTo(4, -36); ctx.stroke();
+    // Piercing Pink Heart Arrow
+    ctx.fillStyle = '#ff4081';
+    ctx.beginPath(); ctx.arc(3, -33, 5, 0, Math.PI * 2); ctx.fill();
+  } else if(isPoisoned) {
+    ctx.fillStyle = 'rgba(118, 255, 3, 0.85)';
+    for(let d = 0; d < 3; d++) {
+      const dy = -40 + ((f * 2.5 + d * 14) % 32);
+      ctx.beginPath(); ctx.ellipse((d - 1) * 6, dy, 1.5, 3, 0, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if(isParalyzed) {
+    ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(-10, -35); ctx.lineTo(-2, -28); ctx.lineTo(-8, -20); ctx.stroke();
+  } else if(isBurned) {
+    ctx.fillStyle = '#ff5722';
+    const flH = 8 + Math.sin(f * 0.8 + idx) * 3;
+    ctx.beginPath(); ctx.ellipse(0, -25, 4, flH, 0, 0, Math.PI * 2); ctx.fill();
+  }
+
+  ctx.restore();
+
+  // HP Bar
+  const hw = 40, hx = tx - hw / 2, hy = ty - 68;
+  ctx.fillStyle = '#3b0909'; ctx.fillRect(hx - 1, hy - 1, hw + 2, 7);
+  ctx.fillStyle = '#7f0000'; ctx.fillRect(hx, hy, hw, 5);
+  const hpG = ctx.createLinearGradient(hx, hy, hx + hw, hy);
+  hpG.addColorStop(0, '#00e676'); hpG.addColorStop(1, '#69f0ae');
+  ctx.fillStyle = hpG; ctx.fillRect(hx, hy, hw * Math.max(0, st.hp), 5);
+
+  ctx.restore();
+}
+
+// ===== DRAW COMPONENT SPRITE =====
+function drawVfxSprite(skill, comp, fIdx, dx, dy, glowCol, isHD, customW, customH) {
+  const sm = META[skill.id];
+  if(!sm || !sm[comp]) return;
+  const m = sm[comp];
+  const src = isHD ? m.sheet_x2 : m.sheet_x1;
+  const img = getImage(src);
+  if(!img || !img.complete || img.naturalWidth === 0) return;
+
+  const sf = isHD ? 2 : 1;
+  const srcW = m.w * sf;
+  const srcH = m.h * sf;
+  const frame = Math.max(0, Math.min(m.frames - 1, Math.floor(fIdx)));
+  const srcY = frame * srcH;
+  const dw = customW || m.w;
+  const dh = customH || m.h;
+
+  ctx.save();
+  if(glowCol && document.getElementById('chkGlow').checked) {
+    ctx.shadowColor = glowCol; ctx.shadowBlur = 20;
+  }
+  ctx.drawImage(img, 0, srcY, srcW, srcH, Math.round(dx), Math.round(dy), dw, dh);
+  ctx.restore();
+}
+
+// ===== ONE-TIME PHASE TRIGGERS =====
+let lastTriggerFrame = -1;
+function handlePhaseTriggers(skill, f) {
+  if(f === lastTriggerFrame) return;
+  lastTriggerFrame = f;
+
+  const col = skill.color;
+
+  if(f === 5) { // Charge start
+    playSfx('charge');
+    addShockwave(CST.x, CST.y, col, 100, 2.5, 18);
+    spawnP(CST.x, CST.y - 25, 20, { col: col, col2: skill.color2, sp: 5, life: 20 });
+  } else if(f === 12) { // Summon / Cast
+    playSfx('charge');
+    addShockwave(CST.x + 50, CST.y, col, 160, 3.5, 24);
+    spawnP(CST.x + 50, CST.y, 30, { col: col, col2: '#fff', sp: 8, life: 22 });
+  } else if(f === 26) { // Launch / Travel
+    playSfx('launch');
+  } else if(f === 35) { // IMPACT!
+    playSfx('impact');
+    targetStates.forEach((st) => {
+      st.flinch = true; st.status = true;
+    });
+    addShockwave(TGTS[0].x, TGTS[0].y, col, 240, 5.5, 30);
+    addShockwave(TGTS[0].x, TGTS[0].y, '#fff', 180, 3.5, 24);
+    spawnP(TGTS[0].x, TGTS[0].y, 50, { col: col, col2: skill.color2, sp: 11, life: 32, sz: 6 });
+  } else if(f === 47) { // Finisher Ground AOE
+    playSfx('finisher');
+    addShockwave(TGTS[0].x, TGTS[0].y, skill.color2, 190, 4.0, 26);
+    spawnP(TGTS[0].x, TGTS[0].y, 35, { col: skill.color2, sp: 7, life: 26, sz: 5 });
+  } else if(f === 44) {
+    targetStates.forEach(st => { st.flinch = false; });
+  } else if(f === 66) {
+    targetStates.forEach(st => { st.status = false; st.hp = 1.0; st.flinch = false; });
+    particles.length = 0; shockwaves.length = 0;
+  }
+
+  // HP drain on targets during impact & finisher
+  if(f >= 36 && f <= 62) {
+    targetStates.forEach(st => {
+      if(st.status) st.hp = Math.max(0.10, 1.0 - (f - 36) * 0.035);
+    });
+  }
+}
+
+// ===== CHROMATIC ABERRATION SCREEN FLASH =====
+function doChroma(strength) {
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  ctx.globalAlpha = strength * 0.35;
+  ctx.fillStyle = 'rgba(255, 0, 80, 0.8)'; ctx.fillRect(-5, 0, cv.width, cv.height);
+  ctx.globalAlpha = strength * 0.25;
+  ctx.fillStyle = 'rgba(0, 230, 255, 0.8)'; ctx.fillRect(5, 0, cv.width, cv.height);
+  ctx.restore();
+}
+
+// ===== MASTER RENDER LOOP =====
+function render() {
+  const skill = SKILLS[curSkillIdx];
+  const sm = META[skill.id];
+  const f = Math.floor(animFrame);
+  const isHD = document.getElementById('chkHD').checked;
+
+  handlePhaseTriggers(skill, f);
+  updatePhysics();
+
+  ctx.save();
+  ctx.clearRect(0, 0, cv.width, cv.height);
+
+  // Screen shake on impact (frames 35-43)
+  if(document.getElementById('chkShake').checked && f >= 35 && f <= 43) {
+    const decay = (43 - f) / 8.0;
+    const sx = (Math.random() - 0.5) * 18 * decay;
+    const sy = (Math.random() - 0.5) * 12 * decay;
+    ctx.translate(sx, sy);
+  }
+
+  if(curMode === 'combat') {
+    // 1. Arena Background
+    drawArena(skill, f);
+
+    // 2. Floor AOE / Finisher (Level -1 Ground — drawn first under characters & dummies)
+    if(sm && sm.finisher && f >= 47 && f <= 64) {
+      const ff = Math.min(sm.finisher.frames - 1, Math.floor((f - 47) / 17 * sm.finisher.frames));
+      const fw = sm.finisher.w, fh = sm.finisher.h;
+      drawVfxSprite(skill, 'finisher', ff, TGTS[0].x - fw / 2, TGTS[0].y - fh / 2 + 10, skill.color2, isHD);
+    }
+
+    // 3. Aura (Ground level - underneath caster)
+    if(sm && sm.aura && f >= 5 && f <= 28) {
+      const af = (f - 5) % sm.aura.frames;
+      drawVfxSprite(skill, 'aura', af, CST.x - sm.aura.w / 2, CST.y - sm.aura.h / 2, skill.color, isHD);
+    }
+
+    // 4. Caster Hero
+    drawCaster(skill, f);
+
+    // 5. Cast / Summon Avatar (scaled dynamically 0.4 -> 1.35x with multi-pass bloom)
+    if(sm && sm.cast && f >= 10 && f <= 28) {
+      const prog = Math.min(1.0, (f - 10) / 18.0);
+      const cf = Math.min(sm.cast.frames - 1, Math.floor(prog * sm.cast.frames));
+      
+      let scale = 1.35;
+      if(f < 15) scale = 0.4 + (f - 10) / 5 * 0.95;
+      else if(f > 24) scale = Math.max(0.4, 1.35 - (f - 24) / 4 * 0.95);
+
+      const dW = Math.round(sm.cast.w * scale);
+      const dH = Math.round(sm.cast.h * scale);
+      const dx = CST.x + 50 - dW / 2;
+      const dy = CST.y - dH + 15;
+
+      // Multi-layer bloom
+      if(document.getElementById('chkGlow').checked) {
+        ctx.save(); ctx.globalAlpha = 0.25;
+        ctx.shadowColor = skill.color; ctx.shadowBlur = 50;
+        drawVfxSprite(skill, 'cast', cf, dx - 15, dy - 15, null, isHD, dW + 30, dH + 30);
+        ctx.restore();
+
+        ctx.save(); ctx.globalAlpha = 0.45;
+        ctx.shadowColor = skill.color2; ctx.shadowBlur = 25;
+        drawVfxSprite(skill, 'cast', cf, dx - 5, dy - 5, null, isHD, dW + 10, dH + 10);
+        ctx.restore();
+      }
+      drawVfxSprite(skill, 'cast', cf, dx, dy, skill.color, isHD, dW, dH);
+    }
+
+    // 6. Rings & Ground Shockwaves
+    drawPhysics();
+
+    // 7. Projectile (travels from caster to target with curved arc trajectory)
+    if(sm && sm.projectile && f >= 26 && f <= 34) {
+      const prog = (f - 26) / 8.0;
+      const px = CST.x + 60 + prog * (TGTS[0].x - CST.x - 60);
+      const py = CST.y - 55 + Math.sin(prog * Math.PI) * -36;
+      const pf = Math.min(sm.projectile.frames - 1, Math.floor(prog * sm.projectile.frames));
+      
+      drawVfxSprite(skill, 'projectile', pf, px - sm.projectile.w / 2, py - sm.projectile.h / 2, skill.color, isHD);
+      spawnP(px, py, 3, { col: skill.color, col2: skill.color2, sp: 2.5, life: 12, sz: 3.5 });
+    }
+
+    // 8. Impact Explosion (Violent burst on targets)
+    if(sm && sm.impact && f >= 35 && f <= 46) {
+      const inf = Math.min(sm.impact.frames - 1, Math.floor((f - 35) / 11 * sm.impact.frames));
+      const iW = Math.round(sm.impact.w * 1.25);
+      const iH = Math.round(sm.impact.h * 1.25);
+      const ix = TGTS[0].x - iW / 2;
+      const iy = TGTS[0].y - iH / 2 - 10;
+
+      // Bloom flash
+      if(f <= 38 && document.getElementById('chkGlow').checked) {
+        const ba = (38 - f) / 3 * 0.45;
+        const bg = ctx.createRadialGradient(TGTS[0].x, TGTS[0].y, 0, TGTS[0].x, TGTS[0].y, 220);
+        bg.addColorStop(0, skill.color + Math.round(ba * 255).toString(16).padStart(2, '0'));
+        bg.addColorStop(1, 'transparent');
+        ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, cv.width, cv.height); ctx.restore();
+      }
+
+      drawVfxSprite(skill, 'impact', inf, ix, iy, skill.color, isHD, iW, iH);
+    }
+
+    // 9. Secondary Bursts (`particles`) on ALL 5 TARGETS!
+    if(sm && sm.particles && f >= 48 && f <= 64) {
+      TGTS.forEach((t, i) => {
+        const bf = Math.max(0, (f - 48) - i * 2);
+        if(bf < sm.particles.frames) {
+          const px = t.x - sm.particles.w / 2;
+          const py = t.y - sm.particles.h + 10;
+          drawVfxSprite(skill, 'particles', bf, px, py, skill.color2, isHD);
+        }
+      });
+    }
+
+    // 10. Targets (5 Reactive Dummies - sorted back to front by Y)
+    const sortedIndices = TGTS.map((t, i) => i).sort((a, b) => TGTS[a].y - TGTS[b].y);
+    sortedIndices.forEach(idx => {
+      drawDummy(idx, skill, f);
+    });
+
+    // 11. Floating Damage Numbers & Status Tags on ALL 5 TARGETS
+    if(document.getElementById('chkDmg').checked && f >= 36 && f <= 58) {
+      const al = Math.max(0, 1 - (f - 36) / 22);
+      const fy = (f - 36) * 2.8;
+      TGTS.forEach((t, i) => {
+        ctx.save();
+        ctx.globalAlpha = al;
+        ctx.font = 'bold 15px sans-serif';
+        ctx.textAlign = 'center';
+        // Shadow text
+        ctx.fillStyle = 'rgba(0,0,0,0.85)';
+        ctx.fillText(`-${skill.dmg}`, t.x + 1, t.y - 74 - fy + 1);
+        // Main damage text
+        if(document.getElementById('chkGlow').checked) {
+          ctx.shadowColor = skill.color; ctx.shadowBlur = 10;
+        }
+        ctx.fillStyle = skill.color2;
+        ctx.fillText(`-${skill.dmg}`, t.x, t.y - 74 - fy);
+        ctx.shadowBlur = 0;
+        // Status Tag
+        ctx.font = 'bold 9.5px sans-serif';
+        ctx.fillStyle = '#ff80ab';
+        ctx.fillText(skill.status_tag, t.x, t.y - 60 - fy);
+        ctx.restore();
+      });
+    }
+
+    // 12. White Flash on Impact (frame 35)
+    if(f === 35) {
+      ctx.save(); ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.fillRect(0, 0, cv.width, cv.height); ctx.restore();
+    }
+
+    // 13. Chromatic Aberration flash (frames 36-37)
+    if(f >= 36 && f <= 37) {
+      doChroma((37 - f + 1) / 2.0);
+    }
+
+  } else {
+    // ── INSPECTOR MODE ────────────────────────────────────────────────────────
+    ctx.fillStyle = '#06020c'; ctx.fillRect(0, 0, cv.width, cv.height);
+    // Checker grid
+    for(let y = 0; y < cv.height; y += 20) {
+      for(let x = 0; x < cv.width; x += 20) {
+        ctx.fillStyle = ((x / 20 + y / 20) % 2 === 0) ? '#0d061c' : '#080312';
+        ctx.fillRect(x, y, 20, 20);
+      }
+    }
+
+    if(sm && sm[inspComp]) {
+      const m = sm[inspComp];
+      const isFullStrip = document.getElementById('inspFullStrip').checked;
+      const src = isHD ? m.sheet_x2 : m.sheet_x1;
+      const img = getImage(src);
+
+      if(img && img.complete && img.naturalWidth > 0) {
+        if(isFullStrip) {
+          const scale = Math.min((cv.width - 40) / img.width, (cv.height - 40) / img.height, 1.0);
+          const dw = img.width * scale, dh = img.height * scale;
+          const dx = (cv.width - dw) / 2, dy = (cv.height - dh) / 2;
+          ctx.drawImage(img, 0, 0, img.width, img.height, dx, dy, dw, dh);
+          ctx.strokeStyle = varColor('--cyan'); ctx.lineWidth = 1.5; ctx.strokeRect(dx, dy, dw, dh);
+          for(let fi = 1; fi < m.frames; fi++) {
+            const lineY = dy + fi * (dh / m.frames);
+            ctx.strokeStyle = 'rgba(124, 77, 255, 0.5)';
+            ctx.beginPath(); ctx.moveTo(dx, lineY); ctx.lineTo(dx + dw, lineY); ctx.stroke();
+          }
+        } else {
+          const curF = Math.floor(animFrame) % m.frames;
+          const zoom = 2.0;
+          const dw = m.w * zoom, dh = m.h * zoom;
+          const dx = (cv.width - dw) / 2, dy = (cv.height - dh) / 2;
+          const sf = isHD ? 2 : 1;
+          const srcY = curF * m.h * sf;
+
+          ctx.drawImage(img, 0, srcY, m.w * sf, m.h * sf, dx, dy, dw, dh);
+
+          if(document.getElementById('inspBBox').checked) {
+            ctx.strokeStyle = '#00e5ff'; ctx.lineWidth = 1.5; ctx.strokeRect(dx, dy, dw, dh);
+          }
+          if(document.getElementById('inspCrosshair').checked) {
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.6)'; ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cv.width / 2, dy - 15); ctx.lineTo(cv.width / 2, dy + dh + 15);
+            ctx.moveTo(dx - 15, cv.height / 2); ctx.lineTo(dx + dw + 15, cv.height / 2);
+            ctx.stroke();
+          }
+
+          document.getElementById('inspStats').textContent = `Frame ${curF + 1}/${m.frames} | Res: ${m.w}x${m.h}px | Total Sheet: ${img.width}x${img.height}px`;
+        }
+      }
+    }
+  }
+
+  ctx.restore();
+
+  document.getElementById('frameSlider').value = f;
+  document.getElementById('frameInfo').textContent = `Frame ${f.toString().padStart(2, '0')}/72 — ${getPhaseName(f)}`;
+  updatePhaseButtons(f);
+}
+
+function getPhaseName(f) {
+  if(f <= 4) return 'P0: Idle Stance';
+  if(f <= 11) return 'P1: Charging Energy';
+  if(f <= 20) return 'P2: Summoning Avatar';
+  if(f <= 25) return 'P3: Roar / Launch';
+  if(f <= 34) return 'P4: Projectile Flight';
+  if(f <= 46) return 'P5: VIOLENT IMPACT!';
+  if(f <= 57) return 'P6: Ground AOE Eruption';
+  if(f <= 65) return 'P7: Secondary Bursts';
+  return 'P8: Cooldown Reset';
+}
+
+function varColor(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function updatePhaseButtons(f) {
+  const pBtns = document.querySelectorAll('.phase-btn');
+  pBtns.forEach(b => {
+    const pf = parseInt(b.dataset.f);
+    let on = false;
+    if(pf === 0 && f <= 4) on = true;
+    else if(pf === 5 && f >= 5 && f <= 11) on = true;
+    else if(pf === 12 && f >= 12 && f <= 20) on = true;
+    else if(pf === 21 && f >= 21 && f <= 25) on = true;
+    else if(pf === 26 && f >= 26 && f <= 34) on = true;
+    else if(pf === 35 && f >= 35 && f <= 46) on = true;
+    else if(pf === 47 && f >= 47 && f <= 57) on = true;
+    else if(pf === 58 && f >= 58 && f <= 65) on = true;
+    else if(pf === 66 && f >= 66) on = true;
+    b.classList.toggle('on', on);
+  });
+}
+
+// ===== ANIMATION TICK =====
+function tick(timestamp) {
+  if(!lastTimestamp) lastTimestamp = timestamp;
+  const delta = (timestamp - lastTimestamp) / 1000.0;
+  lastTimestamp = timestamp;
+
+  if(isPlaying) {
+    animFrame += delta * 20.0 * playSpeed;
+    if(animFrame > 72) {
+      if(document.getElementById('chkLoop').checked) {
+        animFrame = 0;
+      } else {
+        animFrame = 72;
+        isPlaying = false;
+      }
+    }
+  }
+  render();
+  requestAnimationFrame(tick);
+}
+
+// ===== SETUP UI & EVENTS =====
+function selectSkill(idx) {
+  curSkillIdx = idx;
+  const skill = SKILLS[idx];
+  document.querySelectorAll('.skill-card').forEach((c, i) => c.classList.toggle('active', i === idx));
+  document.getElementById('b-id').textContent = `SKILL ${skill.id}`;
+  document.getElementById('b-elem').textContent = skill.element.split('/')[0].trim();
+  document.getElementById('b-elem').style.borderColor = skill.color;
+  document.getElementById('b-elem').style.color = skill.color;
+  document.getElementById('b-aoe').textContent = `AOE ${skill.aoe}`;
+  document.getElementById('b-dmg').textContent = `DMG ${skill.dmg}`;
+  document.getElementById('b-status').textContent = `STATUS: ${skill.status}`;
+
+  animFrame = 0;
+  targetStates.forEach(st => { st.hp = 1.0; st.status = false; st.flinch = false; });
+  particles.length = 0; shockwaves.length = 0;
+
+  buildResourceCards();
+  render();
+}
+
+function buildSidebar() {
+  const container = document.getElementById('skillList');
+  container.innerHTML = '';
+  SKILLS.forEach((s, idx) => {
+    const card = document.createElement('div');
+    card.className = `skill-card ${idx === 0 ? 'active' : ''}`;
+    card.innerHTML = `
+      <img class="sk-icon" src="../exports/icons/44x44/${s.id}.png" alt="${s.id}" onerror="this.src='../exports/icons/88x88/${s.id}.png'">
+      <div class="sk-meta">
+        <div class="sk-top">
+          <span class="sk-id" style="color:${s.color};">${s.id}</span>
+          <span class="sk-hk">[${idx + 1}]</span>
+        </div>
+        <div class="sk-name">${s.name}</div>
+        <div class="sk-char">${s.char}</div>
+      </div>
+    `;
+    card.onclick = () => selectSkill(idx);
+    container.appendChild(card);
+  });
+}
+
+function buildResourceCards() {
+  const container = document.getElementById('resourceCards');
+  container.innerHTML = '';
+  const skill = SKILLS[curSkillIdx];
+  const sm = META[skill.id];
+  if(!sm) return;
+
+  const comps = ['cast', 'projectile', 'impact', 'particles', 'aura', 'finisher'];
+  comps.forEach(c => {
+    if(!sm[c]) return;
+    const m = sm[c];
+    const card = document.createElement('div');
+    card.className = `r-card ${inspComp === c && curMode === 'inspect' ? 'active' : ''}`;
+    card.innerHTML = `
+      <img src="${m.sheet_x1}" alt="${c}">
+      <div class="r-name">${c}</div>
+      <div class="r-dim">${m.w}x${m.h} • ${m.frames}f</div>
+    `;
+    card.onclick = () => {
+      inspComp = c;
+      document.querySelectorAll('.insp-btn').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+      switchTab('inspect');
+      buildResourceCards();
+    };
+    container.appendChild(card);
+  });
+}
+
+function switchTab(mode) {
+  curMode = mode;
+  document.getElementById('tabCombat').classList.toggle('on', mode === 'combat');
+  document.getElementById('tabInspect').classList.toggle('on', mode === 'inspect');
+  document.getElementById('inspector-panel').style.display = mode === 'inspect' ? 'flex' : 'none';
+  buildResourceCards();
+  render();
+}
+
+// Event Listeners
+document.getElementById('tabCombat').onclick = () => switchTab('combat');
+document.getElementById('tabInspect').onclick = () => switchTab('inspect');
+
+document.getElementById('btnPlay').onclick = () => { isPlaying = true; };
+document.getElementById('btnPause').onclick = () => { isPlaying = false; };
+document.getElementById('btnPrev').onclick = () => { isPlaying = false; animFrame = Math.max(0, animFrame - 1); render(); };
+document.getElementById('btnNext').onclick = () => { isPlaying = false; animFrame = Math.min(72, animFrame + 1); render(); };
+document.getElementById('btnReset').onclick = () => {
+  animFrame = 0; isPlaying = true;
+  targetStates.forEach(st => { st.hp = 1.0; st.status = false; st.flinch = false; });
+  particles.length = 0; shockwaves.length = 0;
+  render();
+};
+document.getElementById('btnCast').onclick = () => {
+  animFrame = 5; isPlaying = true;
+  targetStates.forEach(st => { st.hp = 1.0; st.status = false; st.flinch = false; });
+  particles.length = 0; shockwaves.length = 0;
+  render();
+};
+
+document.getElementById('frameSlider').oninput = (e) => {
+  isPlaying = false;
+  animFrame = parseFloat(e.target.value);
+  render();
+};
+
+document.querySelectorAll('.phase-btn').forEach(b => {
+  b.onclick = () => {
+    animFrame = parseInt(b.dataset.f);
+    isPlaying = true;
+    render();
+  };
+});
+
+document.querySelectorAll('.speed-btn').forEach(b => {
+  b.onclick = () => {
+    playSpeed = parseFloat(b.dataset.s);
+    document.querySelectorAll('.speed-btn').forEach(x => x.classList.toggle('on', x === b));
+  };
+});
+
+document.querySelectorAll('.insp-btn').forEach(b => {
+  b.onclick = () => {
+    inspComp = b.dataset.c;
+    document.querySelectorAll('.insp-btn').forEach(x => x.classList.toggle('on', x === b));
+    buildResourceCards();
+    render();
+  };
+});
+
+// Keyboard Hotkeys
+window.addEventListener('keydown', (e) => {
+  if(e.code >= 'Digit1' && e.code <= 'Digit7') {
+    const idx = parseInt(e.key) - 1;
+    if(idx >= 0 && idx < SKILLS.length) selectSkill(idx);
+  } else if(e.code === 'Space') {
+    e.preventDefault();
+    document.getElementById('btnCast').click();
+  } else if(e.code === 'ArrowLeft') {
+    e.preventDefault();
+    document.getElementById('btnPrev').click();
+  } else if(e.code === 'ArrowRight') {
+    e.preventDefault();
+    document.getElementById('btnNext').click();
+  } else if(e.code === 'KeyP') {
+    isPlaying = !isPlaying;
+  } else if(e.code === 'Tab') {
+    e.preventDefault();
+    switchTab(curMode === 'combat' ? 'inspect' : 'combat');
+  }
+});
+
+// Initialize
+buildSidebar();
+selectSkill(0);
+requestAnimationFrame(tick);
+</script>
+</body>
+</html>

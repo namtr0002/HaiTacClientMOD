@@ -1,0 +1,55 @@
+public static int getItemCategory(MainItem item) {
+if (item == null) return -1;
+
+// 1: Trang Bị (Trang bị vũ khí, giáp, phụ kiện, thời trang, cánh, thần thú...)
+if (item.typeObject == 3 || item.typeObject == 102 || item.typeObject == 103 || item.typeObject == 107) {
+return 1;
+}
+
+String name = (item.name != null) ? item.name.toLowerCase() : \"\";
+
+// Kiểm tra nếu là Rương / Hộp quà / Túi / Gói chứa đồ trước để không nhầm sang đá
+boolean isChestOrBox = name.startsWith(\"rương\") || name.startsWith(\"ruong\") || 
+name.startsWith(\"hộp quà\") || name.startsWith(\"hop qua\") || 
+name.startsWith(\"túi\") || name.startsWith(\"tui\") || 
+name.startsWith(\"gói\") || name.startsWith(\"goi\");
+
+// 3: Đá & Nguyên Liệu (Gems, Inlaid stones, Upgrade stones, Crafting materials, Ores, Essences)
+if (!isChestOrBox) {
+// a. Các typeObject nguyên liệu chính
+if (item.typeObject == 7 || item.typeObject == 5 || (item instanceof MainMaterial)) {
+return 3;
+}
+
+// b. BQ (Hp_Mp_Other) của các loại đá khảm / đá thuộc tính / đá nâng cấp
+if (item.typeObject == 4) {
+if (item.BQ == 12 || item.BQ == 57 || item.BQ == 80 || 
+item.BQ == 81 || item.BQ == 77 || item.BQ == 27 || 
+item.BQ == 28 || item.BQ == -16 || item.BQ == -18 || 
+item.BQ == 66 || item.BQ == 93 ||
+(item.BQ == 40 && (name.indexOf(\"đá\") >= 0 || name.indexOf(\"da \") >= 0))) {
+return 3;
+}
+
+// ID ranges của các loại đá khảm / hải thạch / nâng cấp
+if ((item.ID >= 44 && item.ID <= 79) || (item.ID >= 221 && item.ID <= 226) || 
+(item.ID >= 321 && item.ID <= 327) || (item.ID >= 514 && item.ID <= 516) || 
+(item.ID >= 644 && item.ID <= 646) || item.ID == 134 || item.ID == 135 || 
+item.ID == 572 || item.ID == 683) {
+return 3;
+}
+
+// Nhận diện theo tên tiếng Việt mở rộng cho Đá Khảm / Ngọc / Thạch / Nguyên liệu
+if (name.indexOf(\"đá \") >= 0 || name.indexOf(\"da \") >= 0 || name.startsWith(\"đá\") || name.startsWith(\"da\") ||
+name.indexOf(\"khảm\") >= 0 || name.indexOf(\"kham\") >= 0 ||
+name.indexOf(\"ngọc\") >= 0 || name.indexOf(\"ngoc\") >= 0 ||
+name.indexOf(\"cẩm thạch\") >= 0 || name.indexOf(\"hải thạch\") >= 0 || name.indexOf(\"thạch anh\") >= 0 || 
+name.indexOf(\"huyết thạch\") >= 0 || name.indexOf(\"hắc thạch\") >= 0 || name.indexOf(\"thạch\") >= 0 ||
+name.indexOf(\"tinh thể\") >= 0 || name.indexOf(\"tinh the\") >= 0 ||
+name.indexOf(\"saphia\") >= 0 || name.indexOf(\"sapphire\") >= 0 || name.indexOf(\"topaz\") >= 0 || name.indexOf(\"ruby\") >= 0 ||
+name.indexOf(\"kim cương\") >= 0 || name.indexOf(\"diamond\") >= 0 ||
+name.indexOf(\"khoáng\") >= 0 || name.indexOf(\"khoang\") >= 0 || name.indexOf(\"quặng\") >= 0 || 
+name.indexOf(\"phôi\") >= 0 || name.indexOf(\"phoi\") >= 0 || name.indexOf(\"mảnh \") >= 0 || 
+name.indexOf(\"nguyên liệu\") >= 0 || name.indexOf(\"nguyen lieu\") >= 0 ||
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+"}

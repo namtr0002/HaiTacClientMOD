@@ -1,0 +1,942 @@
+public final class MsgOtherCharInfo extends MsgDialog {
+   private MainObject AB;
+   private int AC = 120;
+   private int BB;
+   private MainItem BD;
+   private int BE;
+   private int BF;
+   private int BG;
+   private int BH = 0;
+   private boolean BI = false;
+   private boolean BJ = false;
+   public static InfoMemList AA = null;
+   private iCommand BK;
+   private int BL = 0;
+   private int BM = 0;
+
+   // Màn hình to / nhỏ
+   public boolean isBigScreen = false;
+
+   // Cuộn trang bị lên xuống mượt mà trên màn hình nhỏ
+   public static final int EQUIP_PAGE_H = 104;
+   private int equipScrollY = 0;
+   private int equipToY = 0;
+   private int equipSubTab = 0; // 0: Trang bị, 1: Thần trang
+   private boolean isDraggingEquip = false;
+   private int equipDragStartY = 0;
+   private int equipDragStartScrollY = 0;
+
+   private iCommand cmdSwitchPage;
+   private int tabBtnW = 60;
+   private int tabBtnH = 14;
+   private int tabBtnY = 0;
+   private int viewClipY = 0;
+   private int viewClipH = 104;
+   private int leftSlotX = 0;
+   private int rightSlotX = 0;
+   private int slotGapY = 25;
+
+   // Tọa độ các khối cho màn hình lớn (1 Tab Tổng)
+   private int box0X = 0;
+   private int box1X = 0;
+   private int boxW = 60;
+   private int bodyY = 0;
+   private int bodyH = 114;
+
+   public MsgOtherCharInfo(MainObject var1) {
+      this.AB = var1;
+      this.BK = null;
+      if (var1 != null) {
+         super.cmdList.removeAllElements();
+         super.AG = new iCommand(T.close, 1, this);
+         super.AG = AvMain.AA(super.AG, 2);
+         if (AA != null && AA.AC.compareTo(this.AB.name) == 0) {
+            this.BK = new iCommand(T.chapnhan, 2, this);
+            this.BK = AvMain.AA(this.BK, 0);
+            this.BK = AvMain.AA(this.BK, 1);
+            super.DA = this.BK;
+         }
+
+         super.DB = super.AG;
+
+         this.isBigScreen = (!GameCanvas.isSmallScreen && !GameCanvas.isCompactMode() && MotherCanvas.w >= 300);
+
+         if (this.isBigScreen) {
+            super.wDia = 296;
+            if (super.wDia > MotherCanvas.w - 10) {
+               super.wDia = MotherCanvas.w - 10;
+            }
+            super.wItem = 25;
+            super.hDia = (this.AB.clan != null ? 180 : 170);
+         } else {
+            if (GameCanvas.isSmallScreen || GameCanvas.isCompactMode()) {
+               super.wDia = 158;
+               super.wItem = 23;
+            } else {
+               super.wDia = 176;
+               super.wItem = 26;
+            }
+            if (super.wDia > MotherCanvas.w - 10) {
+               super.wDia = MotherCanvas.w - 10;
+            }
+            super.hDia = (this.AB.clan != null ? 180 : 168);
+         }
+
+         this.AT = super.wDia;
+         this.AS = this.AT;
+         this.BG = 0;
+         if (GameScreen.vecPlayers != null) {
+            for(int var4 = 0; var4 < GameScreen.vecPlayers.size(); ++var4) {
+               MainObject var7;
+               if ((var7 = (MainObject)GameScreen.vecPlayers.elementAt(var4)) != null && !var7.isRemove && var7.typeObject == 0 && var7.name.compareTo(this.AB.name) == 0) {
+                  this.AB.thanhtichLv = var7.thanhtichLv;
+                  this.AB.thanhtichPvP = var7.thanhtichPvP;
+                  this.AB.ID = var7.ID;
+                  if (var7.PL != null && var7.PL.size() > 0) {
+                     for (int k = 0; k < var7.PL.size(); ++k) {
+                        DataSkillEff eff = (DataSkillEff) var7.PL.elementAt(k);
+                        if (eff != null) {
+                           this.AB.addDataEff(eff.idEff, (eff.typeupdate == 3) ? -1 : 0);
+                        }
+                     }
+                  }
+                  break;
+               }
+            }
+         }
+         if (GameScreen.player != null && GameScreen.player.name.compareTo(this.AB.name) == 0) {
+            this.AB.ID = GameScreen.player.ID;
+            if (GameScreen.player.PL != null && GameScreen.player.PL.size() > 0) {
+               for (int k = 0; k < GameScreen.player.PL.size(); ++k) {
+                  DataSkillEff eff = (DataSkillEff) GameScreen.player.PL.elementAt(k);
+                  if (eff != null) {
+                     this.AB.addDataEff(eff.idEff, (eff.typeupdate == 3) ? -1 : 0);
+                  }
+               }
+            }
+         }
+         if (this.AB.thanhtichLv >= 0) {
+            this.BG += 14;
+         }
+         if (this.AB.thanhtichPvP >= 0) {
+            this.BG += 14;
+         }
+         this.BJ = true;
+
+         this.BH = this.BG;
+         if (var1.hOne > 52) {
+            this.BH += var1.hOne - 52;
+         }
+
+         int maxH = MotherCanvas.h - 28 - GameCanvas.hCommand;
+         if (super.hDia > maxH) {
+            super.hDia = maxH;
+         }
+         if (super.hDia < 148) {
+            super.hDia = 148;
+         }
+
+         super.AX = MotherCanvas.hw - super.wDia / 2;
+         super.AY = MotherCanvas.hh - super.hDia / 2;
+         if (super.AY < 22) {
+            super.AY = 22;
+         }
+
+         this.tabBtnW = (super.wDia - 24) / 2;
+         this.tabBtnH = 14;
+
+         this.cmdSwitchPage = new iCommand("Thần trang", 3, this);
+         this.cmdSwitchPage = AvMain.AA(this.cmdSwitchPage, 0);
+
+         if (this.BK != null) {
+            super.DA = this.BK;
+         } else if (!GameCanvas.isTouch && !this.isBigScreen) {
+            super.DA = this.cmdSwitchPage;
+         }
+
+         if (GameCanvas.isTouch) {
+            super.idSelect = -1;
+            super.AG.setPos(super.AX + super.AT / 2 + this.AC / 2, super.AY - 20 + 8, MainTab.fraCloseTab, "");
+            super.cmdList.addElement(super.AG);
+            if (this.BK != null) {
+               this.BK = AvMain.AA(this.BK, 0);
+               super.cmdList.addElement(this.BK);
+            }
+         } else {
+            super.idSelect = 0;
+            this.BI = false;
+            this.BD = (MainItem)var1.hashEquip.get("0");
+         }
+
+         super.backCMD = super.AG;
+      }
+   }
+
+   public final void commandPointer(int var1, int var2) {
+      switch(var1) {
+      case 0:
+         AA = null;
+         break;
+      case 1:
+         GameCanvas.end_Dialog();
+         AA = null;
+         break;
+      case 2:
+         if (AA != null) {
+            GlobalService.getInstance().AA((byte)1, (short)((short)AA.AG), (byte)0);
+            if (GameCanvas.eventScr.vecPlayer != null) {
+               for(var1 = 0; var1 < GameCanvas.eventScr.vecPlayer.size(); ++var1) {
+                  InfoMemList var3;
+                  if ((var3 = (InfoMemList)GameCanvas.eventScr.vecPlayer.elementAt(var1)) == AA) {
+                     GameCanvas.eventScr.vecPlayer.removeElement(var3);
+                     return;
+                  }
+               }
+            }
+         }
+         return;
+      case 3:
+         if (!this.isBigScreen) {
+            this.equipToY = (this.equipToY == 0) ? EQUIP_PAGE_H : 0;
+            this.cmdSwitchPage.caption = (this.equipToY == 0) ? "Thần trang" : "Trang bị";
+            this.BI = false;
+            this.BB = 0;
+            if (super.idSelect >= 0 && super.idSelect < 16) {
+               this.BD = (MainItem)this.AB.hashEquip.get("" + super.idSelect);
+            } else {
+               this.BD = null;
+            }
+         }
+         return;
+      }
+
+      super.commandPointer(var1, var2);
+   }
+
+   private void paintEquipSlot(mGraphics g, int sx, int sy, int size, int equipType) {
+      boolean isSel = (super.idSelect == equipType);
+      boolean isDivine = (equipType >= 8);
+      AvMain.paintRect(g, sx, sy, size, size, (byte)(isSel ? 1 : 0), 3);
+
+      MainItem item = (MainItem)this.AB.hashEquip.get("" + equipType);
+      if (item != null) {
+         item.AC(g, sx + size / 2, sy + size / 2, size - 2);
+         item.AB(g, sx + size / 2, sy + size / 2, size, 1);
+      } else if (equipType < 8 && AvMain.fraEquip != null) {
+         int frameIdx = equipType % 8;
+         if (frameIdx < AvMain.fraEquip.nFrame) {
+            AvMain.fraEquip.drawFrame(frameIdx, sx + size / 2, sy + size / 2, 0, 3, g);
+         }
+      }
+
+      if (isDivine) {
+         g.setColor(0xFFAA00);
+         g.drawRect(sx, sy, size - 1, size - 1);
+      }
+
+      if (isSel) {
+         g.setColor(0xFFFF00);
+         g.drawRect(sx - 1, sy - 1, size + 1, size + 1);
+         g.drawRect(sx - 2, sy - 2, size + 3, size + 3);
+         if (AvMain.imgNenfocus != null) {
+            g.drawRegion(AvMain.imgNenfocus, 2, 2, size, size, 0, sx, sy, 0);
+         }
+      }
+   }
+
+   public final void paint(mGraphics var1) {
+      GameCanvas.resetTrans(var1);
+      int var3 = super.AX + super.wDia / 2;
+      this.AE(var1, super.AX - 5, super.AY - 32, super.AT + 10, super.hDia + 44, super.AT + 10);
+      var1.setColor(-805042);
+      var1.fillRoundRectNew(super.AX + super.wDia / 2 - this.AC / 2, super.AY - 20, this.AC, 16, 4, 4);
+      AvMain.FontBorderColor(var1, this.AB.name, super.AX + super.AT / 2, super.AY - 18, 2, (int)6, (int)5);
+      var1.setClip_(MotherCanvas.hw - super.AT / 2, super.AY, super.AT, super.hDia);
+      mGraphics.AC();
+      mGraphics.AD();
+
+      int yCur = super.AY + 4;
+      MainImage var4;
+      if (this.AB.clan != null && (var4 = Potion.getIconClan(this.AB.clan.idIcon)) != null && var4.img != null) {
+         int var5 = -mFont.tahoma_7b_black.getWidth(this.AB.clan.name) / 2;
+         if (var4.frame == -1) {
+            var4.set_Frame();
+         }
+
+         if (var4.frame <= 1) {
+            var1.drawRegion((mImage)var4.img, super.AX + super.wDia / 2 + var5, yCur, 3);
+         } else {
+            byte var6;
+            if (this.BM >= var4.frame - 1) {
+               var6 = 15;
+            } else {
+               var6 = 3;
+            }
+
+            if (CRes.abs(GameCanvas.gameTick - this.BL) > var6) {
+               ++this.BM;
+               if (this.BM >= var4.frame) {
+                  this.BM = 0;
+               }
+
+               this.BL = GameCanvas.gameTick;
+            }
+
+            var1.drawRegion(var4.img, 0, this.BM * var4.AB, var4.AB, var4.AB, 0, super.AX + super.wDia / 2 + var5, yCur, 3);
+         }
+
+         mFont.tahoma_7b_black.drawString(var1, this.AB.clan.name, super.AX + super.wDia / 2 + 9, yCur - 6, 2);
+         yCur += 14;
+      } else {
+         yCur += 2;
+      }
+
+      // Icon ảnh HP/MP/Lv
+      mImage imgIcon = (this.AB.Lv >= 100) ? Interface_Game.imgIconMPHP2 : Interface_Game.imgIconMPHP;
+      int headerCenterX = super.AX + super.wDia / 2;
+
+      if (this.isBigScreen) {
+         // === MÀN HÌNH LỚN: HP (TRÁI) - EXP/LV (GIỮA) - MP (PHẢI) CÙNG HÀNG Y ===
+         int statY = yCur;
+         int expBarW = 60;
+         int wHp = 64;
+         int wMp = 64;
+
+         // 1. HP BÊN TRÁI của Level/EXP
+         int hpX = headerCenterX - expBarW / 2 - 10 - wHp;
+         var1.drawRegion((mImage)imgIcon, 0, 0, 10, 11, 0, hpX - 6, statY + 5, 3);
+         Interface_Game.AA(var1, (byte)1, this.AB.Hp, this.AB.maxHp, hpX, statY, 0, 9, wHp, 0, false, 0, false, this.AB.MA);
+
+         // 2. LEVEL & EXP Ở GIỮA
+         String expStr;
+         int expFillW;
+         if (this.AB.Lv >= 100) {
+            expStr = this.AB.LvThongThao + " + " + this.AB.KS / 10 + "," + this.AB.KS % 10 + "%";
+            expFillW = this.AB.KS / 10 * expBarW / 100;
+         } else {
+            expStr = this.AB.Lv + " + " + this.AB.percentLv / 10 + "," + this.AB.percentLv % 10 + "%";
+            expFillW = this.AB.percentLv / 10 * expBarW / 100;
+         }
+         mFont.tahoma_7_black.drawString(var1, expStr, headerCenterX, statY - 1, 2);
+         var1.setColor(-15519213);
+         var1.fillRect(headerCenterX - expBarW / 2, statY + 10, expBarW, 2);
+         if (expFillW > 0) {
+            var1.setColor(-13263058);
+            var1.fillRect(headerCenterX - expBarW / 2, statY + 10, expFillW, 2);
+         }
+         for (int var8 = 1; var8 < 4; ++var8) {
+            var1.setColor(-1);
+            var1.fillRect(headerCenterX - expBarW / 2 + var8 * (expBarW / 4), statY + 10, 1, 2);
+         }
+
+         // 3. MP BÊN PHẢI của Level/EXP
+         int mpX = headerCenterX + expBarW / 2 + 18;
+         var1.drawRegion((mImage)imgIcon, 0, 11, 10, 11, 0, mpX - 6, statY + 5, 3);
+         Interface_Game.AA(var1, (byte)2, this.AB.Mp, this.AB.maxMp, mpX, statY, 0, 9, wMp, 0, false, 0, false, 0);
+
+         yCur += 16;
+      } else {
+         // === MÀN HÌNH NHỎ: 2 HÀNG GỌN ĐẸP ===
+         int statY = yCur;
+         int wHp = 56;
+         int wMp = 56;
+         int hpX = headerCenterX - 6 - wHp;
+         int mpX = headerCenterX + 16;
+
+         // Hàng 1: HP bên trái, MP bên phải
+         var1.drawRegion((mImage)imgIcon, 0, 0, 10, 11, 0, hpX - 6, statY + 5, 3);
+         Interface_Game.AA(var1, (byte)1, this.AB.Hp, this.AB.maxHp, hpX, statY, 0, 9, wHp, 0, false, 0, false, this.AB.MA);
+
+         var1.drawRegion((mImage)imgIcon, 0, 11, 10, 11, 0, mpX - 6, statY + 5, 3);
+         Interface_Game.AA(var1, (byte)2, this.AB.Mp, this.AB.maxMp, mpX, statY, 0, 9, wMp, 0, false, 0, false, 0);
+
+         yCur += 12;
+
+         // Hàng 2: Level & EXP ở giữa
+         int expBarW = 60;
+         String expStr;
+         int expFillW;
+         if (this.AB.Lv >= 100) {
+            expStr = this.AB.LvThongThao + " + " + this.AB.KS / 10 + "," + this.AB.KS % 10 + "%";
+            expFillW = this.AB.KS / 10 * expBarW / 100;
+         } else {
+            expStr = this.AB.Lv + " + " + this.AB.percentLv / 10 + "," + this.AB.percentLv % 10 + "%";
+            expFillW = this.AB.percentLv / 10 * expBarW / 100;
+         }
+         mFont.tahoma_7_black.drawString(var1, expStr, headerCenterX, yCur - 1, 2);
+         var1.setColor(-15519213);
+         var1.fillRect(headerCenterX - expBarW / 2, yCur + 10, expBarW, 2);
+         if (expFillW > 0) {
+            var1.setColor(-13263058);
+            var1.fillRect(headerCenterX - expBarW / 2, yCur + 10, expFillW, 2);
+         }
+         for (int var8 = 1; var8 < 4; ++var8) {
+            var1.setColor(-1);
+            var1.fillRect(headerCenterX - expBarW / 2 + var8 * (expBarW / 4), yCur + 10, 1, 2);
+         }
+         yCur += 16;
+      }
+
+      // Chuẩn bị đồ thần trang overrides
+      short cw = (short)-2, ch = (short)-2, cb = (short)-2, cl = (short)-2;
+      MainItem eq8 = (MainItem)this.AB.hashEquip.get("8");
+      if (eq8 != null) cw = (eq8.idPart > 0) ? eq8.idPart : ((eq8.ID == 2603) ? (short)184 : (short)-2);
+      MainItem eq9 = (MainItem)this.AB.hashEquip.get("9");
+      if (eq9 != null) ch = (eq9.idPart > 0) ? eq9.idPart : ((eq9.ID == 2600) ? (short)222 : (short)-2);
+      MainItem eq11 = (MainItem)this.AB.hashEquip.get("11");
+      if (eq11 != null) cb = (eq11.idPart > 0) ? eq11.idPart : ((eq11.ID == 2602) ? (short)223 : (short)-2);
+      MainItem eq13 = (MainItem)this.AB.hashEquip.get("13");
+      if (eq13 != null) cl = (eq13.idPart > 0) ? eq13.idPart : ((eq13.ID == 2601) ? (short)224 : (short)-2);
+
+      if (this.isBigScreen) {
+         // =================== MÀN HÌNH LỚN: 1 TAB TỔNG, VẼ 1 LẦN CHAR Ở GIỮA ===================
+         this.bodyY = yCur;
+         this.bodyH = super.hDia - (this.bodyY - super.AY) - 6;
+         if (this.bodyH < 114) this.bodyH = 114;
+         this.boxW = 60;
+         this.box0X = super.AX + 8;
+         this.box1X = super.AX + super.wDia - 8 - this.boxW;
+
+         int pSlotGap = 24;
+         int pSlotSize = super.wItem;
+
+         // --- CỘT TRÁI: 8 Ô TRANG BỊ THƯỜNG ---
+         AvMain.paintRect(var1, this.box0X, this.bodyY, this.boxW, this.bodyH, (byte)0, 3);
+         AvMain.paintRect(var1, this.box0X + 2, this.bodyY + 2, this.boxW - 4, 12, (byte)0, 1);
+         mFont.tahoma_7b_yellow.drawString(var1, "Trang Bị", this.box0X + this.boxW / 2, this.bodyY + 2, 2);
+
+         int b0LeftX = this.box0X + 4;
+         int b0RightX = this.box0X + this.boxW - pSlotSize - 4;
+         for (int i = 0; i < 4; i++) {
+            paintEquipSlot(var1, b0LeftX, this.bodyY + 16 + i * pSlotGap, pSlotSize, i * 2);
+            paintEquipSlot(var1, b0RightX, this.bodyY + 16 + i * pSlotGap, pSlotSize, i * 2 + 1);
+         }
+
+         // --- SÂN KHẤU TRUNG TÂM: VẼ 1 LẦN CHAR DUY NHẤT ---
+         int centerStageX = this.box0X + this.boxW + 4;
+         int centerStageW = this.box1X - centerStageX - 4;
+         int charCenterX = super.AX + super.wDia / 2;
+         int charCenterY = this.bodyY + 104; // Dịch Y xuống bằng cạnh dưới ô trang bị đáy
+
+         AvMain.paintRect(var1, centerStageX, this.bodyY, centerStageW, this.bodyH, (byte)0, 1);
+         if (MainObject.imgShadow != null) {
+            var1.drawImage((mImage)MainObject.imgShadow, charCenterX, charCenterY + 4, 3);
+         }
+         this.AB.paintThanhTich(var1, this.bodyY + 20, charCenterX);
+
+         // Tự động hiển thị đồ thần trang nếu người chơi đang chọn/xem ô thần trang (8..15)
+         if (super.idSelect >= 8) {
+            this.AB.paintCharShowWithOverride(var1, charCenterX, charCenterY, true, cw, ch, cb, cl);
+         } else {
+            this.AB.AA(var1, charCenterX, charCenterY, true);
+         }
+
+         // --- CỘT PHẢI: 8 Ô THẦN TRANG ---
+         AvMain.paintRect(var1, this.box1X, this.bodyY, this.boxW, this.bodyH, (byte)0, 3);
+         AvMain.paintRect(var1, this.box1X + 2, this.bodyY + 2, this.boxW - 4, 12, (byte)1, 0);
+         mFont.tahoma_7b_yellow.drawString(var1, "Thần Trang", this.box1X + this.boxW / 2, this.bodyY + 2, 2);
+
+         int b1LeftX = this.box1X + 4;
+         int b1RightX = this.box1X + this.boxW - pSlotSize - 4;
+         for (int i = 0; i < 4; i++) {
+            paintEquipSlot(var1, b1LeftX, this.bodyY + 16 + i * pSlotGap, pSlotSize, 8 + i * 2);
+            paintEquipSlot(var1, b1RightX, this.bodyY + 16 + i * pSlotGap, pSlotSize, 8 + i * 2 + 1);
+         }
+
+      } else {
+         // =================== GIAO DIỆN MÀN HÌNH NHỎ / CUỘN MƯỢT MÀ ===================
+         this.tabBtnY = yCur;
+         int btn0_x = super.AX + 8;
+         int btn1_x = super.AX + 12 + this.tabBtnW;
+         boolean isTab0 = (this.equipSubTab == 0);
+         boolean isTab1 = (this.equipSubTab == 1);
+
+         AvMain.paintRect(var1, btn0_x, this.tabBtnY, this.tabBtnW, this.tabBtnH, (byte)(isTab0 ? 1 : 0), (isTab0 ? 0 : 1));
+         if (isTab0 && AvMain.imgNenfocus != null) {
+            var1.drawRegion(AvMain.imgNenfocus, 2, 2, this.tabBtnW, this.tabBtnH, 0, btn0_x, this.tabBtnY, 0);
+         }
+         if (isTab0) {
+            mFont.tahoma_7b_yellow.drawString(var1, "Trang Bị", btn0_x + this.tabBtnW / 2, this.tabBtnY + 1, 2);
+         } else {
+            mFont.tahoma_7_black.drawString(var1, "Trang Bị", btn0_x + this.tabBtnW / 2, this.tabBtnY + 1, 2);
+         }
+
+         AvMain.paintRect(var1, btn1_x, this.tabBtnY, this.tabBtnW, this.tabBtnH, (byte)(isTab1 ? 1 : 0), (isTab1 ? 0 : 1));
+         if (isTab1 && AvMain.imgNenfocus != null) {
+            var1.drawRegion(AvMain.imgNenfocus, 2, 2, this.tabBtnW, this.tabBtnH, 0, btn1_x, this.tabBtnY, 0);
+         }
+         if (isTab1) {
+            mFont.tahoma_7b_yellow.drawString(var1, "Thần Trang", btn1_x + this.tabBtnW / 2, this.tabBtnY + 1, 2);
+         } else {
+            mFont.tahoma_7_black.drawString(var1, "Thần Trang", btn1_x + this.tabBtnW / 2, this.tabBtnY + 1, 2);
+         }
+         yCur += this.tabBtnH + 4;
+
+         // Viewport Cuộn Trang Bị Lên Xuống
+         int equipAreaX = super.AX + 4;
+         int equipAreaW = super.wDia - 8;
+         this.viewClipY = yCur;
+         this.viewClipH = EQUIP_PAGE_H;
+         if (this.viewClipY + this.viewClipH > super.AY + super.hDia - 4) {
+            this.viewClipH = super.AY + super.hDia - 4 - this.viewClipY;
+         }
+         if (this.viewClipH < 60) this.viewClipH = 60;
+
+         this.leftSlotX = equipAreaX + 6;
+         this.rightSlotX = equipAreaX + equipAreaW - super.wItem - 6;
+         int charCenterX = super.AX + super.wDia / 2;
+
+         var1.setClip(equipAreaX, this.viewClipY, equipAreaW, this.viewClipH);
+         var1.translate(0, -this.equipScrollY);
+
+         // --- PAGE 0: TRANG BỊ THƯỜNG (0..7) ---
+         int page0Y = this.viewClipY;
+         for (int i = 0; i < 4; i++) {
+            paintEquipSlot(var1, this.leftSlotX, page0Y + 2 + i * this.slotGapY, super.wItem, i * 2);
+            paintEquipSlot(var1, this.rightSlotX, page0Y + 2 + i * this.slotGapY, super.wItem, i * 2 + 1);
+         }
+         int charCenterY0 = page0Y + 86; // Offset hạ xuống chuẩn
+         if (MainObject.imgShadow != null) {
+            var1.drawImage((mImage)MainObject.imgShadow, charCenterX, charCenterY0 + 4, 3);
+         }
+         this.AB.paintThanhTich(var1, page0Y + 14, charCenterX);
+         this.AB.AA(var1, charCenterX, charCenterY0, true);
+
+         // --- PAGE 1: THẦN TRANG (8..15) ---
+         int page1Y = this.viewClipY + EQUIP_PAGE_H;
+         for (int i = 0; i < 4; i++) {
+            paintEquipSlot(var1, this.leftSlotX, page1Y + 2 + i * this.slotGapY, super.wItem, 8 + i * 2);
+            paintEquipSlot(var1, this.rightSlotX, page1Y + 2 + i * this.slotGapY, super.wItem, 8 + i * 2 + 1);
+         }
+         int charCenterY1 = page1Y + 86;
+         if (MainObject.imgShadow != null) {
+            var1.drawImage((mImage)MainObject.imgShadow, charCenterX, charCenterY1 + 4, 3);
+         }
+         this.AB.paintThanhTich(var1, page1Y + 14, charCenterX);
+         this.AB.paintCharShowWithOverride(var1, charCenterX, charCenterY1, true, cw, ch, cb, cl);
+
+         var1.translate(0, this.equipScrollY);
+         var1.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
+      }
+
+      mGraphics.AE();
+      mGraphics.restoreCanvas();
+      GameCanvas.resetTrans(var1);
+      if (super.cmdList != null) {
+         for(int var8 = 0; var8 < super.cmdList.size(); ++var8) {
+            iCommand var9;
+            (var9 = (iCommand)super.cmdList.elementAt(var8)).paint(var1, var9.xCmd, var9.yCmd);
+         }
+      }
+
+      super.AD(var1);
+      if (this.BI && this.BD != null) {
+         MainTab.AA(var1, this.BD, (mVector)null, (byte)0, this.BE, this.BF, this.BD.BS, this.BD.BT, false, this.AB, 0);
+      }
+   }
+
+   public final void update() {
+      if (this.isClose) {
+         this.closeDialog();
+         return;
+      }
+
+      // Smooth scroll animation cho chế độ compact
+      if (!this.isBigScreen) {
+         if (!this.isDraggingEquip && this.equipScrollY != this.equipToY) {
+            int d = (this.equipToY - this.equipScrollY) / 3;
+            if (d == 0) d = (this.equipToY > this.equipScrollY) ? 1 : -1;
+            this.equipScrollY += d;
+            if (CRes.abs(this.equipToY - this.equipScrollY) < 2) {
+               this.equipScrollY = this.equipToY;
+            }
+         }
+         this.equipSubTab = (this.equipScrollY > EQUIP_PAGE_H / 2) ? 1 : 0;
+      }
+
+      if (this.BD != null && !this.BI) {
+         ++this.BB;
+         if (this.BB >= 10 && super.idSelect >= 0 && super.idSelect < 16) {
+            this.BI = true;
+            calcAndSetPosInfo();
+         }
+      }
+
+      if (this.AB != null && this.AB.PL != null) {
+         for (int i = 0; i < this.AB.PL.size(); ++i) {
+            DataSkillEff eff = (DataSkillEff) this.AB.PL.elementAt(i);
+            if (eff != null) {
+               eff.AA();
+               if (eff.wantDestroy) {
+                  this.AB.PL.removeElement(i);
+                  --i;
+               }
+            }
+         }
+      }
+
+      this.updateAnimation();
+      this.handleKeyPress();
+      this.updatePointer();
+   }
+
+   public MainObject getObj() {
+      return this.AB;
+   }
+
+   private void calcAndSetPosInfo() {
+      if (this.BD == null || super.idSelect < 0 || super.idSelect >= 16) return;
+      if (this.isBigScreen) {
+         int pSlotGap = 24;
+         if (super.idSelect < 8) {
+            int row = super.idSelect / 2;
+            int col = super.idSelect % 2;
+            int sx = (col == 0) ? (this.box0X + 4) : (this.box0X + this.boxW - super.wItem - 4);
+            int sy = this.bodyY + 16 + row * pSlotGap;
+            setPosInfo(this.BD, sx + super.wItem / 2, sy + super.wItem);
+         } else {
+            int idx = super.idSelect - 8;
+            int row = idx / 2;
+            int col = idx % 2;
+            int sx = (col == 0) ? (this.box1X + 4) : (this.box1X + this.boxW - super.wItem - 4);
+            int sy = this.bodyY + 16 + row * pSlotGap;
+            setPosInfo(this.BD, sx + super.wItem / 2, sy + super.wItem);
+         }
+      } else {
+         int page = super.idSelect / 8;
+         int idx = super.idSelect % 8;
+         int row = idx / 2;
+         int col = idx % 2;
+         int sx = (col == 0) ? this.leftSlotX : this.rightSlotX;
+         int sy = this.viewClipY + page * EQUIP_PAGE_H + 2 + row * this.slotGapY - this.equipScrollY;
+         setPosInfo(this.BD, sx + super.wItem / 2, sy + super.wItem);
+      }
+   }
+
+   public final void handleKeyPress() {
+      boolean moved = false;
+      if (super.idSelect == -1 && (GameCanvas.isKeyPressed(0) || GameCanvas.isKeyPressed(2) || GameCanvas.isKeyPressed(1) || GameCanvas.isKeyPressed(3) || GameCanvas.isKeyPressed(5))) {
+         super.idSelect = 0;
+         GameCanvas.AH();
+         moved = true;
+      }
+
+      if (!this.isBigScreen && (GameCanvas.keyMyHold[10] || GameCanvas.keyMyHold[11])) {
+         GameCanvas.clearKeyHold(10);
+         GameCanvas.clearKeyHold(11);
+         this.equipToY = (this.equipToY == 0) ? EQUIP_PAGE_H : 0;
+         this.cmdSwitchPage.caption = (this.equipToY == 0) ? "Thần trang" : "Trang bị";
+         moved = true;
+      }
+
+      if (this.isBigScreen) {
+         // Điều hướng 4 cột trên màn hình to (0..1: Trang bị, 8..9: Thần trang)
+         if (GameCanvas.isKeyPressed(0)) { // Left
+            if (super.idSelect >= 8) {
+               if (super.idSelect % 2 == 1) {
+                  super.idSelect--;
+               } else {
+                  super.idSelect = (super.idSelect - 8) + 1; // Nhảy sang cột phải của Trang Bị
+               }
+            } else {
+               if (super.idSelect % 2 == 1) {
+                  super.idSelect--;
+               } else {
+                  super.idSelect = (super.idSelect + 8) + 1; // Vòng sang cột phải của Thần Trang
+               }
+            }
+            GameCanvas.ClearkeyMove(0);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(2)) { // Right
+            if (super.idSelect < 8) {
+               if (super.idSelect % 2 == 0) {
+                  super.idSelect++;
+               } else {
+                  super.idSelect = (super.idSelect - 1) + 8; // Nhảy sang cột trái của Thần Trang
+               }
+            } else {
+               if (super.idSelect % 2 == 0) {
+                  super.idSelect++;
+               } else {
+                  super.idSelect = (super.idSelect - 8) - 1; // Vòng về cột trái của Trang Bị
+               }
+            }
+            GameCanvas.ClearkeyMove(2);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(1)) { // Up
+            if (super.idSelect < 8) {
+               if (super.idSelect >= 2) super.idSelect -= 2;
+               else super.idSelect += 6; // Wrap row
+            } else {
+               if (super.idSelect >= 10) super.idSelect -= 2;
+               else super.idSelect += 6; // Wrap row
+            }
+            GameCanvas.ClearkeyMove(1);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(3)) { // Down
+            if (super.idSelect < 8) {
+               if (super.idSelect + 2 < 8) super.idSelect += 2;
+               else super.idSelect -= 6; // Wrap row
+            } else {
+               if (super.idSelect + 2 < 16) super.idSelect += 2;
+               else super.idSelect -= 6; // Wrap row
+            }
+            GameCanvas.ClearkeyMove(3);
+            moved = true;
+         }
+      } else {
+         // Điều hướng cuộn mượt mà trên màn hình nhỏ kiểu cũ (Xuống xem Thần Trang)
+         if (GameCanvas.isKeyPressed(0)) { // Left
+            if (super.idSelect % 2 == 1) {
+               super.idSelect--;
+            }
+            GameCanvas.ClearkeyMove(0);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(2)) { // Right
+            if (super.idSelect % 2 == 0 && super.idSelect + 1 < 16) {
+               super.idSelect++;
+            }
+            GameCanvas.ClearkeyMove(2);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(1)) { // Up
+            if (super.idSelect >= 2) {
+               super.idSelect -= 2;
+            } else {
+               super.idSelect = 14 + super.idSelect % 2;
+            }
+            GameCanvas.ClearkeyMove(1);
+            moved = true;
+         } else if (GameCanvas.isKeyPressed(3)) { // Down (Xem thần trang bên dưới khi keypad xuống)
+            if (super.idSelect + 2 < 16) {
+               super.idSelect += 2;
+            } else {
+               super.idSelect = super.idSelect % 2;
+            }
+            GameCanvas.ClearkeyMove(3);
+            moved = true;
+         }
+      }
+
+      if (GameCanvas.isKeyPressed(5)) { // Select
+         if (super.idSelect >= 0 && super.idSelect < 16) {
+            this.BD = (MainItem)this.AB.hashEquip.get("" + super.idSelect);
+            this.BI = (this.BD != null);
+            if (this.BD != null) {
+               calcAndSetPosInfo();
+            }
+         }
+         GameCanvas.ClearkeyMove(5);
+      }
+
+      if (moved) {
+         if (!this.isBigScreen) {
+            if (super.idSelect < 8) {
+               this.equipToY = 0;
+               this.cmdSwitchPage.caption = "Thần trang";
+            } else {
+               this.equipToY = EQUIP_PAGE_H;
+               this.cmdSwitchPage.caption = "Trang bị";
+            }
+         }
+
+         if (super.idSelect >= 0 && super.idSelect < 16) {
+            this.BI = false;
+            this.BB = 0;
+            this.BD = (MainItem)this.AB.hashEquip.get("" + super.idSelect);
+         } else {
+            super.idSelect = 0;
+            this.BI = false;
+            this.BB = 0;
+            this.BD = (MainItem)this.AB.hashEquip.get("0");
+         }
+      }
+   }
+
+   public final void updatePointer() {
+      if (super.cmdList != null) {
+         for(int var1 = 0; var1 < super.cmdList.size(); ++var1) {
+            ((iCommand)super.cmdList.elementAt(var1)).AE();
+         }
+      }
+
+      if (this.isBigScreen) {
+         // Touch / Click trên màn hình lớn
+         if (GameCanvas.isPointerSelect) {
+            int pSlotGap = 24;
+            int pSlotSize = super.wItem;
+            boolean outside = true;
+
+            // Kiểm tra các ô Trang Bị (0..7)
+            int b0LeftX = this.box0X + 4;
+            int b0RightX = this.box0X + this.boxW - pSlotSize - 4;
+            for (int i = 0; i < 4; i++) {
+               int sy = this.bodyY + 16 + i * pSlotGap;
+               int sL = i * 2;
+               int sR = i * 2 + 1;
+               if (GameCanvas.AB(b0LeftX - 2, sy - 2, pSlotSize + 4, pSlotSize + 4)) {
+                  outside = false;
+                  selectSlotPointer(sL, b0LeftX + pSlotSize / 2, sy + pSlotSize);
+                  break;
+               }
+               if (GameCanvas.AB(b0RightX - 2, sy - 2, pSlotSize + 4, pSlotSize + 4)) {
+                  outside = false;
+                  selectSlotPointer(sR, b0RightX + pSlotSize / 2, sy + pSlotSize);
+                  break;
+               }
+            }
+
+            // Kiểm tra các ô Thần Trang (8..15)
+            if (outside) {
+               int b1LeftX = this.box1X + 4;
+               int b1RightX = this.box1X + this.boxW - pSlotSize - 4;
+               for (int i = 0; i < 4; i++) {
+                  int sy = this.bodyY + 16 + i * pSlotGap;
+                  int sL = 8 + i * 2;
+                  int sR = 8 + i * 2 + 1;
+                  if (GameCanvas.AB(b1LeftX - 2, sy - 2, pSlotSize + 4, pSlotSize + 4)) {
+                     outside = false;
+                     selectSlotPointer(sL, b1LeftX + pSlotSize / 2, sy + pSlotSize);
+                     break;
+                  }
+                  if (GameCanvas.AB(b1RightX - 2, sy - 2, pSlotSize + 4, pSlotSize + 4)) {
+                     outside = false;
+                     selectSlotPointer(sR, b1RightX + pSlotSize / 2, sy + pSlotSize);
+                     break;
+                  }
+               }
+            }
+
+            if (outside && !GameCanvas.isPoint(super.AX, super.AY, super.wDia, super.hDia)) {
+               this.BD = null;
+               this.BI = false;
+               super.idSelect = -1;
+            }
+         }
+      } else {
+         // Touch / Drag trên màn hình nhỏ
+         int equipAreaX = super.AX + 4;
+         int equipAreaW = super.wDia - 8;
+
+         // Xử lý vuốt cuộn lên/xuống (Touch Drag Scroll)
+         if (GameCanvas.isPointerDown) {
+            if (!this.isDraggingEquip && GameCanvas.isPoint(equipAreaX, this.viewClipY, equipAreaW, this.viewClipH)) {
+               this.isDraggingEquip = true;
+               this.equipDragStartY = GameCanvas.AZ;
+               this.equipDragStartScrollY = this.equipScrollY;
+            } else if (this.isDraggingEquip) {
+               int dy = GameCanvas.AZ - this.equipDragStartY;
+               this.equipScrollY = this.equipDragStartScrollY - dy;
+               if (this.equipScrollY < -20) this.equipScrollY = -20 + (this.equipScrollY + 20) / 3;
+               if (this.equipScrollY > EQUIP_PAGE_H + 20) this.equipScrollY = EQUIP_PAGE_H + 20 + (this.equipScrollY - EQUIP_PAGE_H - 20) / 3;
+            }
+         } else {
+            if (this.isDraggingEquip) {
+               this.isDraggingEquip = false;
+               int dragDist = GameCanvas.AZ - this.equipDragStartY;
+               if (dragDist < -16) {
+                  this.equipToY = EQUIP_PAGE_H;
+                  this.cmdSwitchPage.caption = "Trang bị";
+               } else if (dragDist > 16) {
+                  this.equipToY = 0;
+                  this.cmdSwitchPage.caption = "Thần trang";
+               } else {
+                  this.equipToY = (this.equipScrollY > EQUIP_PAGE_H / 2) ? EQUIP_PAGE_H : 0;
+                  this.cmdSwitchPage.caption = (this.equipToY == 0) ? "Thần trang" : "Trang bị";
+               }
+            }
+         }
+
+         if (GameCanvas.isPointerSelect) {
+            int btn0_x = super.AX + 8;
+            int btn1_x = super.AX + 12 + this.tabBtnW;
+
+            // Chạm Tab 0: Trang bị
+            if (GameCanvas.AB(btn0_x, this.tabBtnY - 2, this.tabBtnW, this.tabBtnH + 4)) {
+               this.equipToY = 0;
+               this.cmdSwitchPage.caption = "Thần trang";
+               super.idSelect = -1;
+               this.BD = null;
+               this.BI = false;
+               GameCanvas.isPointerSelect = false;
+               return;
+            }
+
+            // Chạm Tab 1: Thần trang
+            if (GameCanvas.AB(btn1_x, this.tabBtnY - 2, this.tabBtnW, this.tabBtnH + 4)) {
+               this.equipToY = EQUIP_PAGE_H;
+               this.cmdSwitchPage.caption = "Trang bị";
+               super.idSelect = -1;
+               this.BD = null;
+               this.BI = false;
+               GameCanvas.isPointerSelect = false;
+               return;
+            }
+
+            // Chạm vào các ô trang bị (16 ô)
+            boolean outside = true;
+            for(int s = 0; s < 16; ++s) {
+               int page = s / 8;
+               int idx = s % 8;
+               int row = idx / 2;
+               int col = idx % 2;
+               int sx = (col == 0) ? this.leftSlotX : this.rightSlotX;
+               int sy = this.viewClipY + page * EQUIP_PAGE_H + 2 + row * this.slotGapY - this.equipScrollY;
+
+               if (sy + super.wItem >= this.viewClipY && sy <= this.viewClipY + this.viewClipH && GameCanvas.AB(sx - 2, sy - 2, super.wItem + 4, super.wItem + 4)) {
+                  outside = false;
+                  selectSlotPointer(s, sx + super.wItem / 2, sy + super.wItem);
+                  break;
+               }
+            }
+
+            if (outside && !GameCanvas.isPoint(equipAreaX, this.viewClipY, equipAreaW, this.viewClipH)) {
+               this.BD = null;
+               this.BI = false;
+               super.idSelect = -1;
+            }
+         }
+      }
+   }
+
+   private void selectSlotPointer(int s, int px, int py) {
+      if (s != super.idSelect) {
+         super.idSelect = s;
+         this.BD = (MainItem)this.AB.hashEquip.get("" + s);
+         this.BI = (this.BD != null);
+         this.BB = 10;
+         if (this.BD != null) {
+            setPosInfo(this.BD, px, py);
+         }
+      }
+      GameCanvas.isPointerSelect = false;
+   }
+
+   public void setPosInfo(MainItem item, int xbe, int ybe) {
+      int num = 100;
+      int num2 = 40;
+      if (item != null) {
+         num = item.BS;
+         num2 = item.BT;
+      }
+      this.BE = xbe - num / 2;
+      if (this.BE + num > MotherCanvas.w - 4) {
+         this.BE = MotherCanvas.w - num - 4;
+      }
+      if (this.BE < 4) {
+         this.BE = 4;
+      }
+      this.BF = ybe + 2;
+      if (this.BF + num2 > MotherCanvas.h - GameCanvas.hCommand - 4) {
+         this.BF = ybe - num2 - super.wItem - 4;
+      }
+      if (this.BF < 4) {
+         this.BF = 4;
+      }
+      if (item != null) {
+         int maxH = MotherCanvas.h - GameCanvas.hCommand - 8 - this.BF;
+         if (item.BT > maxH && maxH > 0) {
+            item.CO = item.BT - maxH;
+         }
+      }
+   }
+}

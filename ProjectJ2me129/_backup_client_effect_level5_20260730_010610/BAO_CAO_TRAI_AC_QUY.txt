@@ -1,0 +1,190 @@
+BAO CAO HIEU UNG TRAI AC QUY - CLIENT JAVA HAI TAC TI HON
+Ngay cap nhat: 29/07/2026
+
+Pham vi kiem tra:
+- Source client Java: C:\Users\Admin\Downloads\client sever\src client java haitactihon
+- Client Unity doi chieu: C:\Users\Admin\Downloads\client sever\HaiTacMobile_v1.2.9
+- Tai nguyen keo tu server: C:\Users\Admin\Downloads\release\release\Data\LeakRes\res\effect\4
+- Khong dung Effect_Skill.java phia server tuy bien lam bang anh xa goc.
+
+============================================================
+1. KET LUAN VE MA HOA
+============================================================
+
+Khong tim thay lop ma hoa trong cac file {id}.data cua effect 13-55.
+
+Nguyen nhan Java cu khong doc duoc effect 43, 53 va 55 la sai dinh dang parser:
+- Frame thuong: dx(short), dy(short), imageId(byte), flip(byte), onTop(byte).
+- Frame mo rong: dx(short), dy(short), imageId(byte), 0x80, flip(byte), rotate(short), onTop(byte).
+- Byte 0x80 la marker bao co them goc xoay, khong phai khoa hay du lieu ma hoa.
+
+Unity moi con ho tro SmallImage mo rong:
+- SmallImage thuong dung 5 byte: id, x, y, w, h.
+- Neu byte dau la 0xFF, parser doc id(byte) va x, y, w, h bang short.
+
+File .enc trong thu muc LeakRes chi la ban XOR 0x5A do cong cu leak tao ra.
+Client luc chay su dung .data; .enc khong phai lop bao ve cua client.
+
+============================================================
+2. DATA CHUA GI VA KHONG CHUA GI
+============================================================
+
+Moi effect dong gom:
+- {id}.png: sprite sheet.
+- {id}.data: vung anh, danh sach frame, vi tri tung manh anh, flip, goc xoay,
+  lop tren/duoi, sequence va mot so moc animation.
+
+Data + PNG du de client tu ve animation sau khi DataSkillEff duoc tao.
+Data khong tu chua:
+- sat thuong;
+- cooldown;
+- dieu kien dung skill;
+- chon muc tieu;
+- tru mana/nang luong;
+- toan bo trinh tu ghep nhieu effect cua mot skill.
+
+Nhung phan tren phai den tu Effect_Skill client hoac packet/logic server.
+
+Luong tai effect:
+DataSkillEff(effectId)
+-> kiem tra cache
+-> command 74, type 0 xin PNG + data
+-> server tra tai nguyen
+-> DataSkillEff parse va ve animation.
+
+Luong server gan effect dong:
+command 74, type 1
+-> target index, effect ID, thoi gian, typeMove, loop
+-> MainObject.addDataEff()
+-> DataSkillEff tu phat animation.
+
+============================================================
+3. ANH SANG
+============================================================
+
+Anh Sang cap 1: effect 13-23
+- Effect 13-18: skill chu dong 1, co bo dieu phoi hard-code tai Effect_Skill case 404.
+- Effect 19-22: skill chu dong 2, co bo dieu phoi hard-code tai Effect_Skill case 405.
+- Effect 23: buff; khong thay caller truc tiep, kha nang cao do server gan qua command 74 type 1.
+
+Anh Sang cap 5: effect 37-39 va 46-49
+- Data/PNG hop le va parser Java doc duoc.
+- Khong thay caller hard-code truc tiep trong source Java da phuc hoi.
+- Server co the gui tung ID qua command 74 type 1.
+- Neu server chi gui mot ma skill tong, client van can bo dieu phoi rieng de ghep dung thu tu.
+
+============================================================
+4. TINH YEU
+============================================================
+
+Tinh Yeu cap 1: effect 24-36
+- Case 406 dung truc tiep 25, 26, 27, 28 va 35; dieu khien duong bay, huong va va cham.
+- Case 407 dung truc tiep 29, 30, 31, 32 va 33; chia cac giai doan theo sequence.
+- Effect 24, 34 va 36 khong thay caller truc tiep; co the la effect server gan rieng.
+- Effect 34-36 co sequence rong nhung co mot frame hop le; day khong phai loi ma hoa.
+
+Tinh Yeu cap 5: effect 44-45
+- Data/PNG hop le va parser Java doc duoc.
+- Khong thay caller hard-code truc tiep trong source Java.
+- Co the hien thi khi server gan bang command 74 type 1.
+- Thu tu ghep 44/45 phai den tu server hoac bo dieu phoi client chua duoc tim thay.
+
+============================================================
+5. NIKA
+============================================================
+
+Anh xa da xac nhan:
+- Cap 1: effect 40-43.
+- Skill buff: effect 54.
+- Cap 5: effect 50-53.
+- Skill chu dong thu 2: effect 55.
+
+Quan he sprite/data:
+- 40.png trung 50.png; 41.png trung 51.png; 42.png trung 52.png; 43.png trung 53.png.
+- Cac cap co the dung chung hinh nhung file .data khac nhau de thay doi timing va chuyen dong.
+- 43 va 53: 6 anh nho, 10 frame, 36 part; 30 part dung record xoay mo rong.
+- 55: 10 anh nho, 26 frame, 415 part; 311 part dung record xoay mo rong.
+- 54: 12 anh nho, 4 frame, 12 part; parser cu van doc duoc.
+
+Unity IL2CPP xac nhan ba nhanh goc 810, 811 va 2107. Ban Java da doi sang
+type 3101, 3102 va 3103 de tranh xung dot voi cac effect cu:
+
+typeEffect 3101 - nhay/dap cua skill chu dong 1 cap 5, dung effect 50-53:
+- Frame 0: tao DataSkillEff 50 tai muc tieu.
+- Khoi tao fRemove = 30, step = 0; dung them FrameImage 356 va 183.
+- Frame 0-8: tang objFireMain.dy them 60 moi tick de tao chuyen dong bay len.
+- Frame 4: phat sound 51.
+- Frame 5: tao DataSkillEff 51 tai vi tri muc tieu, sau do step = 1.
+- Frame 9: dat dy = 480.
+- Frame 10-20: giam dy 60 moi tick de ha nhan vat xuong.
+- Frame 12: neu khoang cach toi muc tieu < 260, dua nguoi tung toi x cua muc tieu,
+  y = y muc tieu + 5.
+- Frame 21: reset dy = 0, setAva(1), tao Effect_End 148 va 45, rung man hinh 2-6 tick.
+- Frame 25: neu step = 1, tao effect 52 tai target.x - 30 va effect 53 tai target.x + 30;
+  sau do step = 2.
+- Sau frame 30: remove effect skill.
+
+typeEffect 3100 - skill chu dong 1 cap 1:
+- Dung cung choreography voi 3101.
+- Frame 0/5/25 lan luot goi bo 40, 41 va 42/43.
+- Anh 40-43 trung tung cap voi 50-53, nhung data animation khac nhau.
+
+typeEffect 3102 - skill chu dong thu 2, dung effect 55:
+- Luc khoi tao tao them Effect_End 30 tai diem tung skill, time 250.
+- Frame 0: tao DataSkillEff 55 tai vi tri nguoi tung skill.
+- Phan bay len, ha xuong, dich chuyen, va cham va rung man hinh giong typeEffect 3101.
+- Khong co doan goi effect 52/53 o frame 25.
+
+typeEffect 3103 - skill buff Nika:
+- Khoi tao fRemove = 2, levelPaint = 1.
+- Frame 0: objFireMain.addDataEff(54, 25000), nghia la gan effect 54 trong 25 giay.
+- Phat sound 30 va remove nhanh effect dieu phoi sau frame 2.
+
+Ket luan client:
+- Da port case 3100, 3101, 3102 va 3103 vao ca ba switch create/paint/update.
+- Da port day du cac moc dy, dich chuyen, va cham, rung man hinh, effect ket thuc va buff 25 giay.
+- Bo x4 ID 1-55 da duoc copy nguyen ID; client goi truc tiep effect 40-43 va 50-55 cua Nika.
+- Server/SQL dung skill 840-843; khong con chiem 816-821 cua Quan Cach Mang.
+- Command 74 chi gan animation len object; logic dy, dich chuyen va cac moc frame dac biet
+  hien da nam trong Effect_Skill.java cua client Java.
+
+============================================================
+6. PHAN DA PHUC HOI VA KIEM THU
+============================================================
+
+Da bo sung vao source Java:
+- Parser marker 0x80, flip va rotate(short).
+- Parser SmallImage mo rong 0xFF.
+- PartFrame.flip va PartFrame.rotate(short).
+- Renderer drawRegionRot cho goc xoay tuy y, co cache anh da xoay.
+- Constructor DataSkillEff(byte[]) de doc/kiem thu truc tiep tai nguyen.
+
+Ket qua kiem thu parser tren tai nguyen effect 13-55:
+- 43/43 file data doc thanh cong.
+- Effect 43: 10 frame, sequence 20, 36 part, 30 part xoay.
+- Effect 53: 10 frame, sequence 20, 36 part, 30 part xoay.
+- Effect 55: 26 frame, sequence 52, 415 part, 311 part xoay.
+
+Ket qua build:
+- Build Java thanh cong, 238 class.
+- JAR: target\HaiTacMobile_v129-recovered.jar
+- Bytecode JAR da xac nhan co dispatch typeEffect 3100-3103.
+- SHA-256: C28DB4402B07AAA65F5D3CC1B35CEEC4827150D11E2E08AF780C8881529A3F5B
+
+Gioi han con lai:
+- Build, parser, renderer va choreography Nika da co, nhung chua the khang dinh dung 100% gameplay
+  neu chua test truc tiep server gui typeEffect 3100-3103 va danh sach muc tieu.
+- Khong can dat choreography Nika trong server: src + SQL chi can gui dung typeEffect, target
+  va cac file data/PNG; timeline va logic nam trong client Java.
+- Can test trong game tung skill de xac nhan vi tri/pivot xoay va thu tu effect trung Unity.
+- Choreography cap 1 type 3100 duoc dung theo cap 5 vi 40-43 va 50-53 la cac cap anh tuong ung;
+  caller goc cap 1 khong xuat hien thanh literal trong dump Unity.
+
+File client quan trong:
+- src\main\java\main\DataSkillEff.java
+- src\main\java\main\PartFrame.java
+- src\main\java\main\mGraphics.java
+- src\main\java\main\Effect_Skill.java
+- src\main\java\main\MainObject.java
+- src\main\java\main\ReadMessenge.java
+- src\main\java\main\GlobalService.java

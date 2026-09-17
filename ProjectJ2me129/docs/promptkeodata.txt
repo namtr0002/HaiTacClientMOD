@@ -1,0 +1,1160 @@
+hãy nghiên cứu công cụ gửi msg và yêu cầu server gửi effect từ 0-256 tối ưu rút gọn chuẩn chỉnh ở 1 file class AEffectExporter không lỗi tối ưu siêu mạnh 
+
+data sql tôi cần kéo dạng như này INSERT `pirvateserverz`.`effect_data` SET `num_images` = 10, `seq_length` = 1, `has_extended` = 1, `images` = '[{\"idx\":30,\"x\":0,\"y\":0,\"w\":0,\"h\":35},{\"idx\":6,\"x\":1,\"y\":40,\"w\":37,\"h\":6},{\"idx\":18,\"x\":2,\"y\":0,\"w\":30,\"h\":24},{\"idx\":6,\"x\":3,\"y\":46,\"w\":37,\"h\":6},{\"idx\":18,\"x\":4,\"y\":35,\"w\":19,\"h\":19},{\"idx\":9,\"x\":5,\"y\":24,\"w\":30,\"h\":8},{\"idx\":19,\"x\":6,\"y\":35,\"w\":0,\"h\":17},{\"idx\":6,\"x\":7,\"y\":40,\"w\":43,\"h\":9},{\"idx\":9,\"x\":8,\"y\":24,\"w\":39,\"h\":9},{\"idx\":11,\"x\":9,\"y\":35,\"w\":37,\"h\":5}]', `frames` = '[{\"frame_idx\":0,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-34,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":1,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":2,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":3,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":4,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":5,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-30,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":6,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-34,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":7,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":8,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-34,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":9,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-34,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":10,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-31,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-32,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":11,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":12,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-34,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":13,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":14,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":15,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":16,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-18,\"dy\":-33,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":17,\"parts\":[{\"img_id\":0,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1},{\"img_id\":2,\"dx\":-19,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-2,\"dy\":-20,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":18,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-27,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":19,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":20,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":21,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":22,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":23,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-30,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-24,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":24,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-27,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":25,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":26,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-27,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":27,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-27,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":28,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-31,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-17,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-25,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":29,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":30,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-27,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":31,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":32,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":33,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":34,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-7,\"dy\":-26,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":35,\"parts\":[{\"img_id\":0,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":1,\"dy\":-17,\"flip\":0,\"on_top\":1},{\"img_id\":4,\"dx\":-8,\"dy\":-25,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":36,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":37,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":38,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":39,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":40,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":41,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-30,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-13,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-7,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":42,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":43,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":44,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":45,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":46,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-31,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-17,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":47,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":48,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":49,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":50,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":51,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":52,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":53,\"parts\":[{\"img_id\":0,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":1,\"dy\":-17,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":4,\"dy\":-14,\"flip\":0,\"on_top\":1},{\"img_id\":6,\"dx\":1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":4,\"dy\":-8,\"flip\":0,\"on_top\":1}]},{\"frame_idx\":54,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":55,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":56,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":57,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":58,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":59,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-30,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-13,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-7,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-11,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":60,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":61,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":62,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":63,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":64,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-31,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-17,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-12,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":65,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":66,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":67,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":68,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":69,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":70,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":71,\"parts\":[{\"img_id\":0,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":1,\"dy\":-17,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":4,\"dy\":-14,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":4,\"dy\":-8,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":7,\"dy\":-12,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":72,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-19,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":73,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":74,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":75,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":76,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":77,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-30,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-13,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-7,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-11,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-16,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":78,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-19,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":79,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":80,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-19,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":81,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-19,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":82,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-31,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-20,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-17,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-8,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-12,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-17,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":83,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":0},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":0},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":0},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":0},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":0},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":84,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-33,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-22,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-19,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-16,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-10,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-14,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-19,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":85,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":86,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":87,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":88,\"parts\":[{\"img_id\":0,\"dx\":-17,\"dy\":-32,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-1,\"dy\":-21,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":2,\"dy\":-18,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":5,\"dy\":-15,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":5,\"dy\":-9,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":8,\"dy\":-13,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":12,\"dy\":-18,\"flip\":0,\"on_top\":0}]},{\"frame_idx\":89,\"parts\":[{\"img_id\":0,\"dx\":-18,\"dy\":-31,\"flip\":0,\"on_top\":1},{\"img_id\":1,\"dx\":-2,\"dy\":-20,\"flip\":0,\"on_top\":1},{\"img_id\":3,\"dx\":1,\"dy\":-17,\"flip\":0,\"on_top\":1},{\"img_id\":5,\"dx\":4,\"dy\":-14,\"flip\":0,\"on_top\":1},{\"img_id\":7,\"dx\":4,\"dy\":-8,\"flip\":0,\"on_top\":1},{\"img_id\":8,\"dx\":7,\"dy\":-12,\"flip\":0,\"on_top\":0},{\"img_id\":9,\"dx\":11,\"dy\":-17,\"flip\":0,\"on_top\":0}]}]', `sequences` = '[{\"frame_idx\":0}]', `char_frames` = '[]', `splash` = '[{\"index_splash\":0},{\"index_splash\":0},{\"index_splash\":0}]', `parse_ok` = 1, `parse_error` = NULL WHERE `eff_id` = 13;
+
+
+
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+public final class AEffectExporter {
+    private AEffectExporter() {}
+
+    private static final String DEFAULT_SCHEMA = "pirvateserverz";
+    private static final String DEFAULT_TABLE = "effect_data";
+    private static final Path BASE_RES = Paths.get("C:", "ThMadara", "HTTH", "res", "effect");
+    private static final Path BASE_SQL = Paths.get("C:", "ThMadara", "HTTH", "SQL", "eff");
+    private static final Path BASE_RAW = Paths.get("C:", "ThMadara", "HTTH", "data", "template", "skill");
+    private static final int TIMEOUT_MS = 3000;
+    private static final int RETRIES = 1;
+
+    public static void startRange(int fromId, int toId, int threads, int zoom, int pauseMs) {
+        if (fromId < 0) fromId = 0;
+        if (toId < fromId) return;
+        try {
+            Files.createDirectories(BASE_RES.resolve(String.valueOf(zoom)));
+            Files.createDirectories(BASE_SQL);
+            Files.createDirectories(BASE_RAW);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+        ExecutorService ex = Executors.newFixedThreadPool(Math.max(1, threads));
+        List<Future<?>> futures = new ArrayList<>();
+        for (int id = fromId; id <= toId; id++) {
+            final short eff = (short) id;
+            futures.add(ex.submit(() -> {
+                byte[] raw = null;
+                byte[] img = null;
+                for (int attempt = 0; attempt <= RETRIES; attempt++) {
+                    try {
+                        sendRequestForEffect(eff);
+                        Wrapper w = waitForEffectData(eff);
+                        if (w != null && w.data != null) {
+                            raw = w.data;
+                            img = w.img;
+                            DataSkillEff.ALL_EFF_DATA.remove(String.valueOf(eff));
+                            break;
+                        }
+                    } catch (Throwable t) {}
+                    try { Thread.sleep(pauseMs); } catch (InterruptedException ie) { return; }
+                }
+                ParsedEffect parsed = raw != null ? parse(raw) : null;
+                try {
+                    saveFilesAtomic(eff, raw, img, zoom, parsed);
+                    System.out.println("[OK] effId=" + eff);
+                } catch (IOException e) {
+                    System.err.println("[FAIL SAVE] effId=" + eff + ": " + e.getMessage());
+                }
+            }));
+        }
+        ex.shutdown();
+        try {
+            ex.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException ignored) {}
+        System.out.println("Done " + fromId + "-" + toId);
+    }
+
+    private static void sendRequestForEffect(short effId) {
+        try {
+            GlobalService.getInstance().getDataSkillEFf((byte)0, effId);
+        } catch (Throwable t) {
+            try {
+                Message m = new Message((byte)74);
+                DataOutputStream dos = m.writer();
+                dos.writeByte(0);
+                dos.writeShort(effId);
+                dos.flush();
+                Session_ME.getInstance().AA(m);
+            } catch (Throwable ignored) {}
+        }
+    }
+
+    private static Wrapper waitForEffectData(short effId) {
+        long start = System.currentTimeMillis();
+        String key = String.valueOf(effId);
+        while (System.currentTimeMillis() - start < TIMEOUT_MS) {
+            try {
+                Object o = DataSkillEff.ALL_EFF_DATA.get(key);
+                if (o != null) {
+                    byte[] data = (byte[]) o.getClass().getField("data").get(o);
+                    byte[] imgRaw = (byte[]) o.getClass().getField("imgRaw").get(o);
+                    if (data != null) return new Wrapper(data, imgRaw);
+                }
+            } catch (Throwable ignored) {}
+            try { Thread.sleep(20); } catch (InterruptedException ignored) { return null; }
+        }
+        return null;
+    }
+
+    private static class Wrapper {
+        byte[] data, img;
+        Wrapper(byte[] d, byte[] i) { data = d; img = i; }
+    }
+
+    private static void saveFilesAtomic(short effId, byte[] raw, byte[] img, int zoom, ParsedEffect parsed) throws IOException {
+        Path zoomDir = BASE_RES.resolve(String.valueOf(zoom));
+        if (img != null && img.length > 8) {
+            String ext = detectImageExt(img);
+            atomicWrite(zoomDir.resolve(effId + ext), img);
+        }
+        if (raw != null && raw.length > 0) {
+            atomicWrite(BASE_RAW.resolve(effId + ".data"), raw);
+        }
+        String sql = parsed != null ? generateUpdateSQL(DEFAULT_SCHEMA, DEFAULT_TABLE, effId, parsed) : generateFailSql(effId);
+        atomicWrite(BASE_SQL.resolve("effect_" + effId + ".sql"), sql.getBytes("UTF-8"));
+    }
+
+    private static void atomicWrite(Path file, byte[] data) throws IOException {
+        Path tmp = file.getParent().resolve(file.getFileName() + ".tmp");
+        Files.write(tmp, data);
+        Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public static String generateUpdateSQL(String schema, String table, int effId, ParsedEffect parsed) {
+        if (schema == null) schema = DEFAULT_SCHEMA;
+        if (table == null) table = DEFAULT_TABLE;
+        int numImages = parsed != null && parsed.smallImages != null ? parsed.smallImages.length : 0;
+        int seqLength = parsed != null && parsed.sequence != null ? parsed.sequence.length : 0;
+        int hasExtended = parsed != null && parsed.charFrames != null ? 1 : 0;
+        String images = escapeJsonForSql(buildImagesJson(parsed != null ? parsed.smallImages : null));
+        String frames = escapeJsonForSql(buildFramesJson(parsed != null ? parsed.frames : null));
+        String sequences = escapeJsonForSql(buildSequencesJson(parsed != null ? parsed.sequence : null));
+        String charFrames = escapeJsonForSql(buildCharFramesJson(parsed != null ? parsed.charFrames : null));
+        String splash = escapeJsonForSql(buildSplashJson(parsed != null ? parsed.indexSplash : null));
+        StringBuilder sb = new StringBuilder(2048);
+        sb.append("UPDATE `").append(schema).append("`.`").append(table).append("` SET ");
+        sb.append("`num_images`=").append(numImages).append(",`seq_length`=").append(seqLength).append(",`has_extended`=").append(hasExtended).append(",");
+        sb.append("`images`='").append(images).append("',`frames`='").append(frames).append("',`sequences`='").append(sequences).append("',");
+        sb.append("`char_frames`='").append(charFrames).append("',`splash`='").append(splash).append("',`parse_ok`=1,`parse_error`=NULL ");
+        sb.append("WHERE `eff_id`=").append(effId).append(";");
+        return sb.toString();
+    }
+
+    public static String generateFailSql(int effId) {
+        return "UPDATE `" + DEFAULT_SCHEMA + "`.`" + DEFAULT_TABLE + "` SET `num_images`=0,`seq_length`=0,`has_extended`=0," +
+                "`images`='[]',`frames`='[]',`sequences`='[]',`char_frames`='[]',`splash`='[]',`parse_ok`=0,`parse_error`='timeout_or_missing' " +
+                "WHERE `eff_id`=" + effId + ";";
+    }
+
+    private static String escapeJsonForSql(String s) {
+        return s.replace("\\", "\\\\").replace("'", "\\'").replace("\"", "\\\"");
+    }
+
+    private static String detectImageExt(byte[] b) {
+        if (b == null || b.length < 4) return ".bin";
+        if (b[0] == (byte)0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47) return ".png";
+        if (b[0] == 'G' && b[1] == 'I' && b[2] == 'F') return ".gif";
+        if (b[0] == (byte)0xFF && b[1] == (byte)0xD8) return ".jpg";
+        return ".bin";
+    }
+
+    private static String buildImagesJson(SmallImage[] imgs) {
+        if (imgs == null || imgs.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < imgs.length; i++) {
+            SmallImage im = imgs[i];
+            sb.append("{\"idx\":").append(i).append(",\"x\":").append(im.x & 0xff).append(",\"y\":").append(im.y & 0xff)
+              .append(",\"w\":").append(im.w).append(",\"h\":").append(im.h).append("}");
+            if (i < imgs.length - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    private static String buildFramesJson(FrameEff[] frames) {
+        if (frames == null || frames.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int fi = 0; fi < frames.length; fi++) {
+            FrameEff f = frames[fi];
+            sb.append("{\"frame_idx\":").append(fi).append(",\"parts\":[");
+            boolean first = true;
+            if (f.topParts != null) for (PartFrame p : f.topParts) {
+                if (!first) sb.append(",");
+                sb.append(partJson(p));
+                first = false;
+            }
+            if (f.bottomParts != null) for (PartFrame p : f.bottomParts) {
+                if (!first) sb.append(",");
+                sb.append(partJson(p));
+                first = false;
+            }
+            sb.append("]}");
+            if (fi < frames.length - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    private static String partJson(PartFrame p) {
+        return "{\"img_id\":" + p.idSmallImg + ",\"dx\":" + p.dx + ",\"dy\":" + p.dy + ",\"flip\":" + p.flip + ",\"on_top\":" + p.onTop + "}";
+    }
+
+    private static String buildSequencesJson(byte[] seq) {
+        if (seq == null || seq.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < seq.length; i++) {
+            sb.append("{\"frame_idx\":").append(seq[i] & 0xff).append("}");
+            if (i < seq.length - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    private static String buildCharFramesJson(byte[][] charFrames) {
+        if (charFrames == null || charFrames.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < charFrames.length; i++) {
+            byte[] arr = charFrames[i];
+            sb.append("[");
+            if (arr != null) for (int j = 0; j < arr.length; j++) {
+                sb.append(arr[j] & 0xff);
+                if (j < arr.length - 1) sb.append(",");
+            }
+            sb.append("]");
+            if (i < charFrames.length - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    private static String buildSplashJson(byte[] splash) {
+        if (splash == null || splash.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < splash.length; i++) {
+            sb.append("{\"index_splash\":").append(splash[i] & 0xff).append("}");
+            if (i < splash.length - 1) sb.append(",");
+        }
+        return sb.append("]").toString();
+    }
+
+    public static ParsedEffect parse(byte[] raw) {
+        if (raw == null || raw.length == 0) return null;
+        try (DataInputStream dis = new DataInputStream(new ByteArrayInputStream(raw))) {
+            int numImages = dis.readUnsignedByte();
+            SmallImage[] smallImages = new SmallImage[numImages];
+            for (int i = 0; i < numImages; i++) {
+                smallImages[i] = new SmallImage(dis.readUnsignedByte(), dis.readUnsignedByte(), dis.readUnsignedByte(), dis.readUnsignedByte(), dis.readUnsignedByte());
+            }
+            short numFrames = dis.readShort();
+            FrameEff[] frames = new FrameEff[numFrames];
+            for (int fi = 0; fi < numFrames; fi++) {
+                byte countParts = dis.readByte();
+                Vector<PartFrame> topParts = new Vector<>();
+                Vector<PartFrame> bottomParts = new Vector<>();
+                for (int pi = 0; pi < countParts; pi++) {
+                    PartFrame part = new PartFrame(dis.readShort(), dis.readShort(), dis.readByte());
+                    part.flip = dis.readByte();
+                    part.onTop = dis.readByte();
+                    if (part.onTop == 0) bottomParts.add(part);
+                    else topParts.add(part);
+                }
+                frames[fi] = new FrameEff(topParts, bottomParts);
+            }
+            int seqLen = dis.readUnsignedByte();
+            byte[] sequence = new byte[seqLen];
+            for (int i = 0; i < seqLen; i++) sequence[i] = (byte) dis.readShort();
+            dis.readByte(); // skip unknown
+            byte[][] charFrames = new byte[4][];
+            byte fc0 = dis.readByte();
+            charFrames[0] = new byte[fc0 & 0xff];
+            dis.readFully(charFrames[0]);
+            byte fc1 = dis.readByte();
+            charFrames[1] = new byte[fc1 & 0xff];
+            dis.readFully(charFrames[1]);
+            byte fc3 = dis.readByte();
+            charFrames[3] = new byte[fc3 & 0xff];
+            dis.readFully(charFrames[3]);
+            byte[] indexSplash = new byte[4];
+            try {
+                indexSplash[0] = dis.readByte();
+                indexSplash[1] = dis.readByte();
+                indexSplash[2] = dis.readByte();
+                indexSplash[3] = indexSplash[2];
+            } catch (Exception ignored) {}
+            ParsedEffect parsed = new ParsedEffect();
+            parsed.smallImages = smallImages;
+            parsed.frames = frames;
+            parsed.sequence = sequence;
+            parsed.charFrames = charFrames;
+            parsed.indexSplash = indexSplash;
+            return parsed;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static class ParsedEffect {
+        SmallImage[] smallImages;
+        FrameEff[] frames;
+        byte[] sequence;
+        byte[][] charFrames;
+        byte[] indexSplash;
+    }
+
+    static class SmallImage {
+        byte x, y, w, h, other;
+        SmallImage(int x, int y, int w, int h, int other) {
+            this.x = (byte)x; this.y = (byte)y; this.w = (byte)w; this.h = (byte)h; this.other = (byte)other;
+        }
+    }
+
+    static class FrameEff {
+        Vector<PartFrame> topParts, bottomParts;
+        FrameEff(Vector<PartFrame> top, Vector<PartFrame> bottom) {
+            topParts = top;
+            bottomParts = bottom;
+        }
+    }
+
+    static class PartFrame {
+        short idSmallImg, dx;
+        byte dy, flip, onTop;
+        PartFrame(short id, short dx, byte dy) {
+            idSmallImg = id;
+            this.dx = dx;
+            this.dy = dy;
+        }
+    }
+}
+
+public final class EffectData {
+   public byte[] data;
+   public long count = -1L;
+   public mImage image;
+}
+
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+
+public final class DataSkillEff {
+   private byte Frame;
+   private byte AF;
+   private mVector listFrame = new mVector();
+   private SmallImage[] smallImage;
+   private byte[][] AI;
+   private byte[] AJ;
+   private byte[] AK;
+   private byte AL;
+   private boolean isLoadData;
+   public short idEff;
+   public static MyHashTable ALL_EFF_DATA = new MyHashTable();
+   private byte typeupdate;
+   private int AO;
+   private int AP;
+   public byte AC;
+   private int AQ;
+   public boolean AD;
+   private long AR;
+   private long AS;
+
+   static {
+      new MyHashTable();
+   }
+
+   public DataSkillEff(short var1, int var2) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AF = 0;
+      if (var2 == -1) {
+         this.typeupdate = 3;
+      } else if (var2 == 0) {
+         this.typeupdate = 1;
+      } else {
+         this.typeupdate = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.load();
+   }
+
+   public DataSkillEff(short var1, int var2, byte var3, byte var4) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AC = var3;
+      this.AL = var4;
+      if (var2 == -1) {
+         this.typeupdate = 3;
+      } else if (var2 == 0) {
+         this.typeupdate = 1;
+      } else {
+         this.typeupdate = 2;
+         this.AS = System.currentTimeMillis() + (long)var2;
+      }
+
+      this.load();
+   }
+
+   public DataSkillEff(short var1, int var2, int var3) {
+      new mVector();
+      this.AI = new byte[4][];
+      this.AK = new byte[4];
+      this.idEff = 0;
+      this.typeupdate = 0;
+      this.AQ = 0;
+      this.idEff = var1;
+      this.AO = var2;
+      this.AP = var3;
+      this.typeupdate = 1;
+      this.load();
+   }
+
+   private void loadData(byte[] var1) {
+      if (var1 != null) {
+         DataInputStream var2 = null;
+
+         try {
+            this.listFrame.removeAllElements();
+            this.smallImage = null;
+            byte var21 = (var2 = new DataInputStream(new ByteArrayInputStream(var1))).readByte();
+            this.smallImage = new SmallImage[var21];
+
+            int var3;
+            for(var3 = 0; var3 < var21; ++var3) {
+               this.smallImage[var3] = new SmallImage(var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte(), var2.readUnsignedByte());
+            }
+
+            var3 = 0;
+            int var22 = 10000;
+            short var4 = var2.readShort();
+
+            for(int var5 = 0; var5 < var4; ++var5) {
+               byte var6 = var2.readByte();
+               mVector var7 = new mVector();
+               mVector var8 = new mVector();
+
+               for(int var9 = 0; var9 < var6; ++var9) {
+                  PartFrame var10;
+                  (var10 = new PartFrame(var2.readShort(), var2.readShort(), var2.readByte())).AD = var2.readByte();
+                  var10.AE = var2.readByte();
+                  if (var10.AE == 0) {
+                     var7.addElement(var10);
+                  } else {
+                     var8.addElement(var10);
+                  }
+
+                  if (var3 < CRes.AD(var10.AC)) {
+                     var3 = CRes.AD(var10.AC);
+                  }
+
+                  if (CRes.AD(var10.AC) < var22) {
+                     var22 = CRes.AD(var10.AC);
+                  }
+               }
+
+               this.listFrame.addElement(new FrameEff(var7, var8));
+            }
+
+            short var10000 = this.smallImage[0].w;
+            this.AQ = var22;
+            short var23 = (short)var2.readUnsignedByte();
+            this.AJ = new byte[var23];
+
+            int var25;
+            for(var25 = 0; var25 < var23; ++var25) {
+               this.AJ[var25] = (byte)var2.readShort();
+            }
+
+            var2.readByte();
+            byte var24 = var2.readByte();
+            this.AI[0] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[0][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[1] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[1][var25] = var2.readByte();
+            }
+
+            var24 = var2.readByte();
+            this.AI[3] = new byte[var24];
+
+            for(var25 = 0; var25 < var24; ++var25) {
+               this.AI[3][var25] = var2.readByte();
+            }
+
+            this.isLoadData = true;
+
+            try {
+               this.AK[0] = (byte)(this.AI[0].length - 7);
+               this.AK[1] = (byte)(this.AI[1].length - 7);
+               this.AK[2] = (byte)(this.AI[2].length - 7);
+               this.AK[3] = (byte)(this.AI[3].length - 7);
+            } catch (Exception var18) {
+            }
+
+            this.AK[0] = var2.readByte();
+            this.AK[1] = var2.readByte();
+            this.AK[2] = var2.readByte();
+            this.AK[3] = this.AK[2];
+            return;
+         } catch (Exception var19) {
+         } finally {
+            try {
+               var2.close();
+            } catch (Exception var17) {
+            }
+
+         }
+
+      }
+   }
+
+   private void load() {
+      EffectData effectData;
+      if ((effectData = (EffectData)ALL_EFF_DATA.get(String.valueOf(this.idEff))) == null) {
+         effectData = new EffectData();
+         ALL_EFF_DATA.put(String.valueOf(this.idEff), effectData);
+         GlobalService.getInstance().getDataSkillEFf((byte)0, (short)this.idEff);
+      }
+      if (effectData != null && effectData.data != null) {
+         effectData.count = GameCanvas.timeNow / 1000L;
+         this.loadData(effectData.data);
+         this.isLoadData = true;
+      }
+
+   }
+
+   private boolean isHavedata() {
+      if (this.isLoadData) {
+         return true;
+      } else {
+         this.load();
+         return false;
+      }
+   }
+
+   public final void paintTopEff(mGraphics g, int x, int y, int hOne) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff frameEff = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector listPartTop = frameEff.listPartTop;
+
+                  for(int i = 0; i < listPartTop.size(); ++i) {
+                     PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
+                     SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
+                     mImage image;
+                     if ((image = this.getImage()) != null && image.image != null) {
+                        short dx = partFrame.dx;
+                        int num = smallImage.w;
+                        int num2 = smallImage.h;
+                        short num3 = smallImage.x;
+                        short num4 = smallImage.y;
+                        if (num3 > mImage.getImageWidth(image.image)) {
+                           num3 = 0;
+                        }
+
+                        if (num4 > mImage.getImageHeight(image.image)) {
+                           num4 = 0;
+                        }
+
+                        if (num3 + num > mImage.getImageWidth(image.image)) {
+                           num = mImage.getImageWidth(image.image) - num3;
+                        }
+
+                        if (num4 + num2 > mImage.getImageHeight(image.image)) {
+                           num2 = mImage.getImageHeight(image.image) - num4;
+                        }
+
+                        byte var14 = 0;
+                        if (hOne == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        g.drawRegion(image, num3, num4, num, num2, partFrame.AD == 1 ? 2 : 0, x + dx, y + partFrame.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+                  var15.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.idEff).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AA(mGraphics var1) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var2 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var12 = var2.listPartTop;
+
+                  for(int var3 = 0; var3 < var12.size(); ++var3) {
+                     PartFrame var4 = (PartFrame)var12.elementAt(var3);
+                     SmallImage var5 = this.smallImage[var4.idSmallImg];
+                     mImage var6;
+                     if ((var6 = this.getImage()) != null && var6.image != null) {
+                        short var7 = var4.dx;
+                        int var8 = var5.w;
+                        int var9 = var5.h;
+                        short var10 = var5.x;
+                        short var13 = var5.y;
+                        if (var10 > mImage.getImageWidth(var6.image)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.getImageHeight(var6.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.getImageWidth(var6.image)) {
+                           var8 = mImage.getImageWidth(var6.image) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.getImageHeight(var6.image)) {
+                           var9 = mImage.getImageHeight(var6.image) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+                  var11.printStackTrace();
+                  (new StringBuffer(" loi tai e  ")).append(this.idEff).toString();
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AB(mGraphics var1, int var2, int var3, int var4) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var5 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var16 = var5.AB;
+
+                  for(int var6 = 0; var6 < var16.size(); ++var6) {
+                     PartFrame var7 = (PartFrame)var16.elementAt(var6);
+                     SmallImage var8 = this.smallImage[var7.idSmallImg];
+                     mImage var9;
+                     if ((var9 = this.getImage()) != null && var9.image != null) {
+                        short var10 = var7.dx;
+                        int var11 = var8.w;
+                        int var12 = var8.h;
+                        short var13 = var8.x;
+                        short var17 = var8.y;
+                        if (var13 > mImage.getImageWidth(var9.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var17 > mImage.getImageHeight(var9.image)) {
+                           var17 = 0;
+                        }
+
+                        if (var13 + var11 > mImage.getImageWidth(var9.image)) {
+                           var11 = mImage.getImageWidth(var9.image) - var13;
+                        }
+
+                        if (var17 + var12 > mImage.getImageHeight(var9.image)) {
+                           var12 = mImage.getImageHeight(var9.image) - var17;
+                        }
+
+                        byte var14 = 0;
+                        if (var4 == 62 && this.AQ >= 50) {
+                           var14 = -8;
+                        }
+
+                        var1.drawRegion(var9, var13, var17, var11, var12, var7.AD == 1 ? 2 : 0, var2 + var10, var3 + var7.AC + var14, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var15) {
+               }
+            }
+
+         }
+      }
+   }
+
+   public final void AB(mGraphics var1) {
+      if (this.isHavedata()) {
+         if (this.typeupdate != 3 || this.Frame != -1) {
+            if (this.Frame < this.listFrame.size()) {
+               FrameEff var2 = (FrameEff)this.listFrame.elementAt(this.Frame);
+
+               try {
+                  mVector var12 = var2.AB;
+
+                  for(int var3 = 0; var3 < var12.size(); ++var3) {
+                     PartFrame var4 = (PartFrame)var12.elementAt(var3);
+                     SmallImage var5 = this.smallImage[var4.idSmallImg];
+                     mImage var6;
+                     if ((var6 = this.getImage()) != null && var6.image != null) {
+                        short var7 = var4.dx;
+                        int var8 = var5.w;
+                        int var9 = var5.h;
+                        short var10 = var5.x;
+                        short var13 = var5.y;
+                        if (var10 > mImage.getImageWidth(var6.image)) {
+                           var10 = 0;
+                        }
+
+                        if (var13 > mImage.getImageHeight(var6.image)) {
+                           var13 = 0;
+                        }
+
+                        if (var10 + var8 > mImage.getImageWidth(var6.image)) {
+                           var8 = mImage.getImageWidth(var6.image) - var10;
+                        }
+
+                        if (var13 + var9 > mImage.getImageHeight(var6.image)) {
+                           var9 = mImage.getImageHeight(var6.image) - var13;
+                        }
+
+                        var1.drawRegion(var6, var10, var13, var8, var9, var4.AD == 1 ? 2 : 0, this.AO + var7, this.AP + var4.AC, 0);
+                     }
+                  }
+
+                  return;
+               } catch (Exception var11) {
+               }
+            }
+
+         }
+      }
+   }
+
+   private mImage getImage() {
+      EffectData var1;
+      (var1 = (EffectData)ALL_EFF_DATA.get(String.valueOf(this.idEff))).count = GameCanvas.timeNow / 1000L;
+      return var1.image;
+   }
+
+   public static EffectData readData(byte[] var0) {
+      EffectData var1 = null;
+
+      try {
+         ByteArrayInputStream var2 = new ByteArrayInputStream(var0);
+         DataInputStream var8;
+         short var3 = (var8 = new DataInputStream(var2)).readShort();
+         byte[] var4 = new byte[var8.readShort()];
+         var8.read(var4);
+         byte[] var5 = new byte[var8.available()];
+         var8.read(var5);
+         if ((var1 = (EffectData)ALL_EFF_DATA.get(String.valueOf(var3))) != null) {
+            var1.data = var4;
+            var1.image = mImage.AA(var5);
+            var1.count = GameCanvas.timeNow / 1000L;
+         }
+
+         short var10 = var3;
+         byte[] var9 = var0;
+
+         try {
+            CRes.AA("DataSkillEff" + var10, var9);
+         } catch (Exception var6) {
+            var6.printStackTrace();
+         }
+      } catch (Exception var7) {
+      }
+
+      return var1;
+   }
+
+   public final void AA() {
+      if (this.isHavedata()) {
+         if (this.listFrame.size() > 0 || this.AJ.length > 0) {
+            try {
+               switch(this.typeupdate) {
+               case 0:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AD = true;
+                     this.AF = 0;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 1:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                     this.AD = true;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 2:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     this.AF = 0;
+                  }
+
+                  if (this.AS - System.currentTimeMillis() < 0L) {
+                     this.AD = true;
+                  }
+
+                  this.Frame = this.AJ[this.AF];
+                  return;
+               case 3:
+                  ++this.AF;
+                  if (this.AF > this.AJ.length) {
+                     label52: {
+                        if (this.AL > 0) {
+                           if (System.currentTimeMillis() - this.AR <= (long)(this.AL * 1000)) {
+                              break label52;
+                           }
+
+                           this.AR = System.currentTimeMillis();
+                        }
+
+                        this.AF = 0;
+                     }
+                  }
+
+                  if (this.AF < this.AJ.length) {
+                     this.Frame = this.AJ[this.AF];
+                     return;
+                  } else {
+                     this.Frame = -1;
+                     return;
+                  }
+               default:
+               }
+            } catch (Exception var1) {
+            }
+         }
+      }
+   }
+}
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public final class Session_ME implements Class_HQ {
+   private static Session_ME instance = new Session_ME();
+   private DataOutputStream AM;
+   public DataInputStream AA;
+   public static IMessageHandler AB;
+   private Class_CC AN;
+   public boolean AC;
+   public boolean AD;
+   private final Sender sender = new Sender(this);
+   private Thread AP;
+   public Thread AE;
+   private int AQ;
+   public int AF;
+   boolean AG;
+   public byte[] AH = null;
+   private byte AR;
+   private byte AS;
+   long AI;
+   public static boolean AJ;
+   private static mVector AT = new mVector();
+   public static int AK = 0;
+
+   public static Session_ME getInstance() {
+      return instance;
+   }
+
+   public final boolean AB() {
+      return this.AC;
+   }
+
+   public static void setHandler(IMessageHandler var0) {
+      AB = var0;
+   }
+
+   public final void connect(String var1, int var2) {
+      if (!this.AC && !this.AD) {
+         this.sender.AA();
+         this.AG = false;
+         this.AN = null;
+         this.AP = new Thread(new Class_HU(this, var1, var2));
+         System.out.println("connect " + var1 + ":" + var2);
+         this.AP.start();
+         if (LoadMap.AY == 3) {
+            GameScreen.player.AD(true);
+         }
+
+      }
+   }
+
+   public static void AB(Message var0) {
+      GameMidlet.AE();
+      AB.AA(var0);
+   }
+
+   public final void AA(Message var1) {
+      this.sender.AA(var1);
+   }
+
+   private synchronized void AC(Message var1) {
+      byte[] var2 = var1.AA();
+
+      try {
+         byte var5;
+         if (this.AG) {
+            var5 = this.AB(var1.AA);
+            this.AM.writeByte(var5);
+         } else {
+            this.AM.writeByte(var1.AA);
+         }
+
+         if (var2 != null) {
+            int var6 = var2.length;
+            if (this.AG) {
+               byte var3 = this.AB((byte)(var6 >> 8));
+               this.AM.writeByte(var3);
+               var5 = this.AB((byte)var6);
+               this.AM.writeByte(var5);
+            } else {
+               this.AM.writeShort(var6);
+            }
+
+            if (this.AG) {
+               for(int var7 = 0; var7 < var2.length; ++var7) {
+                  var2[var7] = this.AB(var2[var7]);
+               }
+            }
+
+            this.AM.write(var2);
+            this.AQ += 5 + var2.length;
+         } else {
+            this.AM.writeShort(0);
+            this.AQ += 5;
+         }
+
+         this.AM.flush();
+      } catch (IOException var4) {
+         var4.printStackTrace();
+      }
+   }
+
+   private byte AA(byte var1) {
+      byte[] var10000 = this.AH;
+      byte var10003 = this.AR;
+      this.AR = (byte)(var10003 + 1);
+      var1 = (byte)(var10000[var10003] & 255 ^ var1 & 255);
+      if (this.AR >= this.AH.length) {
+         this.AR = (byte)(this.AR % this.AH.length);
+      }
+
+      return var1;
+   }
+
+   private byte AB(byte var1) {
+      byte[] var10000 = this.AH;
+      byte var10003 = this.AS;
+      this.AS = (byte)(var10003 + 1);
+      var1 = (byte)(var10000[var10003] & 255 ^ var1 & 255);
+      if (this.AS >= this.AH.length) {
+         this.AS = (byte)(this.AS % this.AH.length);
+      }
+
+      return var1;
+   }
+
+   public final void AC() {
+      this.AD();
+   }
+
+   private void AD() {
+      this.AH = null;
+      this.AR = 0;
+      this.AS = 0;
+
+      try {
+         this.AC = false;
+         this.AD = false;
+         if (this.AN != null) {
+            this.AN.AA();
+            this.AN = null;
+         }
+
+         if (this.AM != null) {
+            this.AM.close();
+            this.AM = null;
+         }
+
+         if (this.AA != null) {
+            this.AA.close();
+            this.AA = null;
+         }
+
+         this.AE = null;
+         if (this.AP != null && this.AP.isAlive()) {
+            this.AP.interrupt();
+            this.AP = null;
+         }
+
+         System.gc();
+      } catch (Exception var2) {
+         var2.printStackTrace();
+      }
+   }
+
+   static Class_CC AA(Session_ME var0) {
+      return var0.AN;
+   }
+
+   static void AA(Session_ME var0, Class_CC var1) {
+      var0.AN = var1;
+   }
+
+   static void AA(Session_ME var0, DataOutputStream var1) {
+      var0.AM = var1;
+   }
+
+   static Sender AB(Session_ME var0) {
+      return var0.sender;
+   }
+
+   static void AA(Session_ME var0, Message var1) {
+      var0.AC(var1);
+   }
+
+   static void AC(Session_ME var0) {
+      var0.AD();
+   }
+
+   static byte AA(Session_ME var0, byte var1) {
+      return var0.AA(var1);
+   }
+
+   static Message AB(Session_ME var0, byte var1) {
+       try {
+           byte var2 = (var0 = var0).AA(var0.AA.readByte());
+           byte var3 = var0.AA(var0.AA.readByte());
+           byte var4 = var0.AA(var0.AA.readByte());
+           byte var5 = var0.AA(var0.AA.readByte());
+           int var7;
+           byte[] var8 = new byte[var7 = (var2 & 255) << 24 | (var3 & 255) << 16 | (var4 & 255) << 8 | var5 & 255];
+           int var9 = 0;
+           int var10 = 0;
+           
+           int var6;
+           while(var9 != -1 && var10 < var7) {
+               if ((var9 = var0.AA.read(var8, var10, var7 - var10)) > 0) {
+                   var10 += var9;
+                   var0.AF += var10 + 5;
+                   var6 = instance.AF + instance.AQ;
+                   (new StringBuffer(String.valueOf(var6 / 1024))).append(".").append(var6 % 1024 / 102).append("Kb").toString();
+               }
+           }
+           
+           if (var0.AG) {
+               for(var6 = 0; var6 < var8.length; ++var6) {
+                   var8[var6] = var0.AA(var8[var6]);
+               }
+           }
+           
+           return new Message(var1, var8);
+       } catch (IOException ex) {
+           ex.printStackTrace();
+       }
+       return null;
+   }
+}
+case 74:
+      case 76:
+         rmsg = GameCanvas.readMessage;
+         ReadMessenge.getDataEff(var1);
+         return;
+		 
+public static void getDataEff(Message m) {
+      try {
+         short id;
+         MainObject mainObject;
+         switch(m.reader().readByte()) {
+         case 0:
+            byte[] data = new byte[m.reader().available()];
+            m.reader().read(data);
+            DataSkillEff.readData(data);
+            return;
+         case 1:
+            id = m.reader().readShort();
+            short id2 = m.reader().readShort();
+            int time = m.reader().readInt();
+            byte typemove = m.reader().readByte();
+            byte loop = m.reader().readByte();
+            if ((mainObject = GameScreen.AA(id)) != null) {
+               mainObject.addDataEff(id2, time, typemove, loop);
+               return;
+            }
+            break;
+         case 2:
+            id = m.reader().readShort();
+            short id3 = m.reader().readShort();
+            if ((mainObject = GameScreen.AA(id)) == null) {
+               break;
+            }
+            mainObject.removeDataEff(id3);
+         default:
+            return;
+         }
+      } catch (Exception var5) {
+      }
+
+   }
+   
+SERVER
+case 74: {
+                byte type = m.reader().readByte();
+                short id = m.reader().readShort();
+                Logp.debug("74 type", type, "id", id);
+
+                if (conn.p != null) {
+                    switch (type) {
+                        case 0: // client yêu cầu dữ liệu effect
+                            EffectService.sendEffectData(conn.p, id);
+                            break;
+                        case 1: // gắn effect vào đối tượng (ví dụ mob, player)
+                            // Cái này thường do server chủ động gọi, nhưng nếu client gửi lên thì xử lý tại đây
+                            // Tham số tiếp theo: targetId, time, typeMove, loop
+                            int targetId = m.reader().readShort();
+                            int time = m.reader().readInt();
+                            byte typeMove = m.reader().readByte();
+                            byte loop = m.reader().readByte();
+                            EffectService.attachEffectToPlayer(conn.p, targetId, id, time, typeMove, loop);
+                            break;
+                        case 2: // gỡ effect
+                            int targetIdRemove = m.reader().readShort();
+                            EffectService.removeEffectFromPlayer(conn.p, targetIdRemove, id);
+                            break;
+                        default:
+                            Logp.warn("Unknown effect type: " + type);
+                            break;
+                    }
+                }
+                break;
+            }

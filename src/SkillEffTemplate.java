@@ -1,0 +1,1 @@
+"public class SkillEffTemplate {\n   public mVector listFrame = new mVector();\n   public SmallImage[] smallImage;\n   public byte[][] frameChar = new byte[4][];\n   public byte[] sequence;\n   public int fw;\n   public int fh;\n   public int min;\n}\n"

@@ -1,0 +1,28 @@
+
+InputObject                                                                              SideIndicator
+-----------                                                                              -------------
+			short oldMapId = (short)AThMadaraMOD.lastRecordedMapId;                               =>           
+			if (oldMapId != -1 && oldMapId != idmap)                                              =>           
+				AThMadaraFunc.recordTransition(oldMapId, idmap, AThMadaraMOD.lastSteppedPortalName); =>           
+			AThMadaraMOD.lastRecordedMapId = idmap;                                               =>           
+			AThMadaraMOD.lastSteppedPortalName = null;                                            =>           
+			if (GameScreen.player != null)                                                        =>           
+				GameScreen.player.forceStopMovement();                                               =>           
+			short oldMapId = (short)AThMadaraMOD.lastRecordedMapId;                               =>           
+			if (oldMapId != -1 && oldMapId != idmap)                                              =>           
+				AThMadaraFunc.recordTransition(oldMapId, idmap, AThMadaraMOD.lastSteppedPortalName); =>           
+			AThMadaraMOD.lastRecordedMapId = idmap;                                               =>           
+			AThMadaraMOD.lastSteppedPortalName = null;                                            =>           
+			if (GameScreen.player != null)                                                        =>           
+				GameScreen.player.forceStopMovement();                                               =>           
+			{                                                                                     =>           
+			}                                                                                     =>           
+			{                                                                                     =>           
+			}                                                                                     =>           
+			{                                                                                     =>           
+			}                                                                                     =>           
+			{                                                                                     =>           
+			}                                                                                     =>           
+					string text = "";                                                                   <=           
+
+

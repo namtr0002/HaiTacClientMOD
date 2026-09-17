@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill 4013 — Đại Phật Sóng Xung Kích X | Sengoku Masterpiece VFX</title>
+<style>
+:root {
+  --bg-deep: #080410;
+  --bg-card: #120b22;
+  --border: #2e1d4e;
+  --border-glow: #ffb300;
+  --accent: #ffd700;
+  --gold: #ffb300;
+  --cyan: #00e5ff;
+  --text-main: #f5f0ff;
+  --text-sub: #a694c4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background: var(--bg-deep); color: var(--text-main); padding: 24px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+.header { max-width: 1040px; width: 100%; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+.header h1 { font-size: 22px; color: var(--accent); letter-spacing: 1px; }
+.header p { font-size: 12px; color: var(--text-sub); margin-top: 4px; }
+.back-btn { background: #261644; color: #fff; text-decoration: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); transition: all 0.15s; }
+.back-btn:hover { background: #3d2170; border-color: var(--accent); color: var(--accent); }
+
+.main-grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; max-width: 1040px; width: 100%; }
+@media(max-width: 860px) { .main-grid { grid-template-columns: 1fr; } }
+
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 18px; margin-bottom: 18px; }
+.card h2 { font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Canvas Player */
+#player-wrap { position: relative; width: 100%; background: radial-gradient(circle, #1a0e33 0%, #080410 80%); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 12px; }
+canvas#previewCanvas { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.player-controls { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl-btn { padding: 6px 14px; background: #22143d; border: 1px solid var(--border); color: #fff; border-radius: 4px; font-size: 11px; cursor: pointer; }
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+#phaseText { font-size: 11px; color: #ffb300; margin-left: 4px; font-weight: 700; }
+
+/* Timeline Bar */
+.timeline-bar { margin-top: 10px; height: 6px; background: #1a0e33; border-radius: 3px; overflow: hidden; position: relative; }
+.timeline-fill { height: 100%; background: linear-gradient(90deg, #ffb300, #ffd700, #ffffff, #ffb300); border-radius: 3px; transition: width 0.05s linear; }
+
+/* Spritesheets Grid */
+.sheet-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sheet-card { background: #0a0614; border: 1px solid var(--border); border-radius: 6px; padding: 10px; text-align: center; }
+.sheet-card img { max-height: 80px; width: auto; object-fit: contain; image-rendering: pixelated; margin-bottom: 6px; }
+.sheet-title { font-size: 11px; font-weight: 600; color: #fff; }
+.sheet-sub { font-size: 10px; color: var(--cyan); margin-top: 2px; }
+
+/* Specs */
+.stat-row { display: flex; justify-content: space-between; font-size: 12px; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.stat-row span.val { color: var(--accent); font-weight: 600; }
+.icon-box { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+.icon-box img { border: 1px solid var(--accent); border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>[ SKILL 4013 — Đại Phật Sóng Xung Kích X ]</h1>
+    <p>Thần Trang Bộ Tuyệt Kỹ | Sengoku Golden Daibutsu Masterpiece Engine — 72 Frames 60FPS</p>
+  </div>
+  <a href="index.html" class="back-btn">← Master Showcase</a>
+</div>
+
+<div class="main-grid">
+  <!-- Left Column -->
+  <div>
+    <div class="card">
+      <h2>MÔ PHỎNG CHIÊU THỨC THỜI GIAN THỰC (CANVAS 60 FPS SUB-FRAME)</h2>
+      <div id="player-wrap">
+        <canvas id="previewCanvas" width="600" height="300"></canvas>
+      </div>
+      <div class="player-controls">
+        <button class="ctrl-btn" id="btnPlay">⏸ Pause</button>
+        <button class="ctrl-btn" id="btnLoop">↺ Loop: ON</button>
+        <button class="ctrl-btn" id="btnSpeed">Speed: 1x</button>
+        <span id="frameText" style="font-size: 11px; color: #ffd700; margin-left: auto;">t=0.00s</span>
+        <span id="phaseText">TỤ LỰC</span>
+      </div>
+      <div class="timeline-bar"><div class="timeline-fill" id="timelineFill" style="width:0%"></div></div>
+      <p style="font-size: 12px; color: #a694c4; line-height: 1.6; margin-top: 10px;">
+        Hóa thân Đại Phật Hoàng Kim cực đại tụ áp lực kình khí phóng bức tường sóng xung kích chấn động càn khôn quét sạch quân thù.
+      </p>
+    </div>
+
+    <!-- Spritesheets -->
+    <div class="card">
+      <h2>BỘ 6 SPRITESHEETS VERTICAL STRIP MASTERPIECE (72 FRAMES)</h2>
+      <div class="sheet-grid">
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_cast_sheet.png" alt="Cast">
+          <div class="sheet-title">Cast / Tụ Lực</div>
+          <div class="sheet-sub">280×240 (12 frames)</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_projectile_sheet.png" alt="Projectile">
+          <div class="sheet-title">Projectile / Đạn</div>
+          <div class="sheet-sub">240×90 (12 frames)</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_impact_sheet.png" alt="Impact">
+          <div class="sheet-title">Impact / Va Chạm</div>
+          <div class="sheet-sub">280×280 (12 frames)</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_particles_sheet.png" alt="Particles">
+          <div class="sheet-title">Particles / Mảnh Vụn</div>
+          <div class="sheet-sub">140×160 (10 frames)</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_aura_sheet.png" alt="Aura">
+          <div class="sheet-title">Aura / Đài Sen</div>
+          <div class="sheet-sub">200×120 (10 frames)</div>
+        </div>
+        <div class="sheet-card">
+          <img src="../spritesheets/skill_4013_finisher_sheet.png" alt="Finisher">
+          <div class="sheet-title">Finisher / Dư Chấn</div>
+          <div class="sheet-sub">400×300 (16 frames)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column -->
+  <div>
+    <div class="card">
+      <h2>ICON THẦN TRANG CHUẨN</h2>
+      <div class="icon-box">
+        <div>
+          <img src="../icons/88x88/4013.png" width="88" height="88" alt="88x88" onerror="this.style.display='none'">
+          <div style="font-size: 10px; color: #a694c4; text-align: center; margin-top: 4px;">88×88 (Zoom 4)</div>
+        </div>
+        <div>
+          <img src="../icons/44x44/4013_mini.png" width="44" height="44" alt="44x44" onerror="this.style.display='none'">
+          <div style="font-size: 10px; color: #a694c4; text-align: center; margin-top: 4px;">44×44 (In-game)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>THÔNG SỐ ĐẶC TẢ KỸ NĂNG</h2>
+      <div class="stat-row"><span>Mã Skill:</span> <span class="val">ID 4013</span></div>
+      <div class="stat-row"><span>Nhân Vật:</span> <span class="val">Sengoku (Đức Phật Vàng)</span></div>
+      <div class="stat-row"><span>Hệ / Nguyên Tố:</span> <span class="val">Kim Cương / Sóng Xung Kích</span></div>
+      <div class="stat-row"><span>Tổng Frame VFX:</span> <span class="val" style="color:#00e5ff;">72 Frames (HD Masterpiece)</span></div>
+      <div class="stat-row"><span>Phạm Vi Đánh:</span> <span class="val">240px</span></div>
+      <div class="stat-row"><span>Bán Kính Nổ AOE:</span> <span class="val">200px</span></div>
+      <div class="stat-row"><span>Hiệu Ứng Khống Chế:</span> <span class="val" style="color:#ffb300;">CHẤN ĐỘNG / VĂNG XA</span></div>
+      <div class="stat-row"><span>Trạng Thái Kiểm Thử:</span> <span class="val" style="color: #00e676;">ZERO CLIP (0 Clipped)</span></div>
+    </div>
+
+    <div class="card">
+      <h2>PHASE TIMELINE HOẠT HỌA</h2>
+      <div class="stat-row"><span>① Tụ Lực (CAST):</span> <span class="val">0.0 → 0.65s (12f)</span></div>
+      <div class="stat-row"><span>② Đài Sen (AURA):</span> <span class="val">0.0 → 0.70s (10f)</span></div>
+      <div class="stat-row"><span>③ Sóng Càn Quét (PROJ):</span> <span class="val">0.65 → 1.30s (12f)</span></div>
+      <div class="stat-row"><span>④ Bộc Phát Sóng (IMPACT):</span> <span class="val">1.25 → 1.95s (12f)</span></div>
+      <div class="stat-row"><span>⑤ Mảnh Vụn (PARTICLES):</span> <span class="val">1.30 → 2.10s (10f)</span></div>
+      <div class="stat-row"><span>⑥ Đại Phật Chưởng (FINISHER):</span> <span class="val">1.80 → 3.00s (16f)</span></div>
+      <div class="stat-row"><span>Tổng Thời Lượng:</span> <span class="val">3.00 giây</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const sid = 4013;
+const canvas = document.getElementById('previewCanvas');
+const ctx = canvas.getContext('2d');
+const SW = 600, SH = 300;
+
+let playing = true, looping = true, speedMul = 1.0;
+const TOTAL_DUR = 3.0;
+let t = 0, lastRAF = null;
+
+let shakeAmt = 0, shakeTimer = 0;
+function triggerShake(amt, dur) { shakeAmt = amt; shakeTimer = dur; }
+
+const sheets = {};
+['cast','projectile','impact','particles','aura','finisher'].forEach(c => {
+  const img = new Image();
+  img.src = `../spritesheets/skill_${sid}_${c}_sheet.png`;
+  sheets[c] = img;
+});
+
+const meta = {
+  cast:       { w: 280, h: 240, f: 12 },
+  projectile: { w: 240, h: 90,  f: 12 },
+  impact:     { w: 280, h: 280, f: 12 },
+  aura:       { w: 200, h: 120, f: 10 },
+  particles:  { w: 140, h: 160, f: 10 },
+  finisher:   { w: 400, h: 300, f: 16 }
+};
+
+function drawSprite(comp, fFloat, dx, dy, dw, dh, alpha) {
+  const img = sheets[comp], m = meta[comp];
+  if (!img || !img.complete || img.naturalWidth === 0) return;
+  const fIdx = Math.max(0, Math.min(m.f - 1, Math.floor(fFloat)));
+  ctx.save();
+  ctx.globalAlpha = (alpha !== undefined ? Math.max(0, Math.min(1, alpha)) : 1);
+  ctx.drawImage(img, 0, fIdx * m.h, m.w, m.h, Math.round(dx), Math.round(dy), Math.round(dw || m.w), Math.round(dh || m.h));
+  ctx.restore();
+}
+
+const CX1 = SW * 0.22, CX2 = SW * 0.72, CY = SH * 0.78;
+
+function draw() {
+  ctx.fillStyle = '#050210';
+  ctx.fillRect(0, 0, SW, SH);
+
+  let sx = 0, sy = 0;
+  if (shakeTimer > 0) {
+    sx = (Math.random() - 0.5) * shakeAmt * 2;
+    sy = (Math.random() - 0.5) * shakeAmt * 2;
+  }
+  ctx.save();
+  ctx.translate(sx, sy);
+
+  ctx.strokeStyle = '#2d184c';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, CY); ctx.lineTo(SW, CY); ctx.stroke();
+
+  ctx.fillStyle = 'rgba(255, 180, 0, 0.25)';
+  ctx.beginPath(); ctx.ellipse(CX1, CY, 22, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = 'rgba(120, 50, 20, 0.35)';
+  ctx.beginPath(); ctx.ellipse(CX2, CY, 26, 7, 0, 0, Math.PI*2); ctx.fill();
+
+  const phaseEl = document.getElementById('phaseText');
+
+  if (t < 0.70) {
+    phaseEl.textContent = '① TỤ KHÍ ĐẠI PHẬT';
+    const a_prog = t / 0.70;
+    const a_f = (a_prog * meta.aura.f) % meta.aura.f;
+    drawSprite('aura', a_f, CX1 - 100, CY - 60, 200, 120, 1.0);
+
+    const c_prog = Math.min(1.0, t / 0.65);
+    const c_f = c_prog * (meta.cast.f - 1);
+    drawSprite('cast', c_f, CX1 - 140, CY - 240 + 20, 280, 240, 1.0);
+  }
+
+  if (t >= 0.65 && t <= 1.30) {
+    phaseEl.textContent = '② SÓNG XUNG KÍCH';
+    const p_prog = (t - 0.65) / 0.65;
+    const p_f = p_prog * (meta.projectile.f - 1);
+    const px = CX1 + p_prog * (CX2 - CX1);
+    drawSprite('projectile', p_f, px - 120, CY - 45, 240, 90, 1.0);
+  }
+
+  if (t >= 1.25 && t < 1.30) {
+    triggerShake(7, 0.25);
+  }
+
+  if (t >= 1.25 && t <= 2.05) {
+    phaseEl.textContent = '③ BỘC PHÁT SÓNG NỔ';
+    const i_prog = (t - 1.25) / 0.75;
+    const i_f = Math.min(meta.impact.f - 1, i_prog * meta.impact.f);
+    drawSprite('impact', i_f, CX2 - 140, CY - 140, 280, 280, 1.0);
+
+    if (t >= 1.30) {
+      const pt_prog = (t - 1.30) / 0.75;
+      const pt_f = Math.min(meta.particles.f - 1, pt_prog * meta.particles.f);
+      drawSprite('particles', pt_f, CX2 - 70, CY - 150, 140, 160, 1.0);
+    }
+  }
+
+  if (t >= 1.80 && t < 1.85) {
+    triggerShake(12, 0.40);
+  }
+
+  if (t >= 1.80) {
+    phaseEl.textContent = '④ ĐẠI PHẬT THIÊN CHƯỞNG';
+    const fin_prog = (t - 1.80) / 1.20;
+    const fin_f = Math.min(meta.finisher.f - 1, fin_prog * meta.finisher.f);
+    drawSprite('finisher', fin_f, CX2 - 200, CY - 300 + 85, 400, 300, 1.0);
+  }
+
+  ctx.restore();
+}
+
+function frameLoop(now) {
+  if (!lastRAF) lastRAF = now;
+  const dt = (now - lastRAF) / 1000.0;
+  lastRAF = now;
+
+  if (playing) {
+    t += dt * speedMul;
+    if (shakeTimer > 0) shakeTimer -= dt;
+    if (t >= TOTAL_DUR) {
+      if (looping) { t = 0; }
+      else { t = TOTAL_DUR; playing = false; }
+    }
+    document.getElementById('timelineFill').style.width = (t / TOTAL_DUR * 100) + '%';
+    document.getElementById('frameText').textContent = `t=${t.toFixed(2)}s / ${TOTAL_DUR.toFixed(1)}s`;
+  }
+  draw();
+  requestAnimationFrame(frameLoop);
+}
+requestAnimationFrame(frameLoop);
+
+document.getElementById('btnPlay').onclick = function() {
+  playing = !playing;
+  this.textContent = playing ? '⏸ Pause' : '▶ Play';
+};
+document.getElementById('btnLoop').onclick = function() {
+  looping = !looping;
+  this.textContent = `↺ Loop: ${looping ? 'ON' : 'OFF'}`;
+};
+document.getElementById('btnSpeed').onclick = function() {
+  speedMul = speedMul === 1.0 ? 0.5 : (speedMul === 0.5 ? 2.0 : 1.0);
+  this.textContent = `Speed: ${speedMul}x`;
+};
+</script>
+</body>
+</html>

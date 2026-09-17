@@ -1,0 +1,25 @@
+                    return "[ERROR] Đổi mật khẩu thất bại cho " + parts[1];
+
+                case "sync_extol":
+                case "syncextol":
+                    if (parts.length < 3) return "[ERROR] Cú pháp: /sync_extol <tên player> <số lượng>";
+                    try {
+                        String sTarget = parts[1];
+                        long sAmount = Long.parseLong(parts[2]);
+                        Player sOnline = getOnlinePlayer(sTarget);
+                        if (sOnline != null) {
+                            sOnline.updateVnd(sAmount);
+                            sOnline.updateMoney();
+                            if (sOnline.getService() != null) {
+                                sOnline.getService().send_box_ThongBao_OK("Bạn vừa nhận được +" + sAmount + " Extol từ Web!");
+                            }
+                            zLog.gI().add_log_by_name(sOnline.name, "WEB_EXCHANGE_SYNC", "Synced Extol +" + sAmount);
+                            return "[SUCCESS] Đã đồng bộ Extol +" + sAmount + " cho " + sOnline.name + " (đang online)";
+                        } else {
+                            return "[SUCCESS] Player " + sTarget + " đang offline, số dư Extol trong DB đã được cập nhật trước đó.";
+                        }
+                    } catch (Exception exSync) {
+                        return "[ERROR] Lỗi sync_extol: " + exSync.getMessage();
+                    }
+
+                case "save":

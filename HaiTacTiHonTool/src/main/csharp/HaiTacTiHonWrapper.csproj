@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWindowsForms>false</UseWindowsForms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- AOT native compilation: tạo ra 1 file .exe nắng nưng hoàn toàn native, không cần .NET runtime -->
+    <PublishAot>true</PublishAot>
+    <SelfContained>true</SelfContained>
+    <!-- PublishSingleFile không dùng cùng AOT - AOT đã tạo single native exe -->
+
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <StripSymbols>true</StripSymbols>
+    <AssemblyName>HaiTacTiHonWrapper</AssemblyName>
+
+    <!-- Tối ưu kích thước AOT native exe -->
+    <OptimizationPreference>Size</OptimizationPreference>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <IlcFoldIdenticalMethodBodies>true</IlcFoldIdenticalMethodBodies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\runtime.enc" />
+    <EmbeddedResource Include="Resources\payload.enc" />
+    <EmbeddedResource Include="Resources\data.enc" Condition="Exists('Resources\data.enc')" />
+  </ItemGroup>
+
+</Project>

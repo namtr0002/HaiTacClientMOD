@@ -1,0 +1,10 @@
+Microsoft (R) Visual C# Compiler version 4.3.1-3.22526.13 (41a5af9d)
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(676,1): warning CS0162: Unreachable code detected
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(2113,28): warning CS0168: The variable 'e' is declared but never used
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(2168,32): warning CS0168: The variable 'e' is declared but never used
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(2826,20): warning CS0168: The variable 'var20' is declared but never used
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(3422,20): warning CS0168: The variable 'e' is declared but never used
+Assets\Scripts\Assembly-CSharp\DualTabScreen.cs(3515,36): warning CS0168: The variable 'e' is declared but never used
+

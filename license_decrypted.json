@@ -1,0 +1,145 @@
+{
+  "version": "1.0",
+  "master_enabled": true,
+  "server_check_enabled": true,
+  "global_notice": "Vui lòng cập nhật phiên bản mới tại haitacz.xyz/tai-game",
+  "updated_at": 1789203009608,
+  "lines": [
+    {
+      "line_id": "MOD_LIBGDX",
+      "line_name": "Bản MOD LibGDX (PC & Mobile)",
+      "enabled": true,
+      "require_key": true,
+      "free_ips": [
+        "*"
+      ],
+      "notice": "Vui lòng cập nhật phiên bản mới tại haitacz.xyz/tai-game"
+    },
+    {
+      "line_id": "MOD_J2ME",
+      "line_name": "Bản MOD J2ME Java",
+      "enabled": true,
+      "require_key": false,
+      "free_ips": [
+        "*"
+      ],
+      "notice": "Vui lòng cập nhật phiên bản mới tại haitacz.xyz/tai-game"
+    },
+    {
+      "line_id": "MOD_UNITY",
+      "line_name": "Bản MOD Unity (PC & Mobile)",
+      "enabled": true,
+      "require_key": true,
+      "free_ips": [
+        "*"
+      ],
+      "notice": "Vui lòng cập nhật phiên bản mới tại haitacz.xyz/tai-game"
+    }
+  ],
+  "keys": [
+    {
+      "key": "HTTH_CLIENT_NAMTR0002_SECURE_KEY_V2_2026",
+      "line_id": "MOD_UNITY",
+      "customer": "Unity & J2ME Official Client V2",
+      "note": "Key bao mat chinh thuc V2 cho cac phien ban MOD",
+      "status": "ACTIVE",
+      "created_at": 1789203009608,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-UNI-TEST-ACTIVE",
+      "line_id": "MOD_UNITY",
+      "customer": "Khách Thuê Unity (30 ngày)",
+      "note": "Gói thuê 1 tháng Unity",
+      "status": "ACTIVE",
+      "created_at": 1789202436549,
+      "expire_at": 1796978436549,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-UNI-VIP-LIFETIME",
+      "line_id": "MOD_UNITY",
+      "customer": "Khách VIP Unity",
+      "note": "Bản quyền vĩnh viễn Unity",
+      "status": "ACTIVE",
+      "created_at": 1789202436549,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH_CLIENT_NAMTR0002_SECURE_KEY_2026",
+      "line_id": "MOD_UNITY",
+      "customer": "Unity Client Mặc Định",
+      "note": "KHOA KEY PHIEN BAN CU (Yeu cau cap nhat ban moi)",
+      "status": "LOCKED",
+      "created_at": 1789202436549,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-LIB-TEST-ACTIVE",
+      "line_id": "MOD_LIBGDX",
+      "customer": "Anh Nam (Khach Thue 1)",
+      "note": "Goi VIP 30 ngay",
+      "status": "ACTIVE",
+      "created_at": 1789042161770,
+      "expire_at": 1791634161770,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-LIB-TEST-LIFETIME",
+      "line_id": "MOD_LIBGDX",
+      "customer": "Khach VIP Vinh Vien",
+      "note": "Bao hanh tron doi",
+      "status": "ACTIVE",
+      "created_at": 1789042161975,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-LIB-TEST-EXPIRED",
+      "line_id": "MOD_LIBGDX",
+      "customer": "Khach Het Han",
+      "note": "Qua han tu hom qua",
+      "status": "ACTIVE",
+      "created_at": 1785586161975,
+      "expire_at": 1788955761975,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    },
+    {
+      "key": "HTTH-LIB-TEST-LOCKED",
+      "line_id": "MOD_LIBGDX",
+      "customer": "Khach Vi Pham",
+      "note": "Tam khoa de kiem tra",
+      "status": "LOCKED",
+      "created_at": 1789042161975,
+      "expire_at": 1791634161975,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": ""
+    }
+  ]
+}

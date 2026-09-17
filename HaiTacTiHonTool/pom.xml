@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.deplor</groupId>
+    <artifactId>HaiTacTiHonTool</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>22</maven.compiler.source>
+        <maven.compiler.target>22</maven.compiler.target>
+        <exec.mainClass>com.deplor.haitactihontool.ui.Bootstrap</exec.mainClass>
+        <exec.vmArgs>-Xms512m -Xmx2048m -XX:+UseG1GC -Dsun.java2d.uiScale=1.0</exec.vmArgs>
+    </properties>
+
+    <dependencies>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
+
+        <!-- MySQL -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
+        </dependency>
+
+        <!-- FlatLaf -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.2.5</version>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.38</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Javassist -->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.30.2-GA</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+
+        <plugins>
+
+            <!-- JAVA COMPILER -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+
+                <configuration>
+                    <source>22</source>
+                    <target>22</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <!-- STANDARD JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.1</version>
+
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>
+                                com.deplor.haitactihontool.ui.Bootstrap
+                            </mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- SHADE FAT JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+
+                        <configuration>
+
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+
+                            <transformers>
+
+                                <!-- MAIN CLASS -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>
+                                        com.deplor.haitactihontool.ui.Bootstrap
+                                    </mainClass>
+                                </transformer>
+
+                                <!-- SERVICES -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+
+                            </transformers>
+
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+
+                                </filter>
+                            </filters>
+
+                        </configuration>
+
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- PROGUARD -->
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.6.1</version>
+
+                <configuration>
+
+                    <proguardVersion>7.6.0</proguardVersion>
+
+                    <!-- INPUT -->
+                    <injar>${project.build.finalName}.jar</injar>
+
+                    <!-- OUTPUT -->
+                    <outjar>${project.build.finalName}-obfuscated.jar</outjar>
+
+                    <obfuscate>true</obfuscate>
+
+                    <options>
+
+                        <option>
+                            -include ${project.basedir}/proguard-rules.pro
+                        </option>
+
+                        <!-- KEEP MAIN -->
+                        <option>
+                            -keep public class com.deplor.haitactihontool.ui.Bootstrap {
+                                public static void main(java.lang.String[]);
+                            }
+                        </option>
+
+                        <!-- KEEP LOGIN -->
+                        <option>
+                            -keep class com.deplor.haitactihontool.ultimate_security.LoginUI { *; }
+                        </option>
+
+                        <!-- KEEP IMPORTANT -->
+                        <option>
+                            -keep class com.deplor.haitactihontool.ui.** { *; }
+                        </option>
+
+                        <option>
+                            -keep class com.deplor.haitactihontool.map.** { *; }
+                        </option>
+
+                        <option>
+                            -keep class com.deplor.haitactihontool.config.** { *; }
+                        </option>
+
+                        <option>
+                            -keep class com.formdev.flatlaf.** { *; }
+                        </option>
+
+                        <option>
+                            -keep class org.json.** { *; }
+                        </option>
+
+                        <option>
+                            -keep class com.mysql.** { *; }
+                        </option>
+
+                        <!-- KEEP ATTRIBUTES -->
+                        <option>
+                            -keepattributes *Annotation*,InnerClasses,Signature,Exceptions,EnclosingMethod
+                        </option>
+
+                    </options>
+
+                    <!-- JDK MODULES -->
+                    <libs>
+
+                        <lib>${java.home}/jmods/java.base.jmod</lib>
+                        <lib>${java.home}/jmods/java.desktop.jmod</lib>
+                        <lib>${java.home}/jmods/java.datatransfer.jmod</lib>
+                        <lib>${java.home}/jmods/java.sql.jmod</lib>
+                        <lib>${java.home}/jmods/java.logging.jmod</lib>
+                        <lib>${java.home}/jmods/java.xml.jmod</lib>
+
+                    </libs>
+
+                </configuration>
+
+                <dependencies>
+
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>7.6.0</version>
+                    </dependency>
+
+                </dependencies>
+
+            </plugin>
+
+            <!-- LAUNCH4J -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+
+                <configuration>
+
+                    <headerType>gui</headerType>
+
+                    <jar>
+                        ${project.build.directory}/${project.build.finalName}-obfuscated.jar
+                    </jar>
+
+                    <outfile>
+                        ${project.build.directory}/HaiTacTiHonTool.exe
+                    </outfile>
+
+                    <downloadUrl>
+                        https://java.com/download
+                    </downloadUrl>
+
+                    <classPath>
+
+                        <mainClass>
+                            com.deplor.haitactihontool.ui.Bootstrap
+                        </mainClass>
+
+                    </classPath>
+
+                    <jre>
+
+                        <path>jre</path>
+
+                        <bundledJre64Bit>true</bundledJre64Bit>
+
+                        <minVersion>22.0.0</minVersion>
+
+                        <jdkPreference>preferJre</jdkPreference>
+
+                        <runtimeBits>64/32</runtimeBits>
+
+                        <initialHeapSize>512</initialHeapSize>
+
+                        <maxHeapSize>2048</maxHeapSize>
+
+                        <opts>
+                            <opt>-XX:+UseG1GC</opt>
+                        </opts>
+
+                    </jre>
+
+                    <versionInfo>
+
+                        <fileVersion>1.0.0.0</fileVersion>
+                        <txtFileVersion>1.0</txtFileVersion>
+
+                        <fileDescription>
+                            HaiTacTiHon Tool Suite
+                        </fileDescription>
+
+                        <copyright>
+                            DepLor
+                        </copyright>
+
+                        <productVersion>1.0.0.0</productVersion>
+                        <txtProductVersion>1.0</txtProductVersion>
+
+                        <productName>
+                            HaiTacTiHonTool
+                        </productName>
+
+                        <internalName>
+                            HTTH
+                        </internalName>
+
+                        <originalFilename>
+                            HaiTacTiHonTool.exe
+                        </originalFilename>
+
+                    </versionInfo>
+
+                </configuration>
+
+            </plugin>
+
+            <!-- EXEC PLUGIN CONFIG -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>${exec.mainClass}</mainClass>
+                    <commandlineArgs>${exec.vmArgs}</commandlineArgs>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>
