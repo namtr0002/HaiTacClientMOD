@@ -51,7 +51,9 @@ public final class Effect_Skill extends MainEffect {
    private int fPlayFrameSuper;
    private FrameImage[] CO;
    private boolean isAddSound;
+   private boolean isSpawnedPool;
    private MainObject objBeFireMain;
+   public MainSkill skill;
    private mVector VecEff;
    private mVector VecSubEff;
    private mVector CT;
@@ -75,6 +77,22 @@ public final class Effect_Skill extends MainEffect {
    private int DL;
    private int DM;
    private int DN;
+
+   public int enelOrigX;
+   public int enelOrigY;
+   public int phoenixOrigX;
+   public int phoenixOrigY;
+   public int phoenixTargetX;
+   public int phoenixTargetY;
+   public int marcoWaveHitMask;
+   public int daibutsuCasterX;
+   public int daibutsuCasterY;
+   public int daibutsuImpactX;
+   public int daibutsuImpactY;
+   public int kidCannonImpactX;
+   public int kidCannonImpactY;
+
+
 
    public Effect_Skill(MainSkill var1, MainObject var2, int var3, int var4, mVector var5) {
       int[][][] var10000 = new int[][][]{{{4, -26, -23}, {1, -10, 20}}, {{3, -15, -43}, {1, 5, -26}, {3, -28, -4}, {4, -28, 10}}, {{0, -27, -90}, {3, -27, -76}, {4, -22, -58}, {2, -10, -30}, {1, 0, -14}}, {{3, -44, -70}, {0, -44, -45}, {4, -36, -21}, {3, -24, 0}}};
@@ -115,6 +133,7 @@ public final class Effect_Skill extends MainEffect {
          Skill_Info _sk1 = (var1 != null) ? Skill_Info.getSkillFromID(var1.ID) : null;
          int _skillIdx1 = (_sk1 != null) ? _sk1.indexSkillInServer : -1;
          super.typeEffect = (var1 != null) ? getUpgradedEffSkill(var1.AA, var1.lvDevil, _skillIdx1) : 0;
+         this.skill = var1;
          this.subType = var1.AE;
          super.timeBegin = var1.AK;
          super.timeEnd = var1.AF;
@@ -150,8 +169,10 @@ public final class Effect_Skill extends MainEffect {
          Skill_Info _sk2 = (var1 != null) ? Skill_Info.getSkillFromID(var1.ID) : null;
          int _skillIdx2 = (_sk2 != null) ? _sk2.indexSkillInServer : -1;
          super.typeEffect = (var1 != null) ? getUpgradedEffSkill(var1.AA, var1.lvDevil, _skillIdx2) : 0;
+         this.skill = var1;
          this.subType = var1.AE;
          super.timeBegin = var1.AK;
+         super.timeEnd = (var1 != null) ? var1.AF : 0;
          super.objFireMain = var2;
          super.isEff = true;
          super.numNextFrame = 1;
@@ -474,7 +495,31 @@ public final class Effect_Skill extends MainEffect {
          MainObject var5;
          float var10000;
          int xdich;
-         if (super.typeEffect >= 4001 && super.typeEffect <= 4080) {
+         if (super.typeEffect == 4017 || super.typeEffect == 4010) {
+            this.createThanTrangSkill(4010);
+            return true;
+         }
+         if (super.typeEffect == 4018) {
+            this.createVenomRain4018();
+            return true;
+         }
+         if (super.typeEffect == 4019) {
+            this.createVenomBuff4019();
+            return true;
+         }
+         if (super.typeEffect == 4021) {
+            this.createThanhLongActive4021();
+            return true;
+         }
+         if (super.typeEffect == 4022) {
+            this.createThanhLongActive4022();
+            return true;
+         }
+         if (super.typeEffect == 4023) {
+            this.createThanhLongBuff4023();
+            return true;
+         }
+         if ((super.typeEffect >= 4001 && super.typeEffect <= 4080) || (super.typeEffect >= 4201 && super.typeEffect <= 4216) || (super.typeEffect >= 4501 && super.typeEffect <= 4516)) {
             this.createThanTrangSkill(super.typeEffect);
             return true;
          }
@@ -1810,7 +1855,7 @@ public final class Effect_Skill extends MainEffect {
          case 492:
             super.fraImgEff = new FrameImage(323, 92, 64);
             super.fraImgSubEff = new FrameImage(183, 20, 54);
-            super.fraImgSub2Eff = new FrameImage(468, 6);
+            super.fraImgSub2Eff = null; // Old skill effs only 0-466. 468 is Thần Trang Venom
             super.fRemove = 26;
             GameScreen.addEffectEnd((short)30, 0, super.x + super.am_duong * 15, super.y, 200, super.Dir, super.objMainEff);
             super.mframe = new int[]{4, 4, 5, 5, 4, 4, 5, 5, 4, 4, 5, 5, 6, 6, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1};
@@ -1882,10 +1927,34 @@ public final class Effect_Skill extends MainEffect {
          case 3122:
             this.createNikyuBuff();
             break;
-         // ─── 16 Thần Trang (4001..4080) ───
+         case 4017:
+            this.createThanTrangSkill(4010);
+            break;
+         case 4018:
+            this.createVenomRain4018();
+            break;
+         case 4019:
+            this.createVenomBuff4019();
+            break;
+         case 4021:
+            this.createThanhLongActive4021();
+            break;
+         case 4022:
+            this.createThanhLongActive4022();
+            break;
+         case 4023:
+            this.createThanhLongBuff4023();
+            break;
+         // ─── 16 Thần Trang (4001..4080, 4201..4216, 4501..4516) ───
          case 4001: case 4002: case 4003: case 4004: case 4005: case 4006:
          case 4007: case 4008: case 4009: case 4010: case 4011: case 4012:
          case 4013: case 4014: case 4015: case 4016:
+         case 4201: case 4202: case 4203: case 4204: case 4205: case 4206:
+         case 4207: case 4208: case 4209: case 4210: case 4211: case 4212:
+         case 4213: case 4214: case 4215: case 4216:
+         case 4501: case 4502: case 4503: case 4504: case 4505: case 4506:
+         case 4507: case 4508: case 4509: case 4510: case 4511: case 4512:
+         case 4513: case 4514: case 4515: case 4516:
             this.createThanTrangSkill(super.typeEffect);
             break;
          case 10001:
@@ -2310,7 +2379,31 @@ public final class Effect_Skill extends MainEffect {
    }
 
    public final void paint(mGraphics var1) {
-      if (super.typeEffect >= 4001 && super.typeEffect <= 4080) {
+      if (super.typeEffect == 4017 || super.typeEffect == 4010) {
+         this.paintThanTrangSkill(var1);
+         return;
+      }
+      if (super.typeEffect == 4018) {
+         this.paintVenomRain4018(var1);
+         return;
+      }
+      if (super.typeEffect == 4019) {
+         this.paintVenomBuff4019(var1);
+         return;
+      }
+      if (super.typeEffect == 4021) {
+         this.paintThanhLongActive4021(var1);
+         return;
+      }
+      if (super.typeEffect == 4022) {
+         this.paintThanhLongActive4022(var1);
+         return;
+      }
+      if (super.typeEffect == 4023) {
+         this.paintThanhLongBuff4023(var1);
+         return;
+      }
+      if ((super.typeEffect >= 4001 && super.typeEffect <= 4080) || (super.typeEffect >= 4201 && super.typeEffect <= 4216) || (super.typeEffect >= 4501 && super.typeEffect <= 4516)) {
          this.paintThanTrangSkill(var1);
          return;
       }
@@ -4506,10 +4599,16 @@ public final class Effect_Skill extends MainEffect {
          // ─── Paint Trái Chân Gấu (Nikyu) ───
          case 3120: case 3121: case 3122:
             return;
-         // ─── Paint 16 Thần Trang ───
+         // ─── Paint 16 Thần Trang (4001..4080, 4201..4216, 4501..4516) ───
          case 4001: case 4002: case 4003: case 4004: case 4005: case 4006:
          case 4007: case 4008: case 4009: case 4010: case 4011: case 4012:
          case 4013: case 4014: case 4015: case 4016:
+         case 4201: case 4202: case 4203: case 4204: case 4205: case 4206:
+         case 4207: case 4208: case 4209: case 4210: case 4211: case 4212:
+         case 4213: case 4214: case 4215: case 4216:
+         case 4501: case 4502: case 4503: case 4504: case 4505: case 4506:
+         case 4507: case 4508: case 4509: case 4510: case 4511: case 4512:
+         case 4513: case 4514: case 4515: case 4516:
             this.paintThanTrangSkill(var1);
             return;
          case 10001:
@@ -4810,12 +4909,36 @@ public final class Effect_Skill extends MainEffect {
    }
 
    public final void update() {
+      super.update();
+      if (super.typeEffect == 4017 || super.typeEffect == 4010) {
+         this.updateThanTrangSkill(4010);
+         return;
+      }
+      if (super.typeEffect == 4018) {
+         this.updateVenomRain4018();
+         return;
+      }
+      if (super.typeEffect == 4019) {
+         this.updateVenomBuff4019();
+         return;
+      }
+      if (super.typeEffect == 4021) {
+         this.updateThanhLongActive4021();
+         return;
+      }
+      if (super.typeEffect == 4022) {
+         this.updateThanhLongActive4022();
+         return;
+      }
+      if (super.typeEffect == 4023) {
+         this.updateThanhLongBuff4023();
+         return;
+      }
+      if ((super.typeEffect >= 4001 && super.typeEffect <= 4080) || (super.typeEffect >= 4201 && super.typeEffect <= 4216) || (super.typeEffect >= 4501 && super.typeEffect <= 4516)) {
+         this.updateThanTrangSkill(super.typeEffect);
+         return;
+      }
       if (super.objFireMain == null || !super.objFireMain.returnAction() && super.objFireMain.Action != 4) {
-         super.update();
-         if (super.typeEffect >= 4001 && super.typeEffect <= 4080) {
-            this.updateThanTrangSkill(super.typeEffect);
-            return;
-         }
          byte var1;
          Point point2;
          MainObject var3;
@@ -6738,10 +6861,43 @@ public final class Effect_Skill extends MainEffect {
          case 3122:
             this.updateNikyuBuff();
             return;
-         // ─── Update 16 Thần Trang ───
+         case 4017:
+         case 4010:
+            if (this.subType == 1004)
+            {
+               if (super.f >= super.fRemove)
+               {
+                  this.removeEff();
+               }
+               return;
+            }
+            this.updateThanTrangSkill(4010);
+            return;
+         case 4018:
+            this.updateVenomRain4018();
+            return;
+         case 4019:
+            this.updateVenomBuff4019();
+            return;
+         case 4021:
+            this.updateThanhLongActive4021();
+            return;
+         case 4022:
+            this.updateThanhLongActive4022();
+            return;
+         case 4023:
+            this.updateThanhLongBuff4023();
+            return;
+         // ─── Update 16 Thần Trang (4001..4080, 4201..4216, 4501..4516) ───
          case 4001: case 4002: case 4003: case 4004: case 4005: case 4006:
-         case 4007: case 4008: case 4009: case 4010: case 4011: case 4012:
+         case 4007: case 4008: case 4009: case 4011: case 4012:
          case 4013: case 4014: case 4015: case 4016:
+         case 4201: case 4202: case 4203: case 4204: case 4205: case 4206:
+         case 4207: case 4208: case 4209: case 4210: case 4211: case 4212:
+         case 4213: case 4214: case 4215: case 4216:
+         case 4501: case 4502: case 4503: case 4504: case 4505: case 4506:
+         case 4507: case 4508: case 4509: case 4510: case 4511: case 4512:
+         case 4513: case 4514: case 4515: case 4516:
             this.updateThanTrangSkill(super.typeEffect);
             return;
          case 10001:
@@ -10014,7 +10170,12 @@ public final class Effect_Skill extends MainEffect {
    }
 
    public final void removeEff() {
-      if (super.objFireMain == GameScreen.player && GameScreen.typePaintGameScreen == 1) {
+      int effSetId = (super.typeEffect >= 4001 && super.typeEffect <= 4016) ? (super.typeEffect - 4000) : ((super.typeEffect >= 4201 && super.typeEffect <= 4216) ? (super.typeEffect - 4200) : ((super.typeEffect >= 4501 && super.typeEffect <= 4516) ? (super.typeEffect - 4500) : (((super.typeEffect - 4001) / 5) + 1)));
+      if (effSetId == 5 || effSetId == 9) {
+         Player.isBlock = false;
+         GameCanvas.gameScr.isFullScreen = false;
+      }
+      if (GameScreen.typePaintGameScreen == 1) {
          GameScreen.isPaintNormal();
       }
 
@@ -10563,7 +10724,7 @@ public final class Effect_Skill extends MainEffect {
       super.fraImgEff = new FrameImage(31, 70, 70);
       super.Dir = (byte)super.objFireMain.type_left_right;
       super.fraImgEff = new FrameImage(284, 70, 70);
-      super.fraImgSubEff = new FrameImage(470, 12);
+      super.fraImgSubEff = null; // Old skill effs only 0-466. 470 is Thần Trang Venom
       super.fraImgSub2Eff = new FrameImage(406, 42, 34);
       super.fraImgSub3Eff = new FrameImage(283, 22, 28);
       super.BP = new FrameImage(283, 22, 28);
@@ -11040,7 +11201,7 @@ public final class Effect_Skill extends MainEffect {
    private void create_Zoro_S1_L7() {
       super.fRemove = 32;
       super.vMax = 18;
-      super.fraImgEff = new FrameImage(467, 3);
+      super.fraImgEff = new FrameImage(443, 5);
       super.y = super.objFireMain.y;
       this.x1000 = super.x + 30 * super.am_duong;
       int var10000 = this.x1000;
@@ -21707,58 +21868,129 @@ public final class Effect_Skill extends MainEffect {
 			new FrameImage(101, 40, 47), new FrameImage(240, 30, 73, 1), new FrameImage(183, 3), new FrameImage(239, 40, 40), new FrameImage(406, 30, 30)
 		};
 		s_ttFrames[2] = new FrameImage[] {
-			new FrameImage(171, 153, 84, 100, 54), new FrameImage(239, 40, 40)
+			// 4002 Đại Phún Hỏa Volcano _X (Akainu Magma Eruption) — 10 Authentic Fire & Magma Textures
+			new FrameImage(271, 130, 80, 3),          // [0] 271: Đại Phún Hỏa Cự Quyền / Colossal Magma Wave Fist (130x80, 3f)
+			new FrameImage(336, 74, 30, 3),           // [1] 336: Dòng Dung Nham Cánh Tay / Magma Arm Stream (74x30, 3f)
+			new FrameImage(254, 30, 40),              // [2] 254: Phản Lực Hỏa Diễm / Fiery Jet Trail (30x40, 1f)
+			new FrameImage(252, 62, 64, 4),           // [3] 252: Vụ Nổ Dung Nham Bộc Phát / Magma Impact Blast (62x64, 4f)
+			new FrameImage(238, 30, 73),              // [4] 238: Cột Nham Thạch Phun Trào / Molten Magma Pillar (30x73, 1f)
+			new FrameImage(240, 30, 73, 1),           // [5] 240: Cột Lửa Vút Trời Thẳng Đứng / Rising Flame Column (30x73, 1f)
+			new FrameImage(239, 38, 22),              // [6] 239: Hồ Dung Nham Sôi Sùng Sục / Boiling Magma Pool (38x22, 1f)
+			new FrameImage(246, 49, 21, 4),           // [7] 246: Vết Rạn Nứt Núi Lửa Phun Trào / Volcanic Ground Fissure (49x21, 4f)
+			new FrameImage(78, 22, 28, 5),            // [8] 78: Hạt Tàn Lửa Đỏ Li Ti / Crimson Sparks (22x28, 5f)
+			new FrameImage(272, 50, 24)               // [9] 272: Vết Cháy Sém Mặt Đất / Scorched Earth Ground Shadow (50x24, 1f)
 		};
 		s_ttFrames[3] = new FrameImage[] {
-			new FrameImage(244, 20, 37, 3), new FrameImage(230, 30, 73)
+			new FrameImage(37, 31, 74),          // [0] 37: Cột Băng Đao / Colossal Ice Pillar (31x74)
+			new FrameImage(40, 63, 20),          // [1] 40: Thềm Băng Mặt Đất / Permafrost Ground Patch (63x20)
+			new FrameImage(41, 40, 40),          // [2] 41: Hoa Tuyết & Bụi Băng Tinh Thể / Diamond Snow Crystal (40x40)
+			new FrameImage(43, 84, 110),         // [3] 43: Đại Băng Trĩ / Glacial Avalanche Wave (84x110)
+			new FrameImage(89, 28, 44),          // [4] 89: Gai Băng Nhọn Tủa / Jagged Ground Icicles (28x44)
+			new FrameImage(46, 70, 100, 49, 70), // [5] 46: Hàn Băng Xung Kích / Glacial Shockwave (70x100)
+			new FrameImage(39, 53, 28),          // [6] 39: Khối Băng Vĩnh Cửu / Eternal Permafrost Block (53x28)
+			new FrameImage(41, 40, 40),          // [7] 41: Hoa Tuyết & Kim Cương Băng Tinh (40x40)
+			new FrameImage(152, 25, 21)          // [8] 152: Khói Bụi Sương Lạnh / Sub-Zero Frost Fog (25x21)
 		};
 		s_ttFrames[4] = new FrameImage[] {
 			new FrameImage(255, 42, 50, 3), new FrameImage(254, 30, 40)
 		};
 		s_ttFrames[5] = new FrameImage[] {
-			new FrameImage(266, 80, 100, 64, 80, 2), new FrameImage(292, 78, 24)
+			// 4005 Hắc Ám Thôn Phệ Vô Tận _X (Marshall D. Teach Black Hole Abyss Singularity) — 14 Master VFX Assets
+			new FrameImage(480, 120, 100, 8),        // [0] 480: Caster Void Aura (120x100, 8f, anchor 33)
+			new FrameImage(481, 240, 180, 8),        // [1] 481: Singularity Gate Cast (240x180, 8f, anchor 33)
+			new FrameImage(482, 180,  80, 8),        // [2] 482: Void Wave Projectile (180x80, 8f, anchor 3)
+			new FrameImage(483, 240, 240, 10),       // [3] 483: Colossal Black Hole Vortex (240x240, 10f, anchor 3)
+			new FrameImage(484, 280, 200, 12),       // [4] 484: Cataclysmic Singularity Collapse (280x200, 12f, anchor 3)
+			new FrameImage(485,  90, 140, 8),        // [5] 485: Target Void Spire Particles (90x140, 8f, anchor 33)
+			new FrameImage(272,  50,  24),           // [6] 272: Vết Cháy Sém / Hồ Hư Vô Mặt Đất (50x24)
+			new FrameImage(246,  49,  21, 4),        // [7] 246: Vết Rạn Nứt Hư Vô Địa Chấn (49x21, 4f)
+			new FrameImage(285, 111,  90),           // [8] 285: Sóng Không Gian Biến Dạng Hư Vô (111x90, 3f)
+			new FrameImage(394, 126,  41),           // [9] 394: Vành Đai Trọng Lực Sóng Xung Kích (126x41, 3f)
+			new FrameImage(104,  30,  30),           // [10] 104: Chớp Sao Bụi Hắc Ám / Dark Starburst Sparks (30x30, 3f)
+			new FrameImage(152,  25,  21),           // [11] 152: Khói Bụi Va Chạm Mặt Đất (25x21)
+			new FrameImage(92,   64, 126, 45, 89, 1),// [12] 92: Sét Hư Vô Tím Đen / Cosmic Void Lightning (64x126)
+			new FrameImage(175,  40,  40)            // [13] 175: Vòng Nén Trọng Lực Hư Vô (40x40)
 		};
 		s_ttFrames[6] = new FrameImage[] {
-			// 4006 Enel 200M Volt El Thor — 7 Authentic Textures from Skills 169 & 170
-			new FrameImage(243, 36, 39),      // [0] 243: Cầu lôi tụ điện (36x39)
-			new FrameImage(244, 20, 37, 3),   // [1] 244: Sét chéo dội trần (20x37, 3f)
-			new FrameImage(240, 30, 73, 1),   // [2] 240: Cột sét dọc (30x73, 1f)
-			new FrameImage(241, 40, 27, 2),   // [3] 241: Điện quang mặt đất (40x27, 2f)
-			new FrameImage(242, 49, 28, 2),   // [4] 242: Vành đai điện chân cột (49x28, 2f)
-			new FrameImage(104, 30, 30),      // [5] 104: Chớp sao bùng nổ (30x30)
-			new FrameImage(152, 25, 21)       // [6] 152: Khói bụi tiếp đất (25x21)
+			// 4006 Enel 200M Volt El Thor — 8 Pure Authentic Lightning Assets
+			new FrameImage(243, 36, 39),          // [0] 243: Cầu lôi tụ điện (36x39) — High-voltage plasma sphere
+			new FrameImage(244, 20, 37, 3),       // [1] 244: Sét chéo dội trần (20x37, 3f) — Sky diagonal thunderbolt
+			new FrameImage(240, 30, 73, 1),       // [2] 240: Cột sét dọc (30x73, 1f) — Vertical lightning bolt column
+			new FrameImage(241, 40, 27, 2),       // [3] 241: Điện quang mặt đất (40x27, 2f) — Ground spiderweb crackle
+			new FrameImage(242, 49, 28, 2),       // [4] 242: Vành đai điện xả (49x28, 2f) — Ground discharge ring
+			new FrameImage(104, 30, 30),          // [5] 104: Chớp sao bùng nổ hồ quang (30x30) — Starburst spark flash
+			new FrameImage(152, 25, 21),          // [6] 152: Khói bụi tiếp đất (25x21) — Ground impact dust
+			new FrameImage(92, 64, 126, 45, 89, 1)// [7] 92:  Cung sét khổng lồ / Hồ quang cao thế (64x126, 1f)
 		};
 		s_ttFrames[7] = new FrameImage[] {
 			new FrameImage(310, 73, 59), new FrameImage(312, 121, 77)
 		};
 		s_ttFrames[8] = new FrameImage[] {
-			new FrameImage(393, 110, 110), new FrameImage(392, 101, 44), new FrameImage(394, 126, 41), new FrameImage(395, 69, 32), new FrameImage(224, 22, 28), new FrameImage(358, 51, 22), new FrameImage(352, 52, 15)
+			// 4008 ROOM Gamma Knife (Law - Phẫu thuật Ope Ope no Mi)
+			new FrameImage(393, 1), // [0] 393: ROOM sphere quanh nhân vật (1 frame 110x110)
+			new FrameImage(394, 3), // [1] 394: Vòng sáng chân nhân vật (3 frame dọc chuẩn)
+			new FrameImage(391, 1), // [2] 391: Hiệu ứng nửa trên mục tiêu dính (1 frame 28x13)
+			new FrameImage(392, 3), // [3] 392: Vòng sáng chân mục tiêu dính (3 frame dọc chuẩn tương tự 394)
+			new FrameImage(358, 3)  // [4] 358: Vết chém nhỏ ngẫu nhiên ở mục tiêu (3 frame dọc 51x22)
 		};
 		s_ttFrames[9] = new FrameImage[] {
-			new FrameImage(413, 91, 73), new FrameImage(427, 4)
+			// 4009 Eustass Kid: Từ Trường Bộc Phá Đại Pháo _X (Damned Punk Railgun)
+			new FrameImage(243, 36, 39),        // [0] Lõi plasma từ trường quay cuồng (36x39)
+			new FrameImage(92, 40, 40),         // [1] Tia sét hồ quang điện từ (40x40)
+			new FrameImage(104, 30, 30),        // [2] Tia lửa ma sát kim loại & điểm nổ (30x30)
+			new FrameImage(175, 40, 40),        // [3] Vòng sóng nén từ trường (40x40)
+			new FrameImage(152, 25, 21),        // [4] Khói bụi va chạm mặt đất (25x21)
+			new FrameImage(240, 30, 73, 1),     // [5] Cột năng lượng ánh sáng thẳng đứng (30x73, 1f)
+			new FrameImage(238, 110, 50),       // [6] Sóng chấn địa chấn (110x50)
+			new FrameImage(402, 120, 60),       // [7] Luồng phản lực Railgun (120x60)
+			new FrameImage(358, 51, 22),        // [8] Mảnh kim loại & tia chém (51x22)
+			new FrameImage(272, 50, 24)         // [9] Vòng định vị mục tiêu mặt đất (50x24)
 		};
 		s_ttFrames[10] = new FrameImage[] {
-			new FrameImage(118, 62, 64, 47, 48), new FrameImage(292, 78, 24)
+			// 4010 Cổ Độc Phán Quyết Venom _X — texIDs 467-473 (Cinematic VFX)
+			new FrameImage(467, 8),
+			new FrameImage(468, 11),
+			new FrameImage(469, 6),
+			new FrameImage(470, 13),
+			new FrameImage(471, 8),
+			new FrameImage(472, 8),
+			new FrameImage(473, 4)
 		};
 		s_ttFrames[11] = new FrameImage[] {
 			new FrameImage(266, 80, 100, 64, 80, 2), new FrameImage(254, 30, 40)
 		};
 		s_ttFrames[12] = new FrameImage[] {
-			new FrameImage(101, 40, 47), new FrameImage(225, 24, 32)
+			// 4012 Phượng Hoàng Bất Tử Bộc Phá _X (Marco Blue Phoenix Climax) — 12 Authentic VFX Assets
+			new FrameImage(474, 120, 100, 8),  // [0] Lam Hỏa Caster Aura (120x100, 8f, anchor 33)
+			new FrameImage(475, 240, 180, 8),  // [1] Phượng Hoàng Thức Tỉnh Cast (240x180, 8f, anchor 33)
+			new FrameImage(476, 180,  80, 8),  // [2] Phượng Hoàng Phi Thiên Projectile (180x80, 8f, anchor 3)
+			new FrameImage(477, 240, 240, 10), // [3] Lam Hỏa Đại Bộc Phá _X Impact (240x240, 10f, anchor 3)
+			new FrameImage(478, 280, 200, 12), // [4] Tung Cánh Phượng Hoàng Finisher AOE (280x200, 12f, anchor 33)
+			new FrameImage(479,  90, 140, 8),  // [5] Cột Lam Hỏa Thiêu Đốt Particles (90x140, 8f, anchor 33)
+			new FrameImage(243, 36, 39),         // [6] Swirling Solar Blue Flame Core (36x39)
+			new FrameImage(242, 49, 28, 2),      // [7] Ground Flame Shockwave Ring (49x28, 2f)
+			new FrameImage(241, 40, 27, 2),      // [8] Radiating Blue Ground Fire Sparks (40x27, 2f)
+			new FrameImage(224, 22, 28, 5),      // [9] Sacred Rebirth Feathers & Embers (22x28, 5f)
+			new FrameImage(272, 50, 24),         // [10] Ground Tracking Shadow (50x24)
+			new FrameImage(104, 30, 30)          // [11] Starburst Blue Sparks & Flash (30x30, 3f)
 		};
 		s_ttFrames[13] = new FrameImage[] {
-			new FrameImage(500, 4), // 0: PART_01 Buddha Divine Aura (24500)
-			new FrameImage(501, 4), // 1: PART_02 Buddha Giant Palm Silhouette (24501)
-			new FrameImage(502, 4), // 2: PART_03 Palm Charge Energy Core (24502)
-			new FrameImage(503, 4), // 3: PART_04 Palm Blast Burst Wave (24503)
-			new FrameImage(510, 4), // 4: PART_05 Shockwave Inner Crest & Dharma Wheel (24510)
-			new FrameImage(511, 4), // 5: PART_06 Shockwave Outer Mega Ring (24511)
-			new FrameImage(512, 4), // 6: PART_07 Ground Seismic Shock & Dust (24512)
-			new FrameImage(520, 4), // 7: PART_08 Radial Solar Light Spears (24520)
-			new FrameImage(521, 4), // 8: PART_09 Divine Lotus Bloom (24521)
-			new FrameImage(522, 4), // 9: PART_11 Center Flash Core (24522)
-			new FrameImage(530, 4), // 10: PART_10 Sacred Golden Embers & Sparks (24530)
-			new FrameImage(531, 4)  // 11: PART_12 Dissipation Wave & Holy Smoke (24531)
+			// 4013 Đại Phật Sóng Xung Kích _X (Sengoku Daibutsu Golden Shockwave) — 15 Authentic Textures
+			new FrameImage(416, 78, 40),              // [0] 416: Kim Cương Phật Chưởng / Palm Thrust Wave (78x40, 4f)
+			new FrameImage(171, 153, 84),             // [1] 171: Sóng Xung Kích Hoàng Kim / Traveling Shockwave Ring (153x84, 4f)
+			new FrameImage(453, 169, 126),            // [2] 453: Đại Bộc Phá Cực Đại / Colossal Mega Shockwave (169x126, 3f)
+			new FrameImage(394, 126, 41),             // [3] 394: Vành Đai Địa Chấn / Ground Shockwave Ring (126x41, 3f)
+			new FrameImage(357, 100, 100, 2),         // [4] 357: Pháp Luân Kim Quang / Sacred Dharma Wheel Nimbus (100x100, 4f)
+			new FrameImage(315, 77, 54, 3),           // [5] 315: Khai Hoa Kim Liên / Divine Lotus Bloom (77x54, 6f)
+			new FrameImage(174, 40, 40, 4),           // [6] 174: Thái Dương Quang Cầu / Condensed Palm Energy Core (40x40, 8f)
+			new FrameImage(335, 80, 80, 2),           // [7] 335: Phật Chưởng Bộc Phá / Palm Blast Burst Cone (80x80, 10f)
+			new FrameImage(300, 80, 25, 3),           // [8] 300: Địa Chấn Thổ Bụi / Seismic Dust Upheaval (80x25, 9f)
+			new FrameImage(246, 49, 21, 4),           // [9] 246: Vết Rạn Nứt Địa Chấn / Ground Seismic Fissure Crevasse (49x21, 8f)
+			new FrameImage(285, 111, 90),             // [10] 285: Sóng Không Gian Biến Dạng / Radial Distortion Wave (111x90, 3f)
+			new FrameImage(66, 75, 55),               // [11] 66: Lõi Bạch Kim Thiểm Quang / Divine White-Gold Core Flash (75x55, 1f)
+			new FrameImage(104, 30, 30),              // [12] 104: Chớp Sao Kim Cương / Diamond Starburst Sparks (30x30, 3f)
+			new FrameImage(267, 47, 53),              // [13] 267: Kim Sắc Hộ Thể Linh Khí / Golden Transformation Aura (47x53, 1f)
+			new FrameImage(224, 22, 28, 5)            // [14] 224: Hạt Kim Quang Linh Khí / Sacred Floating Nirvana Embers (22x28, 20f)
 		};
 		s_ttFrames[14] = new FrameImage[] {
 			new FrameImage(291, 47, 48), new FrameImage(295, 34, 24)
@@ -21776,7 +22008,7 @@ public final class Effect_Skill extends MainEffect {
 	private void createThanTrangSkill(int typeEff)
 	{
 		this.VecSubEff.removeAllElements();
-		int setId = (typeEff >= 4001 && typeEff <= 4016) ? (typeEff - 4000) : (((typeEff - 4001) / 5) + 1);
+		int setId = (typeEff == 4017 || typeEff == 4010) ? 10 : ((typeEff >= 4001 && typeEff <= 4016) ? (typeEff - 4000) : ((typeEff >= 4201 && typeEff <= 4216) ? (typeEff - 4200) : ((typeEff >= 4501 && typeEff <= 4516) ? (typeEff - 4500) : (((typeEff - 4001) / 5) + 1))));
 		if (setId < 1 || setId > 16) setId = 1;
 		ensureThanTrangFrames();
 		FrameImage[] arr = s_ttFrames[setId];
@@ -21810,7 +22042,8 @@ public final class Effect_Skill extends MainEffect {
 				this.addSound(10);
 				this.addSound(18);
 				break;
-			case 12: case 15: this.addSound(5); break;
+			case 12: this.addSound(10); break;
+			case 15: this.addSound(5); break;
 			case 10: case 14: this.addSound(14); break;
 			case 3: this.addSound(2); break;
 			case 4: case 11: case 13: this.addSound(10); break;
@@ -21845,19 +22078,24 @@ public final class Effect_Skill extends MainEffect {
 					break;
 				case 15: GameScreen.addEffectEnd(63, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 				case 3: GameScreen.addEffectEnd(35, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
-				case 4: case 13: GameScreen.addEffectEnd(175, 0, super.x, super.y - 20, (byte)super.Dir, super.objFireMain); break;
+				case 4: GameScreen.addEffectEnd(175, 0, super.x, super.y - 20, (byte)super.Dir, super.objFireMain); break;
+				case 13: GameScreen.addHightDataeff(33, super.x, super.y); break;
 				case 5: GameScreen.addEffectEnd(108, 7, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 				case 6: GameScreen.addEffectEnd(40, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 				case 9: GameScreen.addEffectEnd(92, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 				case 10: GameScreen.addEffectEnd(108, 7, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 				case 11: GameScreen.addEffectEnd(175, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
-				case 12: GameScreen.addEffectEnd(63, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
+				case 12:
+					this.marcoWaveHitMask = 0;
+					GameScreen.addEffectEnd(63, 0, super.x, super.y, (byte)super.Dir, super.objFireMain);
+					GameScreen.addEffectEnd(175, 0, super.x, super.y - 15, (byte)super.Dir, super.objFireMain);
+					break;
 				case 14: GameScreen.addEffectEnd(50, 0, super.x, super.y, (byte)super.Dir, super.objFireMain); break;
 			}
 		}
 
 		int maxTravelFrame = 0;
-		if (setId != 2 && setId != 6 && setId != 7 && setId != 8 && setId != 13)
+		if (setId != 2 && setId != 3 && setId != 5 && setId != 6 && setId != 7 && setId != 8 && setId != 9 && setId != 10 && setId != 12 && setId != 13 && setId != 16)
 		{
 			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
 			{
@@ -21918,46 +22156,296 @@ public final class Effect_Skill extends MainEffect {
 		{
 			if (this.VecEff == null) this.VecEff = new mVector();
 			this.VecEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
+
+			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+
 			int centerX = super.toX;
 			int centerY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (tInfo != null)
+				{
+					MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (t0 != null && !t0.isDie && t0.Hp > 0 && !t0.isRemove)
+					{
+						centerX = t0.x;
+						centerY = t0.y - (t0.hOne / 2);
+					}
+				}
+			}
 			if (centerX == 0 && centerY == 0)
 			{
-				centerX = super.x + (super.Dir == 2 ? 120 : -120);
-				centerY = super.y - 20;
+				centerX = casterX + facingSign * 160;
+				centerY = casterY - 15;
 			}
 
-			// Ring 0: Molten Caldera Epicenter (r = 0, delay = 4)
-			Point p0 = new Point(); p0.x = centerX; p0.y = centerY; p0.f = 0; p0.fSmall = 4; p0.subType = 0; this.VecEff.addElement(p0);
-
-			// Ring 1: Inner Circular Ring (r = 45px, 6 vents at 60 deg, delay = 10)
-			int[][] r1 = new int[][] { new int[] { 45, 0 }, new int[] { 23, 25 }, new int[] { -23, 25 }, new int[] { -45, 0 }, new int[] { -23, -25 }, new int[] { 23, -25 } };
-			for (int i = 0; i < r1.length; i++)
+			// Clamp distance to range = 220
+			int dist = Math.abs(centerX - casterX);
+			if (dist > 220)
 			{
-				Point p = new Point(); p.x = centerX + r1[i][0]; p.y = centerY + r1[i][1]; p.f = 0; p.fSmall = 10; p.subType = 1; this.VecEff.addElement(p);
+				centerX = casterX + facingSign * 220;
 			}
+			super.toX = centerX;
+			super.toY = centerY;
 
-			// Ring 2: Mid Circular Ring 1 (r = 95px, 8 vents at 45 deg, delay = 18)
-			int[][] r2 = new int[][] { new int[] { 95, 0 }, new int[] { 67, 44 }, new int[] { 0, 62 }, new int[] { -67, 44 }, new int[] { -95, 0 }, new int[] { -67, -44 }, new int[] { 0, -62 }, new int[] { 67, -44 } };
-			for (int i = 0; i < r2.length; i++)
+			// Khởi tạo 12 hạt tàn lửa nham thạch bắn tung tóe quanh tâm chấn
+			for (int i = 0; i < 12; i++)
 			{
-				Point p = new Point(); p.x = centerX + r2[i][0]; p.y = centerY + r2[i][1]; p.f = 0; p.fSmall = 18; p.subType = 1; this.VecEff.addElement(p);
+				Point ep = new Point();
+				int angle = (i * 30) % 360;
+				int speed = 3 + (i % 4);
+				ep.x = centerX;
+				ep.y = centerY - 10;
+				ep.vx = (CRes.getcos(angle) * speed) >> 10;
+				ep.vy = -(3 + (i % 4));
+				ep.f = 0;
+				ep.fRe = 24;
+				ep.color = (i % 2 == 0) ? 0 : 2;
+				this.VecSubEff.addElement(ep);
 			}
 
-			// Ring 3: Mid Circular Ring 2 (r = 150px, 10 vents at 36 deg, delay = 28)
-			int[][] r3 = new int[][] { new int[] { 150, 0 }, new int[] { 121, 57 }, new int[] { 46, 93 }, new int[] { -46, 93 }, new int[] { -121, 57 }, new int[] { -150, 0 }, new int[] { -121, -57 }, new int[] { -46, -93 }, new int[] { 46, -93 }, new int[] { 121, -57 } };
-			for (int i = 0; i < r3.length; i++)
+			super.fRemove = 70;
+		}
+		else if (setId == 3)
+		{
+			if (this.VecEff == null) this.VecEff = new mVector();
+			this.VecEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
+
+			int centerX = super.toX;
+			int centerY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
 			{
-				Point p = new Point(); p.x = centerX + r3[i][0]; p.y = centerY + r3[i][1]; p.f = 0; p.fSmall = 28; p.subType = 1; this.VecEff.addElement(p);
+				Object_Effect_Skill t0 = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (t0 != null)
+				{
+					MainObject target = MainObject.get_Object((int)t0.ID, (byte)t0.tem);
+					if (target != null)
+					{
+						centerX = target.x;
+						centerY = target.y;
+					}
+				}
 			}
-
-			// Ring 4: Outer Perimeter Circular Ring (r = 210px, 12 vents at 30 deg, delay = 40)
-			int[][] r4 = new int[][] { new int[] { 210, 0 }, new int[] { 182, 68 }, new int[] { 105, 118 }, new int[] { 0, 136 }, new int[] { -105, 118 }, new int[] { -182, 68 }, new int[] { -210, 0 }, new int[] { -182, -68 }, new int[] { -105, -118 }, new int[] { 0, -136 }, new int[] { 105, -118 }, new int[] { 182, -68 } };
-			for (int i = 0; i < r4.length; i++)
+			if (centerX == 0 && centerY == 0)
 			{
-				Point p = new Point(); p.x = centerX + r4[i][0]; p.y = centerY + r4[i][1]; p.f = 0; p.fSmall = 40; p.subType = 1; this.VecEff.addElement(p);
+				centerX = super.x + (super.Dir == 2 ? 140 : -140);
+				centerY = super.y - 15;
+			}
+			super.toX = centerX;
+			super.toY = centerY;
+
+			// 1. SEVEN COLOSSAL PERMAFROST PILLARS & 6 INTERMEDIATE JAGGED SPIKES
+			// Final Unified Structure ("cuối vẫn ra 1 hình"):
+			// 7 Colossal Ice Spires (dis = max height) & 6 Ground Icicles forming the majestic Glacial Peak
+			int pattern = CRes.random(6);
+			int[] spireDelays = new int[7];
+			int[] spikeDelays = new int[6];
+			int[] jitterX = new int[7];
+			int[] jitterY = new int[7];
+
+			switch (pattern)
+			{
+				case 0: // Pattern 0: Băng Tâm Bộc Phát (Epicenter Bloom / Inside-Out Surge)
+					spireDelays[0] = 14; // Center pinnacle erupts first!
+					spireDelays[1] = 16; spireDelays[2] = 17; // Inner flank
+					spireDelays[3] = 19; spireDelays[4] = 20; // Mid flank
+					spireDelays[5] = 22; spireDelays[6] = 23; // Outer perimeter
+					spikeDelays[4] = 15; spikeDelays[5] = 15;
+					spikeDelays[0] = 18; spikeDelays[1] = 18;
+					spikeDelays[2] = 21; spikeDelays[3] = 21;
+					break;
+
+				case 1: // Pattern 1: Gọng Kìm Băng Phổ (Glacial Pincer / Outside-In Converge)
+					spireDelays[5] = 14; spireDelays[6] = 14; // Outer flanks seal perimeter first!
+					spireDelays[3] = 17; spireDelays[4] = 17; // Mid flank
+					spireDelays[1] = 20; spireDelays[2] = 20; // Inner flank
+					spireDelays[0] = 23; // Grand center pinnacle climax!
+					spikeDelays[2] = 15; spikeDelays[3] = 15;
+					spikeDelays[0] = 18; spikeDelays[1] = 18;
+					spikeDelays[4] = 21; spikeDelays[5] = 21;
+					break;
+
+				case 2: // Pattern 2: Hàn Băng Thần Triều Thuận (Tidal Avalanche Wave Left-to-Right Surge)
+					spireDelays[5] = 14; // Left Outer
+					spireDelays[3] = 16; // Left Mid
+					spireDelays[1] = 18; // Left Inner
+					spireDelays[0] = 20; // Center
+					spireDelays[2] = 22; // Right Inner
+					spireDelays[4] = 24; // Right Mid
+					spireDelays[6] = 26; // Right Outer
+					spikeDelays[2] = 15; spikeDelays[0] = 17; spikeDelays[4] = 19;
+					spikeDelays[5] = 21; spikeDelays[1] = 23; spikeDelays[3] = 25;
+					break;
+
+				case 3: // Pattern 3: Hàn Băng Thần Triều Nghịch (Tidal Avalanche Wave Right-to-Left Surge)
+					spireDelays[6] = 14; // Right Outer
+					spireDelays[4] = 16; // Right Mid
+					spireDelays[2] = 18; // Right Inner
+					spireDelays[0] = 20; // Center
+					spireDelays[1] = 22; // Left Inner
+					spireDelays[3] = 24; // Left Mid
+					spireDelays[5] = 26; // Left Outer
+					spikeDelays[3] = 15; spikeDelays[1] = 17; spikeDelays[5] = 19;
+					spikeDelays[4] = 21; spikeDelays[0] = 23; spikeDelays[2] = 25;
+					break;
+
+				case 4: // Pattern 4: Hàn Băng Tinh Khắc Đan Chéo (Criss-Cross Zigzag Eruption)
+					spireDelays[5] = 14; // Left Outer
+					spireDelays[6] = 15; // Right Outer
+					spireDelays[4] = 17; // Right Mid
+					spireDelays[3] = 18; // Left Mid
+					spireDelays[1] = 20; // Left Inner
+					spireDelays[2] = 21; // Right Inner
+					spireDelays[0] = 23; // Center Pinnacle Climax
+					spikeDelays[2] = 15; spikeDelays[3] = 16;
+					spikeDelays[1] = 18; spikeDelays[0] = 19;
+					spikeDelays[4] = 21; spikeDelays[5] = 22;
+					break;
+
+				default: // Pattern 5: Băng Tách Hỗn Mang Tự Nhiên (Organic Shuffled Fracture with Natural Micro-Jitter)
+					int[] baseDelays = { 14, 15, 17, 18, 20, 22, 23 };
+					for (int s = 6; s > 0; s--)
+					{
+						int r = CRes.random(s + 1);
+						int tmp = baseDelays[s];
+						baseDelays[s] = baseDelays[r];
+						baseDelays[r] = tmp;
+					}
+					for (int s = 0; s < 7; s++)
+					{
+						spireDelays[s] = baseDelays[s];
+						jitterX[s] = CRes.random_Am_0(5);
+						jitterY[s] = CRes.random_Am_0(3);
+					}
+					for (int k = 0; k < 6; k++)
+					{
+						spikeDelays[k] = 15 + CRes.random(8);
+					}
+					break;
 			}
 
-			super.fRemove = Math.max(maxTravelFrame + 75, 85);
+			Point p0 = new Point(); p0.x = centerX + jitterX[0]; p0.y = centerY + jitterY[0]; p0.f = 0; p0.fSmall = spireDelays[0]; p0.subType = 0; p0.dis = 135; p0.color = 0; this.VecEff.addElement(p0);
+			Point p1 = new Point(); p1.x = centerX - 42 + jitterX[1]; p1.y = centerY - 5 + jitterY[1]; p1.f = 0; p1.fSmall = spireDelays[1]; p1.subType = 0; p1.dis = 110; p1.color = 2; this.VecEff.addElement(p1);
+			Point p2 = new Point(); p2.x = centerX + 42 + jitterX[2]; p2.y = centerY - 4 + jitterY[2]; p2.f = 0; p2.fSmall = spireDelays[2]; p2.subType = 0; p2.dis = 110; p2.color = 0; this.VecEff.addElement(p2);
+			Point p3 = new Point(); p3.x = centerX - 85 + jitterX[3]; p3.y = centerY + 2 + jitterY[3]; p3.f = 0; p3.fSmall = spireDelays[3]; p3.subType = 0; p3.dis = 88; p3.color = 2; this.VecEff.addElement(p3);
+			Point p4 = new Point(); p4.x = centerX + 85 + jitterX[4]; p4.y = centerY + 3 + jitterY[4]; p4.f = 0; p4.fSmall = spireDelays[4]; p4.subType = 0; p4.dis = 88; p4.color = 0; this.VecEff.addElement(p4);
+			Point p5 = new Point(); p5.x = centerX - 135 + jitterX[5]; p5.y = centerY + 6 + jitterY[5]; p5.f = 0; p5.fSmall = spireDelays[5]; p5.subType = 0; p5.dis = 68; p5.color = 2; this.VecEff.addElement(p5);
+			Point p6 = new Point(); p6.x = centerX + 135 + jitterX[6]; p6.y = centerY + 8 + jitterY[6]; p6.f = 0; p6.fSmall = spireDelays[6]; p6.subType = 0; p6.dis = 68; p6.color = 0; this.VecEff.addElement(p6);
+
+			int[][] subOffsets = {
+				{-65, 10},
+				{65, 12},
+				{-110, -8},
+				{110, -6},
+				{-20, 14},
+				{20, 15}
+			};
+			for (int i = 0; i < subOffsets.length; i++)
+			{
+				Point sp = new Point();
+				sp.x = centerX + subOffsets[i][0];
+				sp.y = centerY + subOffsets[i][1];
+				sp.f = 0; sp.fSmall = spikeDelays[i]; sp.subType = 1; sp.dis = 40; sp.color = (i % 2 == 0) ? 0 : 2;
+				this.VecEff.addElement(sp);
+			}
+
+			// 2. 24 BLIZZARD VORTEX PARTICLES
+			for (int b = 0; b < 24; b++)
+			{
+				Point bp = new Point();
+				bp.x = centerX;
+				bp.y = centerY;
+				bp.frame = b * 15;
+				bp.dis = 30 + (b * 5);
+				bp.fSmall = b;
+				bp.subType = (b % 3 == 0) ? 1 : 0;
+				this.VecSubEff.addElement(bp);
+			}
+
+			super.fRemove = 65;
+		}
+		else if (setId == 5)
+		{
+			if (this.VecEff == null) this.VecEff = new mVector();
+			this.VecEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
+
+			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+
+			int impactX = super.toX;
+			int impactY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				Object_Effect_Skill t0 = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (t0 != null)
+				{
+					MainObject target = MainObject.get_Object((int)t0.ID, (byte)t0.tem);
+					if (target != null)
+					{
+						impactX = target.x;
+						impactY = target.y;
+					}
+				}
+			}
+			if (impactX == 0 && impactY == 0)
+			{
+				impactX = casterX + facingSign * 160;
+				impactY = casterY;
+			}
+			super.toX = impactX;
+			super.toY = impactY;
+
+			// Hướng mặt Caster về phía mục tiêu và vào pose tụ lực hắc ám
+			if (super.objFireMain != null)
+			{
+				super.Dir = (byte)((impactX >= casterX) ? 2 : 0);
+				super.objFireMain.type_left_right = super.Dir;
+				super.objFireMain.Dir = super.Dir;
+				super.objFireMain.Action = 2; // Windup tụ năng lượng Hắc Ám
+				super.objFireMain.f = 0;
+			}
+
+			// Khởi tạo 16 hạt vật chất tối xoay quanh đĩa bồi tụ chân trời sự kiện (this.VecSubEff)
+			for (int b = 0; b < 16; b++)
+			{
+				Point bp = new Point();
+				bp.x = impactX;
+				bp.y = impactY;
+				bp.frame = b * 22;                  // Góc xoay quỹ đạo ban đầu
+				bp.dis = 45 + (b * 6);              // Bán kính xoay (45px -> 140px)
+				bp.fSmall = b;                      // Seed nhấp nháy
+				bp.subType = (b % 3 == 0) ? 1 : 0;  // 0 = điểm sáng tím, 1 = đốm sao hắc ám
+				bp.color = (b % 2 == 0) ? 0x9C27B0 : 0x4A148C; // Màu tím hư vô / tím đậm
+				this.VecSubEff.addElement(bp);
+			}
+
+			// Khởi tạo 6 điểm nứt hư vô mặt đất quanh tâm chấn (this.VecEff)
+			int[][] riftOffsets = {
+				{ 0, 4 }, { -45, 2 }, { 45, 3 }, { -85, 5 }, { 85, 4 }, { 0, -10 }
+			};
+			for (int r = 0; r < riftOffsets.length; r++)
+			{
+				Point rp = new Point();
+				rp.x = impactX + riftOffsets[r][0];
+				rp.y = impactY + riftOffsets[r][1];
+				rp.f = 0;
+				rp.fSmall = 16 + r * 3; // Delay xuất hiện rạn nứt
+				rp.subType = (r % 2 == 0) ? 0 : 2; // Lật hình ngẫu nhiên
+				this.VecEff.addElement(rp);
+			}
+
+			this.addSound((byte)10);
+			super.fRemove = 76;
 		}
 		else if (setId == 7)
 		{
@@ -22033,28 +22521,50 @@ public final class Effect_Skill extends MainEffect {
 		}
 		else if (setId == 6)
 		{
-			// Enel 200M Volt El Thor — Giant Sequential Random Lightning Barrage
+			// Enel 200M Volt El Thor — Full Procedural Lightning Matrix & Random Aerial Teleport
 			if (this.VecEff == null) this.VecEff = new mVector();
 			this.VecEff.removeAllElements();
-			if (this.VecSubEff != null) this.VecSubEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
 
 			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
 			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
 			int facingSign = (super.Dir == 2) ? 1 : -1;
 
+			this.enelOrigX = casterX;
+			this.enelOrigY = casterY;
+			if (super.objFireMain != null && super.objFireMain == GameScreen.player)
+			{
+				Player.isBlock = true;
+			}
+
+			// Epicenter determination
 			int impactX = super.toX;
 			int impactY = super.toY;
-			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			int nTargets = (super.vecObjsBeFire != null) ? super.vecObjsBeFire.size() : 0;
+			if (nTargets > 0)
 			{
-				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
-				if (tInfo != null)
+				int sumX = 0;
+				int sumY = 0;
+				int validCount = 0;
+				for (int k = 0; k < nTargets; k++)
 				{
-					MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
-					if (t0 != null && !t0.isDie)
+					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (tInfo != null)
 					{
-						impactX = t0.x;
-						impactY = t0.y;
+						MainObject t = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (t != null && !t.isDie && t.Hp > 0)
+						{
+							sumX += t.x;
+							sumY += t.y;
+							validCount++;
+						}
 					}
+				}
+				if (validCount > 0)
+				{
+					impactX = sumX / validCount;
+					impactY = sumY / validCount;
 				}
 			}
 			if (impactX == 0 && impactY == 0)
@@ -22062,89 +22572,584 @@ public final class Effect_Skill extends MainEffect {
 				impactX = casterX + facingSign * 140;
 				impactY = casterY;
 			}
+			super.toX = impactX;
+			super.toY = impactY;
 
-			// Phase 2: Raining Thunderbolts (Skill 170 evolved) targeting all 6 enemies
-			int nTargets = (super.vecObjsBeFire != null) ? super.vecObjsBeFire.size() : 0;
-			int strikeCount = Math.max(6, nTargets);
-			int baseStartFrame = 16;
+			// ─── 1. MATRIX NODES GENERATION (Stored in this.VecEff) ───
+			// Node 0: Epicenter Master Node (subType = 1: Colossal 200M Volt El Thor Beam, strike at f = 36)
+			Point nodeCenter = new Point();
+			nodeCenter.x = impactX;
+			nodeCenter.y = impactY;
+			nodeCenter.f = 0;
+			nodeCenter.fSmall = 36;
+			nodeCenter.subType = 1;
+			nodeCenter.color = 0;
+			nodeCenter.dis = 120;
+			this.VecEff.addElement(nodeCenter);
 
-			for (int i = 0; i < strikeCount; i++)
+			// Nodes 1..N: Locked Target Nodes (subType = 0: Cascading Sky Bolts)
+			for (int i = 0; i < nTargets; i++)
 			{
-				Point p = new Point();
-				if (i < nTargets)
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
+				if (tInfo != null)
 				{
-					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
-					MainObject t = (tInfo != null) ? MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem) : null;
+					MainObject t = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
 					if (t != null && !t.isDie)
 					{
-						p.x = t.x;
-						p.y = t.y;
-					}
-					else
-					{
-						int dx = (i % 2 == 0 ? -1 : 1) * (30 + (i * 20));
-						int dy = (i % 3 == 0 ? -10 : (i % 3 == 1 ? 10 : 0));
-						p.x = impactX + dx;
-						p.y = impactY + dy;
+						Point pTarget = new Point();
+						pTarget.x = t.x;
+						pTarget.y = t.y;
+						pTarget.f = 0;
+						pTarget.fSmall = 16 + i * 4; // Staggered: 16, 20, 24, 28, 32
+						pTarget.subType = 0;
+						pTarget.color = (i % 2 == 0 ? 0 : 2);
+						pTarget.dis = 30;
+						this.VecEff.addElement(pTarget);
 					}
 				}
-				else
-				{
-					int dx = (i % 2 == 0 ? -1 : 1) * (35 + (i * 18));
-					int dy = (i % 3 == 0 ? -12 : (i % 3 == 1 ? 12 : 0));
-					p.x = impactX + dx;
-					p.y = impactY + dy;
-				}
-				p.f = 0;
-				p.fSmall = baseStartFrame + i * 3; // Staggered: 16, 19, 22, 25, 28, 31...
-				p.subType = 0; // 0 = Diagonal Raining Thunderbolt (Skill 170)
-				p.color = (i % 2 == 0) ? 0 : 2; // Flip direction
-				this.VecEff.addElement(p);
 			}
 
-			// Phase 3: The Climax — Colossal 200M Volt Divine Beam (Skill 169 evolved)
-			Point megaStrike = new Point();
-			megaStrike.x = impactX;
-			megaStrike.y = impactY;
-			megaStrike.f = 0;
-			megaStrike.fSmall = 36; // Lands at super.f = 36
-			megaStrike.subType = 1; // 1 = Colossal 200M Volt El Thor Beam
-			megaStrike.color = 0;
-			this.VecEff.addElement(megaStrike);
+			// Nodes: Inner Geometric Matrix Ring (6 Nodes at r = 65px, staggered strikes)
+			int rInner = 65;
+			for (int a = 0; a < 6; a++)
+			{
+				int angle = a * 60 + 15;
+				Point pInner = new Point();
+				pInner.x = impactX + (rInner * CRes.getcos(angle) >> 10);
+				pInner.y = impactY + ((rInner * 3 / 5) * CRes.getsin(angle) >> 10);
+				pInner.f = 0;
+				pInner.fSmall = 14 + (a * 3); // 14, 17, 20, 23, 26, 29
+				pInner.subType = 0;
+				pInner.color = (a % 2 == 0 ? 0 : 2);
+				pInner.dis = 45;
+				this.VecEff.addElement(pInner);
+			}
 
-			// Phase 3 Bonus Aftershocks (super.f = 46, super.f = 50)
-			Point bonus1 = new Point();
-			bonus1.x = impactX + 45;
-			bonus1.y = impactY + 8;
-			bonus1.f = 0;
-			bonus1.fSmall = 46;
-			bonus1.subType = 2; // 2 = Residual Aftershock
-			bonus1.color = 2;
-			this.VecEff.addElement(bonus1);
+			// Nodes: Outer Perimeter Grid Nodes (6 Nodes at r = 150px)
+			int rOuter = 150;
+			for (int b = 0; b < 6; b++)
+			{
+				int angle = b * 60 + 45;
+				Point pOuter = new Point();
+				int perturbR = rOuter + CRes.random_Am_0(15);
+				pOuter.x = impactX + (perturbR * CRes.getcos(angle) >> 10);
+				pOuter.y = impactY + ((perturbR * 3 / 5) * CRes.getsin(angle) >> 10);
+				pOuter.f = 0;
+				pOuter.fSmall = 22 + (b * 4); // 22, 26, 30, 34, 38, 42
+				pOuter.subType = (b % 2 == 0 ? 0 : 2);
+				pOuter.color = (b % 2 == 0 ? 2 : 0);
+				pOuter.dis = 60;
+				this.VecEff.addElement(pOuter);
+			}
 
-			Point bonus2 = new Point();
-			bonus2.x = impactX - 45;
-			bonus2.y = impactY - 8;
-			bonus2.f = 0;
-			bonus2.fSmall = 50;
-			bonus2.subType = 2; // 2 = Residual Aftershock
-			bonus2.color = 0;
-			this.VecEff.addElement(bonus2);
+			// Nodes: Residual Overdrive Aftershock Nodes (Landing at f = 46, 50, 54, 58)
+			int[][] aftershockOffsets = new int[][] {
+				new int[] { -55, -8, 46, 2, 0 },
+				new int[] { 60, -10, 50, 2, 2 },
+				new int[] { -85, 12, 54, 2, 0 },
+				new int[] { 90, 8, 58, 2, 2 }
+			};
+			for (int s = 0; s < aftershockOffsets.length; s++)
+			{
+				Point pAfter = new Point();
+				pAfter.x = impactX + aftershockOffsets[s][0];
+				pAfter.y = impactY + aftershockOffsets[s][1];
+				pAfter.f = 0;
+				pAfter.fSmall = aftershockOffsets[s][2];
+				pAfter.subType = aftershockOffsets[s][3];
+				pAfter.color = aftershockOffsets[s][4];
+				this.VecEff.addElement(pAfter);
+			}
 
-			super.fRemove = 76;
+			// ─── 2. MATRIX INTERCONNECTION EDGES / LIGHTNING ARCS (Stored in this.VecSubEff) ───
+			// Interconnect nodes to draw the glowing celestial lightning web / matrix lines!
+			int totalNodes = this.VecEff.size();
+			if (totalNodes >= 7)
+			{
+				// A. Center-to-Inner Spokes (Connecting Node 0 to Inner Ring Nodes)
+				for (int i = 1; i <= 6 && i < totalNodes; i++)
+				{
+					Point targetNode = (Point)this.VecEff.elementAt(i);
+					Point arc = new Point();
+					arc.x = nodeCenter.x;
+					arc.y = nodeCenter.y - 10;
+					arc.x2 = targetNode.x;
+					arc.y2 = targetNode.y;
+					arc.fSmall = 10 + i * 2; // Active from f=12..38
+					arc.fRe = 28; // Duration
+					arc.subType = 0; // 0 = standard lightning arc
+					arc.frame = i * 7; // jitter seed
+					arc.color = (i % 2 == 0 ? 0x00B0FF : 0x33B5E5);
+					this.VecSubEff.addElement(arc);
+				}
+
+				// B. Inner Ring Perimeter Polygon (Connecting adjacent inner nodes)
+				for (int i = 1; i <= 6 && i < totalNodes; i++)
+				{
+					int nextIdx = (i == 6) ? 1 : (i + 1);
+					Point n1 = (Point)this.VecEff.elementAt(i);
+					Point n2 = (Point)this.VecEff.elementAt(nextIdx);
+					Point arc = new Point();
+					arc.x = n1.x;
+					arc.y = n1.y;
+					arc.x2 = n2.x;
+					arc.y2 = n2.y;
+					arc.fSmall = 12 + i * 2;
+					arc.fRe = 26;
+					arc.subType = 0;
+					arc.frame = i * 11;
+					arc.color = 0x80D8FF;
+					this.VecSubEff.addElement(arc);
+				}
+
+				// C. Outer Ring Polygon & Spokes to Inner Ring
+				for (int i = 7; i <= 12 && i < totalNodes; i++)
+				{
+					Point nOuter = (Point)this.VecEff.elementAt(i);
+					int innerIdx = 1 + (i - 7) % 6;
+					Point nInner = (Point)this.VecEff.elementAt(innerIdx);
+					// Ray connecting inner to outer
+					Point arcRay = new Point();
+					arcRay.x = nInner.x;
+					arcRay.y = nInner.y;
+					arcRay.x2 = nOuter.x;
+					arcRay.y2 = nOuter.y;
+					arcRay.fSmall = 16 + (i - 7) * 3;
+					arcRay.fRe = 24;
+					arcRay.subType = 0;
+					arcRay.frame = i * 13;
+					arcRay.color = 0x00E5FF;
+					this.VecSubEff.addElement(arcRay);
+
+					// Outer loop edge
+					int nextOuter = (i == 12) ? 7 : (i + 1);
+					if (nextOuter < totalNodes)
+					{
+						Point nOuterNext = (Point)this.VecEff.elementAt(nextOuter);
+						Point arcOuter = new Point();
+						arcOuter.x = nOuter.x;
+						arcOuter.y = nOuter.y;
+						arcOuter.x2 = nOuterNext.x;
+						arcOuter.y2 = nOuterNext.y;
+						arcOuter.fSmall = 18 + (i - 7) * 2;
+						arcOuter.fRe = 22;
+						arcOuter.subType = 0;
+						arcOuter.frame = i * 17;
+						arcOuter.color = 0xB1EDFC;
+						this.VecSubEff.addElement(arcOuter);
+					}
+				}
+
+				// D. Sky-to-Ground Feeder Arcs (From high altitude stormcloud down to ground nodes)
+				for (int sky = 0; sky < 5; sky++)
+				{
+					Point arcSky = new Point();
+					arcSky.x = impactX - 120 + sky * 60 + CRes.random_Am_0(15);
+					arcSky.y = impactY - 260; // High in the heavens
+					int groundTargetIdx = (sky * 2) % totalNodes;
+					Point groundNode = (Point)this.VecEff.elementAt(groundTargetIdx);
+					arcSky.x2 = groundNode.x;
+					arcSky.y2 = groundNode.y;
+					arcSky.fSmall = 14 + sky * 4;
+					arcSky.fRe = 26;
+					arcSky.subType = 1; // 1 = Vertical Sky Lightning Feeder
+					arcSky.frame = sky * 19;
+					arcSky.color = 0xFFFFFF;
+					this.VecSubEff.addElement(arcSky);
+				}
+			}
+
+			super.fRemove = 78;
 		}
 		else if (setId == 8)
 		{
 			if (this.VecEff != null) this.VecEff.removeAllElements();
 			if (this.VecSubEff != null) this.VecSubEff.removeAllElements();
-			super.fRemove = 75;
+			super.fRemove = 74;
+		}
+		else if (setId == 12)
+		{
+			// 4012 Phượng Hoàng Bất Tử Bộc Phá _X (Marco Blue Phoenix Climax)
+			if (this.VecEff == null) this.VecEff = new mVector();
+			this.VecEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
+
+			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			this.phoenixOrigX = casterX;
+			this.phoenixOrigY = casterY;
+
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+			int targetX = super.toX;
+			int targetY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (tInfo != null)
+				{
+					MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (t0 != null && !t0.isDie && t0.Hp > 0 && !t0.isRemove)
+					{
+						targetX = t0.x;
+						targetY = t0.y - (t0.hOne / 2);
+					}
+				}
+			}
+			if (targetX == 0 && targetY == 0)
+			{
+				targetX = casterX + facingSign * 160;
+				targetY = casterY - 15;
+			}
+
+			// Clamp distance to range = 220
+			int dist = Math.abs(targetX - casterX);
+			if (dist > 220)
+			{
+				targetX = casterX + facingSign * 220;
+			}
+			this.phoenixTargetX = targetX;
+			this.phoenixTargetY = targetY;
+			this.marcoWaveHitMask = 0;
+
+			// Movement Lock: Không cho player di chuyển khi đang tung tuyệt chiêu
+			if (super.objFireMain != null && super.objFireMain == GameScreen.player)
+			{
+				Player.isBlock = true;
+				GameScreen.player.Action = 0;
+				GameScreen.player.toX = GameScreen.player.x;
+				GameScreen.player.toY = GameScreen.player.y;
+			}
+
+			// Sinh 16 hạt lông vũ linh thiêng & tàn lam hỏa (Sacred Feathers & Blue Embers)
+			for (int i = 0; i < 16; i++)
+			{
+				Point p = new Point();
+				p.x = casterX + CRes.random_Am_0(25);
+				p.y = casterY - 10 + CRes.random_Am_0(20);
+				p.vx = CRes.random_Am_0(3);
+				p.vy = -(2 + CRes.random(4));
+				p.f = 0;
+				p.fRe = 20 + CRes.random(15);
+				p.subType = (i % 2); // 0: feather (p12[9]), 1: spark (p12[8])
+				p.color = (i % 2 == 0) ? 0 : 2;
+				this.VecSubEff.addElement(p);
+			}
+
+			this.addSound(10);
+			LoadMap.timeVibrateScreen = 6;
+			super.fRemove = 68;
 		}
 		else if (setId == 13)
 		{
-			// Dai Phat Song Xung Kich - 36-tick 7-phase animation lifecycle
+			// 4013 Đại Phật Sóng Xung Kích _X (Sengoku Daibutsu Golden Shockwave) - 44-tick 5-phase cinematic animation
 			if (this.VecEff != null) this.VecEff.removeAllElements();
 			if (this.VecSubEff != null) this.VecSubEff.removeAllElements();
-			super.fRemove = 36;
+
+			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			this.daibutsuCasterX = casterX;
+			this.daibutsuCasterY = casterY;
+
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+			int targetX = super.toX;
+			int targetY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (tInfo != null)
+				{
+					MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (t0 != null && !t0.isDie && t0.Hp > 0 && !t0.isRemove)
+					{
+						targetX = t0.x;
+						targetY = t0.y - (t0.hOne / 2);
+					}
+				}
+			}
+			if (targetX == 0 && targetY == 0)
+			{
+				targetX = casterX + facingSign * 180;
+				targetY = casterY - 15;
+			}
+			// Clamp to max skill range = 220
+			int dist = Math.abs(targetX - casterX);
+			if (dist > 220)
+			{
+				targetX = casterX + facingSign * 220;
+			}
+			this.daibutsuImpactX = targetX;
+			this.daibutsuImpactY = targetY;
+
+			super.fRemove = 44;
+		}
+		else if (setId == 9)
+		{
+			// 4009 Eustass Kid: Từ Trường Bộc Phá Đại Pháo _X (Damned Punk Railgun)
+			if (this.VecEff == null) this.VecEff = new mVector();
+			this.VecEff.removeAllElements();
+			if (this.VecSubEff == null) this.VecSubEff = new mVector();
+			this.VecSubEff.removeAllElements();
+
+			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+
+			// Root fixed casting coordinates
+			super.x = casterX;
+			super.y = casterY;
+			if (super.objFireMain != null)
+			{
+				super.objFireMain.Action = 2; // Đổi pose gồng nhẹ khi bắt đầu tụ lực
+				super.objFireMain.f = 0;
+			}
+			super.fRemove = 48;
+
+			// Lock target coordinates (tối đa range = 220)
+			int targetX = super.toX;
+			int targetY = super.toY;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+				if (tInfo != null)
+				{
+					MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (t0 != null && !t0.isDie && t0.Hp > 0 && !t0.isRemove)
+					{
+						targetX = t0.x;
+						targetY = t0.y - (t0.hOne / 2);
+					}
+				}
+			}
+			if (targetX == 0 && targetY == 0)
+			{
+				targetX = casterX + facingSign * 180;
+				targetY = casterY - 15;
+			}
+			// Clamp range to 220px theo chuẩn skill data
+			int dist = Math.abs(targetX - casterX);
+			if (dist > 220)
+			{
+				targetX = casterX + facingSign * 220;
+			}
+			this.kidCannonImpactX = targetX;
+			this.kidCannonImpactY = targetY;
+
+			// Master Pool of 48 authentic metallic weapon icons in HTTH
+			int[] baseWeaponPool = {
+				// Swords & Sabers (11)
+				2, 26, 50, 74, 98, 122, 146, 170, 194, 218, 257,
+				// Daggers, Cleavers & Great Blades (11)
+				3, 27, 51, 75, 99, 123, 147, 171, 195, 219, 252,
+				// Staves, Spears, Tridents & Polearms (11)
+				4, 28, 52, 76, 100, 124, 148, 172, 196, 220, 256,
+				// Pistols, Rifles, Flintlocks & Cannons (11)
+				5, 29, 53, 77, 101, 125, 149, 173, 197, 221, 269,
+				// Iron Claws & Spiked Gauntlets (4)
+				49, 169, 193, 255
+			};
+
+			// Shuffle using Fisher-Yates to guarantee 100% unique weapons on every cast (NO DUPLICATES)
+			int[] shuffledPool = new int[baseWeaponPool.length];
+			System.arraycopy(baseWeaponPool, 0, shuffledPool, 0, baseWeaponPool.length);
+			for (int s = shuffledPool.length - 1; s > 0; s--)
+			{
+				int r = CRes.random(s + 1);
+				int tmp = shuffledPool[s];
+				shuffledPool[s] = shuffledPool[r];
+				shuffledPool[r] = tmp;
+			}
+
+			// Scan nearby mobs & players within 220px to pull weapons from
+			mVector nearbyEntities = new mVector();
+			if (GameScreen.vecPlayers != null)
+			{
+				for (int k = 0; k < GameScreen.vecPlayers.size(); k++)
+				{
+					MainObject obj = (MainObject)GameScreen.vecPlayers.elementAt(k);
+					if (obj != null && obj != super.objFireMain && !obj.isDie && obj.Hp > 0 && !obj.isRemove)
+					{
+						int d = MainObject.getDistance(casterX, casterY, obj.x, obj.y);
+						if (d <= 220)
+						{
+							nearbyEntities.addElement(obj);
+						}
+					}
+				}
+			}
+
+			int totalWeapons = 28;
+			for (int i = 0; i < totalWeapons; i++)
+			{
+				Point p = new Point();
+				p.subType = shuffledPool[i];
+
+				if (i < nearbyEntities.size())
+				{
+					MainObject ent = (MainObject)nearbyEntities.elementAt(i);
+					p.AZ = ent;
+					p.x2 = ent.x + CRes.random_Am_0(10);
+					p.y2 = ent.y - (ent.hOne / 2) + CRes.random_Am_0(8);
+				}
+				else
+				{
+					p.AZ = null;
+					int pullAngle = (i * (360 / totalWeapons) + CRes.random_Am_0(16) + 360) % 360;
+					int pullDist = 140 + CRes.random(0, 100);
+					p.x2 = casterX + (pullDist * CRes.getcos(pullAngle)) / 1000;
+					p.y2 = casterY + (pullDist * CRes.getsin(pullAngle)) / 1000;
+				}
+
+				p.x = p.x2;
+				p.y = p.y2;
+
+				// Relative offsets in cannon assembly formation (Twin-Rail Damned Punk Great Cannon)
+				// 0..7: Upper Rail, 8..15: Lower Rail, 16..21: Breech & Coils, 22..27: Muzzle Converters
+				int rx = 0;
+				int ry = 0;
+				int depth = 0;
+				if (i < 8)
+				{
+					// Upper Magnetic Rail
+					rx = facingSign * (-10 + i * 7);
+					ry = -14 + (i % 2) * 2;
+					depth = 1;
+				}
+				else if (i < 16)
+				{
+					// Lower Magnetic Rail
+					int k = i - 8;
+					rx = facingSign * (-10 + k * 7);
+					ry = 14 - (k % 2) * 2;
+					depth = 0;
+				}
+				else if (i < 22)
+				{
+					// Breech & Magnetic Accelerator Coils
+					int k = i - 16;
+					rx = facingSign * (-22 + (k % 3) * 8);
+					ry = -8 + (k / 3) * 16;
+					depth = (k % 2 == 0) ? 0 : 1;
+				}
+				else
+				{
+					// Muzzle Converters & Rail Stabilizers
+					int k = i - 22;
+					rx = facingSign * (36 + (k % 2) * 8);
+					ry = -10 + k * 4;
+					depth = 1;
+				}
+
+				p.AK = rx;
+				p.AL = ry;
+				p.color = depth; // 0 = back layer, 1 = front layer
+				p.frame = CRes.random(8);
+
+				p.fSmall = CRes.random(0, 4); // Takeoff delay
+				p.fRe = 10 + CRes.random(0, 4); // Flight duration: lands at cannon by frame 10..14
+
+				p.f = (i + CRes.random(4)) % 4; // Flight style
+				p.dis = 35 + CRes.random(0, 35); // Curvature amplitude
+
+				// Dispersal explosion velocities (for Phase 5)
+				int disperseAngle = (i * (360 / totalWeapons) + CRes.random_Am_0(20) + 360) % 360;
+				int disperseSpeed = 16 + CRes.random(0, 16);
+				p.vx = (disperseSpeed * CRes.getcos(disperseAngle)) / 1000;
+				p.vy = (disperseSpeed * CRes.getsin(disperseAngle)) / 1000 - 4;
+
+				this.VecEff.addElement(p);
+			}
+
+			this.addSound((byte)18);
+		}
+		else if (setId == 10)
+		{
+			if (this.VecEff == null) this.VecEff = new mVector();
+			this.VecEff.removeAllElements();
+
+			// 1. Ưu tiên tuyệt đối tìm mục tiêu chuẩn:
+			MainObject target = null;
+			if (GameScreen.objFocus != null && !GameScreen.objFocus.isDie && !GameScreen.objFocus.isRemove && GameScreen.objFocus != super.objFireMain)
+			{
+				target = GameScreen.objFocus;
+			}
+			else if (this.objBeFireMain != null && this.objBeFireMain != super.objFireMain && !this.objBeFireMain.isDie && !this.objBeFireMain.isRemove)
+			{
+				target = this.objBeFireMain;
+			}
+			else if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+			{
+				for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+				{
+					Object_Effect_Skill t0 = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (t0 != null)
+					{
+						MainObject mob = MainObject.get_Object((int)t0.ID, (byte)t0.tem);
+						if (mob != null && !mob.isDie && !mob.isRemove && mob != super.objFireMain)
+						{
+							target = mob;
+							break;
+						}
+					}
+				}
+			}
+
+			int centerX = 0;
+			int centerY = 0;
+			if (target != null)
+			{
+				this.objBeFireMain = target;
+				centerX = target.x;
+				centerY = target.y;
+				super.toX = centerX;
+				super.toY = centerY;
+				if (super.objFireMain != null)
+				{
+					super.Dir = (byte)((target.x >= super.objFireMain.x) ? 2 : 0);
+					super.objFireMain.type_left_right = super.Dir;
+					super.objFireMain.Dir = super.Dir;
+				}
+			}
+			else if (super.toX != 0 || super.toY != 0)
+			{
+				centerX = super.toX;
+				centerY = super.toY;
+			}
+			else
+			{
+				centerX = super.x + (super.Dir == 2 ? 140 : -140);
+				centerY = super.y;
+				super.toX = centerX;
+				super.toY = centerY;
+			}
+
+			Point targetCenter = new Point();
+			targetCenter.x = centerX;
+			targetCenter.y = centerY;
+			targetCenter.obj = target;
+			this.VecEff.addElement(targetCenter);
+			super.fRemove = 72;
+
+			if (super.levelPaint >= 0)
+			{
+				Effect_Skill groundPool = new Effect_Skill();
+				groundPool.typeEffect = typeEff;
+				groundPool.levelPaint = -1; // ONTOP = 0: DƯỚI MỤC TIÊU & NHÂN VẬT
+				groundPool.x = centerX;
+				groundPool.y = centerY;
+				groundPool.toX = centerX;
+				groundPool.toY = centerY;
+				groundPool.Dir = super.Dir;
+				groundPool.objFireMain = super.objFireMain;
+				groundPool.objBeFireMain = target;
+				groundPool.vecObjsBeFire = super.vecObjsBeFire;
+				groundPool.fRemove = 72;
+				groundPool.f = 0;
+				groundPool.subType = 1004;
+				if (groundPool.VecEff == null) groundPool.VecEff = new mVector();
+				groundPool.VecEff.addElement(new Point(centerX, centerY));
+				GameScreen.VecEffect.addElement(groundPool);
+			}
 		}
 		else
 		{
@@ -22154,178 +23159,491 @@ public final class Effect_Skill extends MainEffect {
 
 	private void updateThanTrangSkill(int typeEff)
 	{
-		int setId = (typeEff >= 4001 && typeEff <= 4016) ? (typeEff - 4000) : (((typeEff - 4001) / 5) + 1);
+		int setId = (typeEff == 4017 || typeEff == 4010) ? 10 : ((typeEff >= 4001 && typeEff <= 4016) ? (typeEff - 4000) : (((typeEff - 4001) / 5) + 1));
 		if (setId < 1 || setId > 16) setId = 1;
 
 		// Continuous Volcanic Screen Heat Vibration & Sound for Set 2 (Dung Nham - Volcano)
 		if (setId == 2 && super.f <= super.fRemove)
 		{
-			if (super.f % 3 == 0)
+			if (super.f == 2)
 			{
-				addVir(2, 4, 10, true);
-				LoadMap.timeVibrateScreen = 14;
+				this.addSound(5);
+				LoadMap.timeVibrateScreen = 6;
 			}
-			if (super.f == 2 || super.f == 10 || super.f == 18 || super.f == 28 || super.f == 40 || super.f == 55)
+			else if (super.f == 12)
+			{
+				this.addSound(5);
+			}
+			else if (super.f == 24)
+			{
+				// VA CHẠM CỰC ĐẠI - IMPACT & VOLCANIC EXPLOSION!
+				this.addSound(51);
+				this.addSound(18);
+				this.addSound(14);
+				LoadMap.timeVibrateScreen = 28;
+
+				// 1 HIT DUY NHẤT (nKick = 1): Kích ứng quái trúng đòn giật lùi & chớp trắng
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo != null)
+						{
+							MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+							if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
+							{
+								this.setAva(2, target);
+								target.dy = -8;
+							}
+						}
+					}
+				}
+			}
+			else if (super.f == 36)
 			{
 				this.addSound(51);
-				this.addSound(5);
+				LoadMap.timeVibrateScreen = 10;
 			}
 		}
 
-		// Multi-Pulse Damage & Proximity Burning on targets for Set 2 (Radial Area)
-		if (setId == 2 && (super.f == 10 || super.f == 18 || super.f == 28 || super.f == 40 || super.f == 55))
+		// Cập nhật vị trí hạt tàn lửa nham thạch (VecSubEff) sau va chạm (f >= 24)
+		if (setId == 2)
 		{
-			if (super.vecObjsBeFire != null)
+			if (super.f >= 24 && this.VecSubEff != null)
 			{
-				for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+				int impactY = super.toY;
+				for (int k = 0; k < this.VecSubEff.size(); k++)
 				{
-					Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
-					if (targetInfo != null)
+					Point p = (Point)this.VecSubEff.elementAt(k);
+					if (p != null)
 					{
-						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
-						if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
+						p.f++;
+						if (p.f < 20)
 						{
-							this.setAva(2, target);
-							GameScreen.addEffectEnd(112, 0, target.x, target.y, (byte)super.Dir, super.objMainEff);
-							GameScreen.addEffectEnd(85, 0, target.x, target.y - target.hOne / 2, (byte)super.Dir, super.objMainEff);
-							GameScreen.addHightDataeff(33, target.x, target.y);
-							GameScreen.addEffectEnd(30, 0, target.x, target.y - target.hOne / 2, 400, (byte)super.Dir, super.objMainEff);
+							p.x += p.vx;
+							p.y += p.vy;
+							p.vy++;
+							if (p.y > impactY + 12)
+							{
+								p.y = impactY + 12;
+								p.vx = 0;
+								p.vy = 0;
+							}
+						}
+					}
+				}
+			}
+
+			// Clean finish
+			if (super.f >= super.fRemove)
+			{
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo != null)
+						{
+							MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+							if (target != null) target.dy = 0;
 						}
 					}
 				}
 			}
 		}
 
-		// Molten Lava Ground Eruptions & Shrapnel Splashes for Set 2 (Concentric Circles)
-		if (setId == 2 && this.VecEff != null)
+		// ─── setId 3: Kỷ Băng Hà Tuyệt Đối X (Aokiji Ice Age) ───
+		if (setId == 3)
 		{
-			for (int k = 0; k < this.VecEff.size(); k++)
+			// 1. Screen Freezing Audio & Glacial Creak Milestones
+			if (super.f == 4)
 			{
-				Point vent = (Point)this.VecEff.elementAt(k);
-				if (vent != null)
-				{
-					vent.f++;
-					int age = vent.f - vent.fSmall;
-					if (age == 1)
-					{
-						// 1. Ground cracks and melts into boiling molten lava pool
-						GameScreen.addEffectEnd(110, 0, vent.x, vent.y + 6, 0, null);
-						GameScreen.addEffectEnd(111, 0, vent.x, vent.y, 0, null);
-						GameScreen.addEffectEnd(112, 0, vent.x, vent.y + 4, 0, null);
-						GameScreen.addHightDataeff(33, vent.x, vent.y);
-					}
-					else if (age == 5)
-					{
-						// 2. Towering molten lava geyser erupts violently upward
-						GameScreen.addEffectEnd(111, 0, vent.x, vent.y - 10, 0, null);
-						GameScreen.addEffectEnd(60, 2, vent.x, vent.y, 0, null);
-						GameScreen.addEffectEnd(63, 0, vent.x, vent.y, 0, null);
-					}
-					else if (age == 7 || age == 14 || age == 21 || age == 28)
-					{
-						// 3. Lava shrapnel & sparks exploding and bursting outward
-						GameScreen.addEffectEnd(113, 0, vent.x, vent.y - 20, 0, null);
-						GameScreen.addEffectEnd(85, 0, vent.x + CRes.random_Am_0(20), vent.y - 30 + CRes.random_Am_0(15), 0, null);
-						GameScreen.addEffectEnd(30, 0, vent.x + CRes.random_Am_0(15), vent.y - 25, 300, 0, null);
-					}
-					else if (age > 5 && age <= 40 && age % 5 == 0)
-					{
-						// 4. Boiling bubbling lava ground patch
-						GameScreen.addEffectEnd(112, 0, vent.x, vent.y, 0, null);
-					}
-				}
-			}
-		}
-
-		// ─── setId 6: 200 Triệu Volt Thần Lôi (Enel El Thor) — Authentic Fusion of Skills 169 & 170 ───
-		if (setId == 6)
-		{
-			// 1. Caster Airborne Levitation with Smooth Sinusoidal Easing
-			if (super.objFireMain != null)
-			{
-				if (super.f <= 16)
-				{
-					// Ease-out liftoff: 0 -> -45px using CRes.getsin
-					int angleProg = super.f * 90 / 16;
-					super.objFireMain.dy = -(45 * CRes.getsin(angleProg) >> 10);
-				}
-				else if (super.f > 16 && super.f <= 56)
-				{
-					// Floating in Sky: -45px with high voltage float tremor
-					int floatOffset = (super.f % 2 == 0) ? -1 : 1;
-					super.objFireMain.dy = -45 + floatOffset;
-				}
-				else if (super.f > 56 && super.f <= 74)
-				{
-					// Ease-in landing: -45px -> 0px using CRes.getcos
-					int tDown = super.f - 56; // 0..18
-					int angleDown = tDown * 90 / 18;
-					super.objFireMain.dy = -(45 * CRes.getcos(angleDown) >> 10);
-				}
-				else
-				{
-					super.objFireMain.dy = 0;
-				}
-			}
-
-			// 2. Sound Milestones
-			if (super.f == 2)
-			{
-				this.addSound(10); // Charging hum
+				this.addSound(2);
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 14;
 			}
 			else if (super.f == 14)
 			{
-				this.addSound(18); // Sky lightning activation
+				this.addSound(14);
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 28;
+			}
+			else if (super.f == 28)
+			{
+				this.addSound(2);
+				this.addSound(18);
+				LoadMap.timeVibrateScreen = 16;
+			}
+			else if (super.f == 42)
+			{
+				this.addSound(10);
+				LoadMap.timeVibrateScreen = 10;
 			}
 
-			// 3. Dynamic Sequential Thunder Strikes from this.VecEff
+			// 2. Target Freezing & Sub-Zero Damage Pulses (Hit at f = 14, 28, 42)
+			if (super.f == 14 || super.f == 28 || super.f == 42)
+			{
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+						if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+
+						this.setAva(2, target);
+						target.dy = 0;
+						// Pure sub-zero ice burst at target feet (Effect 35: Jagged Ice 89)
+						GameScreen.addEffectEnd((short)35, 0, target.x, target.y, (byte)0, null);
+					}
+				}
+			}
+
+			// 3. 24 Blizzard Snow Crystal Vortex Orbiting Simulation (this.VecSubEff)
+			if (this.VecSubEff != null)
+			{
+				for (int i = 0; i < this.VecSubEff.size(); i++)
+				{
+					Point bp = (Point)this.VecSubEff.elementAt(i);
+					if (bp != null)
+					{
+						bp.frame = (bp.frame + 12) % 360;
+						if (super.f < 14)
+						{
+							bp.dis = Math.min(135, bp.dis + 7);
+						}
+						else if (super.f > 45)
+						{
+							bp.dis = Math.max(0, bp.dis - 5);
+						}
+					}
+				}
+			}
+
+			// 4. Glacial Pillars & Icicles Eruption Age Advance (this.VecEff)
 			if (this.VecEff != null)
 			{
 				for (int i = 0; i < this.VecEff.size(); i++)
 				{
-					Point strike = (Point)this.VecEff.elementAt(i);
-					if (strike != null && super.f == strike.fSmall)
+					Point sp = (Point)this.VecEff.elementAt(i);
+					if (sp != null)
 					{
-						if (strike.subType == 1)
-						{
-							// ─── CỘT THIÊN LÔI KHỔNG LỒ CỰC ĐẠI (200M VOLT EL THOR) ───
-							this.addSound(51);
-							this.addSound(14);
-							this.addSound(18);
-							LoadMap.timeVibrateScreen = 36; // Climax screen quake
+						sp.f++;
+					}
+				}
+			}
 
-							// Pop all targets into the air & deal damage
-							if (super.vecObjsBeFire != null)
-							{
-								for (int k = 0; k < super.vecObjsBeFire.size(); k++)
-								{
-									Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
-									if (targetInfo == null) continue;
-									MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
-									if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+			// 5. Clean up targets on end
+			if (super.f >= super.fRemove && super.vecObjsBeFire != null)
+			{
+				for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+				{
+					Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (targetInfo == null) continue;
+					MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+					if (target != null) target.dy = 0;
+				}
+			}
+		}
 
-									this.setAva(2, target);
-									target.dy = -22; // Smooth air pop
-								}
-							}
-						}
-						else if (strike.subType == 0)
+		// ─── setId 5: Hắc Ám Thôn Phệ Vô Tận _X (Marshall D. Teach Black Hole Abyss Singularity) ───
+		if (setId == 5)
+		{
+			int impactX = super.toX;
+			int impactY = super.toY;
+
+			// TUYỆT ĐỐI KHÔNG LÀM TỐI MAP VÀ TRỜI (Bản đồ và bầu trời giữ nguyên 100% tự nhiên)
+			GameCanvas.gameScr.isFullScreen = false;
+
+			// 1. Audio Milestones & Dynamic Screen Shake (chuẩn nhịp chiến đấu hoành tráng)
+			if (super.f == 2)
+			{
+				this.addSound((byte)10); // Tiếng rền trầm hư vô tích tụ
+				LoadMap.timeVibrateScreen = 4;
+			}
+			else if (super.f == 14)
+			{
+				// Caster xuất chiêu phóng hắc tinh cầu xé toạc không gian
+				this.addSound((byte)4);
+				this.addSound((byte)51);
+				LoadMap.timeVibrateScreen = 8;
+				if (super.objFireMain != null)
+				{
+					super.objFireMain.Action = 2;
+					super.objFireMain.f = 0; // Đổi thế xuất chiêu oanh tạc
+				}
+			}
+			else if (super.f == 22)
+			{
+				// Hố đen khai mở gầm vang
+				this.addSound((byte)10);
+				this.addSound((byte)51);
+				LoadMap.timeVibrateScreen = 14;
+			}
+			else if (super.f == 34 || super.f == 42)
+			{
+				// Nhịp co thắt trọng lực
+				this.addSound((byte)10);
+				LoadMap.timeVibrateScreen = 6;
+			}
+			else if (super.f == 50)
+			{
+				// Vụ Nổ Đại Hư Vô Sụp Đổ Cực Đại & Giải Phóng
+				this.addSound((byte)14);
+				this.addSound((byte)51);
+				this.addSound((byte)18);
+				LoadMap.timeVibrateScreen = 28;
+			}
+
+			// 2. Caster Action Transition:
+			// Sau khi giải phóng hắc tinh cầu (f >= 28), Caster tự do di chuyển chiến đấu bình thường
+			if (super.objFireMain != null)
+			{
+				if (super.f == 28)
+				{
+					super.objFireMain.Action = 0;
+					if (super.objFireMain == GameScreen.player)
+					{
+						Player.isBlock = false;
+					}
+				}
+			}
+
+			// 3. Phản Ứng Chiến Đấu Của Mục Tiêu (Hiện mục tiêu bình thường, dính đòn rung giật tự nhiên)
+			if (super.vecObjsBeFire != null)
+			{
+				// Các nhịp hút chấn thương (f = 22, 30, 38, 46)
+				if (super.f == 22 || super.f == 30 || super.f == 38 || super.f == 46)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+						if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+						this.setAva(2, target);
+						target.dy = -4; // Nhịp giật sát thương nhẹ
+					}
+				}
+				// Cú nổ sụp đổ hố đen cực đại tại f = 50: Giật lùi mạnh
+				else if (super.f == 50)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+						if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+						this.setAva(2, target);
+						target.dy = -10; // Hất tung nhẹ khỏi mặt đất khi hố đen phát nổ
+					}
+				}
+				// Hồi phục tiếp đất mượt mà sau khi bị hất tung
+				else if (super.f > 50 && super.f <= 58)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (targetInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+						if (target != null && target.dy < 0)
 						{
-							// Raining thunderbolt impact
-							this.addSound(51);
-							LoadMap.timeVibrateScreen = 8;
-						}
-						else
-						{
-							// Bonus aftershock
-							this.addSound(10);
-							LoadMap.timeVibrateScreen = 6;
+							target.dy += 2;
 						}
 					}
 				}
 			}
 
-			// 4. Smooth Gravity Recovery for Targets
+			// 4. Cập nhật 16 Hạt Vật Chất Tối Xoay Xoắn Ốc Quỹ Đạo Hố Đen (this.VecSubEff)
+			if (this.VecSubEff != null)
+			{
+				for (int i = 0; i < this.VecSubEff.size(); i++)
+				{
+					Point bp = (Point)this.VecSubEff.elementAt(i);
+					if (bp != null)
+					{
+						int rotSpd = (super.f < 22) ? 8 : ((super.f < 48) ? 16 : 24);
+						bp.frame = (bp.frame + rotSpd) % 360;
+						if (super.f >= 20 && super.f <= 48)
+						{
+							// Xoáy logarithmic thu dần bán kính vào tâm hố đen
+							if (bp.dis > 15) bp.dis -= 1;
+						}
+						else if (super.f > 50)
+						{
+							// Bắn tung tỏa ra ngoài khi hố đen sụp đổ
+							bp.dis += 8;
+						}
+					}
+				}
+			}
+
+			// 5. Cập nhật tiến trình rạn nứt mặt đất (this.VecEff)
+			if (this.VecEff != null)
+			{
+				for (int i = 0; i < this.VecEff.size(); i++)
+				{
+					Point rp = (Point)this.VecEff.elementAt(i);
+					if (rp != null)
+					{
+						rp.f++;
+					}
+				}
+			}
+
+			// 6. Hoàn tất chiêu & Giải phóng an toàn
+			if (super.f >= super.fRemove)
+			{
+				GameCanvas.gameScr.isFullScreen = false;
+				if (super.objFireMain != null && super.objFireMain == GameScreen.player)
+				{
+					Player.isBlock = false;
+				}
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null)
+						{
+							target.dy = 0;
+							if (target == GameScreen.player)
+							{
+								Player.isBlock = false;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// ─── setId 6: 200 Triệu Volt Thần Lôi (Enel El Thor) — Full Random Aerial Teleport, Flight & Matrix Update ───
+		if (setId == 6)
+		{
+			int casterOrigX = this.enelOrigX;
+			int casterOrigY = this.enelOrigY;
+			int impactX = super.toX;
+			int impactY = super.toY;
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+
+			// 1. RANDOM AERIAL TELEPORT & LEVITATION FLIGHT CHOREOGRAPHY
+			if (super.objFireMain != null)
+			{
+				if (super.f < 6)
+				{
+					// Ground charging stage
+					super.objFireMain.dy = 0;
+					super.objFireMain.isTanHinh = false;
+				}
+				else if (super.f == 6)
+				{
+					// ─── TELEPORT 1: Ground to Sky Ascent ───
+					GameScreen.addEffectEnd(40, 0, super.objFireMain.x, super.objFireMain.y, (byte)0, null);
+					GameScreen.addEffectEnd(42, 0, super.objFireMain.x, super.objFireMain.y, (byte)0, null);
+					this.addSound(18);
+					super.objFireMain.x = casterOrigX + facingSign * 50;
+					super.objFireMain.dy = -50;
+				}
+				else if (super.f > 6 && super.f < 19)
+				{
+					// Aerial hovering 1 with electric tremor
+					int tremor = (super.f % 2 == 0) ? -1 : 1;
+					super.objFireMain.dy = -50 + tremor;
+				}
+				else if (super.f == 19)
+				{
+					// ─── TELEPORT 2: Aerial Lightning Blitz Dash ───
+					GameScreen.addEffectEnd(40, 0, super.objFireMain.x, super.objFireMain.y + super.objFireMain.dy, (byte)0, null);
+					GameScreen.addEffectEnd(42, 0, super.objFireMain.x, super.objFireMain.y + super.objFireMain.dy, (byte)0, null);
+					this.addSound(18);
+					// Teleport to random aerial vantage over targets
+					super.objFireMain.x = impactX - facingSign * 55 + CRes.random_Am_0(25);
+					super.objFireMain.dy = -60;
+				}
+				else if (super.f > 19 && super.f < 32)
+				{
+					// Aerial hovering 2 with matrix invocation
+					int tremor = (super.f % 2 == 0) ? -1 : 1;
+					super.objFireMain.dy = -60 + tremor;
+				}
+				else if (super.f == 32)
+				{
+					// ─── TELEPORT 3: Zenith Climax Apex (Over the epicenter) ───
+					GameScreen.addEffectEnd(40, 0, super.objFireMain.x, super.objFireMain.y + super.objFireMain.dy, (byte)0, null);
+					GameScreen.addEffectEnd(42, 0, super.objFireMain.x, super.objFireMain.y + super.objFireMain.dy, (byte)0, null);
+					this.addSound(51);
+					super.objFireMain.x = impactX;
+					super.objFireMain.dy = -75;
+				}
+				else if (super.f > 32 && super.f < 48)
+				{
+					// Zenith levitation unleashing the 200M volt beam
+					int tremor = (super.f % 2 == 0) ? -2 : 2;
+					super.objFireMain.dy = -75 + tremor;
+				}
+				else if (super.f == 48)
+				{
+					// ─── TELEPORT 4: Flank Descending Overdrive ───
+					GameScreen.addEffectEnd(40, 0, super.objFireMain.x, super.objFireMain.y + super.objFireMain.dy, (byte)0, null);
+					super.objFireMain.x = impactX + facingSign * 70;
+					super.objFireMain.dy = -38;
+				}
+				else if (super.f > 48 && super.f < 68)
+				{
+					// Gliding down smoothly
+					int tDown = super.f - 48; // 0..20
+					super.objFireMain.dy = -38 + (38 * tDown / 20);
+				}
+				else if (super.f >= 68)
+				{
+					// ─── TELEPORT 5: Return to Origin (Perfect Safety) ───
+					super.objFireMain.x = casterOrigX;
+					super.objFireMain.y = casterOrigY;
+					super.objFireMain.dy = 0;
+					super.objFireMain.isTanHinh = false;
+					if (super.objFireMain == GameScreen.player)
+					{
+						Player.isBlock = false;
+					}
+				}
+			}
+
+			// 2. AUDIO & SCREEN SHAKE MILESTONES
+			if (super.f == 2)
+			{
+				this.addSound(10); // High-voltage charge hum
+				LoadMap.timeVibrateScreen = 6;
+			}
+			else if (super.f == 14)
+			{
+				this.addSound(18); // Matrix activation
+				LoadMap.timeVibrateScreen = 10;
+			}
+			else if (super.f == 26)
+			{
+				this.addSound(10);
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 16;
+			}
+			else if (super.f == 36)
+			{
+				// CLIMAX CATACLYSM: 200M Volt El Thor mega impact!
+				this.addSound(51);
+				this.addSound(14);
+				this.addSound(18);
+				LoadMap.timeVibrateScreen = 38; // Violent full-screen quake
+			}
+			else if (super.f == 46 || super.f == 54)
+			{
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 12;
+			}
+
+			// 3. TARGET PARALYSIS, AIRBORNE POP & DAMAGE SYNCHRONIZATION
 			if (super.vecObjsBeFire != null)
 			{
 				for (int k = 0; k < super.vecObjsBeFire.size(); k++)
@@ -22335,8 +23653,31 @@ public final class Effect_Skill extends MainEffect {
 					MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
 					if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
 
-					// Gravity recovery
-					if (super.f >= 46 && super.f <= 64)
+					// Intermediate matrix shocks (f = 20, 28)
+					if (super.f == 20 || super.f == 28)
+					{
+						this.setAva(2, target);
+						GameScreen.addEffectEnd(40, 0, target.x, target.y - target.hOne / 2, (byte)0, null);
+					}
+
+					// Mega Climax Strike at f = 36: Popped high into air, paralyzed!
+					if (super.f == 36)
+					{
+						this.setAva(2, target);
+						target.dy = -24; // High pop
+						GameScreen.addEffectEnd(40, 0, target.x, target.y, (byte)0, null);
+						GameScreen.addEffectEnd(42, 0, target.x, target.y, (byte)0, null);
+					}
+
+					// Lateral paralyzed electric shaking while suspended (f = 37..50)
+					if (super.f >= 37 && super.f <= 50)
+					{
+						int wobble = (super.f % 2 == 0) ? 3 : -3;
+						target.x += wobble;
+					}
+
+					// Smooth gravity recovery
+					if (super.f >= 48 && super.f <= 66)
 					{
 						if (target.dy < 0)
 						{
@@ -22344,7 +23685,7 @@ public final class Effect_Skill extends MainEffect {
 						}
 					}
 
-					// Skill end cleanup
+					// Final cleanup
 					if (super.f >= super.fRemove)
 					{
 						target.dy = 0;
@@ -22352,10 +23693,20 @@ public final class Effect_Skill extends MainEffect {
 				}
 			}
 
-			// Clean caster dy on skill end
-			if (super.f >= super.fRemove && super.objFireMain != null)
+			// Skill lifecycle safety finish
+			if (super.f >= super.fRemove)
 			{
-				super.objFireMain.dy = 0;
+				if (super.objFireMain != null)
+				{
+					super.objFireMain.x = casterOrigX;
+					super.objFireMain.y = casterOrigY;
+					super.objFireMain.dy = 0;
+					super.objFireMain.isTanHinh = false;
+					if (super.objFireMain == GameScreen.player)
+					{
+						Player.isBlock = false;
+					}
+				}
 			}
 		}
 
@@ -22483,14 +23834,14 @@ public final class Effect_Skill extends MainEffect {
 							int remaining = 100 - (tScaled * tScaled / 100);
 							targetDy = 72 * remaining / 100;
 						}
-						else if (super.f > 22 && super.f <= 58)
+						else if (super.f > 22 && super.f <= 56)
 						{
 							targetDy = 72; // Suspended in air inside ROOM sphere
 						}
-						else if (super.f > 58 && super.f <= 72)
+						else if (super.f > 56 && super.f <= 70)
 						{
 							// Easing-in quadratic landing: slow at start, accelerates down (72→0px over 14 frames)
-							int t = super.f - 58; // 0..14
+							int t = super.f - 56; // 0..14
 							int tScaled = (14 - t) * 100 / 14;
 							targetDy = 72 * tScaled * tScaled / 10000;
 						}
@@ -22521,8 +23872,8 @@ public final class Effect_Skill extends MainEffect {
 			}
 		}
 
-		// 3. Simultaneous Multi-Slashes & Organ Incision on Targets (while levitating, super.f = 6..56 every 7 frames)
-		if (setId == 8 && (super.f % 7 == 0) && super.f >= 6 && super.f <= 56)
+		// 3. Periodic Hit Feedback on Targets while levitating (super.f = 8..56 every 8 frames)
+		if (setId == 8 && (super.f % 8 == 0) && super.f >= 8 && super.f <= 56)
 		{
 			this.addSound(18);
 			if (super.vecObjsBeFire != null)
@@ -22564,27 +23915,498 @@ public final class Effect_Skill extends MainEffect {
 			}
 		}
 
-		// ─── setId 13: Dai Phat Song Xung Kich – 7-Phase Timing & Hit Frame Sync ───
+		// ─── setId 12: Phượng Hoàng Bất Tử Bộc Phá _X (Marco Blue Phoenix Climax) ───
+		if (setId == 12)
+		{
+			// Caster state management
+			if (super.objFireMain != null)
+			{
+				super.objFireMain.isTanHinh = false;
+				super.objFireMain.dy = 0;
+			}
+
+			// Sound and screenshake cues
+			if (super.f == 4)
+			{
+				this.addSound(18); // Tiếng ngọn lửa bùng phát
+				LoadMap.timeVibrateScreen = 6;
+			}
+			else if (super.f == 16)
+			{
+				this.addSound(5);  // Tiếng phượng hoàng cất cánh rít gió
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 8;
+			}
+			else if (super.f == 32)
+			{
+				// ─── CLIMAX IMPACT X ───
+				this.addSound(14); // Tiếng nổ oanh tạc cực lớn
+				this.addSound(51);
+				this.addSound(18);
+				LoadMap.timeVibrateScreen = 32; // Rung màn hình cực đại 32 tick
+
+				// Spawn các vụ nổ và hiệu ứng phụ tại tâm chấn
+				GameScreen.addEffectEnd(118, 0, this.phoenixTargetX, this.phoenixTargetY, (byte)0, null);
+				GameScreen.addEffectEnd(54, 0, this.phoenixTargetX, this.phoenixTargetY - 10, (byte)0, null);
+				GameScreen.addEffectEnd(104, 0, this.phoenixTargetX, this.phoenixTargetY - 25, (byte)0, null);
+
+				// Kích nổ lan ra nTarget = 5 mục tiêu, nảy lên không trung dy = -18
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+						if (Math.abs(target.x - this.phoenixTargetX) <= 140)
+						{
+							this.setAva(2, target);
+							target.dy = -18; // Pop airborne
+							GameScreen.addEffectEnd(118, 0, target.x, target.y - 20, (byte)0, null);
+						}
+					}
+				}
+			}
+			else if (super.f == 40)
+			{
+				// Finisher Wings Sweep Sound
+				this.addSound(10);
+				this.addSound(51);
+				LoadMap.timeVibrateScreen = 14;
+			}
+			else if (super.f == 46)
+			{
+				this.addSound(18); // Tiếng lam hỏa thiêu đốt bốc lên dưới chân mục tiêu
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+						if (Math.abs(target.x - this.phoenixTargetX) <= 140)
+						{
+							this.setAva(2, target); // Giật chớp trắng lần 2
+							GameScreen.addEffectEnd(54, 0, target.x, target.y - 10, (byte)0, null);
+						}
+					}
+				}
+			}
+
+			// Target gravity recovery after pop (f = 42..62)
+			if (super.f >= 42 && super.f <= 62)
+			{
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null && target.dy < 0)
+						{
+							target.dy += 3;
+							if (target.dy > 0) target.dy = 0;
+						}
+					}
+				}
+			}
+
+			// Update floating particles (VecSubEff)
+			if (this.VecSubEff != null)
+			{
+				for (int i = 0; i < this.VecSubEff.size(); i++)
+				{
+					Point p = (Point)this.VecSubEff.elementAt(i);
+					if (p != null)
+					{
+						p.f++;
+						p.x += p.vx;
+						p.y += p.vy;
+						if (p.f % 4 == 0)
+						{
+							p.vx = CRes.random_Am_0(2);
+						}
+						if (p.f >= p.fRe)
+						{
+							// Tái sinh hạt ở quanh tâm chấn nếu f >= 32
+							if (super.f >= 32 && super.f < 60)
+							{
+								p.x = this.phoenixTargetX + CRes.random_Am_0(70);
+								p.y = this.phoenixTargetY - 10 + CRes.random_Am_0(30);
+								p.vx = CRes.random_Am_0(3);
+								p.vy = -(2 + CRes.random(4));
+								p.f = 0;
+								p.fRe = 15 + CRes.random(10);
+							}
+						}
+					}
+				}
+			}
+
+			// End skill cleanup (f >= fRemove)
+			if (super.f >= super.fRemove)
+			{
+				if (super.objFireMain != null)
+				{
+					super.objFireMain.isTanHinh = false;
+					super.objFireMain.dy = 0;
+					if (super.objFireMain == GameScreen.player)
+					{
+						Player.isBlock = false;
+					}
+				}
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null) target.dy = 0;
+					}
+				}
+				if (GameScreen.typePaintGameScreen == 1)
+				{
+					GameScreen.isPaintNormal();
+				}
+				this.removeEff();
+			}
+		}
+
+		// ─── setId 9: Eustass Kid — Từ Trường Bộc Phá Đại Pháo _X (Damned Punk Railgun Laser & Colossal Pillar) ───
+		if (setId == 9)
+		{
+			// Toạ độ xuất chiêu cố định - nhân vật giữ nguyên x, y không bị lệch khi di chuyển
+			int casterX = super.x;
+			int casterY = super.y;
+			int facingSign = (super.Dir == 2) ? 1 : -1;
+			int impactX = (this.kidCannonImpactX != 0) ? this.kidCannonImpactX : super.toX;
+			int impactY = (this.kidCannonImpactY != 0) ? this.kidCannonImpactY : super.toY;
+
+			int cannonBaseX = casterX + facingSign * 35;
+			int cannonBaseY = casterY - 26;
+
+			// Phase 1: Hút vũ khí & Pose gồng nhẹ (f: 0..14)
+			if (super.f < 14)
+			{
+				if (super.f == 2 || super.f == 8)
+				{
+					this.addSound((byte)18); // Tiếng từ trường hút kim loại
+				}
+			}
+
+			// Phase 2: Ra hiệu ứng bắn laze -> Mở khóa di chuyển ngay lập tức (f == 14)
+			if (super.f == 14)
+			{
+				if (super.objFireMain == GameScreen.player)
+				{
+					Player.isBlock = false;
+				}
+				if (super.objFireMain != null && super.objFireMain.Action == 2)
+				{
+					super.objFireMain.Action = 0; // Trở về pose bình thường, nhân vật tự do di chuyển ngay
+				}
+				this.addSound((byte)14); // Tiếng nổ khai hỏa đại pháo
+				LoadMap.timeVibrateScreen = 8;
+			}
+
+			// Phase 3 & 4: Laser bắn trúng & Cột sáng nổ đi (f == 18)
+			if (super.f == 18)
+			{
+				// Vết nứt đất phát sáng ở tầng levelPaint = -1 (dưới chân char/mob)
+				GameScreen.addEffectEnd((short)133, 0, impactX, impactY, (byte)0, null);
+
+				this.addSound((byte)14);
+				LoadMap.timeVibrateScreen = 20;
+
+				// Tính sát thương & ĐẨY LÙI mục tiêu chính + mục tiêu lân cận (tối đa nTarget = 5, bán kính rangeLan = 140)
+				int hitCount = 0;
+				// 1. Đẩy lùi mục tiêu chính
+				if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+				{
+					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+					if (tInfo != null)
+					{
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
+						{
+							target.x += facingSign * 28; // Đẩy lùi mạnh về sau theo hướng bắn
+							this.setAva(2, target);
+							hitCount++;
+						}
+					}
+				}
+
+				// 2. Đẩy lùi các mục tiêu lân cận trong vecObjsBeFire
+				if (super.vecObjsBeFire != null)
+				{
+					for (int k = 1; k < super.vecObjsBeFire.size() && hitCount < 5; k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo != null)
+						{
+							MainObject other = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (other != null && !other.isDie && other.Hp > 0 && !other.isRemove)
+							{
+								int dist = MainObject.getDistance(impactX, impactY, other.x, other.y);
+								if (dist <= 140)
+								{
+									other.x += facingSign * 22; // Đẩy lùi mục tiêu lân cận
+									this.setAva(2, other);
+									hitCount++;
+								}
+							}
+						}
+					}
+				}
+
+				// 3. Đẩy lùi các quái/mục tiêu lân cận trên bản đồ (nếu chưa đủ nTarget = 5)
+				if (hitCount < 5 && GameScreen.vecPlayers != null)
+				{
+					for (int k = 0; k < GameScreen.vecPlayers.size() && hitCount < 5; k++)
+					{
+						MainObject other = (MainObject)GameScreen.vecPlayers.elementAt(k);
+						if (other != null && other != super.objFireMain && !other.isDie && other.Hp > 0 && !other.isRemove)
+						{
+							int dist = MainObject.getDistance(impactX, impactY, other.x, other.y);
+							if (dist <= 140)
+							{
+								boolean alreadyHit = false;
+								if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+								{
+									Object_Effect_Skill t0 = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
+									if (t0 != null && t0.ID == other.ID && t0.tem == other.typeObject)
+									{
+										alreadyHit = true;
+									}
+								}
+								if (!alreadyHit)
+								{
+									other.x += facingSign * 22;
+									this.setAva(2, other);
+									hitCount++;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			// Cập nhật toạ độ 28 vũ khí kim loại trong VecEff
+			if (this.VecEff != null)
+			{
+				for (int i = 0; i < this.VecEff.size(); i++)
+				{
+					Point p = (Point)this.VecEff.elementAt(i);
+					if (p == null) continue;
+
+					p.frame = (p.frame + 1) % 8;
+
+					if (super.f < 14)
+					{
+						// Bay xoáy từ ngoài vào tụ thành nòng pháo
+						if (super.f >= p.fSmall)
+						{
+							int dur = Math.max(1, p.fRe - p.fSmall);
+							int elapsed = Math.min(dur, super.f - p.fSmall);
+							int targetX = cannonBaseX + p.AK;
+							int targetY = cannonBaseY + p.AL;
+
+							int style = p.f % 4;
+							if (style == 3)
+							{
+								int hyperEase = (elapsed * elapsed * elapsed * 100) / (dur * dur * dur);
+								p.x = p.x2 + ((targetX - p.x2) * hyperEase) / 100;
+								p.y = p.y2 + ((targetY - p.y2) * hyperEase) / 100;
+							}
+							else
+							{
+								int easePercent = (elapsed * elapsed * 100) / (dur * dur);
+								int baseX = p.x2 + ((targetX - p.x2) * easePercent) / 100;
+								int baseY = p.y2 + ((targetY - p.y2) * easePercent) / 100;
+
+								if (style == 0)
+								{
+									int arcMid = (elapsed * (dur - elapsed) * 300) / (dur * dur);
+									p.x = baseX;
+									p.y = baseY - arcMid;
+								}
+								else if (style == 1)
+								{
+									int waveX = (CRes.getsin((elapsed * 180) / dur) * p.dis) / 1000;
+									p.x = baseX + waveX;
+									p.y = baseY;
+								}
+								else
+								{
+									int zig = ((elapsed % 4) < 2) ? 6 : -6;
+									p.x = baseX + zig;
+									p.y = baseY - zig;
+								}
+							}
+						}
+					}
+					else if (super.f < 32)
+					{
+						// Khóa chặt vị trí nòng pháo phát sáng
+						p.x = cannonBaseX + p.AK;
+						p.y = cannonBaseY + p.AL;
+					}
+					else
+					{
+						// Phase 5: Tán xạ ra xa khi năng lượng giải phóng xong
+						p.x += p.vx;
+						p.y += p.vy;
+						p.vy += 1;
+					}
+				}
+			}
+			return;
+		}
+
+		// ─── setId 10: Cổ Độc Phán Quyết Venom _X (Magellan Hell's Judgment) — UPDATE TIMELINE ───
+		if (setId == 10)
+		{
+			// Vũng axit độc ngầm cố định 1 vị trí tại tâm mục tiêu đã chọn, không di chuyển theo quái
+			if (this.subType == 1004)
+			{
+				if (super.f >= super.fRemove)
+				{
+					this.removeEff();
+				}
+				return;
+			}
+
+			int targetX = (this.VecEff != null && this.VecEff.size() > 0) ? ((Point)this.VecEff.elementAt(0)).x : super.toX;
+			int targetY = (this.VecEff != null && this.VecEff.size() > 0) ? ((Point)this.VecEff.elementAt(0)).y : super.toY;
+
+			// Sound & Screen Vibration Timeline
+			if (super.f == 5)
+			{
+				this.addSound((byte)10); // Toxic charge hiss
+			}
+			else if (super.f == 12)
+			{
+				this.addSound((byte)14); // Hydra 3-headed roar
+				LoadMap.timeVibrateScreen = 8;
+			}
+			else if (super.f == 24)
+			{
+				this.addSound((byte)5);  // Venom dragon projectile blast
+			}
+			else if (super.f == 35)
+			{
+				// ZERO HOUR: VENOM IMPACT X DETONATION!
+				this.addSound((byte)14);
+				this.addSound((byte)51);
+				this.addSound((byte)18);
+				LoadMap.timeVibrateScreen = 28;
+
+				// Flash & Flinch targets
+			if (super.vecObjsBeFire != null)
+			{
+				for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+				{
+					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (tInfo != null)
+					{
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
+						{
+							this.setAva(2, target);
+						}
+					}
+				}
+			}
+
+			}
+			else if (super.f == 46)
+			{
+				// Acid pool active bubbling sound
+				this.addSound((byte)10);
+			}
+			else if (super.f == 52)
+			{
+				// Geyser eruption sound & screen tremor
+				this.addSound((byte)51);
+				this.addSound((byte)14);
+				LoadMap.timeVibrateScreen = 16;
+			}
+
+			// Target flinch release at f44
+			if (super.f == 44 && super.vecObjsBeFire != null)
+			{
+				for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+				{
+					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (tInfo != null)
+					{
+						MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (target != null)
+						{
+							target.NG = false;
+						}
+					}
+				}
+			}
+
+			// Release player block when skill completes
+			if (super.f >= super.fRemove)
+			{
+				if (super.objFireMain != null)
+				{
+					super.objFireMain.NG = false;
+					if (super.objFireMain == GameScreen.player)
+					{
+						Player.isBlock = false;
+						if (super.objFireMain.Action == 2)
+						{
+							super.objFireMain.Action = 0;
+						}
+					}
+				}
+				GameScreen.isPaintNormal();
+			}
+		}
+
+		// ─── setId 13: Đại Phật Sóng Xung Kích _X (Sengoku Daibutsu) – 5-Phase Timing & Hit Frame Sync ───
 		if (setId == 13)
 		{
-			// Phase 1: Charge sound at frame 2
+			// Phase 1: Divine Charge Chime & Pre-Tremor
 			if (super.f == 2)
 			{
 				this.addSound(10);
 			}
-			// Phase 3: Palm Release blast sound at frame 11
-			if (super.f == 11)
+			if (super.f == 6)
+			{
+				LoadMap.timeVibrateScreen = 6;
+			}
+			// Phase 2: Palm Thrust Sonic Boom at tick 10
+			if (super.f == 10)
 			{
 				this.addSound(51);
-				LoadMap.timeVibrateScreen = 14;
+				LoadMap.timeVibrateScreen = 16;
 			}
-			// Phase 5: HIT FRAME at tick 21 (Impact on all targets, damage tick, knockback recoil & screen shake)
+			// Phase 4: OFFICIAL HIT FRAME at tick 21 (Impact detonation on all targets, damage tick, knockback recoil & screen shake)
 			if (super.f == 21)
 			{
 				this.addSound(14);
 				this.addSound(51);
-				LoadMap.timeVibrateScreen = 32;
+				LoadMap.timeVibrateScreen = 38;
 				int facingSign = (super.Dir == 2) ? 1 : -1;
+				int impX = (this.daibutsuImpactX != 0) ? this.daibutsuImpactX : (super.x + facingSign * 180);
+				int impY = (this.daibutsuImpactY != 0) ? this.daibutsuImpactY : (super.y - 15);
+
+				// Engine shockwave ring & detonations at epicenter
+				GameScreen.addHightDataeff(238, impX, impY, super.Dir == 2);
+				GameScreen.addHightDataeff(33, impX, impY + 10);
+				GameScreen.addEffectEnd(92, 0, impX - 25, impY - 20, 0, null);
+				GameScreen.addEffectEnd(92, 0, impX + 25, impY - 20, 2, null);
+				GameScreen.addEffectEnd(110, 0, impX, impY, 0, null);
+
 				if (super.vecObjsBeFire != null)
 				{
 					for (int j = 0; j < super.vecObjsBeFire.size(); j++)
@@ -22596,16 +24418,16 @@ public final class Effect_Skill extends MainEffect {
 							if (tObj != null && !tObj.isDie && tObj.Hp > 0 && !tObj.isRemove)
 							{
 								this.setAva(2, tObj);
-								tObj.x += facingSign * 16;
-								tObj.dy = -10;
-								GameScreen.addEffectEnd(92, 0, tObj.x, tObj.y, 0, null);
+								tObj.x += facingSign * 22;
+								tObj.dy = -14;
+								GameScreen.addEffectEnd(63, 0, tObj.x, tObj.y, 0, null);
 							}
 						}
 					}
 				}
 			}
-			// Target recovery from airborne recoil pop
-			if (super.f >= 22 && super.f <= 28)
+			// Airborne recoil recovery for targets (ticks 22..29)
+			if (super.f >= 22 && super.f <= 29)
 			{
 				if (super.vecObjsBeFire != null)
 				{
@@ -22623,10 +24445,15 @@ public final class Effect_Skill extends MainEffect {
 					}
 				}
 			}
-			// Phase 6: Secondary Lotus burst vibration at frame 26
+			// Secondary Lotus Bloom Resonance at tick 26
 			if (super.f == 26)
 			{
-				LoadMap.timeVibrateScreen = 16;
+				int facingSign = (super.Dir == 2) ? 1 : -1;
+				int impX = (this.daibutsuImpactX != 0) ? this.daibutsuImpactX : (super.x + facingSign * 180);
+				int impY = (this.daibutsuImpactY != 0) ? this.daibutsuImpactY : (super.y - 15);
+				GameScreen.addHightDataeff(33, impX, impY + 8);
+				this.addSound(10);
+				LoadMap.timeVibrateScreen = 14;
 			}
 			// Clean reset at end of skill
 			if (super.f >= super.fRemove)
@@ -22649,7 +24476,7 @@ public final class Effect_Skill extends MainEffect {
 			}
 		}
 
-		if (setId != 2 && setId != 7 && setId != 8 && setId != 13)
+		if (setId != 2 && setId != 3 && setId != 5 && setId != 6 && setId != 7 && setId != 8 && setId != 9 && setId != 10 && setId != 12 && setId != 13 && setId != 16)
 		{
 			for (int i = 0; i < this.VecSubEff.size(); i++)
 			{
@@ -22727,10 +24554,8 @@ public final class Effect_Skill extends MainEffect {
 						LoadMap.timeVibrateScreen = 25;
 						break;
 					case 6: // 200M Volts Enel El Thor — Divine Thunder Impact
-						GameScreen.addHightDataeff(4, impactX, impactY);
-						GameScreen.addHightDataeff(33, impactX, impactY);
 						GameScreen.addEffectEnd(40, 0, impactX, impactY, 0, null);          // electric burst
-						GameScreen.addEffectEnd(110, 0, impactX, impactY, 0, null);         // white flash
+						GameScreen.addEffectEnd(42, 0, impactX, impactY, 0, null);          // electric spark
 						GameScreen.addEffectEnd(92, 0, impactX, impactY, 0, null);          // electric arc
 						LoadMap.timeVibrateScreen = 30;
 						this.addSound(18);
@@ -22806,13 +24631,21 @@ public final class Effect_Skill extends MainEffect {
 		if ((super.f >= super.fRemove && this.VecSubEff.size() == 0) || super.f > super.fRemove + 15)
 		{
 			if (super.objFireMain != null) super.objFireMain.dy = 0;
+			if (GameScreen.typePaintGameScreen == 1)
+			{
+				GameScreen.isPaintNormal();
+			}
 			this.removeEff();
 		}
-		// setId 2/6/7/8/13 dùng this.VecEff thay this.VecSubEff — this.removeEff khi hết super.fRemove
+		// setId 2/3/5/6/7/8/12/13/16 dùng this.VecEff thay this.VecSubEff — this.removeEff khi hết super.fRemove
 		int _setId2 = (typeEff >= 4001 && typeEff <= 4016) ? (typeEff - 4000) : (((typeEff - 4001) / 5) + 1);
-		if (super.f > super.fRemove + 5 && (_setId2 == 2 || _setId2 == 6 || _setId2 == 7 || _setId2 == 8 || _setId2 == 13))
+		if (super.f > super.fRemove + 5 && (_setId2 == 2 || _setId2 == 3 || _setId2 == 5 || _setId2 == 6 || _setId2 == 7 || _setId2 == 8 || _setId2 == 12 || _setId2 == 13 || _setId2 == 16))
 		{
 			if (super.objFireMain != null) super.objFireMain.dy = 0;
+			if (GameScreen.typePaintGameScreen == 1)
+			{
+				GameScreen.isPaintNormal();
+			}
 			this.removeEff();
 		}
 	}
@@ -22822,9 +24655,761 @@ public final class Effect_Skill extends MainEffect {
 		if (g == null) return;
 		try
 		{
-			int setId = (typeEffect >= 4001 && typeEffect <= 4016) ? (typeEffect - 4000) : (((typeEffect - 4001) / 5) + 1);
+			int setId = (typeEffect == 4017 || typeEffect == 4010) ? 10 : ((typeEffect >= 4001 && typeEffect <= 4016) ? (typeEffect - 4000) : (((typeEffect - 4001) / 5) + 1));
 			if (setId < 1 || setId > 16) setId = 1;
 			ensureThanTrangFrames();
+		// ═══════════════════════════════════════════════════════════════════
+		// Paint Set 2: Đại Phún Hỏa Volcano _X (Akainu Magma Eruption)
+		// Chuẩn hóa theo phong cách Hỏa Diễm & Nham Thạch nguyên bản HTTH
+		// ═══════════════════════════════════════════════════════════════════
+		if (setId == 2)
+		{
+			try
+			{
+				FrameImage[] p2 = (s_ttFrames != null && s_ttFrames.length > 2) ? s_ttFrames[2] : null;
+				if (p2 != null && p2.length >= 10)
+				{
+					int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+					int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+					int impactX = super.toX;
+					int impactY = super.toY;
+					int facingSign = (super.Dir == 2) ? 1 : -1;
+					int dirTrans = (super.Dir == 2) ? 0 : 2;
+
+					// ─── TẦNG 1: TỤ LỰC DUNG NHAM TẠI CASTER (f: 0..12) ───
+					if (super.f <= 12)
+					{
+						// Nền đất nứt lửa dưới chân Akainu (p2[7]: 246)
+						if (p2[7] != null && p2[7].nFrame > 0)
+						{
+							int fissF = (super.f / 3) % p2[7].nFrame;
+							p2[7].drawFrameNew(fissF, casterX, casterY + 4, 0, 3, g);
+						}
+
+						// Dòng dung nham cánh tay rực đỏ (p2[1]: 336)
+						if (p2[1] != null && p2[1].nFrame > 0)
+						{
+							int armF = (super.f / 2) % p2[1].nFrame;
+							p2[1].drawFrame(armF, casterX + facingSign * 12, casterY - 20, dirTrans, 3, g);
+						}
+
+						// Nắm đấm cự quyền tích tụ năng lượng (p2[0]: 271)
+						if (p2[0] != null && p2[0].nFrame > 0)
+						{
+							int fistOffset = Math.min(20, 8 + super.f);
+							p2[0].drawFrameNew(0, casterX + facingSign * fistOffset, casterY - 20, dirTrans, 3, g);
+						}
+					}
+
+					// ─── TẦNG 2: ĐẠI PHÚN HỎA CỰ QUYỀN LAO KÍCH (f: 12..24) ───
+					if (super.f >= 12 && super.f <= 24)
+					{
+						int t = super.f - 12; // 0..12
+						int fistStartX = casterX + facingSign * 24;
+						int fistStartY = casterY - 20;
+						int fistX = fistStartX + ((impactX - fistStartX) * t) / 12;
+						int fistY = fistStartY + ((impactY - 15 - fistStartY) * t) / 12;
+
+						// Bóng trượt mặt đất sém đen (p2[9]: 272)
+						if (p2[9] != null && p2[9].nFrame > 0)
+						{
+							p2[9].drawFrame(0, fistX, impactY + 4, 0, 3, g);
+						}
+
+						// Luồng cánh tay dung nham nối dài kéo sau lưng Cự Quyền (p2[1]: 336)
+						if (p2[1] != null && p2[1].nFrame > 0)
+						{
+							int armF = (super.f / 2) % p2[1].nFrame;
+							p2[1].drawFrame(armF, fistX - facingSign * 35, fistY, dirTrans, 3, g);
+						}
+
+						// Phản lực hỏa diễm bộc phát (p2[2]: 254)
+						if (p2[2] != null && p2[2].nFrame > 0)
+						{
+							p2[2].drawFrame(0, fistX - facingSign * 55, fistY, dirTrans, 3, g);
+						}
+
+						// ĐẠI PHÚN HỎA CỰ QUYỀN KHỔNG LỒ (p2[0]: 271, 130x80)
+						if (p2[0] != null && p2[0].nFrame > 0)
+						{
+							int fistF = (super.f / 2) % p2[0].nFrame;
+							p2[0].drawFrameNew(fistF, fistX, fistY, dirTrans, 3, g);
+						}
+					}
+
+					// ─── TẦNG 3: VỤ NỔ DUNG NHAM ĐẠI BỘC PHÁ TẠI TÂM CHẤN (f: 24..38) ───
+					if (super.f >= 24 && super.f <= 38 && p2[3] != null && p2[3].nFrame > 0)
+					{
+						int blastF = (super.f - 24) / 3;
+						if (blastF < p2[3].nFrame)
+						{
+							p2[3].drawFrameNew(blastF, impactX, impactY - 18, (super.f % 2 == 0 ? 0 : 2), 3, g);
+						}
+					}
+
+					// ─── TẦNG 4: HỒ DUNG NHAM, VẾT RẠN NỨT & CỘT NHAM THẠCH PHUN TRÀO (f: 24..62) ───
+					if (super.f >= 24 && super.f <= 62)
+					{
+						// A. Vết Rạn Nứt Núi Lửa (p2[7]: 246)
+						if (p2[7] != null && p2[7].nFrame > 0)
+						{
+							int fissF = ((super.f - 24) / 3) % p2[7].nFrame;
+							p2[7].drawFrameNew(fissF, impactX, impactY + 5, 0, 3, g);
+							p2[7].drawFrameNew((fissF + 1) % p2[7].nFrame, impactX - 50, impactY + 3, 2, 3, g);
+							p2[7].drawFrameNew((fissF + 2) % p2[7].nFrame, impactX + 50, impactY + 3, 0, 3, g);
+						}
+
+						// B. Hồ Dung Nham Sôi Sùng Sục (p2[6]: 239)
+						if (p2[6] != null && p2[6].nFrame > 0)
+						{
+							int poolTrans1 = (super.f % 8 < 4) ? 0 : 2;
+							int poolTrans2 = (super.f % 8 < 4) ? 2 : 0;
+							p2[6].drawFrame(0, impactX, impactY + 2, poolTrans1, 3, g);
+							p2[6].drawFrame(0, impactX - 45, impactY + 2, poolTrans2, 3, g);
+							p2[6].drawFrame(0, impactX + 45, impactY + 2, poolTrans1, 3, g);
+						}
+
+						// C. Cột Nham Thạch (p2[4]: 238) & Cột Lửa (p2[5]: 240) Phun Trào Dữ Dội
+						if (super.f >= 25 && super.f <= 58)
+						{
+							// 1. Cột trung tâm chọc trời
+							if (p2[4] != null && p2[4].nFrame > 0)
+							{
+								p2[4].drawFrame(0, impactX, impactY + 4, (super.f % 4 < 2 ? 0 : 2), 33, g);
+							}
+							if (p2[5] != null && p2[5].nFrame > 0)
+							{
+								p2[5].drawFrame(0, impactX, impactY - 60, (super.f % 4 < 2 ? 2 : 0), 33, g);
+							}
+
+							// 2. Hai cột phun trào hai bên sườn (bán kính 45px)
+							if (p2[4] != null && p2[4].nFrame > 0)
+							{
+								p2[4].drawFrame(0, impactX - 45, impactY - 5, 2, 33, g);
+								p2[4].drawFrame(0, impactX + 45, impactY - 5, 0, 33, g);
+							}
+							if (p2[5] != null && p2[5].nFrame > 0)
+							{
+								p2[5].drawFrame(0, impactX - 45, impactY - 65, 0, 33, g);
+								p2[5].drawFrame(0, impactX + 45, impactY - 65, 2, 33, g);
+							}
+
+							// 3. Hai cột rìa ngoài bao quát vùng lan 140px (p2[4]: 238)
+							if (p2[4] != null && p2[4].nFrame > 0)
+							{
+								p2[4].drawFrame(0, impactX - 85, impactY + 2, 0, 33, g);
+								p2[4].drawFrame(0, impactX + 85, impactY + 2, 2, 33, g);
+							}
+						}
+					}
+
+					// ─── TẦNG 5: HẠT TÀN LỬA ĐỎ BẮN TUNG TÓE (f: 25..60) ───
+					if (this.VecSubEff != null && super.f >= 25 && super.f <= 60 && p2[8] != null && p2[8].nFrame > 0)
+					{
+						for (int i = 0; i < this.VecSubEff.size(); i++)
+						{
+							Point p = (Point)this.VecSubEff.elementAt(i);
+							if (p != null)
+							{
+								int sparkF = (p.f / 2) % p2[8].nFrame;
+								p2[8].drawFrame(sparkF, p.x, p.y, p.color, 3, g);
+							}
+						}
+					}
+
+					// ─── TẦNG 6: HIỆU ỨNG THIÊU ĐỐT DƯỚI CHÂN MỤC TIÊU (f: 25..55) ───
+					if (super.f >= 25 && super.f <= 55 && super.vecObjsBeFire != null)
+					{
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
+						{
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo == null) continue;
+							MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (tObj == null || tObj.isDie || tObj.Hp <= 0 || tObj.isRemove) continue;
+
+							int targetFlip = (k % 2 == 0) ? 0 : 2;
+
+							// Vũng dung nham thiêu đốt dưới chân mục tiêu (p2[6]: 239)
+							if (p2[6] != null && p2[6].nFrame > 0)
+							{
+								p2[6].drawFrame(0, tObj.x, tObj.y + 2, targetFlip, 3, g);
+							}
+
+							// Tàn lửa đỏ bùng cháy trên người mục tiêu (p2[8]: 78)
+							if (p2[8] != null && p2[8].nFrame > 0 && (super.f + k) % 2 == 0)
+							{
+								int spF = (super.f / 2 + k) % p2[8].nFrame;
+								p2[8].drawFrame(spF, tObj.x, tObj.y - tObj.hOne / 2, 0, 3, g);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+			}
+		}
+
+		// Paint Set 3: Kỷ Băng Hà Tuyết Đối X (Absolute Blizzard / Ice Age X)
+		if (setId == 3)
+		{
+			try
+			{
+				FrameImage[] p3 = s_ttFrames[3];
+				if (p3 != null && p3.length >= 9)
+				{
+					int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+					int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+					int centerX = super.toX;
+					int centerY = super.toY;
+					int facingSign = (super.Dir == 2) ? 1 : -1;
+					int dirTrans = (super.Dir == 2) ? 0 : 2;
+
+					// ─── 1. CASTER SUB-ZERO AURA & 3D ORBITING DIAMOND ORBS (f: 0..22) ───
+					if (super.f <= 22)
+					{
+						// Ground permafrost patch under caster feet (p3[1]: 40, 63x20)
+						if (p3[1] != null && p3[1].nFrame > 0)
+						{
+							p3[1].drawFrame(0, casterX, casterY + 2, 0, 3, g);
+						}
+
+						// 3 Orbital Diamond Snow Spheres revolving around caster (p3[2]: 41, 40x40 & p3[7]: 104, 30x30)
+						if (p3[2] != null && p3[2].nFrame > 0)
+						{
+							int baseAngle = (super.f * 24) % 360;
+							for (int orb = 0; orb < 3; orb++)
+							{
+								int angle = (baseAngle + orb * 120) % 360;
+								int ox = casterX + (CRes.getcos(angle) * 32 >> 10);
+								int oy = casterY - 18 + (CRes.getsin(angle) * 12 >> 10);
+								p3[2].drawFrame((super.f / 2 + orb) % p3[2].nFrame, ox, oy, 0, 3, g);
+								if (p3[7] != null && p3[7].nFrame > 0 && super.f % 2 == 0)
+								{
+									p3[7].drawFrame((super.f / 2 + orb) % p3[7].nFrame, ox, oy - 2, 0, 3, g);
+								}
+							}
+						}
+					}
+
+					// ─── 2. SURGING GLACIAL AVALANCHE WAVE (f: 5..20) ───
+					if (super.f >= 5 && super.f <= 20)
+					{
+						int tProg = super.f - 5; // 0..15
+						int waveX = casterX + ((centerX - casterX) * tProg) / 15;
+						int waveY = casterY + ((centerY - casterY) * tProg) / 15;
+
+						// Frozen Permafrost wake trailing behind the wave
+						if (p3[1] != null && p3[1].nFrame > 0 && tProg >= 3)
+						{
+							int trailX = casterX + ((centerX - casterX) * (tProg - 3)) / 15;
+							int trailY = casterY + ((centerY - casterY) * (tProg - 3)) / 15;
+							p3[1].drawFrame(0, trailX, trailY + 2, dirTrans, 3, g);
+						}
+
+						// Colossal Ice Pheasant Crest Surge (p3[3]: 43, 84x110)
+						if (p3[3] != null && p3[3].nFrame > 0)
+						{
+							int wFrame = Math.min(p3[3].nFrame - 1, tProg / 3);
+							p3[3].drawFrame(wFrame, waveX, waveY - 25, dirTrans, 3, g);
+						}
+
+						// Snow / Frost Mist Sparkles along path (p3[2]: 41)
+						if (p3[2] != null && p3[2].nFrame > 0)
+						{
+							p3[2].drawFrame((super.f / 2) % p3[2].nFrame, waveX - facingSign * 20, waveY - 10, 0, 3, g);
+						}
+					}
+
+					// ─── 3. PERMAFROST GROUND CARPET AT EPICENTER (f: 14..55) ───
+					if (super.f >= 14 && super.f <= 55 && p3[1] != null && p3[1].nFrame > 0)
+					{
+						p3[1].drawFrame(0, centerX, centerY + 4, 0, 3, g);
+						p3[1].drawFrame(0, centerX - 55, centerY + 2, 0, 3, g);
+						p3[1].drawFrame(0, centerX + 55, centerY + 2, 2, 3, g);
+						p3[1].drawFrame(0, centerX - 110, centerY + 3, 2, 3, g);
+						p3[1].drawFrame(0, centerX + 110, centerY + 3, 0, 3, g);
+					}
+
+					// ─── 4. FOREST OF 7 COLOSSAL ICE SPIRES, JAGGED ICICLES & BLIZZARD VORTEX (f: 14..55) ───
+					if (this.VecEff != null && super.f >= 14)
+					{
+						for (int i = 0; i < this.VecEff.size(); i++)
+						{
+							Point spire = (Point)this.VecEff.elementAt(i);
+							if (spire == null) continue;
+
+							if (spire.subType == 0)
+							{
+								int age = super.f - spire.fSmall;
+								if (age < 0 || age >= 38) continue;
+
+								// ─── Colossal Ice Spire (p3[0]: 37, 31x74) ───
+								int targetH = spire.dis; // 65..140 px
+								int curH = (age <= 4) ? (targetH * age / 4) : targetH;
+								int shakeX = (age > 28 && (age % 2 == 0)) ? (spire.x + ((age % 4 == 0) ? 1 : -1)) : spire.x;
+								int riseOffsetY = (targetH - curH);
+
+								if (p3[0] != null && p3[0].nFrame > 0)
+								{
+									p3[0].drawFrame(0, shakeX, spire.y + 4 + riseOffsetY, spire.color, 33, g);
+									if (curH > 74)
+									{
+										p3[0].drawFrame(0, shakeX, spire.y + 4 + riseOffsetY - 55, spire.color == 2 ? 0 : 2, 33, g);
+									}
+									if (curH > 120)
+									{
+										p3[0].drawFrame(0, shakeX, spire.y + 4 + riseOffsetY - 100, spire.color, 33, g);
+									}
+								}
+
+								// Base Jagged Ice (p3[4]: 89, 28x44) at ground level
+								if (p3[4] != null && p3[4].nFrame > 0 && age >= 2 && age <= 34)
+								{
+									int jF = Math.min(p3[4].nFrame - 1, age / 4);
+									p3[4].drawFrame(jF, shakeX, spire.y + 2, spire.color, 33, g);
+								}
+
+								// Spire Frost Sparkle Glint (p3[7]: 104) at tip
+								if (p3[7] != null && p3[7].nFrame > 0 && age >= 4 && age <= 28 && ((age + spire.fSmall) % 3 == 0))
+								{
+									p3[7].drawFrame((age / 3) % p3[7].nFrame, shakeX, spire.y - curH + 4, 0, 3, g);
+								}
+
+								// Base sub-zero frost mist (p3[8]: 152)
+								if (p3[8] != null && p3[8].nFrame > 0 && age <= 12)
+								{
+									p3[8].drawFrame(age / 3 % p3[8].nFrame, shakeX + (spire.color == 2 ? 8 : -8), spire.y + 2, spire.color, 33, g);
+								}
+							}
+							else if (spire.subType == 1)
+							{
+								int age = super.f - spire.fSmall;
+								if (age < 0 || age >= 38) continue;
+
+								// ─── Intermediate Ground Icicles (p3[4]: 89, 28x44) ───
+								if (p3[4] != null && p3[4].nFrame > 0 && age <= 32)
+								{
+									int jF = Math.min(p3[4].nFrame - 1, age / 3);
+									p3[4].drawFrame(jF, spire.x, spire.y + 2, spire.color, 33, g);
+								}
+							}
+							else if (spire.subType == 2 && super.f >= 16 && super.f <= 54)
+							{
+								// ─── Blizzard Vortex & Diamond Dust Particles (subType = 2) ───
+								int curAngle = (spire.frame + (super.f - 16) * 16) % 360;
+								int radVariation = CRes.getsin(((super.f - 16) * 18 + spire.fSmall * 20) % 360) * 12 >> 10;
+								int curR = Math.max(12, spire.dis + radVariation);
+
+								int px = centerX + (CRes.getcos(curAngle) * curR >> 10);
+								int py = centerY - 28 + (CRes.getsin(curAngle) * (curR * 3 / 5) >> 10);
+
+								if (spire.color == 1 && p3[7] != null && p3[7].nFrame > 0)
+								{
+									p3[7].drawFrame((super.f / 2 + spire.fSmall) % p3[7].nFrame, px, py, 0, 3, g);
+								}
+								else if (p3[2] != null && p3[2].nFrame > 0)
+								{
+									p3[2].drawFrame((super.f / 2 + spire.fSmall) % p3[2].nFrame, px, py, 0, 3, g);
+								}
+							}
+						}
+					}
+
+					// ─── 5. FROST ENCASEMENT & DIAMOND GLINT OVER TARGETS (f: 18..50) ───
+					if (super.f >= 18 && super.f <= 50 && super.vecObjsBeFire != null)
+					{
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+						{
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo == null) continue;
+							MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (tObj == null || tObj.isDie || tObj.Hp <= 0 || tObj.isRemove) continue;
+
+							// Eternal permafrost block encasing target (p3[6]: 39, 53x28)
+							if (p3[6] != null && p3[6].nFrame > 0)
+							{
+								p3[6].drawFrame(0, tObj.x, tObj.y - 6, 0, 3, g);
+							}
+							// Frozen head frost crown / diamond glint (p3[7]: 104)
+							if (p3[7] != null && p3[7].nFrame > 0 && (super.f + k) % 3 == 0)
+							{
+								p3[7].drawFrame((super.f / 2 + k) % p3[7].nFrame, tObj.x, tObj.y - tObj.hOne - 4, 0, 3, g);
+							}
+							// Ground freeze base under target feet (p3[1]: 40)
+							if (p3[1] != null && p3[1].nFrame > 0)
+							{
+								p3[1].drawFrame(0, tObj.x, tObj.y + 2, (k % 2 == 0 ? 0 : 2), 3, g);
+							}
+						}
+					}
+
+					// ─── 6. CATACLYSMIC ICE SHATTER SPARKS (f: 45..56) ───
+					if (super.f >= 45 && super.f <= 56 && p3[7] != null && p3[7].nFrame > 0)
+					{
+						int sProg = super.f - 45;
+						for (int sp = 0; sp < 8; sp++)
+						{
+							int spAng = sp * 45;
+							int spDist = sProg * 10;
+							int sx = centerX + (CRes.getcos(spAng) * spDist >> 10);
+							int sy = centerY - 30 + (CRes.getsin(spAng) * (spDist * 3 / 4) >> 10);
+							p3[7].drawFrame((sProg + sp) % p3[7].nFrame, sx, sy, 0, 3, g);
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+			}
+		}
+
+		// ═══════════════════════════════════════════════════════════════════
+		// Paint Set 5: Hắc Ám Thôn Phệ Vô Tận _X (Marshall D. Teach Black Hole Abyss Singularity)
+		// 6 Master Dark Void Assets (IDs 480..485)
+		// ═══════════════════════════════════════════════════════════════════
+		// ═══════════════════════════════════════════════════════════════════
+		// Paint Set 5: Hắc Ám Thôn Phệ Vô Tận _X (Marshall D. Teach Black Hole Abyss Singularity)
+		// Master Multi-Layered VFX System (14 Visual Layers + Procedural Gravitational Spirals)
+		// ═══════════════════════════════════════════════════════════════════
+		if (setId == 5)
+		{
+			try
+			{
+				FrameImage[] p5 = (s_ttFrames != null && s_ttFrames.length > 5) ? s_ttFrames[5] : null;
+				if (p5 != null && p5.length >= 6)
+				{
+					int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+					int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+					int impactX = super.toX;
+					int impactY = super.toY;
+					int facingSign = (super.Dir == 2) ? 1 : -1;
+					int dirTrans = (super.Dir == 2) ? 0 : 2;
+
+					// ─── TẦNG 1: VỰC THẲM HẮC ÁM & HỒ BÓNG TỐI DƯỚI ĐẤT (f: 18..72) ───
+					// Sử dụng p5[6] (272: Scorched Ground Shadow) xếp tầng tạo thành Hồ Hư Vô Khổng Lồ
+					if (p5.length > 6 && p5[6] != null && p5[6].nFrame > 0 && super.f >= 18 && super.f <= 72)
+					{
+						p5[6].drawFrame(0, impactX, impactY + 6, 0, 3, g);
+						p5[6].drawFrame(0, impactX - 45, impactY + 4, 2, 3, g);
+						p5[6].drawFrame(0, impactX + 45, impactY + 4, 0, 3, g);
+						p5[6].drawFrame(0, impactX - 85, impactY + 3, 0, 3, g);
+						p5[6].drawFrame(0, impactX + 85, impactY + 3, 2, 3, g);
+					}
+
+					// ─── TẦNG 2: VẾT RẠN NỨT ĐỊA CHẤN HƯ VÔ (f: 20..68) ───
+					// Sử dụng p5[7] (246: Ground Fissure) rạn nứt mặt đất dưới sức hút hố đen
+					if (p5.length > 7 && p5[7] != null && p5[7].nFrame > 0 && this.VecEff != null && super.f >= 20 && super.f <= 68)
+					{
+						for (int r = 0; r < this.VecEff.size(); r++)
+						{
+							Point rp = (Point)this.VecEff.elementAt(r);
+							if (rp != null && super.f >= rp.fSmall)
+							{
+								int fissF = ((super.f - rp.fSmall) / 3) % p5[7].nFrame;
+								p5[7].drawFrameNew(fissF, rp.x, rp.y, rp.subType, 3, g);
+							}
+						}
+					}
+
+					// ─── TẦNG 3: VÀNH ĐAI SÓNG TRỌNG LỰC ĐỊA BÀN (f: 20..64) ───
+					// Sử dụng p5[9] (394: 126x41 Ground Shockwave Ring) tỏa sóng hấp dẫn liên tục
+					if (p5.length > 9 && p5[9] != null && p5[9].nFrame > 0 && super.f >= 20 && super.f <= 64)
+					{
+						int ringF = ((super.f - 20) / 2) % p5[9].nFrame;
+						p5[9].drawFrame(ringF, impactX, impactY + 4, 0, 3, g);
+						if (super.f % 4 < 2)
+						{
+							p5[9].drawFrame((ringF + 1) % p5[9].nFrame, impactX, impactY + 2, 2, 3, g);
+						}
+					}
+
+					// ─── TẦNG 4: KHÍ HẮC ÁM & CỔNG KHÔNG GIAN TẠI CASTER (f: 0..32) ───
+					// Nền đen dưới chân Caster (p5[6]: 272)
+					if (p5.length > 6 && p5[6] != null && p5[6].nFrame > 0 && super.f <= 26)
+					{
+						p5[6].drawFrame(0, casterX, casterY + 4, 0, 3, g);
+					}
+					// Khói đen hư vô cuộn quanh Caster (p5[0]: 480)
+					if (p5[0] != null && super.f <= 28)
+					{
+						int n = (p5[0].nFrame > 0) ? p5[0].nFrame : 8;
+						int auraF = (super.f / 2) % n;
+						p5[0].drawFrame(auraF, casterX, casterY + 2, dirTrans, 33, g);
+					}
+					// Cổng không gian mở trước Caster giải phóng hắc ám (p5[1]: 481)
+					if (p5[1] != null && super.f <= 22)
+					{
+						int n = (p5[1].nFrame > 0) ? p5[1].nFrame : 8;
+						int castF = Math.min(n - 1, super.f / 2);
+						p5[1].drawFrame(castF, casterX + facingSign * 35, casterY + 4, dirTrans, 33, g);
+					}
+
+					// ─── TẦNG 5: HẮC TINH CẦU LAO XÉ KHÔNG GIAN (f: 12..24) ───
+					// p5[2]: 482 (Void Wave Projectile) phóng từ Caster tới tâm Hố Đen
+					if (p5[2] != null && super.f >= 12 && super.f <= 24)
+					{
+						int n = (p5[2].nFrame > 0) ? p5[2].nFrame : 8;
+						int pF = (super.f - 12) % n;
+						int startX = casterX + facingSign * 35;
+						int startY = casterY - 15;
+						int endX = impactX;
+						int endY = impactY - 20;
+						int tProg = super.f - 12; // 0..12
+						int curX = startX + (endX - startX) * tProg / 12;
+						int curY = startY + (endY - startY) * tProg / 12;
+
+						// Vòng nén trọng lực bay kèm (p5[13]: 175)
+						if (p5.length > 13 && p5[13] != null && p5[13].nFrame > 0)
+						{
+							p5[13].drawFrame(0, curX - facingSign * 18, curY, dirTrans, 3, g);
+						}
+						// Bóng hắc tinh cầu mặt đất (p5[6]: 272)
+						if (p5.length > 6 && p5[6] != null && p5[6].nFrame > 0)
+						{
+							p5[6].drawFrame(0, curX, impactY + 3, 0, 3, g);
+						}
+						// Hắc tinh cầu chính (p5[2]: 482)
+						p5[2].drawFrame(pF, curX, curY, dirTrans, 3, g);
+					}
+
+					// ─── TẦNG 6: MA TRẬN XOÁY TRỌNG LỰC HƯ VÔ QUANH HỐ ĐEN (f: 20..54) ───
+					// Vẽ các nhánh xoắn ốc trọng lực Logarithmic Spiral hút vào tâm (Procedural Cosmic Darkness)
+					if (super.f >= 20 && super.f <= 54)
+					{
+						int rotBase = (super.f * 9) % 360;
+						// 3 Nhánh xoắn ốc hắc ám (Triple Accretion Spiral Arms)
+						for (int arm = 0; arm < 3; arm++)
+						{
+							int armAngle = (rotBase + arm * 120) % 360;
+							int prevPx = 0;
+							int prevPy = 0;
+							// Đi từ rìa ngoài (120px) xoáy vào tâm (15px)
+							for (int step = 6; step >= 1; step--)
+							{
+								int rDist = step * 20; // 120, 100, 80, 60, 40, 20
+								int spiralAng = (armAngle + (6 - step) * 28) % 360;
+								int px = impactX + (rDist * CRes.getcos(spiralAng) >> 10);
+								int py = impactY - 20 + ((rDist * 3 / 5) * CRes.getsin(spiralAng) >> 10);
+
+								if (step < 6)
+								{
+									// Lớp hào quang tím huyền ảo ngoài
+									g.setColor(0x7B1FA2);
+									g.drawLine(prevPx, prevPy, px, py);
+									// Lớp lõi hắc ám obsidian bên trong
+									g.setColor(0x1A0033);
+									g.drawLine(prevPx + 1, prevPy, px + 1, py);
+									g.setColor(0x0A0014);
+									g.drawLine(prevPx, prevPy + 1, px, py + 1);
+								}
+								prevPx = px;
+								prevPy = py;
+							}
+						}
+
+						// Vành đai chân trời sự kiện (Concentric Event Horizon Rings)
+						g.setColor(0x4A148C);
+						int r1 = 35 + (super.f % 6) * 2;
+						int r2 = 65 + ((super.f + 3) % 6) * 2;
+						for (int ang = 0; ang < 12; ang++)
+						{
+							int a1 = (rotBase + ang * 30) % 360;
+							int a2 = (rotBase + (ang + 1) * 30) % 360;
+							int px1 = impactX + (r1 * CRes.getcos(a1) >> 10);
+							int py1 = impactY - 20 + ((r1 * 3 / 5) * CRes.getsin(a1) >> 10);
+							int px2 = impactX + (r1 * CRes.getcos(a2) >> 10);
+							int py2 = impactY - 20 + ((r1 * 3 / 5) * CRes.getsin(a2) >> 10);
+							g.drawLine(px1, py1, px2, py2);
+
+							int qx1 = impactX + (r2 * CRes.getcos(a1) >> 10);
+							int qy1 = impactY - 20 + ((r2 * 3 / 5) * CRes.getsin(a1) >> 10);
+							int qx2 = impactX + (r2 * CRes.getcos(a2) >> 10);
+							int qy2 = impactY - 20 + ((r2 * 3 / 5) * CRes.getsin(a2) >> 10);
+							g.drawLine(qx1, qy1, qx2, qy2);
+						}
+					}
+
+					// ─── TẦNG 7: 16 HẠT VẬT CHẤT TỐI XOAY HÚT VÀO HỐ ĐEN (this.VecSubEff) (f: 20..54) ───
+					if (this.VecSubEff != null && super.f >= 20 && super.f <= 54)
+					{
+						for (int i = 0; i < this.VecSubEff.size(); i++)
+						{
+							Point bp = (Point)this.VecSubEff.elementAt(i);
+							if (bp != null)
+							{
+								int px = impactX + (bp.dis * CRes.getcos(bp.frame) >> 10);
+								int py = impactY - 20 + ((bp.dis * 3 / 5) * CRes.getsin(bp.frame) >> 10);
+
+								// Đốm sao bụi hắc ám (p5[10]: 104)
+								if (bp.subType == 1 && p5.length > 10 && p5[10] != null && p5[10].nFrame > 0)
+								{
+									int sF = (super.f / 2 + bp.fSmall) % p5[10].nFrame;
+									p5[10].drawFrame(sF, px, py, 0, 3, g);
+								}
+								else
+								{
+									// Điểm phát sáng vật chất tối tím/đen
+									g.setColor(bp.color);
+									g.fillRect(px - 1, py - 1, 3, 3);
+									g.setColor(0xE1BEE7);
+									g.fillRect(px, py, 1, 1);
+								}
+							}
+						}
+					}
+
+					// ─── TẦNG 8: LỖ ĐEN THÔN PHỆ KHỔNG LỒ 240x240 (p5[3]: 483) (f: 20..52) ───
+					if (p5[3] != null && super.f >= 20 && super.f <= 52)
+					{
+						int n = (p5[3].nFrame > 0) ? p5[3].nFrame : 10;
+						int vF = ((super.f - 20) / 2) % n;
+						p5[3].drawFrame(vF, impactX, impactY - 20, 0, 3, g);
+
+						// Lớp lõi hố đen thứ hai xoay nghịch tạo chiều sâu không gian
+						if (super.f >= 24 && super.f <= 48 && (super.f % 2 == 0))
+						{
+							p5[3].drawFrame((vF + 3) % n, impactX, impactY - 20, 2, 3, g);
+						}
+					}
+
+					// ─── TẦNG 9: TIA SÉT HƯ VÔ KẾT NỐI TÂM HỐ ĐEN VỚI CÁC MỤC TIÊU (f: 24..50) ───
+					if (super.f >= 24 && super.f <= 50 && super.vecObjsBeFire != null)
+					{
+						int tickSeed = GameCanvas.gameTick;
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+						{
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo == null) continue;
+							MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (tObj == null || tObj.isDie || tObj.Hp <= 0 || tObj.isRemove) continue;
+
+							int tx = tObj.x;
+							int ty = tObj.y - tObj.hOne / 2;
+							int jitter = ((tickSeed + k * 3) % 3 - 1) * 7;
+							int midX1 = impactX + (tx - impactX) / 3 + jitter;
+							int midY1 = (impactY - 20) + (ty - (impactY - 20)) / 3 - jitter / 2;
+							int midX2 = impactX + (tx - impactX) * 2 / 3 - jitter;
+							int midY2 = (impactY - 20) + (ty - (impactY - 20)) * 2 / 3 + jitter / 2;
+
+							// Sét tím hư vô
+							g.setColor(0x9C27B0);
+							g.drawLine(impactX, impactY - 20, midX1, midY1);
+							g.drawLine(midX1, midY1, midX2, midY2);
+							g.drawLine(midX2, midY2, tx, ty);
+							// Sợi quang học trắng-tím ở lõi
+							g.setColor(0xE1BEE7);
+							g.drawLine(impactX + 1, impactY - 20, midX1 + 1, midY1);
+							g.drawLine(midX1 + 1, midY1, midX2 + 1, midY2);
+							g.drawLine(midX2 + 1, midY2, tx + 1, ty);
+
+							// Sét lớn hồ quang hư vô (p5[12]: 92)
+							if (p5.length > 12 && p5[12] != null && ((super.f + k) % 4 == 0))
+							{
+								p5[12].drawFrame(0, tx, ty - 15, (k % 2 == 0 ? 0 : 2), 3, g);
+							}
+						}
+					}
+
+					// ─── TẦNG 10: TRỤ HẮC ÁM & BỤI SAO TRÓI CHÂN MỤC TIÊU (f: 22..62) ───
+					if (p5[5] != null && super.f >= 22 && super.f <= 62 && super.vecObjsBeFire != null)
+					{
+						int n = (p5[5].nFrame > 0) ? p5[5].nFrame : 8;
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+						{
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo == null) continue;
+							MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (tObj == null || tObj.isDie || tObj.Hp <= 0 || tObj.isRemove) continue;
+
+							int sF = ((super.f - 22) / 2 + k * 2) % n;
+							// Bóng đen dưới chân mục tiêu (p5[6]: 272)
+							if (p5.length > 6 && p5[6] != null && p5[6].nFrame > 0)
+							{
+								p5[6].drawFrame(0, tObj.x, tObj.y + 3, (k % 2 == 0 ? 0 : 2), 3, g);
+							}
+							// Cột hắc khí xoắn ốc nuốt trọn mục tiêu (p5[5]: 485, 90x140)
+							p5[5].drawFrame(sF, tObj.x, tObj.y + 2, (k % 2 == 0 ? 0 : 2), 33, g);
+
+							// Điểm nổ sao đen trên người mục tiêu (p5[10]: 104)
+							if (p5.length > 10 && p5[10] != null && p5[10].nFrame > 0 && (super.f + k) % 3 == 0)
+							{
+								int spkF = (super.f / 2 + k) % p5[10].nFrame;
+								p5[10].drawFrame(spkF, tObj.x, tObj.y - tObj.hOne / 2, 0, 3, g);
+							}
+						}
+					}
+
+					// ─── TẦNG 11: ĐẠI HƯ VÔ SỤP ĐỔ BỘC PHÁ CỰC ĐẠI (f: 48..74) ───
+					// Vụ nổ hủy diệt 280x200 (p5[4]: 484)
+					if (p5[4] != null && super.f >= 48 && super.f <= 74)
+					{
+						int n = (p5[4].nFrame > 0) ? p5[4].nFrame : 12;
+						int colF = (super.f - 48) / 2;
+						if (colF < n)
+						{
+							p5[4].drawFrame(colF, impactX, impactY - 25, (super.f % 2 == 0 ? 0 : 2), 3, g);
+						}
+					}
+
+					// ─── TẦNG 12: SÓNG BIẾN DẠNG KHÔNG GIAN BÙNG NỔ (f: 48..66) ───
+					// Sóng cầu méo mó không gian (p5[8]: 285, 111x90)
+					if (p5.length > 8 && p5[8] != null && p5[8].nFrame > 0 && super.f >= 48 && super.f <= 66)
+					{
+						int distF = Math.min(p5[8].nFrame - 1, (super.f - 48) / 3);
+						p5[8].drawFrame(distF, impactX, impactY - 25, 0, 3, g);
+						p5[8].drawFrame(distF, impactX, impactY - 25, 2, 3, g);
+					}
+
+					// ─── TẦNG 13: VÀNH ĐAI XUNG KÍCH BỘC PHÁ BỐN PHƯƠNG (f: 49..68) ───
+					// Vành đai nén trọng lực vỡ tung (p5[13]: 175) & Vành đai mặt đất (p5[9]: 394)
+					if (super.f >= 49 && super.f <= 68)
+					{
+						int ageDet = super.f - 49;
+						if (p5.length > 13 && p5[13] != null && p5[13].nFrame > 0)
+						{
+							p5[13].drawFrame(0, impactX - ageDet * 6, impactY - 20, 0, 3, g);
+							p5[13].drawFrame(0, impactX + ageDet * 6, impactY - 20, 2, 3, g);
+							p5[13].drawFrame(0, impactX, impactY - 20 - ageDet * 4, 0, 3, g);
+							p5[13].drawFrame(0, impactX, impactY - 20 + ageDet * 4, 2, 3, g);
+						}
+						if (p5.length > 9 && p5[9] != null && p5[9].nFrame > 0 && ageDet <= 14)
+						{
+							p5[9].drawFrame(ageDet / 2 % p5[9].nFrame, impactX - 60, impactY + 4, 0, 3, g);
+							p5[9].drawFrame(ageDet / 2 % p5[9].nFrame, impactX + 60, impactY + 4, 2, 3, g);
+						}
+					}
+
+					// ─── TẦNG 14: MẢNH VẬT CHẤT TỐI BẮN RA 8 HƯỚNG & KHÓI BỤI SỤP ĐỔ (f: 50..70) ───
+					if (super.f >= 50 && super.f <= 70)
+					{
+						int sProg = super.f - 50;
+						// Bụi khói tiếp đất (p5[11]: 152)
+						if (p5.length > 11 && p5[11] != null && p5[11].nFrame > 0 && sProg <= 12)
+						{
+							int dF = Math.min(p5[11].nFrame - 1, sProg / 2);
+							p5[11].drawFrame(dF, impactX - 55, impactY + 4, 0, 3, g);
+							p5[11].drawFrame(dF, impactX + 55, impactY + 4, 2, 3, g);
+						}
+						// 8 Tia mảnh vỡ hư vô bắn tỏa ra 8 góc (p5[10]: 104)
+						if (p5.length > 10 && p5[10] != null && p5[10].nFrame > 0)
+						{
+							for (int sp = 0; sp < 8; sp++)
+							{
+								int spAng = sp * 45;
+								int spDist = sProg * 9;
+								int sx = impactX + (spDist * CRes.getcos(spAng) >> 10);
+								int sy = impactY - 25 + ((spDist * 3 / 4) * CRes.getsin(spAng) >> 10);
+								p5[10].drawFrame((sProg + sp) % p5[10].nFrame, sx, sy, 0, 3, g);
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+			}
+		}
 
 		// Paint Multi-Node Gradual Spatial Shatter & Full Screen Glass Break for Set 7 (Quake / Trấn Thiên)
 		if (setId == 7 && this.VecEff != null)
@@ -22888,11 +25473,11 @@ public final class Effect_Skill extends MainEffect {
 			}
 		}
 
-		// Paint Set 6: Enel 200 Triệu Volt Thần Lôi — Authentic Fusion of Skills 169 & 170
+		// Paint Set 6: Enel 200 Triệu Volt Thần Lôi — Pure Authentic Lightning Matrix, Aerial Teleport & 200M Volt El Thor
 		if (setId == 6)
 		{
 			FrameImage[] p6 = s_ttFrames[6];
-			if (p6 != null && p6.length >= 7)
+			if (p6 != null && p6.length >= 8)
 			{
 				int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
 				int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
@@ -22902,71 +25487,163 @@ public final class Effect_Skill extends MainEffect {
 
 				int impactX = super.toX;
 				int impactY = super.toY;
-				if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
-				{
-					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
-					if (tInfo != null)
-					{
-						MainObject t0 = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
-						if (t0 != null && !t0.isDie)
-						{
-							impactX = t0.x;
-							impactY = t0.y;
-						}
-					}
-				}
 				if (impactX == 0 && impactY == 0)
 				{
 					impactX = casterX + facingSign * 140;
 					impactY = casterY;
 				}
 
-				// ─── 1. CASTER STAGE: Airborne Levitation, Swirling Triple Orbs & Ground Sparks ───
-				// Ground discharge ring under caster while levitating (p6[4]: 242)
-				if (p6[4] != null && super.f >= 2 && super.f <= 72 && p6[4].nFrame > 0)
+				// ═══════════════════════════════════════════════════════════════════
+				// LAYER 1: GROUND LIGHTNING MAGIC MATRIX (f: 4..68)
+				// ═══════════════════════════════════════════════════════════════════
+				if (super.f >= 4 && super.f <= 68)
 				{
-					int ringF = (GameCanvas.gameTick / 3) % p6[4].nFrame;
-					p6[4].drawFrameNew(ringF, casterX, casterY + 6, 0, 3, g);
-				}
-				// Ground electric crackle under caster (p6[3]: 241)
-				if (p6[3] != null && super.f >= 4 && super.f <= 70 && p6[3].maxNumFrame > 0)
-				{
-					int crackleF = (super.f % 2) * 2 + (GameCanvas.gameTick / 2 % 2);
-					p6[3].drawFrameNew(crackleF, casterX, casterY + 8, 0, 3, g);
-				}
-				// Swirling Triple Lightning Spheres orbiting Enel in 3D ellipse (p6[0]: 243)
-				if (p6[0] != null && super.f >= 2 && super.f <= 62 && p6[0].nFrame > 0)
-				{
-					int baseAngle = (super.f * 18) % 360;
-					for (int orbIdx = 0; orbIdx < 3; orbIdx++)
+					// High-Voltage Ground Discharge Rings (p6[4]: 242, 49x28, 2f)
+					if (p6[4] != null && p6[4].nFrame > 0)
 					{
-						int orbAngle = (baseAngle + orbIdx * 120) % 360;
-						int ox = casterX + (CRes.getcos(orbAngle) * 24 >> 10);
-						int oy = cy - 16 + (CRes.getsin(orbAngle) * 9 >> 10);
-						int orbF = ((super.f / 2) + orbIdx) % p6[0].nFrame;
-						p6[0].drawFrame(orbF, ox, oy, 0, 3, g);
-						if (p6[5] != null && p6[5].nFrame > 0)
+						int ringF = (super.f / 3) % p6[4].nFrame;
+						// Epicenter ring
+						p6[4].drawFrameNew(ringF, impactX, impactY + 4, 0, 3, g);
+						// Perimeter discharge nodes (left, right, top, bottom, far-left, far-right)
+						p6[4].drawFrameNew((ringF + 1) % p6[4].nFrame, impactX - 65, impactY + 4, 0, 3, g);
+						p6[4].drawFrameNew((ringF + 2) % p6[4].nFrame, impactX + 65, impactY + 4, 2, 3, g);
+						p6[4].drawFrameNew((ringF + 1) % p6[4].nFrame, impactX, impactY - 22, 0, 3, g);
+						p6[4].drawFrameNew((ringF + 2) % p6[4].nFrame, impactX, impactY + 22, 2, 3, g);
+						p6[4].drawFrameNew((ringF + 3) % p6[4].nFrame, impactX - 120, impactY + 4, 0, 3, g);
+						p6[4].drawFrameNew((ringF + 3) % p6[4].nFrame, impactX + 120, impactY + 4, 2, 3, g);
+					}
+
+					// Ground Lightning Spiderweb Crackles (p6[3]: 241, 40x27, 2f)
+					if (p6[3] != null && p6[3].maxNumFrame > 0)
+					{
+						int crackleF = (super.f % 2) * 2 + (GameCanvas.gameTick / 2 % 2);
+						p6[3].drawFrameNew(crackleF, impactX, impactY + 8, 0, 3, g);
+						p6[3].drawFrameNew((crackleF + 1) % 4, impactX - 70, impactY + 6, 0, 3, g);
+						p6[3].drawFrameNew((crackleF + 2) % 4, impactX + 70, impactY + 6, 2, 3, g);
+						p6[3].drawFrameNew((crackleF + 3) % 4, impactX - 130, impactY + 4, 0, 3, g);
+						p6[3].drawFrameNew((crackleF) % 4, impactX + 130, impactY + 4, 2, 3, g);
+					}
+
+					// Locked target grounding rings (p6[4]: 242)
+					if (p6[4] != null && p6[4].nFrame > 0 && super.vecObjsBeFire != null)
+					{
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
 						{
-							p6[5].drawFrame(((super.f / 2) + orbIdx) % p6[5].nFrame, ox, oy - 2, 0, 3, g);
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo != null)
+							{
+								MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+								if (tObj != null && !tObj.isDie && tObj.Hp > 0 && !tObj.isRemove)
+								{
+									int ringF = (super.f / 3 + k) % p6[4].nFrame;
+									p6[4].drawFrameNew(ringF, tObj.x, tObj.y + 4, (k % 2 == 0 ? 0 : 2), 3, g);
+								}
+							}
+						}
+					}
+
+					// Procedural Rotating Geometric Electric Matrix Polygons (Dual-layer Cyan & White Core)
+					int rotAngle = (super.f * 5) % 360;
+					g.setColor(0x00E5FF);
+					for (int ang = 0; ang < 6; ang++)
+					{
+						int a1 = (rotAngle + ang * 60) % 360;
+						int a2 = (rotAngle + (ang + 1) * 60) % 360;
+						int px1 = impactX + (65 * CRes.getcos(a1) >> 10);
+						int py1 = impactY + (39 * CRes.getsin(a1) >> 10);
+						int px2 = impactX + (65 * CRes.getcos(a2) >> 10);
+						int py2 = impactY + (39 * CRes.getsin(a2) >> 10);
+						g.drawLine(px1, py1, px2, py2);
+
+						int ox1 = impactX + (125 * CRes.getcos(a1) >> 10);
+						int oy1 = impactY + (75 * CRes.getsin(a1) >> 10);
+						int ox2 = impactX + (125 * CRes.getcos(a2) >> 10);
+						int oy2 = impactY + (75 * CRes.getsin(a2) >> 10);
+						g.drawLine(ox1, oy1, ox2, oy2);
+						g.drawLine(px1, py1, ox1, oy1);
+					}
+					g.setColor(0xFFFFFF);
+					for (int ang = 0; ang < 6; ang++)
+					{
+						int a1 = (rotAngle + ang * 60) % 360;
+						int px1 = impactX + (65 * CRes.getcos(a1) >> 10);
+						int py1 = impactY + (39 * CRes.getsin(a1) >> 10);
+						g.fillRect(px1 - 1, py1 - 1, 3, 3);
+					}
+				}
+
+				// ═══════════════════════════════════════════════════════════════════
+				// LAYER 2: PROCEDURAL LIGHTNING MATRIX ARCS ("VẼ MA TRẬN SÉT") (f: 10..56)
+				// ═══════════════════════════════════════════════════════════════════
+				if (this.VecSubEff != null && super.f >= 10 && super.f <= 56)
+				{
+					int tickSeed = GameCanvas.gameTick;
+					for (int e = 0; e < this.VecSubEff.size(); e++)
+					{
+						Point arc = (Point)this.VecSubEff.elementAt(e);
+						if (arc != null && super.f >= arc.fSmall && super.f <= (arc.fSmall + arc.fRe))
+						{
+							int x1 = arc.x;
+							int y1 = arc.y;
+							int x2 = arc.x2;
+							int y2 = arc.y2;
+
+							// Compute 4-segment procedural electric zigzag displacement
+							int jitter = ((tickSeed + arc.frame + e) % 3 - 1) * 6;
+							int midX1 = x1 + (x2 - x1) / 4 + jitter;
+							int midY1 = y1 + (y2 - y1) / 4 - (jitter / 2);
+							int midX2 = x1 + (x2 - x1) / 2 - jitter;
+							int midY2 = y1 + (y2 - y1) / 2 + (jitter / 2);
+							int midX3 = x1 + (x2 - x1) * 3 / 4 + jitter;
+							int midY3 = y1 + (y2 - y1) * 3 / 4 - (jitter / 2);
+
+							// Outer High-Voltage Corona Line (Cyan / Electric Blue)
+							g.setColor(arc.color);
+							g.drawLine(x1, y1, midX1, midY1);
+							g.drawLine(midX1, midY1, midX2, midY2);
+							g.drawLine(midX2, midY2, midX3, midY3);
+							g.drawLine(midX3, midY3, x2, y2);
+
+							// Inner Searing White-Hot Core Line
+							g.setColor(0xFFFFFF);
+							g.drawLine(x1 + 1, y1, midX1 + 1, midY1);
+							g.drawLine(midX1 + 1, midY1, midX2 + 1, midY2);
+							g.drawLine(midX2 + 1, midY2, midX3 + 1, midY3);
+							g.drawLine(midX3 + 1, midY3, x2 + 1, y2);
+
+							// Starburst sparks at junction nodes
+							if (p6[5] != null && p6[5].nFrame > 0 && ((super.f + e) % 3 == 0))
+							{
+								int sF = ((super.f / 2) + e) % p6[5].nFrame;
+								p6[5].drawFrame(sF, midX2, midY2, 0, 3, g);
+							}
+
+							// High-voltage giant electric arc bursts (p6[7]: 92) at active nodes
+							if (p6[7] != null && (super.f % 6 == 0) && e % 4 == 0)
+							{
+								p6[7].drawFrame(0, midX2, midY2 - 30, (e % 2 == 0 ? 0 : 2), 3, g);
+							}
+						}
+					}
+
+					// Swirling electric plasma sparks & mini-orbs drifting across matrix
+					if (p6[5] != null && p6[5].nFrame > 0)
+					{
+						for (int em = 0; em < 6; em++)
+						{
+							int emAngle = (super.f * 14 + em * 60) % 360;
+							int emDist = 45 + (em * 16);
+							int emX = impactX + (emDist * CRes.getcos(emAngle) >> 10);
+							int emY = impactY - 15 + ((emDist * 3 / 5) * CRes.getsin(emAngle) >> 10);
+							int emF = (super.f / 2 + em) % p6[5].nFrame;
+							p6[5].drawFrame(emF, emX, emY, (em % 2 == 0 ? 0 : 2), 3, g);
 						}
 					}
 				}
 
-				// Stunned Target Electrical Shock Sparks while floating (p6[5]: 104)
-				if (p6[5] != null && super.f >= 36 && super.f <= 50 && p6[5].nFrame > 0 && super.vecObjsBeFire != null)
-				{
-					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
-					{
-						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
-						if (tInfo == null) continue;
-						MainObject t = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
-						if (t == null || t.isDie || t.Hp <= 0 || t.isRemove) continue;
-						int sparkF = (super.f / 2 + k) % p6[5].nFrame;
-						p6[5].drawFrame(sparkF, t.x + (k % 2 == 0 ? -6 : 6), t.y + t.dy - 18, 0, 3, g);
-					}
-				}
-
-				// ─── 2. SEQUENTIAL THUNDERBOLT STRIKES & COLOSSAL BEAM (From this.VecEff) ───
+				// ═══════════════════════════════════════════════════════════════════
+				// LAYER 3: SEQUENTIAL SKY THUNDERBOLTS & CLIMAX 200M VOLT EL THOR
+				// ═══════════════════════════════════════════════════════════════════
 				if (this.VecEff != null)
 				{
 					for (int i = 0; i < this.VecEff.size(); i++)
@@ -22975,10 +25652,10 @@ public final class Effect_Skill extends MainEffect {
 						if (strike == null) continue;
 						int age = super.f - strike.fSmall;
 
-						// ─── TYPE 0: Diagonal Cascading Lightning Bolt (Skill 170 evolved) ───
+						// ─── TYPE 0: Diagonal Cascading Lightning Bolt ───
 						if (strike.subType == 0)
 						{
-							// In-flight cascading lightning fork connecting sky to ground (age -3..-1)
+							// In-flight descending lightning fork (age -3..-1)
 							if (age >= -3 && age < 0)
 							{
 								int startX = strike.x + (strike.color == 2 ? -80 : 80);
@@ -22993,22 +25670,22 @@ public final class Effect_Skill extends MainEffect {
 									p6[1].drawFrameNew(boltF2, strike.x, strike.y - 20, strike.color == 2 ? 0 : 2, 3, g);
 								}
 							}
-							// Impact at ground (age 0..8)
+							// Ground Impact (age 0..8)
 							else if (age >= 0 && age <= 8)
 							{
-								// Dust puff upon landing (p6[6]: 152)
+								// Dust puff (p6[6]: 152)
 								if (p6[6] != null && p6[6].nFrame > 0 && age <= 4)
 								{
 									int dustF = Math.min(p6[6].nFrame - 1, age / 2);
 									p6[6].drawFrame(dustF, strike.x, strike.y, strike.color, 3, g);
 								}
-								// Ground crackles (p6[3]: 241)
+								// Ground crackle (p6[3]: 241)
 								if (p6[3] != null && p6[3].maxNumFrame > 0)
 								{
 									int crackleF = (strike.color == 2 ? 2 : 0) + (GameCanvas.gameTick / 2 % 2);
 									p6[3].drawFrameNew(crackleF, strike.x, strike.y + 4, 0, 3, g);
 								}
-								// Vertical lightning column 3 segments high (p6[2]: 240)
+								// 3-Segment Vertical Lightning Column (p6[2]: 240)
 								if (p6[2] != null && p6[2].maxNumFrame > 0 && age <= 6)
 								{
 									int colFlip = (age % 2 == 0) ? 0 : 2;
@@ -23017,7 +25694,7 @@ public final class Effect_Skill extends MainEffect {
 										p6[2].drawFrameNew((super.f + s) % 2, strike.x, strike.y - s * 73, colFlip, 33, g);
 									}
 								}
-								// Spark burst (p6[5]: 104)
+								// Starburst Spark (p6[5]: 104)
 								if (p6[5] != null && p6[5].nFrame > 0 && age <= 4)
 								{
 									p6[5].drawFrame(age / 2, strike.x, strike.y - 12, 0, 3, g);
@@ -23025,28 +25702,28 @@ public final class Effect_Skill extends MainEffect {
 							}
 						}
 
-						// ─── TYPE 1: COLOSSAL 200 MILLION VOLT DIVINE BEAM (Skill 169 evolved) ───
+						// ─── TYPE 1: COLOSSAL 200 MILLION VOLT DIVINE BEAM (Climax at f = 36..60) ───
 						else if (strike.subType == 1)
 						{
-							if (age >= 0 && age <= 22)
+							if (age >= 0 && age <= 24)
 							{
-								// Smooth beam width expansion and taper
+								// Smooth beam expansion and taper
 								int beamW;
 								if (age <= 2)
 								{
-									beamW = 36 + (64 - 36) * age / 2;
+									beamW = 40 + (70 - 40) * age / 2;
 								}
 								else if (age <= 10)
 								{
-									beamW = 64 - 8 * (age - 2) / 8;
+									beamW = 70 - 10 * (age - 2) / 8;
 								}
 								else if (age <= 18)
 								{
-									beamW = 56 - 28 * (age - 10) / 8;
+									beamW = 60 - 30 * (age - 10) / 8;
 								}
 								else
 								{
-									beamW = Math.max(8, 28 - 20 * (age - 18) / 4);
+									beamW = Math.max(8, 30 - 22 * (age - 18) / 6);
 								}
 
 								int beamJitter = (GameCanvas.gameTick % 2) << 1;
@@ -23093,66 +25770,69 @@ public final class Effect_Skill extends MainEffect {
 								g.setColor(0xFFFFFF);
 								g.fillRect(strike.x - 2 + (beamJitter / 2), topY, 4, 420);
 
-								// B. Flanking Giant Lightning Columns (p6[2]: 240) stacked 5 segments high!
+								// Flanking Giant Lightning Columns (p6[2]: 240) stacked 5 segments high (365px tall)
 								if (p6[2] != null && p6[2].maxNumFrame > 0 && age <= 18)
 								{
 									int flankFlip = (age % 2 == 0) ? 0 : 2;
 									for (int s = 0; s < 5; s++)
 									{
-										// Left flank column
-										p6[2].drawFrameNew((super.f + s) % 2, strike.x - 26, strike.y - s * 73, flankFlip, 33, g);
-										// Right flank column
-										p6[2].drawFrameNew((super.f + s + 1) % 2, strike.x + 26, strike.y - s * 73, flankFlip == 0 ? 2 : 0, 33, g);
+										p6[2].drawFrameNew((super.f + s) % 2, strike.x - 30, strike.y - s * 73, flankFlip, 33, g);
+										p6[2].drawFrameNew((super.f + s + 1) % 2, strike.x + 30, strike.y - s * 73, flankFlip == 0 ? 2 : 0, 33, g);
 									}
 								}
 
-								// C. Ground Epic Discharge Rings (p6[4]: 242)
-								if (p6[4] != null && p6[4].nFrame > 0 && age <= 20)
+								// Ground Mega Discharge Rings (p6[4]: 242)
+								if (p6[4] != null && p6[4].nFrame > 0 && age <= 22)
 								{
 									int ringF = (GameCanvas.gameTick / 2) % p6[4].nFrame;
-									p6[4].drawFrameNew(ringF, strike.x - 18, strike.y + 6, 0, 3, g);
-									p6[4].drawFrameNew((ringF + 1) % p6[4].nFrame, strike.x + 18, strike.y + 6, 2, 3, g);
+									p6[4].drawFrameNew(ringF, strike.x - 22, strike.y + 6, 0, 3, g);
+									p6[4].drawFrameNew((ringF + 1) % p6[4].nFrame, strike.x + 22, strike.y + 6, 2, 3, g);
 								}
 
-								// D. Ground Spiderweb Sparks (p6[3]: 241) radiating outward
-								if (p6[3] != null && p6[3].maxNumFrame > 0 && age <= 20)
+								// Ground Spiderweb Lightning Crawl (p6[3]: 241)
+								if (p6[3] != null && p6[3].maxNumFrame > 0 && age <= 22)
 								{
-									int crackleF = (super.f % 2) * 2 + (GameCanvas.gameTick / 2 % 2);
-									p6[3].drawFrameNew(crackleF, strike.x, strike.y + 8, 0, 3, g);
-									p6[3].drawFrameNew((crackleF + 1) % 4, strike.x - 45, strike.y + 6, 0, 3, g);
-									p6[3].drawFrameNew((crackleF + 2) % 4, strike.x + 45, strike.y + 6, 2, 3, g);
+									int cF = (GameCanvas.gameTick / 2) % 4;
+									p6[3].drawFrameNew(cF, strike.x - 40, strike.y + 6, 0, 3, g);
+									p6[3].drawFrameNew((cF + 1) % 4, strike.x + 40, strike.y + 6, 2, 3, g);
 								}
 
-								// E. Exploding Starburst Sparks (p6[5]: 104)
-								if (p6[5] != null && p6[5].nFrame > 0 && age <= 16)
+								// Giant High-Voltage Electric Arc Spire (p6[7]: 92) surging at epicenter
+								if (p6[7] != null && age >= 2 && age <= 18)
+								{
+									p6[7].drawFrame(0, strike.x, strike.y - 45, 0, 3, g);
+									p6[7].drawFrame(0, strike.x - 25, strike.y - 35, 2, 3, g);
+									p6[7].drawFrame(0, strike.x + 25, strike.y - 35, 0, 3, g);
+								}
+
+								// Exploding Starburst Sparks (p6[5]: 104)
+								if (p6[5] != null && p6[5].nFrame > 0 && age <= 18)
 								{
 									int sparkF = (age / 2) % p6[5].nFrame;
 									p6[5].drawFrame(sparkF, strike.x, strike.y - 18, 0, 3, g);
-									p6[5].drawFrame((sparkF + 1) % p6[5].nFrame, strike.x - 22, strike.y - 30, 0, 3, g);
-									p6[5].drawFrame((sparkF + 2) % p6[5].nFrame, strike.x + 22, strike.y - 30, 0, 3, g);
+									p6[5].drawFrame((sparkF + 1) % p6[5].nFrame, strike.x - 28, strike.y - 35, 0, 3, g);
+									p6[5].drawFrame((sparkF + 2) % p6[5].nFrame, strike.x + 28, strike.y - 35, 0, 3, g);
 								}
 
-								// F. Ground Dust Puffs (p6[6]: 152) surging outward
-								if (p6[6] != null && p6[6].nFrame > 0 && age <= 12)
+								// Ground Dust Puffs (p6[6]: 152) surging outward
+								if (p6[6] != null && p6[6].nFrame > 0 && age <= 14)
 								{
 									int dustF = Math.min(p6[6].nFrame - 1, age / 3);
-									p6[6].drawFrame(dustF, strike.x - 55, strike.y, 0, 3, g);
-									p6[6].drawFrame(dustF, strike.x + 55, strike.y, 2, 3, g);
+									p6[6].drawFrame(dustF, strike.x - 65, strike.y, 0, 3, g);
+									p6[6].drawFrame(dustF, strike.x + 65, strike.y, 2, 3, g);
 								}
 							}
 						}
 
-						// ─── TYPE 2: Residual Aftershocks (super.f = 46, 50) ───
+						// ─── TYPE 2: Residual Aftershock Bolts ───
 						else if (strike.subType == 2)
 						{
 							if (age >= 0 && age <= 8)
 							{
-								// Ground crackle
 								if (p6[3] != null && p6[3].maxNumFrame > 0)
 								{
 									p6[3].drawFrameNew((strike.color == 2 ? 2 : 0) + (GameCanvas.gameTick / 2 % 2), strike.x, strike.y + 4, strike.color, 3, g);
 								}
-								// Short vertical bolt (2 segments)
 								if (p6[2] != null && p6[2].maxNumFrame > 0 && age <= 5)
 								{
 									for (int s = 0; s < 2; s++)
@@ -23160,7 +25840,6 @@ public final class Effect_Skill extends MainEffect {
 										p6[2].drawFrameNew((super.f + s) % 2, strike.x, strike.y - s * 73, strike.color, 33, g);
 									}
 								}
-								// Starburst
 								if (p6[5] != null && p6[5].nFrame > 0 && age <= 4)
 								{
 									p6[5].drawFrame(age / 2, strike.x, strike.y - 10, 0, 3, g);
@@ -23169,198 +25848,897 @@ public final class Effect_Skill extends MainEffect {
 						}
 					}
 				}
+
+				// ═══════════════════════════════════════════════════════════════════
+				// LAYER 4: CASTER (ENEL) AERIAL RENDERING, CORONA & TELEPORTS (f: 0..68)
+				// ═══════════════════════════════════════════════════════════════════
+				// Ground discharge ring under caster when charging (f = 2..8)
+				if (p6[4] != null && super.f >= 2 && super.f <= 8 && p6[4].nFrame > 0)
+				{
+					int ringF = (GameCanvas.gameTick / 2) % p6[4].nFrame;
+					p6[4].drawFrameNew(ringF, casterX, casterY + 6, 0, 3, g);
+				}
+
+				// Ground lightning crackle directly beneath hovering Enel (f = 6..64)
+				if (p6[3] != null && p6[3].maxNumFrame > 0 && super.f >= 6 && super.f <= 64)
+				{
+					int groundF = (super.f % 2) * 2 + (GameCanvas.gameTick / 2 % 2);
+					p6[3].drawFrameNew(groundF, casterX, casterY + 6, 0, 3, g);
+				}
+
+				// Lightning Dash Flash Streak on Teleport frames (f = 6, 19, 32, 48, 68)
+				if (super.f == 6 || super.f == 19 || super.f == 32 || super.f == 48 || super.f == 68)
+				{
+					g.setColor(0xFFFFFF);
+					g.drawLine(casterX, cy, casterX, cy + 50);
+					g.drawLine(casterX - 1, cy, casterX - 1, cy + 50);
+					g.drawLine(casterX + 1, cy, casterX + 1, cy + 50);
+					if (p6[5] != null && p6[5].nFrame > 0)
+					{
+						p6[5].drawFrame(0, casterX, cy, 0, 3, g);
+					}
+				}
+
+				// Electric Corona Aura radiating around Enel while levitating
+				if (super.f >= 4 && super.f <= 66)
+				{
+					int tick = GameCanvas.gameTick;
+					g.setColor(0x00E5FF);
+					for (int r = 0; r < 4; r++)
+					{
+						int rx = casterX + ((r % 2 == 0 ? -1 : 1) * (14 + (tick * 3 + r * 5) % 12));
+						int ry = cy - 26 + ((r < 2 ? -1 : 1) * (8 + (tick * 2 + r * 7) % 14));
+						g.drawLine(casterX, cy - 18, rx, ry);
+					}
+					g.setColor(0xFFFFFF);
+					for (int r = 0; r < 4; r++)
+					{
+						int rx = casterX + ((r % 2 == 0 ? -1 : 1) * (14 + (tick * 3 + r * 5) % 12));
+						int ry = cy - 26 + ((r < 2 ? -1 : 1) * (8 + (tick * 2 + r * 7) % 14));
+						g.fillRect(rx - 1, ry - 1, 2, 2);
+					}
+				}
+
+				// Zenith High-Voltage Arc Discharge summoning the El Thor (f = 28..44)
+				if (p6[7] != null && super.f >= 28 && super.f <= 44)
+				{
+					p6[7].drawFrame(0, casterX, cy - 70, (super.f % 2 == 0 ? 0 : 2), 3, g);
+				}
+
+				// Triple Orbiting High-Voltage Lightning Spheres (p6[0]: 243)
+				if (p6[0] != null && super.f >= 2 && super.f <= 66 && p6[0].nFrame > 0)
+				{
+					int baseAngle = (super.f * 18) % 360;
+					for (int orbIdx = 0; orbIdx < 3; orbIdx++)
+					{
+						int orbAngle = (baseAngle + orbIdx * 120) % 360;
+						int ox = casterX + (CRes.getcos(orbAngle) * 26 >> 10);
+						int oy = cy - 16 + (CRes.getsin(orbAngle) * 10 >> 10);
+						int orbF = ((super.f / 2) + orbIdx) % p6[0].nFrame;
+						p6[0].drawFrame(orbF, ox, oy, 0, 3, g);
+						if (p6[5] != null && p6[5].nFrame > 0)
+						{
+							p6[5].drawFrame(((super.f / 2) + orbIdx) % p6[5].nFrame, ox, oy - 2, 0, 3, g);
+						}
+					}
+				}
+
+				// Target Electrical Shock Sparks while floating / stunned (p6[5]: 104)
+				if (p6[5] != null && super.f >= 36 && super.f <= 52 && p6[5].nFrame > 0 && super.vecObjsBeFire != null)
+				{
+					for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+					{
+						Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+						if (tInfo == null) continue;
+						MainObject t = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+						if (t == null || t.isDie || t.Hp <= 0 || t.isRemove) continue;
+						int sparkF = (super.f / 2 + k) % p6[5].nFrame;
+						p6[5].drawFrame(sparkF, t.x + (k % 2 == 0 ? -6 : 6), t.y + t.dy - 18, 0, 3, g);
+					}
+				}
 			}
 		}
 
-		// Paint Set 8: Trafalgar Law - ROOM Sphere, Ground Aura, Kikoku Stance, Amputate Slashes & Mes Heart Cube
+		// Paint Set 8: Trafalgar Law - ROOM Gamma Knife (Phẫu thuật Ope Ope no Mi)
+		// 393: ROOM sphere quanh nhân vật (1 frame 110x110)
+		// 394: 3 frame dọc chia chuẩn xuất hiện ở chân nhân vật
+		// 391: Hiệu ứng xuất hiện ở nửa trên mục tiêu dính
+		// 392: 3 frame dọc tương tự 394 xuất hiện ở chân mục tiêu dính
+		// Không vẽ bóng tròn ở mục tiêu; mục tiêu chỉ bay lên lơ lửng
 		if (setId == 8)
 		{
 			int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
 			int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+			int casterCenterY = casterY - (super.objFireMain != null ? (super.objFireMain.hOne / 2) : 22);
 
-			// 1. Ground Spike Dust Shockwave (super.fraImgSubEff: 392, 101x44, 3 frames)
-			if (super.fraImgSubEff != null && super.fraImgSubEff.nFrame > 0 && super.f < 54)
+			// 1. Vòng sáng ma trận chân nhân vật tung chiêu (394: 3 frame dọc chia chuẩn)
+			if (super.fraImgSubEff != null && super.fraImgSubEff.nFrame > 0 && super.f <= 65)
 			{
-				super.fraImgSubEff.drawFrame((super.f / 3) % super.fraImgSubEff.nFrame, casterX, casterY - 6, 0, 33, g);
+				int f394 = (super.f / 3) % super.fraImgSubEff.nFrame;
+				super.fraImgSubEff.drawFrame(f394, casterX, casterY, 0, 33, g);
 			}
 
-			// 2. Glowing Light Barrier / Energy Ring (super.fraImgSub2Eff: 394, 126x41, 3 frames)
-			if (super.fraImgSub2Eff != null && super.fraImgSub2Eff.nFrame > 0 && super.f < 54)
+			// 2. Quả cầu ROOM bao quanh nhân vật tung chiêu (393: 110x110)
+			if (super.fraImgEff != null && super.fraImgEff.nFrame > 0 && super.f >= 2 && super.f <= 65)
 			{
-				super.fraImgSub2Eff.drawFrame((super.f / 3) % super.fraImgSub2Eff.nFrame, casterX, casterY + 5, 0, 33, g);
+				super.fraImgEff.drawFrame(0, casterX, casterCenterY, 0, 3, g);
 			}
 
-			// 3. Giant Blue ROOM Sphere (super.fraImgEff: 393, 110x110)
-			if (super.fraImgEff != null && super.f >= 4 && super.f < 54)
-			{
-				super.fraImgEff.drawFrame(0, casterX, casterY - 20, 0, 3, g);
-			}
-
-			// 4. "ROOM!" Comic Text Popup (super.fraImgSub3Eff: 395, 69x32)
-			if (super.fraImgSub3Eff != null && super.f < 24)
-			{
-				int textY = casterY - 55 - (super.f / 2);
-				super.fraImgSub3Eff.drawFrame(0, casterX, textY, (super.Dir == 2 ? 0 : 2), 3, g);
-			}
-
-			// 5. Kikoku Sword Mes Thrust from Caster (super.fraImgSub6Eff: 352, 52x15)
-			if (super.fraImgSub6Eff != null && super.f >= 4 && super.f <= 20)
-			{
-				super.fraImgSub6Eff.drawFrame(0, casterX + (super.Dir == 2 ? 26 : -26), casterY - 20, (super.Dir == 2 ? 0 : 2), 3, g);
-			}
-
-			// 6. Paint Target Airborne Levitation, Simultaneous Multi-Slashes & Mes Extracted Beating Heart Cube
-			if (super.vecObjsBeFire != null && super.f >= 4 && super.f <= 56)
+			// 3. Hiệu ứng trên mục tiêu dính đòn (vecObjsBeFire): 392 ở chân, 391 ở nửa trên, vết chém 358
+			if (super.vecObjsBeFire != null && super.f >= 3 && super.f <= 68)
 			{
 				for (int k = 0; k < super.vecObjsBeFire.size(); k++)
 				{
 					Object_Effect_Skill targetInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
-					if (targetInfo != null)
+					if (targetInfo == null) continue;
+					MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
+					if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
 					{
-						MainObject target = MainObject.get_Object((int)targetInfo.ID, (byte)targetInfo.tem);
-						if (target != null && !target.isDie && target.Hp > 0 && !target.isRemove)
+						int targetFeetY = target.y - target.dy;
+						int targetH = (target.hOne > 0) ? target.hOne : 45;
+						int targetUpperY = targetFeetY - (targetH * 3 / 4);
+
+						// 392: 3 frame dọc chia chuẩn xuất hiện ở chân mục tiêu dính
+						if (super.fraImgSub3Eff != null && super.fraImgSub3Eff.nFrame > 0)
 						{
-							int targetCenterY = target.y - target.dy - (target.hOne / 2);
+							int f392 = (super.f / 3) % super.fraImgSub3Eff.nFrame;
+							super.fraImgSub3Eff.drawFrame(f392, target.x, targetFeetY, 0, 33, g);
+						}
 
-							// Multi-direction Amputate Blade Slices (super.fraImgSub5Eff: 358, 51x22, 3 frames) - Vừa lên vừa chém cùng lúc
-							if (super.f >= 4 && super.f <= 50 && super.fraImgSub5Eff != null && super.fraImgSub5Eff.nFrame > 0)
-							{
-								int slashFrame = (super.f / 2) % super.fraImgSub5Eff.nFrame;
-								super.fraImgSub5Eff.drawFrame(slashFrame, target.x, targetCenterY, (k % 2 == 0 ? 0 : 2), 3, g);
-							}
+						// 391: Xuất hiện ở nửa trên mục tiêu dính
+						if (super.fraImgSub2Eff != null && super.fraImgSub2Eff.nFrame > 0)
+						{
+							super.fraImgSub2Eff.drawFrame(0, target.x, targetUpperY, 0, 3, g);
+						}
 
-							// Mes Tách Tim: Authentic Beating Heart Cube extracted & floating in front of target's chest (super.fraImgSub4Eff: 224, 22x28, 5 frames)
-							if (super.f >= 8 && super.f <= 50 && super.fraImgSub4Eff != null && super.fraImgSub4Eff.nFrame > 0)
-							{
-								int heartFrame = 1 + (((super.f - 8) / 3) % 4); // Frame 1..4: Authentic beating heart animation inside crystal cube
-								int heartX = target.x + (super.Dir == 2 ? 18 : -18);
-								int heartY = targetCenterY - 4;
-								super.fraImgSub4Eff.drawFrame(heartFrame, heartX, heartY, 0, 3, g);
-							}
+						// 358: Vết chém nhỏ ngẫu nhiên trên mục tiêu
+						if (super.fraImgSub4Eff != null && super.fraImgSub4Eff.nFrame > 0 && super.f >= 4 && super.f <= 56)
+						{
+							int slashF = (super.f / 2) % super.fraImgSub4Eff.nFrame;
+							int seed = (k * 13 + super.f * 17);
+							int offX = (seed % 25) - 12;
+							int offY = ((seed / 3) % 21) - 10;
+							int trans = (seed % 2 == 0) ? 0 : 2;
+							int targetCenterY = targetFeetY - (targetH / 2);
+							super.fraImgSub4Eff.drawFrame(slashF, target.x + offX, targetCenterY + offY, trans, 3, g);
 						}
 					}
 				}
 			}
 		}
 
-		// Paint Set 13: Dai Phat Song Xung Kich - Sengoku Daibutsu 8-Layer Modular Composition
-		if (setId == 13)
+		// ─── setId 12: Phượng Hoàng Bất Tử Bộc Phá _X (Marco Blue Phoenix Climax) — PAINT ───
+		if (setId == 12)
 		{
-			FrameImage[] parts = (s_ttFrames != null && s_ttFrames.length > 13) ? s_ttFrames[13] : null;
-			if (parts != null && parts.length >= 12)
+			FrameImage[] p12 = s_ttFrames[12];
+			if (p12 != null && p12.length >= 12)
 			{
-				int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
-				int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
-				int dirTrans = (super.Dir == 2) ? 0 : 2;
-				int facingSign = (super.Dir == 2) ? 1 : -1;
+				int facingSign = (this.phoenixTargetX >= this.phoenixOrigX) ? 1 : -1;
+				int pDir = (facingSign == 1) ? 2 : 0;
 
-				// Determine Impact Epicenter
-				int impactX = super.toX;
-				int impactY = super.toY;
-				if (impactX == 0 && impactY == 0)
+				// ─── LỚP HẠT PARTICLES DƯỚI (VecSubEff: lông vũ & tàn lửa) ───
+				if (this.VecSubEff != null)
 				{
-					impactX = casterX + facingSign * 160;
-					impactY = casterY - 15;
-				}
-				if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
-				{
-					Object_Effect_Skill tInfo0 = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(0);
-					if (tInfo0 != null)
+					for (int i = 0; i < this.VecSubEff.size(); i++)
 					{
-						MainObject t0 = MainObject.get_Object((int)tInfo0.ID, (byte)tInfo0.tem);
-						if (t0 != null && !t0.isDie && t0.Hp > 0 && !t0.isRemove)
+						Point p = (Point)this.VecSubEff.elementAt(i);
+						if (p != null && p.f < p.fRe)
 						{
-							impactX = t0.x;
-							impactY = t0.y - (t0.hOne / 2);
+							if (p.subType == 0 && p12[9] != null && p12[9].nFrame > 0)
+							{
+								// Sacred Rebirth Feathers (224, 22x28, 5f)
+								int featherF = (p.f / 3) % p12[9].nFrame;
+								p12[9].drawFrame(featherF, p.x, p.y, p.color, 3, g);
+							}
+							else if (p12[8] != null && p12[8].nFrame > 0)
+							{
+								// Blue Ground Fire Sparks (241, 40x27, 2f)
+								int sparkF = (p.f / 2) % p12[8].nFrame;
+								p12[8].drawFrame(sparkF, p.x, p.y, p.color, 3, g);
+							}
 						}
 					}
 				}
 
-				// LAYER 0 (Bottom): Ground Seismic Shock & Dust (PART_07 - parts[6])
-				if (super.f >= 10 && super.f <= 28 && parts[6] != null)
+				// ─── GIAI ĐOẠN 1: TỤ KHÍ & THỨC TỈNH (f = 4..16) ───
+				if (super.f >= 4 && super.f < 18)
 				{
-					int dustFrame = Math.min(3, (super.f - 10) / 4);
-					int dustX = casterX + facingSign * (40 + (super.f - 10) * 8);
-					parts[6].drawFrame(dustFrame, dustX, casterY + 4, dirTrans, 33, g);
+					int castF = super.f - 4; // 0..13
+
+					// Caster Aura (p12[0]: 474, 120x100, 8f, anchor 33)
+					if (p12[0] != null && p12[0].nFrame > 0)
+					{
+						int auraF = (castF / 2) % p12[0].nFrame;
+						p12[0].drawFrame(auraF, this.phoenixOrigX, this.phoenixOrigY, pDir, 33, g);
+					}
+
+					// Awakening Phoenix Silhouette behind Caster (p12[1]: 475, 240x180, 8f, anchor 33)
+					if (p12[1] != null && p12[1].nFrame > 0 && castF >= 2)
+					{
+						int awkF = ((castF - 2) / 2) % p12[1].nFrame;
+						p12[1].drawFrame(awkF, this.phoenixOrigX + (facingSign * 10), this.phoenixOrigY - 20, pDir, 33, g);
+					}
+
+					// Swirling Solar Blue Flame Core (p12[6]: 243, 36x39)
+					if (p12[6] != null)
+					{
+						p12[6].drawFrame(0, this.phoenixOrigX, this.phoenixOrigY - 25, 0, 3, g);
+					}
 				}
 
-				// LAYER 1: Giant Daibutsu Avatar & Grand Halo (PART_01 - parts[0]) - 100x120px (3x player!)
-				if (super.f <= 26 && parts[0] != null)
+				// ─── GIAI ĐOẠN 2: PHƯỢNG HOÀNG PHI THIÊN PROJECTILE (f = 16..34) ───
+				if (super.f >= 16 && super.f <= 34)
 				{
-					int avatarFrame = (super.f < 6) ? 0 : ((super.f < 14) ? 1 : ((super.f < 22) ? 2 : 3));
-					parts[0].drawFrame(avatarFrame, casterX, casterY - 55, dirTrans, 3, g);
+					int t = super.f - 16; // 0..18
+					int totalT = 18;
+
+					// Interpolation Parabol từ phoenixOrigX/Y tới phoenixTargetX/Y
+					int curX = this.phoenixOrigX + (this.phoenixTargetX - this.phoenixOrigX) * t / totalT;
+					int linearY = (this.phoenixOrigY - 25) + ((this.phoenixTargetY - 15) - (this.phoenixOrigY - 25)) * t / totalT;
+					// Parabola arc: bay vút lên rồi cắm xuống: 4 * h * (t / totalT) * (1 - t / totalT)
+					int arcH = 45;
+					int curY = linearY - (4 * arcH * t * (totalT - t)) / (totalT * totalT);
+
+					// Ground Shadow (p12[10]: 272, 50x24)
+					if (p12[10] != null)
+					{
+						p12[10].drawFrame(0, curX, this.phoenixOrigY + 2, 0, 3, g);
+					}
+
+					// Flame Shockwave trail behind bird (p12[7]: 242, 49x28)
+					if (p12[7] != null && p12[7].nFrame > 0 && t % 3 == 0)
+					{
+						p12[7].drawFrame((t / 3) % p12[7].nFrame, curX - facingSign * 35, curY + 10, pDir, 3, g);
+					}
+
+					// Phượng Hoàng Phi Thiên Projectile (p12[2]: 476, 180x80, 8f, anchor 3)
+					if (p12[2] != null && p12[2].nFrame > 0)
+					{
+						int projF = (t / 2) % p12[2].nFrame;
+						p12[2].drawFrame(projF, curX, curY, pDir, 3, g);
+					}
+
+					// Solar Blue Flame Core in projectile center (p12[6]: 243, 36x39)
+					if (p12[6] != null)
+					{
+						p12[6].drawFrame(0, curX, curY, 0, 3, g);
+					}
 				}
 
-				// LAYER 2: Shockwave Rings & Dissipation (parts[4], parts[5], parts[11])
-				// Progressive Traveling Shockwave (PART_05 - parts[4]): Small -> Medium -> Large -> Huge
-				if (super.f >= 12 && super.f <= 21 && parts[4] != null)
+				// ─── GIAI ĐOẠN 3: CLIMAX IMPACT _X (f = 32..48) ───
+				if (super.f >= 32 && super.f <= 48)
 				{
-					int startX = casterX + facingSign * 50;
+					int impAge = super.f - 32; // 0..16
+
+					// Ground Shockwave Ring (p12[7]: 242, 49x28, 2f)
+					if (p12[7] != null && p12[7].nFrame > 0 && impAge <= 12)
+					{
+						int ringF = (impAge / 2) % p12[7].nFrame;
+						p12[7].drawFrame(ringF, this.phoenixTargetX - 35, this.phoenixTargetY + 5, 0, 3, g);
+						p12[7].drawFrame((ringF + 1) % p12[7].nFrame, this.phoenixTargetX + 35, this.phoenixTargetY + 5, 2, 3, g);
+					}
+
+					// Ground Fire Radiating (p12[8]: 241, 40x27, 2f)
+					if (p12[8] != null && p12[8].nFrame > 0 && impAge <= 14)
+					{
+						int fireF = (impAge / 2) % p12[8].nFrame;
+						p12[8].drawFrame(fireF, this.phoenixTargetX, this.phoenixTargetY + 4, 0, 3, g);
+						p12[8].drawFrame((fireF + 1) % p12[8].nFrame, this.phoenixTargetX - 60, this.phoenixTargetY + 4, 0, 3, g);
+						p12[8].drawFrame((fireF + 1) % p12[8].nFrame, this.phoenixTargetX + 60, this.phoenixTargetY + 4, 2, 3, g);
+					}
+
+					// Lam Hỏa Đại Bộc Phá _X Impact (p12[3]: 477, 240x240, 10f, anchor 3)
+					if (p12[3] != null && p12[3].nFrame > 0)
+					{
+						int impF = impAge;
+						if (impF >= p12[3].nFrame) impF = p12[3].nFrame - 1;
+						p12[3].drawFrame(impF, this.phoenixTargetX, this.phoenixTargetY - 40, pDir, 3, g);
+					}
+
+					// Starburst Sparks & Flash (p12[11]: 104, 30x30)
+					if (p12[11] != null && impAge <= 8)
+					{
+						int sparkF = (impAge / 2) % 3;
+						p12[11].drawFrame(sparkF, this.phoenixTargetX - 35, this.phoenixTargetY - 60, 0, 3, g);
+						p12[11].drawFrame((sparkF + 1) % 3, this.phoenixTargetX + 35, this.phoenixTargetY - 60, 0, 3, g);
+					}
+				}
+
+				// ─── GIAI ĐOẠN 4: TUNG CÁNH PHƯỢNG HOÀNG FINISHER (f = 40..64) ───
+				if (super.f >= 40 && super.f <= 64)
+				{
+					int wingAge = super.f - 40; // 0..24
+
+					// Finisher Wings Sweep (p12[4]: 478, 280x200, 12f, anchor 33)
+					if (p12[4] != null && p12[4].nFrame > 0)
+					{
+						int wingF = wingAge / 2;
+						if (wingF >= p12[4].nFrame) wingF = p12[4].nFrame - 1;
+						p12[4].drawFrame(wingF, this.phoenixTargetX, this.phoenixTargetY, pDir, 33, g);
+					}
+
+					// Swirling Solar Core in chest of Wings (p12[6]: 243, 36x39)
+					if (p12[6] != null && wingAge <= 16)
+					{
+						p12[6].drawFrame(0, this.phoenixTargetX, this.phoenixTargetY - 50, 0, 3, g);
+					}
+				}
+
+				// ─── GIAI ĐOẠN 5: CỘT LAM HỎA THIÊU ĐỐT TRÊN MỤC TIÊU (f = 46..66) ───
+				if (super.f >= 46 && super.f <= 66)
+				{
+					int geyAge = super.f - 46; // 0..20
+					if (p12[5] != null && p12[5].nFrame > 0)
+					{
+						int geyF = (geyAge / 2);
+						if (geyF >= p12[5].nFrame) geyF = p12[5].nFrame - 1;
+
+						if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+						{
+							for (int k = 0; k < super.vecObjsBeFire.size() && k < 5; k++)
+							{
+								Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+								if (tInfo == null) continue;
+								MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+								if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+								if (Math.abs(target.x - this.phoenixTargetX) <= 140)
+								{
+									p12[5].drawFrame(geyF, target.x, target.y, 0, 33, g);
+								}
+							}
+						}
+						else
+						{
+							p12[5].drawFrame(geyF, this.phoenixTargetX, this.phoenixTargetY, 0, 33, g);
+						}
+					}
+				}
+			}
+		}
+
+		// ─── Paint Set 9: Eustass Kid — Từ Trường Bộc Phá Đại Pháo _X (Straight Laser & Exploding Light Pillar) ───
+		if (setId == 9)
+		{
+			FrameImage[] p9 = (s_ttFrames != null && s_ttFrames.length > 9) ? s_ttFrames[9] : null;
+			if (p9 != null && p9.length >= 10)
+			{
+				int casterX = super.x;
+				int casterY = super.y;
+				int facingSign = (super.Dir == 2) ? 1 : -1;
+				int impactX = (this.kidCannonImpactX != 0) ? this.kidCannonImpactX : super.toX;
+				int impactY = (this.kidCannonImpactY != 0) ? this.kidCannonImpactY : super.toY;
+
+				int cannonBaseX = casterX + facingSign * 35;
+				int cannonBaseY = casterY - 26;
+
+				// 1. Vòng định vị từ tính dưới chân mục tiêu (f < 18)
+				if (super.f < 18 && p9[9] != null && p9[9].nFrame > 0)
+				{
+					p9[9].drawFrame(0, impactX, impactY + 4, 0, 3, g);
+				}
+
+				// 2. Cấu trúc nòng pháo kim loại (f < 32)
+				if (super.f < 32)
+				{
+					// Layer 0: Các vũ khí lớp sau (color == 0)
+					if (this.VecEff != null)
+					{
+						for (int i = 0; i < this.VecEff.size(); i++)
+						{
+							Point p = (Point)this.VecEff.elementAt(i);
+							if (p != null && p.color == 0)
+							{
+								paintKidWeapon(g, p, p9);
+							}
+						}
+					}
+
+					// Lõi plasma từ trường quay cuồng ở khóa nòng (p9[0]: 243)
+					if (super.f >= 8 && p9[0] != null && p9[0].nFrame > 0)
+					{
+						int coreF = (super.f / 2) % p9[0].nFrame;
+						p9[0].drawFrame(coreF, cannonBaseX - facingSign * 10, cannonBaseY, 0, 3, g);
+					}
+
+					// Tia sét hồ quang điện từ giữa các thanh ray (p9[1]: 92)
+					if (super.f >= 8 && p9[1] != null && p9[1].nFrame > 0)
+					{
+						for (int k = 0; k < 3; k++)
+						{
+							int arcX = cannonBaseX + facingSign * (k * 14);
+							int arcY = cannonBaseY + ((k % 2 == 0) ? -12 : 12);
+							int arcF = (super.f / 2 + k) % p9[1].nFrame;
+							p9[1].drawFrame(arcF, arcX, arcY, (k % 2 == 0 ? 0 : 2), 3, g);
+						}
+					}
+
+					// Layer 1: Các vũ khí lớp trước (color != 0)
+					if (this.VecEff != null)
+					{
+						for (int i = 0; i < this.VecEff.size(); i++)
+						{
+							Point p = (Point)this.VecEff.elementAt(i);
+							if (p != null && p.color != 0)
+							{
+								paintKidWeapon(g, p, p9);
+							}
+						}
+					}
+
+					// Vòng sóng nén họng pháo khi bắn (f: 14..32)
+					int muzzleX = cannonBaseX + facingSign * 45;
+					int muzzleY = cannonBaseY;
+					if (super.f >= 14 && super.f <= 32)
+					{
+						if (p9[3] != null && p9[3].nFrame > 0)
+						{
+							int ringF = ((super.f - 14) / 2) % p9[3].nFrame;
+							p9[3].drawFrame(ringF, muzzleX, muzzleY, 0, 3, g);
+						}
+					}
+				}
+				else
+				{
+					// Phase 5: Tán xạ các mảnh kim loại ra xa (f >= 32)
+					if (this.VecEff != null)
+					{
+						for (int i = 0; i < this.VecEff.size(); i++)
+						{
+							Point p = (Point)this.VecEff.elementAt(i);
+							if (p != null)
+							{
+								paintKidWeapon(g, p, p9);
+								if (super.f % 2 == 0 && p9[2] != null && p9[2].nFrame > 0)
+								{
+									p9[2].drawFrame(0, p.x, p.y - 4, 0, 3, g);
+								}
+							}
+						}
+					}
+				}
+
+				// 3. TIA LAZE BẮN THEO HƯỚNG MỤC TIÊU THẲNG TẮP (f: 14..32)
+				if (super.f >= 14 && super.f < 32)
+				{
+					int muzzleX = cannonBaseX + facingSign * 45;
+					int muzzleY = cannonBaseY;
+					int endX = impactX + facingSign * 35;
+					int endY = impactY;
+
+					int dx = endX - muzzleX;
+					int dy = endY - muzzleY;
+					int beamDist = (int)Math.sqrt(dx * dx + dy * dy);
+					if (beamDist <= 0) beamDist = 1;
+
+					// Vector pháp tuyến đơn vị tỉ lệ 1000
+					int perpX = (-dy * 1000) / beamDist;
+					int perpY = (dx * 1000) / beamDist;
+
+					// Độ dày chùm tia nở rộng rồi thu gọn
+					int beamW;
+					if (super.f < 18)
+					{
+						beamW = 8 + (super.f - 14) * 4;
+					}
+					else if (super.f < 26)
+					{
+						beamW = 24 + ((super.f % 2) * 4);
+					}
+					else
+					{
+						beamW = Math.max(2, 24 - (super.f - 26) * 4);
+					}
+
+					// Tầng 1: Hào quang điện từ xanh ngoại vi (0x007CEF)
+					g.setColor(0x007CEF);
+					for (int w = -beamW / 2; w <= beamW / 2; w += 2)
+					{
+						int ox = (w * perpX) / 1000;
+						int oy = (w * perpY) / 1000;
+						g.drawLine(muzzleX + ox, muzzleY + oy, endX + ox, endY + oy);
+					}
+
+					// Tầng 2: Chùm tia Neon Cyan từ tính (0x00E5FF)
+					int innerW = (beamW * 3) / 5;
+					if (innerW > 4)
+					{
+						g.setColor(0x00E5FF);
+						for (int w = -innerW / 2; w <= innerW / 2; w += 2)
+						{
+							int ox = (w * perpX) / 1000;
+							int oy = (w * perpY) / 1000;
+							g.drawLine(muzzleX + ox, muzzleY + oy, endX + ox, endY + oy);
+						}
+					}
+
+					// Tầng 3: Lõi năng lượng trắng sáng chói lòa (0xFFFFFF)
+					int coreW = Math.max(2, beamW / 3);
+					g.setColor(0xFFFFFF);
+					for (int w = -coreW / 2; w <= coreW / 2; w++)
+					{
+						int ox = (w * perpX) / 1000;
+						int oy = (w * perpY) / 1000;
+						g.drawLine(muzzleX + ox, muzzleY + oy, endX + ox, endY + oy);
+					}
+
+					// Vòng sóng nén lao dọc theo tia laze
+					if (p9[3] != null && p9[3].nFrame > 0)
+					{
+						for (int s = 0; s < 3; s++)
+						{
+							int progress = ((super.f * 50 + s * 333) % 1000);
+							int sx = muzzleX + (dx * progress) / 1000;
+							int sy = muzzleY + (dy * progress) / 1000;
+							p9[3].drawFrame((super.f + s) % p9[3].nFrame, sx, sy, 0, 3, g);
+						}
+					}
+				}
+
+				// 4. CỘT SÁNG NỔ ĐI TẠI MỤC TIÊU (f: 18..44)
+				if (super.f >= 18 && super.f < 44)
+				{
+					int pillarAge = super.f - 18;
+					int topY = impactY - 400;
+
+					int pillW;
+					if (pillarAge <= 3)
+					{
+						pillW = 28 + pillarAge * 14;
+					}
+					else if (pillarAge <= 11)
+					{
+						pillW = 70 - (pillarAge - 4) * 2;
+					}
+					else
+					{
+						pillW = Math.max(4, 56 - (pillarAge - 12) * 5);
+					}
+
+					int jitter = (GameCanvas.gameTick % 2) << 1;
+
+					// Tầng 1: Hào quang tím xanh đậm (0x0638E1)
+					g.setColor(0x0638E1);
+					g.fillRect(impactX - pillW / 2, topY, pillW, 400);
+
+					// Tầng 2: Xanh lam từ trường (0x007CEF)
+					if (pillW > 10)
+					{
+						g.setColor(0x007CEF);
+						g.fillRect(impactX - (pillW - 10) / 2, topY, pillW - 10, 400);
+					}
+
+					// Tầng 3: Laser Neon Cyan rực rỡ (0x00E5FF)
+					if (pillW > 20)
+					{
+						g.setColor(0x00E5FF);
+						g.fillRect(impactX - (pillW - 20) / 2, topY, pillW - 20, 400);
+					}
+
+					// Tầng 4: Ánh sáng trắng-cyan mềm mại (0xB1EDFC)
+					if (pillW > 32)
+					{
+						g.setColor(0xB1EDFC);
+						g.fillRect(impactX - (pillW - 32) / 2 + jitter, topY, (pillW - 32) - (jitter << 1), 400);
+					}
+
+					// Tầng 5: Lõi nhiệt hạch trắng tinh khiết (0xFCFFFE)
+					int coreW = Math.max(4, pillW - 46);
+					g.setColor(0xFCFFFE);
+					g.fillRect(impactX - coreW / 2 + jitter, topY, coreW, 400);
+
+					// Trụ cột quang năng bên trong cột sáng (p9[5]: 240, 30x73)
+					if (p9[5] != null && p9[5].nFrame > 0)
+					{
+						int flip = (pillarAge % 2 == 0) ? 0 : 2;
+						for (int seg = 0; seg < 5; seg++)
+						{
+							p9[5].drawFrame(0, impactX, impactY - seg * 73, flip, 33, g);
+						}
+					}
+
+					// Tia lửa ma sát mặt đất tại tâm nổ (p9[2]: 104)
+					if (pillarAge <= 8 && p9[2] != null && p9[2].nFrame > 0)
+					{
+						p9[2].drawFrame(pillarAge / 2, impactX, impactY - 12, 0, 3, g);
+					}
+				}
+			}
+		}
+
+		// ─── setId 10: Cổ Độc Phán Quyết Venom _X (Magellan Hell's Judgment) — CINEMATIC PAINT ───
+		if (setId == 10)
+		{
+			FrameImage[] p10 = (s_ttFrames != null && s_ttFrames.length > 10) ? s_ttFrames[10] : null;
+			if (p10 != null && p10.length >= 7)
+			{
+				int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+				int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+				int casterDir = super.Dir;
+
+				// Vị trí mục tiêu cố định 1 vị trí đã chốt từ lúc thi triển skill (không trôi theo quái)
+				int targetX = (this.VecEff != null && this.VecEff.size() > 0) ? ((Point)this.VecEff.elementAt(0)).x : super.toX;
+				int targetY = (this.VecEff != null && this.VecEff.size() > 0) ? ((Point)this.VecEff.elementAt(0)).y : super.toY;
+				if (targetX == 0 && targetY == 0)
+				{
+					targetX = casterX + (casterDir == 2 ? 140 : -140);
+					targetY = casterY;
+				}
+
+				// GROUND POOL EFFECT (subType == 1004): Vũng axit độc cố định 1 vị trí tại x, y mặt đất
+				if (this.subType == 1004)
+				{
+					if (super.f >= 35 && super.f <= 70 && p10[4] != null && p10[4].nFrame > 0)
+					{
+						int poolFrame = Math.min(p10[4].nFrame - 1, (super.f - 35) * p10[4].nFrame / 35);
+						p10[4].drawFrame(poolFrame, super.x, super.y, 0, 3, g);
+					}
+					return;
+				}
+
+				// 2. PHASE 1: CASTER AURA (f = 5..25) — Toxic aura around caster feet
+				if (super.f >= 5 && super.f <= 25 && p10[0] != null && p10[0].nFrame > 0)
+				{
+					int auraFrame = (super.f - 5) * p10[0].nFrame / 20;
+					if (auraFrame >= p10[0].nFrame) auraFrame = p10[0].nFrame - 1;
+					p10[0].drawFrame(auraFrame, casterX, casterY, 0, 33, g);
+				}
+
+				// 3. PHASE 2 & 3: HYDRA SUMMON (f = 10..30) — Colossal 3-headed poison dragon
+				if (super.f >= 10 && super.f <= 30 && p10[1] != null && p10[1].nFrame > 0)
+				{
+					int hydraFrame = Math.min(p10[1].nFrame - 1, (super.f - 10) * p10[1].nFrame / 20);
+					int hTrans = (casterDir == 2) ? 0 : 2;
+					p10[1].drawFrame(hydraFrame, casterX, casterY, hTrans, 33, g);
+				}
+
+				// LỚP 4: ẢO ẢNH PHANTOM MAGELLAN (f = 10..26) — Avatar chỉ huy đứng sát lưng Caster
+				if (super.f >= 10 && super.f <= 26 && p10[6] != null && p10[6].nFrame > 0)
+				{
+					int mPose = (super.f <= 17) ? 1 : 2; // Pose 1: Gồng trượng, Pose 2: Đâm trượng chỉ định
+					p10[6].drawFrame(mPose, casterX, casterY, (casterDir == 2 ? 0 : 2), 33, g);
+				}
+
+				// 5. PHASE 4: VENOM PROJECTILE TRAVEL (f = 24..35) — Flying poison dragon head
+				if (super.f >= 24 && super.f <= 35 && p10[2] != null && p10[2].nFrame > 0)
+				{
+					int pProg = super.f - 24; // 0..11
+					int startX = casterX;
+					int startY = casterY - 30;
+					int endY = targetY - 25;
+					int curX = startX + (targetX - startX) * pProg / 11;
+					int arc = CRes.getsin(pProg * 180 / 11) * 35 >> 10;
+					int curY = startY + (endY - startY) * pProg / 11 - arc;
+					int projFrame = (pProg * p10[2].nFrame / 12) % p10[2].nFrame;
+					int pTrans = (targetX >= startX) ? 0 : 2;
+					p10[2].drawFrame(projFrame, curX, curY, pTrans, 3, g);
+				}
+
+				// 6. PHASE 5: VENOM IMPACT X CATACLYSM (f = 35..48) — Giant purple/magenta X explosion
+				if (super.f >= 35 && super.f <= 48 && p10[3] != null && p10[3].nFrame > 0)
+				{
+					int impFrame = Math.min(p10[3].nFrame - 1, (super.f - 35) * p10[3].nFrame / 13);
+					p10[3].drawFrame(impFrame, targetX, targetY - 20, 0, 33, g);
+				}
+
+				// 7. PHASE 7: POISON BURST GEYSERS (f = 46..68) — Erupting skull geysers at each target
+				if (super.f >= 46 && super.f <= 68 && p10[5] != null && p10[5].nFrame > 0)
+				{
+					int burstFrame = Math.min(p10[5].nFrame - 1, (super.f - 46) * p10[5].nFrame / 22);
+					if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+					{
+						for (int k = 0; k < super.vecObjsBeFire.size() && k < 6; k++)
+						{
+							Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+							if (tInfo == null) continue;
+							MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+							if (tObj == null || tObj.isDie || tObj.Hp <= 0 || tObj.isRemove) continue;
+							int tBurstF = Math.min(p10[5].nFrame - 1, Math.max(0, burstFrame - (k % 2)));
+							p10[5].drawFrame(tBurstF, tObj.x, tObj.y, 0, 3, g);
+						}
+					}
+					else
+					{
+						p10[5].drawFrame(burstFrame, targetX, targetY, 0, 3, g);
+					}
+				}
+			}
+		}
+
+		// Paint Set 13: Đại Phật Sóng Xung Kích _X - Sengoku Daibutsu Authentic Golden Shockwave
+		if (setId == 13)
+		{
+			FrameImage[] parts = (s_ttFrames != null && s_ttFrames.length > 13) ? s_ttFrames[13] : null;
+			if (parts != null && parts.length >= 15)
+			{
+				int casterX = (this.daibutsuCasterX != 0) ? this.daibutsuCasterX : ((super.objFireMain != null) ? super.objFireMain.x : super.x);
+				int casterY = (this.daibutsuCasterY != 0) ? this.daibutsuCasterY : ((super.objFireMain != null) ? super.objFireMain.y : super.y);
+				int impactX = (this.daibutsuImpactX != 0) ? this.daibutsuImpactX : super.toX;
+				int impactY = (this.daibutsuImpactY != 0) ? this.daibutsuImpactY : super.toY;
+				int dirTrans = (super.Dir == 2) ? 0 : 2;
+				int facingSign = (super.Dir == 2) ? 1 : -1;
+
+				if (impactX == 0 && impactY == 0)
+				{
+					impactX = casterX + facingSign * 180;
+					impactY = casterY - 15;
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 1: Ground Seismic Crevasses & Earth Dust Upheaval
+				// ─────────────────────────────────────────────────────────────
+				// Ground crevasses under caster feet during windup (f <= 22, parts[9]: 246, 49x21)
+				if (super.f <= 22 && parts[9] != null)
+				{
+					parts[9].drawFrameNew((super.f / 2) % 4, casterX, casterY + 6, 0, 3, g);
+					parts[9].drawFrameNew(((super.f / 2) + 1) % 4, casterX + facingSign * 35, casterY + 6, dirTrans, 3, g);
+				}
+				// Ground crevasses under impact epicenter (f 20..44, parts[9]: 246, 49x21)
+				if (super.f >= 20 && super.f <= 44 && parts[9] != null)
+				{
+					int fissF = ((super.f - 20) / 2) % 4;
+					parts[9].drawFrameNew(fissF, impactX, impactY + 12, 0, 3, g);
+					parts[9].drawFrameNew((fissF + 1) % 4, impactX - 45, impactY + 10, 0, 3, g);
+					parts[9].drawFrameNew((fissF + 2) % 4, impactX + 45, impactY + 10, 2, 3, g);
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 2: Caster Daibutsu Manifestation: Shimmering Aura, Dharma Nimbus & Core
+				// ─────────────────────────────────────────────────────────────
+				// Golden Shimmering Transformation Aura (f <= 25, parts[13]: 267, 47x53)
+				if (super.f <= 25 && parts[13] != null)
+				{
+					int aFlip = (super.f % 2 == 0) ? dirTrans : (dirTrans == 0 ? 2 : 0);
+					int aJitterX = (super.f % 2 == 0) ? 1 : -1;
+					parts[13].drawFrame(0, casterX + aJitterX, casterY - 20, aFlip, 3, g);
+					parts[13].drawFrame(0, casterX, casterY - 20, dirTrans, 3, g);
+				}
+				// Sacred Dharma Wheel Nimbus (Pháp Luân Kim Quang) spinning smoothly behind caster (f <= 26, parts[4]: 357, 100x100)
+				if (super.f <= 26 && parts[4] != null)
+				{
+					int haloF = (super.f / 2) % 4;
+					int haloBobY = (CRes.getsin((super.f * 36) % 360) * 3) >> 10;
+					parts[4].drawFrameNew(haloF, casterX - facingSign * 10, casterY - 38 + haloBobY, 0, 3, g);
+				}
+				// Condensed Golden Solar Core in palm during windup (f <= 11, parts[6]: 174, 40x40)
+				if (super.f <= 11 && parts[6] != null)
+				{
+					int coreF = super.f % 8; // High-speed plasma spin (1 tick per frame)
+					int coreX = casterX + facingSign * (18 + (super.f * 6 / 11));
+					int coreY = casterY - 20;
+					parts[6].drawFrameNew(coreF, coreX, coreY, 0, 3, g);
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 3: Kim Cương Phật Chưởng Thrust & Shockwave Burst Snap (f 10..22)
+				// ─────────────────────────────────────────────────────────────
+				if (super.f >= 10 && super.f <= 22 && parts[0] != null)
+				{
+					int palmProgress = super.f - 10;
+					int palmOffset;
+					if (palmProgress <= 0) palmOffset = 0;
+					else if (palmProgress == 1) palmOffset = 24;
+					else if (palmProgress == 2) palmOffset = 50;
+					else if (palmProgress == 3) palmOffset = 68;
+					else palmOffset = Math.min(78, 68 + (palmProgress - 3) * 2);
+
+					int palmX = casterX + facingSign * (26 + palmOffset);
+					int palmY = casterY - 20;
+					int palmF = Math.min(3, palmProgress / 2);
+
+					// Dynamic Kinetic Ghost Trails (After-Images)
+					if (palmProgress >= 1 && palmProgress <= 6)
+					{
+						parts[0].drawFrame(Math.max(0, palmF - 1), palmX - facingSign * 16, palmY, dirTrans, 3, g);
+						parts[0].drawFrame(Math.max(0, palmF - 2), palmX - facingSign * 32, palmY, dirTrans, 3, g);
+					}
+					// Main Golden Palm Thrust Wave (parts[0]: 416, 78x40)
+					parts[0].drawFrame(palmF, palmX, palmY, dirTrans, 3, g);
+
+					// Palm Blast Burst Cone pulsing with rapid alternation (parts[7]: 335, 80x80)
+					if (parts[7] != null && super.f >= 11 && super.f <= 20)
+					{
+						int blastF = (super.f - 11) % 4;
+						parts[7].drawFrameNew(blastF, palmX + facingSign * 32, palmY, dirTrans, 3, g);
+					}
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 4: Progressive Traveling Kinetic Shockwave with Cubic Easing Out (f 12..21)
+				// ─────────────────────────────────────────────────────────────
+				if (super.f >= 12 && super.f <= 21 && parts[1] != null)
+				{
+					int startX = casterX + facingSign * 48;
 					int t = super.f - 12; // 0..9
-					int ringX = startX + ((impactX - startX) * t) / 9;
-					int ringY = (casterY - 22) + ((impactY - (casterY - 22)) * t) / 9;
-					int waveFrame = Math.min(3, t / 3);
-					parts[4].drawFrame(waveFrame, ringX, ringY, dirTrans, 3, g);
-				}
-				// Mega Impact Shockwave Ring (PART_06 - parts[5]): 130x110px!
-				if (super.f >= 20 && super.f <= 34 && parts[5] != null)
-				{
-					int megaFrame = (super.f == 20) ? 0 : ((super.f == 21) ? 1 : ((super.f <= 26) ? 2 : 3));
-					parts[5].drawFrame(megaFrame, impactX, impactY, 0, 3, g);
-				}
-				// Dissipation Shock Haze (PART_12 - parts[11]): 104x84px
-				if (super.f >= 26 && super.f <= 36 && parts[11] != null)
-				{
-					int dissFrame = Math.min(3, (super.f - 26) / 2);
-					parts[11].drawFrame(dissFrame, impactX, impactY, 0, 3, g);
-				}
+					// Cubic Ease-Out acceleration: 0%, 34%, 58%, 75%, 88%, 95%, 98%, 100%
+					int easeRatio;
+					if (t <= 0) easeRatio = 0;
+					else if (t == 1) easeRatio = 87;
+					else if (t == 2) easeRatio = 148;
+					else if (t == 3) easeRatio = 193;
+					else if (t == 4) easeRatio = 224;
+					else if (t == 5) easeRatio = 243;
+					else if (t == 6) easeRatio = 252;
+					else if (t == 7) easeRatio = 255;
+					else easeRatio = 256;
 
-				// LAYER 3: Divine Lotus Bloom (PART_09 - parts[8]): 88x80px
-				if (super.f >= 21 && super.f <= 33 && parts[8] != null)
-				{
-					int lotusFrame = Math.min(3, (super.f - 21) / 3);
-					parts[8].drawFrame(lotusFrame, impactX, impactY + 4, 0, 3, g);
-				}
+					int distX = impactX - startX;
+					int distY = impactY - (casterY - 20);
+					int ringX = startX + (distX * easeRatio) / 256;
+					int ringY = (casterY - 20) + (distY * easeRatio) / 256;
+					int waveJitter = (t % 2 == 0) ? 1 : -1;
+					int ringF = Math.min(3, t / 2);
 
-				// LAYER 4: Caster Palm Assembly (parts[1], parts[2], parts[3])
-				// Giant Buddha Palm: 72x64px
-				if (super.f <= 22)
-				{
-					int palmOffset = (super.f < 7) ? 0 : ((super.f < 15) ? ((super.f - 7) * 4) : 32);
-					int handX = casterX + facingSign * (26 + palmOffset);
-					int handY = casterY - 22;
-
-					if (parts[1] != null)
+					// 1. Leading Compression Arc Wave (parts[0]: 416)
+					if (parts[0] != null)
 					{
-						int pState = (super.f < 7) ? 0 : ((super.f < 14) ? 1 : ((super.f < 20) ? 2 : 3));
-						parts[1].drawFrame(pState, handX, handY, dirTrans, 3, g);
+						parts[0].drawFrame(ringF, ringX + facingSign * 24, ringY, dirTrans, 3, g);
 					}
-					// Condensed Palm Energy Core (PART_03 - parts[2]): 56x56px
-					if (super.f <= 14 && parts[2] != null && parts[2].nFrame > 0)
+
+					// 2. Primary Golden Shockwave Ring (parts[1]: 171, 153x84) with vibration
+					parts[1].drawFrame(ringF, ringX, ringY + waveJitter, dirTrans, 3, g);
+
+					// 3. Secondary Concentric Echo Ring trailing 24px behind
+					if (t >= 1)
 					{
-						int cFrame = (super.f / 3) % parts[2].nFrame;
-						parts[2].drawFrame(cFrame, handX + facingSign * 18, handY, 0, 3, g);
+						int echoX = ringX - facingSign * 24;
+						parts[1].drawFrame(Math.max(0, ringF - 1), echoX, ringY, dirTrans, 3, g);
 					}
-					// Palm Blast Cone (PART_04 - parts[3]): 88x64px
-					if (super.f >= 10 && super.f <= 20 && parts[3] != null)
+
+					// 4. Ground Elliptical Ring sweeping along floor (parts[3]: 394, 126x41)
+					if (parts[3] != null)
 					{
-						int bFrame = Math.min(3, (super.f - 10) / 2);
-						parts[3].drawFrame(bFrame, handX + facingSign * 42, handY, dirTrans, 3, g);
+						parts[3].drawFrame(t % 3, ringX, casterY + 2, 0, 3, g);
+					}
+					// 5. Space Distortion Wave vibrating atmosphere (parts[10]: 285, 111x90)
+					if (parts[10] != null)
+					{
+						int dFlip = (t % 2 == 0) ? dirTrans : (dirTrans == 0 ? 2 : 0);
+						parts[10].drawFrame((t * 2) % 3, ringX - facingSign * 10, ringY, dFlip, 3, g);
+					}
+					// 6. Ground Seismic Dust Upheaval Cascade sweeping directly under wave (parts[8]: 300, 80x25)
+					if (parts[8] != null)
+					{
+						parts[8].drawFrameNew((t * 2) % 3, ringX, casterY + 4, dirTrans, 33, g);
+					}
+					// 7. Starburst Sparks on Wave Crest (parts[12]: 104, 30x30)
+					if (parts[12] != null)
+					{
+						parts[12].drawFrame(t % 3, ringX + facingSign * 42, ringY - 18, 0, 3, g);
+						parts[12].drawFrame((t + 1) % 3, ringX + facingSign * 42, ringY + 18, 2, 3, g);
 					}
 				}
 
-				// LAYER 5: Radial Solar Light Spears (PART_08 - parts[7]): 110x110px
-				if (super.f >= 21 && super.f <= 30 && parts[7] != null)
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 5: Epicenter Cataclysm & Detonation at (impactX, impactY) (f 21..36)
+				// ─────────────────────────────────────────────────────────────
+				// Ground Elliptical Shockwave Ring (parts[3]: 394, 126x41)
+				if (super.f >= 20 && super.f <= 36 && parts[3] != null)
 				{
-					int spearFrame = Math.min(3, (super.f - 21) / 3);
-					parts[7].drawFrame(spearFrame, impactX, impactY, 0, 3, g);
+					int gF = ((super.f - 20) / 2) % 3;
+					parts[3].drawFrame(gF, impactX, impactY + 12, 0, 3, g);
 				}
 
-				// LAYER 6: Center Flash Core (PART_11 - parts[9]): 96x96px
-				if (super.f >= 21 && super.f <= 25 && parts[9] != null)
+				// Colossal Mega Shockwave Explosion (parts[2]: 453, 169x126) (f 21..34)
+				if (super.f >= 21 && super.f <= 34 && parts[2] != null)
 				{
-					int flashFrame = Math.min(3, super.f - 21);
-					parts[9].drawFrame(flashFrame, impactX, impactY, 0, 3, g);
+					int blastAge = super.f - 21;
+					int megaF = (blastAge < 3) ? 0 : ((blastAge < 7) ? 1 : 2);
+					int megaJitter = (super.f % 2 == 0) ? 1 : -1;
+					parts[2].drawFrame(megaF, impactX + megaJitter, impactY - 10, 0, 3, g);
+				}
+
+				// Radial Space Distortion Wave with Alternating Flip (parts[10]: 285, 111x90) (f 21..32)
+				if (super.f >= 21 && super.f <= 32 && parts[10] != null)
+				{
+					int distF = ((super.f - 21) / 2) % 3;
+					int distFlip = ((super.f - 21) % 2 == 0) ? 0 : 2;
+					parts[10].drawFrame(distF, impactX, impactY - 15, distFlip, 3, g);
+				}
+
+				// Blinding White-Gold Core Flash (parts[11]: 66, 75x55) (f 21..24)
+				if (super.f >= 21 && super.f <= 24 && parts[11] != null)
+				{
+					parts[11].drawFrame(0, impactX, impactY - 15, 0, 3, g);
 					if (super.vecObjsBeFire != null)
 					{
 						for (int k = 1; k < super.vecObjsBeFire.size(); k++)
@@ -23371,24 +26749,62 @@ public final class Effect_Skill extends MainEffect {
 								MainObject tObj = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
 								if (tObj != null && !tObj.isDie && tObj.Hp > 0 && !tObj.isRemove)
 								{
-									parts[9].drawFrame(flashFrame, tObj.x, tObj.y - tObj.hOne / 2, 0, 3, g);
+									parts[11].drawFrame(0, tObj.x, tObj.y - tObj.hOne / 2, 0, 3, g);
 								}
 							}
 						}
 					}
 				}
 
-				// LAYER 7 (Top): Sacred Golden Embers & Sparks (PART_10 - parts[10]): 64x64px
-				if (super.f >= 23 && super.f <= 36 && parts[10] != null && parts[10].nFrame > 0)
+				// Diamond Starburst Sparks 4-Way Detonation Expanding with Velocity (parts[12]: 104, 30x30) (f 22..35)
+				if (super.f >= 22 && super.f <= 35 && parts[12] != null)
 				{
-					int emberFrame = ((super.f - 23) / 3) % parts[10].nFrame;
-					parts[10].drawFrame(emberFrame, impactX, impactY - 15, 0, 3, g);
+					int spAge = super.f - 22;
+					int spDist = spAge * 5;
+					int spF = (spAge / 2) % 3;
+					parts[12].drawFrame(spF, impactX - 30 - spDist, impactY - 20 - spDist, 0, 3, g);
+					parts[12].drawFrame((spF + 1) % 3, impactX + 30 + spDist, impactY - 20 - spDist, 2, 3, g);
+					parts[12].drawFrame((spF + 2) % 3, impactX - 20 - spDist, impactY + 10 + spDist / 2, 0, 3, g);
+					parts[12].drawFrame(spF, impactX + 20 + spDist, impactY + 10 + spDist / 2, 2, 3, g);
+				}
+
+				// ─────────────────────────────────────────────────────────────
+				// LAYER 6: Divine Lotus Bloom & Sacred Dharma Wheel Resonance (f 21..44)
+				// ─────────────────────────────────────────────────────────────
+				// Sacred Dharma Wheel Mandala Nimbus at Epicenter (parts[4]: 357, 100x100) (f 21..38)
+				if (super.f >= 21 && super.f <= 38 && parts[4] != null)
+				{
+					int wheelF = ((super.f - 21) / 2) % 4;
+					parts[4].drawFrameNew(wheelF, impactX, impactY - 25, 0, 3, g);
+				}
+
+				// Divine Lotus Bloom Khai Hoa Kim Liên (parts[5]: 315, 77x54) (f 21..44)
+				// Full biological blooming stages 0..5 (bud -> opening -> bloom -> full radiance)
+				if (super.f >= 21 && super.f <= 44 && parts[5] != null)
+				{
+					int lotusF = Math.min(5, (super.f - 21) / 4);
+					parts[5].drawFrameNew(lotusF, impactX, impactY + 6, 0, 3, g);
+				}
+
+				// 6 Sacred Golden Nirvana Embers with Multi-Harmonic Sinusoidal Sway (parts[14]: 224, 22x28) (f 24..45)
+				if (super.f >= 24 && super.f <= 45 && parts[14] != null)
+				{
+					for (int e = 0; e < 6; e++)
+					{
+						int eAge = super.f - 24 + e * 3;
+						int driftUp = eAge * 3;
+						int angle = (eAge * 28 + e * 60) % 360;
+						int swayX = (CRes.getsin(angle) * (14 + (e % 3) * 4)) >> 10;
+						int embF = (eAge / 2) % 5;
+						int eBaseX = impactX - 50 + e * 20;
+						parts[14].drawFrameNew(embF, eBaseX + swayX, impactY - 15 - driftUp, (e % 2 == 0 ? 0 : 2), 3, g);
+					}
 				}
 			}
 		}
 
 		// Paint caster charging aura during initial casting frames
-		if (super.objFireMain != null && super.f < 15 && setId != 7 && setId != 8 && setId != 13)
+		if (super.objFireMain != null && super.f < 15 && setId != 3 && setId != 5 && setId != 6 && setId != 7 && setId != 8 && setId != 9 && setId != 10 && setId != 12 && setId != 13)
 		{
 			if (setId == 1 && super.fraImgSub2Eff != null && super.fraImgSub2Eff.nFrame > 0)
 			{
@@ -23402,7 +26818,7 @@ public final class Effect_Skill extends MainEffect {
 		}
 
 		// Paint active flying projectiles with directional orientation & glowing dual layer
-		if (this.VecSubEff != null && setId != 2 && setId != 7 && setId != 8 && setId != 13)
+		if (this.VecSubEff != null && setId != 2 && setId != 3 && setId != 5 && setId != 6 && setId != 7 && setId != 8 && setId != 9 && setId != 10 && setId != 12 && setId != 13 && setId != 16)
 		{
 			for (int i = 0; i < this.VecSubEff.size(); i++)
 			{
@@ -23432,4 +26848,860 @@ public final class Effect_Skill extends MainEffect {
 		{
 		}
 	}
+
+	private void paintKidWeapon(mGraphics g, Point p, FrameImage[] p9)
+	{
+		if (p == null || g == null) return;
+		boolean drawn = false;
+		try
+		{
+			MainImage m = ObjectData.getImageAll((short)p.subType, ObjectData.hashImageItem, (short)3000);
+			if (m != null && m.img != null && m.img.image != null)
+			{
+				if (m.AB <= 0 || m.AC <= 0)
+				{
+					m.AA();
+				}
+				if (m.AB > 0 && m.AC > 0)
+				{
+					g.drawRegion(m.img, 0, 0, m.AB, m.AC, p.frame % 8, p.x, p.y, 3);
+					drawn = true;
+				}
+			}
+		}
+		catch (Exception ignored)
+		{
+		}
+
+		// Fallback to authentic metallic blade glint (p9[8]: 358, 51x22)
+		if (!drawn && p9 != null && p9.length > 8 && p9[8] != null && p9[8].nFrame > 0)
+		{
+			p9[8].drawFrame(0, p.x, p.y, p.frame % 4, 3, g);
+		}
+	}
+
+	// =========================================================================
+	// DOKU DOKU NO MI DEVIL FRUIT SYSTEM (SKILL 4017, 4018, 4019)
+	// ID 4017: Cổ Độc Phán Quyết (Y hệt 4010 Thần Trang Magellan)
+	// ID 4018: Bách Độc Vũ Mưa Độc Tách Tầng Chuẩn Xịn (Decoupled Toxic Rain)
+	// ID 4019: Độc Long Thức Tỉnh (Thuần Gồng Buff Siêu Tốc 0.2s Frame 6)
+	// =========================================================================
+
+	private static FrameImage s_imgRainDrop;      // ID 474 (32x48, 6f) - Mưa Độc Long giáng xuống
+	private static FrameImage s_imgRainSplash;    // ID 475 (64x36, 6f) - Bộc phá tiếp đất
+	private static FrameImage s_imgPoisonBubbles; // ID 476 (30x30, 8f) - Khí độc dập dềnh
+	private static FrameImage s_imgAuraDragon;    // ID 477 (100x120, 8f) - Song Long Hỏa Trụ sau lưng Caster
+	private static FrameImage s_imgAcidPool4018;  // ID 478 (110x50, 6f) - Vũng axit mặt đất dưới chân mục tiêu
+
+	private static void ensureVenomSkillFrames()
+	{
+		ensureVenomSkillFrames(false);
+	}
+
+	private static void ensureVenomSkillFrames(boolean forceLoad)
+	{
+		if (forceLoad || s_imgRainDrop == null || s_imgRainDrop.nFrame != 6)
+		{
+			s_imgRainDrop = new FrameImage(474, 6);
+		}
+		if (forceLoad || s_imgRainSplash == null || s_imgRainSplash.nFrame != 6)
+		{
+			s_imgRainSplash = new FrameImage(475, 6);
+		}
+		if (forceLoad || s_imgPoisonBubbles == null || s_imgPoisonBubbles.nFrame != 8)
+		{
+			s_imgPoisonBubbles = new FrameImage(476, 8);
+		}
+		if (forceLoad || s_imgAuraDragon == null || s_imgAuraDragon.nFrame != 8)
+		{
+			s_imgAuraDragon = new FrameImage(477, 8);
+		}
+		if (forceLoad || s_imgAcidPool4018 == null || s_imgAcidPool4018.nFrame != 6)
+		{
+			s_imgAcidPool4018 = new FrameImage(478, 6);
+		}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// SKILL 4018: BÁCH ĐỘC VŨ (VENOM DRAGON RAIN & ACID POOL UNDER TARGETS)
+	// ─────────────────────────────────────────────────────────────────────────
+
+	private void createVenomRain4018()
+	{
+		this.VecEff = new mVector();
+		this.VecSubEff = new mVector();
+		this.isSpawnedPool = false; // Flag: vũng độc ngầm chưa tạo
+		ensureVenomSkillFrames(true);
+		super.fRemove = 65;
+		super.levelPaint = 0; // TẦNG TRÊN (0): GIỌT MƯA VÀ IMPACT TIẾP ĐẤT RƠI TRÊN MẶT ĐẤT & TRÊN MỤC TIÊU
+
+		// 1. Ưu tiên tuyệt đối ghim chuẩn giữa mục tiêu đang chọn (GameScreen.objFocus)
+		MainObject target = null;
+		if (GameScreen.objFocus != null && !GameScreen.objFocus.isDie && !GameScreen.objFocus.isRemove && GameScreen.objFocus != super.objFireMain)
+		{
+			target = GameScreen.objFocus;
+		}
+		else if (this.objBeFireMain != null && this.objBeFireMain != super.objFireMain && !this.objBeFireMain.isDie && !this.objBeFireMain.isRemove)
+		{
+			target = this.objBeFireMain;
+		}
+		else if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+		{
+			for (int i = 0; i < super.vecObjsBeFire.size(); i++)
+			{
+				Object_Effect_Skill o = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
+				if (o != null)
+				{
+					MainObject mob = MainObject.get_Object((int)o.ID, (byte)o.tem);
+					if (mob != null && !mob.isDie && !mob.isRemove && mob != super.objFireMain)
+					{
+						target = mob;
+						break;
+					}
+				}
+			}
+		}
+
+		if (target != null)
+		{
+			this.objBeFireMain = target;
+			super.toX = target.x;
+			super.toY = target.y;
+			if (super.objFireMain != null)
+			{
+				super.Dir = (byte)((target.x >= super.objFireMain.x) ? 2 : 0);
+				super.objFireMain.type_left_right = super.Dir;
+				super.objFireMain.Dir = super.Dir;
+			}
+		}
+
+		// Xác định vị trí mặt đất chuẩn dưới chân mục tiêu (bỏ dyShadow âm làm trôi cao)
+		int groundY = (target != null) ? target.y : ((super.toY != 0) ? super.toY : super.y);
+		int mainTargetX = (target != null) ? target.x : ((super.toX != 0) ? super.toX : (super.x + ((super.Dir == 2) ? 140 : -140)));
+		super.toX = mainTargetX;
+		super.toY = groundY;
+
+		// 1. Tạo bão Mưa Độc Long dày đặc (474: 36x48) rơi liên tục từ f=3 đến f=50 (70 giọt phân bố ngẫu nhiên cách đều, sinh động)
+		int totalDrops = 70;
+		for (int i = 0; i < totalDrops; i++)
+		{
+			Point drop = new Point();
+			// Khởi hành rải đều liên tục từ f=3 đến f=48 với độ lệch ngẫu nhiên
+			int fStart = 3 + (i * 45 / totalDrops) + ((i * 3) % 4 - 1);
+			if (fStart < 3) fStart = 3;
+			int fallDur = 6 + (i % 6); // 6..11 frames rơi vũ bão, tốc độ đa dạng sinh động
+			drop.fSmall = fStart;
+			drop.fRe = fStart + fallDur;
+
+			// Tọa độ xuất phát trên cao theo góc chéo tự nhiên ~48..56 độ:
+			int spawnDistY = 175 + ((i * 19) % 55); // 175..229 px
+			int spawnAngleRatio = 125 + ((i * 7) % 30); // 125..154
+			int spawnDistX = spawnDistY * spawnAngleRatio / 180;
+			drop.dis = (super.Dir == 2) ? -spawnDistX : spawnDistX;
+			drop.vy = spawnDistY;
+
+			// Điểm tiếp đất trải rộng ngẫu nhiên khắp khu vực đầm lầy độc (-115..+115, -16..+18)
+			int landOffsetX = -115 + ((i * 53 + 17) % 231) + ((i * 5) % 9 - 4);
+			int landOffsetY = -16 + ((i * 23 + 11) % 35) + ((i * 3) % 7 - 3);
+			drop.color = landOffsetX;
+			drop.frame = landOffsetY;
+			drop.x2 = mainTargetX + drop.color;
+			drop.y2 = groundY + drop.frame;
+			drop.obj = null; // CỐ ĐỊNH 1 VỊ TRÍ TRÊN MẶT ĐẤT, KHÔNG TRÔI THEO QUÁI
+			drop.f = 0; // Đếm frame hiệu ứng bắn tóe tiếp đất (rain_splash)
+			drop.AW = false; // false: đang rơi, true: tiếp đất bộc phá
+			this.VecSubEff.addElement(drop);
+		}
+
+		// 2. Bong bóng độc (476: 30x30) dập dềnh trên khắp mặt hồ vũng độc (16 bóng trải rộng)
+		int[] bXOffsets = new int[] { -82, -68, -52, -38, -25, -12, 0, 14, 26, 38, 52, 66, 80, -45, 18, 58 };
+		int[] bYOffsets = new int[] { 3, 9, -7, 6, -9, 8, 2, -6, 9, 3, -8, 7, 2, 11, -5, 5 };
+		for (int b = 0; b < 16; b++)
+		{
+			Point bubble = new Point();
+			int bxOff = bXOffsets[b] + ((b * 5) % 9 - 4);
+			int byOff = bYOffsets[b] + ((b * 3) % 7 - 3);
+			bubble.x = mainTargetX + bxOff;
+			bubble.y = groundY + byOff;
+			bubble.x2 = bubble.x;
+			bubble.y2 = bubble.y;
+			bubble.color = bxOff;
+			bubble.subType = byOff;
+			bubble.obj = null; // CỐ ĐỊNH 1 VỊ TRÍ TRÊN MẶT ĐẤT, KHÔNG TRÔI THEO QUÁI
+			bubble.fSmall = 10 + (b * 2); // Nổi lên dập dềnh so le
+			bubble.fRe = bubble.fSmall + 46;
+			bubble.f = 0;
+			bubble.frame = (b * 3) % 8;
+			this.VecEff.addElement(bubble);
+		}
+
+		this.addSound(10);
+	}
+
+	private void updateVenomRain4018()
+	{
+		// Xử lý Companion Sub-effect: CỤM NHIỀU VŨNG ĐỘC DƯỚI CHÂN MỤC TIÊU (subType == 1008, levelPaint == -1)
+		// CỐ ĐỊNH 100% VỊ TRÍ MẶT ĐẤT ĐÃ TẠO, KHÔNG DI CHUYỂN THEO QUÁI
+		if (this.subType == 1008)
+		{
+			if (super.f >= super.fRemove)
+			{
+				this.removeEff();
+			}
+			return;
+		}
+
+		// Âm thanh và rung chấn ở từng đợt giáng thế của mưa độc long
+		if (super.f == 8)
+		{
+			this.addSound(10);
+		}
+		else if (super.f == 12 || super.f == 18 || super.f == 24 || super.f == 30 || super.f == 36 || super.f == 42 || super.f == 48)
+		{
+			this.addSound(51);
+			LoadMap.timeVibrateScreen = 4;
+			if (super.vecObjsBeFire != null)
+			{
+				for (int k = 0; k < super.vecObjsBeFire.size() && k < 4; k++)
+				{
+					Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+					if (tInfo == null) continue;
+					MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (target == null || target.isDie || target.Hp <= 0 || target.isRemove) continue;
+					this.setAva(2, target);
+					target.dy = -3;
+				}
+			}
+		}
+
+		// TẠO CỤM NHIỀU VŨNG ĐỘC NGẪU NHIÊN CÁCH NHAU ĐẸP MẮT ĐAN XEN DƯỚI CHÂN MỤC TIÊU KHI GIỌT ĐẦU TIẾP ĐẤT (f >= 10)
+		// ĐẶC BIỆT: levelPaint = -1 (LỚP TILE MAP, DƯỚI TẤT CẢ CHAR VÀ QUÁI - CHAR VÀ QUÁI Ở TRÊN)
+		if (super.f >= 10 && !this.isSpawnedPool)
+		{
+			this.isSpawnedPool = true;
+			int poolX = super.toX;
+			int poolY = super.toY + 4; // Hạ thấp 4px sát chân/bóng đất
+			Effect_Skill groundPool = new Effect_Skill();
+			groundPool.typeEffect = 4018;
+			groundPool.subType = 1008; // 1008 = Ground acid pool cluster companion
+			groundPool.levelPaint = -1; // VẼ TRÊN LỚP TILE MAP, DƯỚI TẤT CẢ MỤC TIÊU & NHÂN VẬT!
+			groundPool.x = poolX;
+			groundPool.y = poolY;
+			groundPool.toX = poolX;
+			groundPool.toY = poolY;
+			groundPool.Dir = super.Dir;
+			groundPool.objFireMain = (super.objFireMain != null) ? super.objFireMain : GameScreen.player;
+			groundPool.objBeFireMain = this.objBeFireMain;
+			groundPool.VecEff = this.VecEff;
+			groundPool.VecSubEff = new mVector();
+
+			// Cấu hình cụm 12 vũng độc ngẫu nhiên, cách nhau thoáng, không trùng lặp, mở rộng thành đầm lầy độc:
+			// { offsetX, offsetY, trans (0 hoặc 2), phase (0..5), delayFrame (fSmall) }
+			int[][] poolConfigs = new int[][]
+			{
+				new int[] { 0, 0, 0, 0, 0 },     // Vũng 0: Tâm chính
+				new int[] { -32, 5, 2, 2, 1 },    // Vũng 1: Bên trái gần
+				new int[] { 35, -3, 0, 4, 2 },    // Vũng 2: Bên phải gần
+				new int[] { 10, 8, 2, 1, 3 },     // Vũng 3: Phía trước trung tâm
+				new int[] { -12, -7, 0, 3, 4 },   // Vũng 4: Phía sau trung tâm
+				new int[] { -60, -4, 2, 5, 5 },   // Vũng 5: Cánh trái trung bình
+				new int[] { 62, 6, 0, 0, 6 },     // Vũng 6: Cánh phải trung bình
+				new int[] { -86, 5, 2, 3, 8 },    // Vũng 7: Rìa trái xa
+				new int[] { 88, -4, 0, 1, 9 },    // Vũng 8: Rìa phải xa
+				new int[] { -46, 11, 0, 4, 10 },  // Vũng 9: Vạt dưới trái
+				new int[] { 44, -10, 2, 2, 11 },  // Vũng 10: Vạt trên phải
+				new int[] { -15, 13, 2, 5, 12 }   // Vũng 11: Mép tiền tuyến
+			};
+			for (int pIdx = 0; pIdx < poolConfigs.length; pIdx++)
+			{
+				Point p = new Point();
+				p.color = poolConfigs[pIdx][0] + CRes.random_Am_0(6);   // offsetX ngẫu nhiên
+				p.subType = poolConfigs[pIdx][1] + CRes.random_Am_0(3); // offsetY ngẫu nhiên
+				p.dis = poolConfigs[pIdx][2];                           // trans (0=bình thường, 2=lật ngang)
+				p.frame = poolConfigs[pIdx][3];                         // phase offset (bọt khí không trùng nhịp)
+				p.fSmall = poolConfigs[pIdx][4];                        // delay frame xuất hiện lan tỏa
+				groundPool.VecSubEff.addElement(p);
+			}
+
+			groundPool.f = 0;
+			groundPool.fRemove = 55; // 10 + 55 = 65 (kết thúc cùng lúc với skill)
+			GameScreen.VecEffect.addElement(groundPool);
+		}
+
+		// Cập nhật giọt mưa độc rơi và bộc phá tiếp đất
+		if (this.VecSubEff != null)
+		{
+			for (int i = 0; i < this.VecSubEff.size(); i++)
+			{
+				Point drop = (Point)this.VecSubEff.elementAt(i);
+				if (drop == null || super.f < drop.fSmall) continue;
+
+				if (super.f >= drop.fRe)
+				{
+					drop.AW = true;
+					drop.f++; // Đếm frame hoạt ảnh bắn tóe (rain_splash)
+				}
+			}
+		}
+
+		// Cập nhật bong bóng độc dập dềnh trên mặt vũng độc (không bay vọt lên trời)
+		if (this.VecEff != null)
+		{
+			for (int i = 0; i < this.VecEff.size(); i++)
+			{
+				Point bubble = (Point)this.VecEff.elementAt(i);
+				if (bubble == null || super.f < bubble.fSmall || super.f >= bubble.fRe) continue;
+				bubble.f++;
+				int sine = CRes.getsin(((bubble.f + bubble.frame * 8) * 24) % 360) * 2 >> 10;
+				bubble.y = bubble.y2 + sine;
+			}
+		}
+
+		if (super.f >= 55 && super.vecObjsBeFire != null)
+		{
+			for (int k = 0; k < super.vecObjsBeFire.size(); k++)
+			{
+				Object_Effect_Skill tInfo = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(k);
+				if (tInfo != null)
+				{
+					MainObject target = MainObject.get_Object((int)tInfo.ID, (byte)tInfo.tem);
+					if (target != null) target.dy = 0;
+				}
+			}
+		}
+
+		if (super.f >= super.fRemove)
+		{
+			this.removeEff();
+		}
+	}
+
+	private void paintVenomRain4018(mGraphics g)
+	{
+		if (g == null) return;
+		ensureVenomSkillFrames();
+
+		// 1. NẾU LÀ COMPANION SUB-EFFECT (subType == 1008, levelPaint == -1):
+		// VẼ CỤM NHIỀU VŨNG AXIT NGẪU NHIÊN GẦN NHAU DƯỚI CHÂN MỤC TIÊU CHÍNH (ANCHOR 3, LEVELPAINT = -1, DƯỚI TẤT CẢ CHAR VÀ QUÁI)
+		if (this.subType == 1008)
+		{
+			if (s_imgAcidPool4018 != null && s_imgAcidPool4018.nFrame > 0)
+			{
+				if (this.VecSubEff != null && this.VecSubEff.size() > 0)
+				{
+					for (int pIdx = 0; pIdx < this.VecSubEff.size(); pIdx++)
+					{
+						Point pool = (Point)this.VecSubEff.elementAt(pIdx);
+						if (pool == null || super.f < pool.fSmall) continue;
+						int poolAge = super.f - pool.fSmall;
+						int poolF = (poolAge < 8) ? (poolAge * s_imgAcidPool4018.nFrame / 8) : (((poolAge / 2) + pool.frame) % s_imgAcidPool4018.nFrame);
+						int px = super.x + pool.color;
+						int py = super.y + pool.subType;
+						s_imgAcidPool4018.drawFrame(poolF % s_imgAcidPool4018.nFrame, px, py, pool.dis, 3, g);
+					}
+				}
+				else
+				{
+					int poolF = (super.f < 8) ? (super.f * s_imgAcidPool4018.nFrame / 8) : ((super.f / 2) % s_imgAcidPool4018.nFrame);
+					s_imgAcidPool4018.drawFrame(poolF % s_imgAcidPool4018.nFrame, super.x, super.y, 0, 3, g);
+				}
+			}
+			// Bong bóng độc mặt đất cũng vẽ ở tầng ngầm này để nằm dưới chân nhân vật và quái
+			if (s_imgPoisonBubbles != null && s_imgPoisonBubbles.nFrame > 0 && this.VecEff != null)
+			{
+				for (int i = 0; i < this.VecEff.size(); i++)
+				{
+					Point bubble = (Point)this.VecEff.elementAt(i);
+					if (bubble == null || super.f < bubble.fSmall || super.f >= bubble.fRe) continue;
+					int bFrame = ((bubble.f / 2) + bubble.frame) % s_imgPoisonBubbles.nFrame;
+					s_imgPoisonBubbles.drawFrame(bFrame, bubble.x, bubble.y, 0, 3, g);
+				}
+			}
+			return;
+		}
+
+		// 2. VƯƠNG MIỆN BỘC PHÁ TIẾP ĐẤT (rain_splash: 475, 64x36, ANCHOR 3 TẠI TIẾP ĐẤT SÁT MẶT ĐẤT)
+		if (s_imgRainSplash != null && s_imgRainSplash.nFrame > 0 && this.VecSubEff != null)
+		{
+			for (int i = 0; i < this.VecSubEff.size(); i++)
+			{
+				Point drop = (Point)this.VecSubEff.elementAt(i);
+				if (drop == null || !drop.AW) continue;
+				if (drop.f >= 0 && drop.f < s_imgRainSplash.nFrame)
+				{
+					s_imgRainSplash.drawFrame(drop.f, drop.x2, drop.y2, 0, 3, g);
+				}
+			}
+		}
+
+		// 3. GIỌT MƯA ĐỘC LONG BAY CHÉO XUỐNG ĐẤT (rain_drop: 474, 36x48, ANCHOR 3)
+		// Quỹ đạo rơi chéo từ (lx + drop.dis, ly - drop.vy) tiếp đất tại (lx, ly)
+		if (s_imgRainDrop != null && s_imgRainDrop.nFrame > 0 && this.VecSubEff != null)
+		{
+			for (int i = 0; i < this.VecSubEff.size(); i++)
+			{
+				Point drop = (Point)this.VecSubEff.elementAt(i);
+				if (drop == null || drop.AW || super.f < drop.fSmall || super.f >= drop.fRe) continue;
+
+				int lx = drop.x2;
+				int ly = drop.y2;
+
+				int p = super.f - drop.fSmall;
+				int dur = drop.fRe - drop.fSmall;
+				if (dur < 1) dur = 1;
+				int sx = lx + drop.dis;
+				int sy = ly - drop.vy;
+
+				int curX = sx + (lx - sx) * p / dur;
+				int curY = sy + (ly - sy) * p / dur;
+
+				int dropF = (p * s_imgRainDrop.nFrame / dur) % s_imgRainDrop.nFrame;
+				int trans = (super.Dir == 2) ? 0 : 2;
+				int headOffX = (super.Dir == 2) ? 6 : -6;
+				s_imgRainDrop.drawFrame(dropF, curX - headOffX, curY, trans, 3, g);
+			}
+		}
+	}
+
+	// ─────────────────────────────────────────────────────────────────────────
+	// SKILL 4019: ĐỘC LONG THỨC TỈNH (BUFF SAU LƯNG NHÂN VẬT, 0.2s KÍCH HOẠT)
+	// ─────────────────────────────────────────────────────────────────────────
+
+	private void createVenomBuff4019()
+	{
+		ensureVenomSkillFrames(true);
+		super.fRemove = 999999;
+		super.levelPaint = -1; // VẼ SAU LƯNG NHÂN VẬT THEO YÊU CẦU NGƯỜI DÙNG!
+		super.timeBegin = GameCanvas.timeNow;
+
+		// Tính toán thời gian tác dụng buff chuẩn từ tham số kỹ năng
+		int buffMs = 0;
+		if (super.timeEnd > 0)
+		{
+			buffMs = (super.timeEnd < 1000) ? (super.timeEnd * 100) : (int)super.timeEnd;
+		}
+		if (buffMs <= 0 && this.skill != null)
+		{
+			if (this.skill.AF > 0)
+			{
+				buffMs = (this.skill.AF < 1000) ? (this.skill.AF * 100) : (int)this.skill.AF;
+			}
+			Skill_Info sk = Skill_Info.getSkillFromID(this.skill.ID);
+			if (sk != null && sk.vecAtt != null)
+			{
+				for (int i = 0; i < sk.vecAtt.size(); i++)
+				{
+					MainInfoItem item = (MainInfoItem)sk.vecAtt.elementAt(i);
+					if (item != null && item.AA == 32 && item.AE > 0)
+					{
+						int val = (item.AE < 1000) ? (item.AE * 100) : item.AE;
+						if (val > buffMs) buffMs = val;
+						break;
+					}
+				}
+				if (buffMs <= 0 && sk.timeEffSpec > 0)
+				{
+					buffMs = (sk.timeEffSpec < 1000) ? (sk.timeEffSpec * 100) : (int)sk.timeEffSpec;
+				}
+			}
+		}
+		if (buffMs <= 0)
+		{
+			// Mặc định chuẩn cấu hình server: sk4019 Option 32 = 180 (18.0s = 18000ms)
+			buffMs = 18000;
+		}
+		super.timeEnd = (short)Math.min(32000, buffMs);
+		this.addSound(10);
+	}
+
+	private void updateVenomBuff4019()
+	{
+		// KÍCH HOẠT THẦN TỐC TẠI FRAME 6 (~0.2s)!
+		if (super.f == 6)
+		{
+			this.addSound(14);
+			this.addSound(51);
+			LoadMap.timeVibrateScreen = 8;
+
+			if (super.objFireMain != null)
+			{
+				super.objFireMain.addDataEff((short)108, (int)super.timeEnd, (byte)0, (byte)0);
+			}
+		}
+
+		// Hết thời gian tác dụng buff theo param của skill -> tự xóa
+		if (super.timeEnd > 0 && GameCanvas.timeNow - super.timeBegin >= (long)super.timeEnd)
+		{
+			this.removeEff();
+			return;
+		}
+
+		// Nếu đối tượng thi triển tử vong hoặc bị xóa -> tự xóa
+		if (super.objFireMain != null && (super.objFireMain.isDie || super.objFireMain.Hp <= 0 || super.objFireMain.isRemove))
+		{
+			this.removeEff();
+			return;
+		}
+	}
+
+	private void paintVenomBuff4019(mGraphics g)
+	{
+		if (g == null) return;
+		ensureVenomSkillFrames();
+		super.levelPaint = -1; // Đảm bảo luôn vẽ sau lưng / dưới nhân vật
+
+		int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+		int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+
+		// Song Long Hỏa Trụ (aura: 477, 100x120) - SAU LƯNG NHÂN VẬT (chỉ vẽ trên nhân vật, đã bỏ vũng độc)
+		if (s_imgAuraDragon != null && s_imgAuraDragon.nFrame > 0)
+		{
+			int dragonF = ((super.f < 4 ? super.f : (super.f - 4)) / 2) % s_imgAuraDragon.nFrame;
+			s_imgAuraDragon.drawFrame(dragonF, casterX, casterY, 0, 33, g);
+		}
+	}
+
+	// =========================================================================
+	// HE THONG SKILL TRAI AC QUY THANH LONG KAIDO (SEIRYU)
+	// Skill 1 (4021): Co Long Hoang Kim (Ma tran chan 4021 -> Long Chau 65 -> Than Long Ngoam 4025)
+	// Skill 2 (4022): Than Long Giang Loi (Than Long 4022 -> Loi Cau 56 tu mieng rong dx=+48, dy=-75 -> Boc pha set 57)
+	// Skill 3 (4023): Long Than Ho The (Hao quang kim than 4023 bao quanh Caster 18s)
+	// =========================================================================
+
+	private DataSkillEff effThanhLongBullet;
+	private DataSkillEff effThanhLongThunderBullet;
+
+	// --- SKILL 1 (4021): CO LONG HOANG KIM ---
+	private void createThanhLongActive4021()
+	{
+		this.VecEff = new mVector();
+		super.fRemove = 55;
+		super.levelPaint = 0;
+
+		MainObject target = null;
+		if (GameScreen.objFocus != null && !GameScreen.objFocus.isDie && !GameScreen.objFocus.isRemove && GameScreen.objFocus != super.objFireMain)
+		{
+			target = GameScreen.objFocus;
+		}
+		else if (this.objBeFireMain != null && this.objBeFireMain != super.objFireMain && !this.objBeFireMain.isDie && !this.objBeFireMain.isRemove)
+		{
+			target = this.objBeFireMain;
+		}
+		else if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+		{
+			for (int i = 0; i < super.vecObjsBeFire.size(); i++)
+			{
+				Object_Effect_Skill o = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
+				if (o != null)
+				{
+					MainObject mob = MainObject.get_Object((int)o.ID, (byte)o.tem);
+					if (mob != null && !mob.isDie && !mob.isRemove && mob != super.objFireMain)
+					{
+						target = mob;
+						break;
+					}
+				}
+			}
+		}
+
+		int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+		int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+		int targetX = (target != null) ? target.x : ((super.toX != 0) ? super.toX : (casterX + ((super.Dir == 2) ? 140 : -140)));
+		int targetY = (target != null) ? target.y : ((super.toY != 0) ? super.toY : casterY);
+
+		if (super.objFireMain != null)
+		{
+			super.Dir = (byte)((targetX >= casterX) ? 2 : 0);
+			super.objFireMain.type_left_right = super.Dir;
+			super.objFireMain.Dir = super.Dir;
+		}
+		super.toX = targetX;
+		super.toY = targetY;
+
+		// 1. Ma tran chan Co Long 4021 tai vi tri Caster
+		GameScreen.addHightDataeff((short)4021, casterX, casterY, super.Dir == 0);
+		this.addSound(10);
+
+		// 2. Tao dan Long Chau Hoang Kim 65 lao toi muc tieu
+		Point bullet = new Point();
+		bullet.x = casterX;
+		bullet.y = casterY - 20;
+		bullet.x2 = targetX;
+		bullet.y2 = targetY;
+		bullet.fSmall = 4;
+		bullet.fRe = 14;
+		bullet.f = 0;
+		bullet.AW = false;
+		bullet.obj = target;
+		this.VecEff.addElement(bullet);
+
+		this.effThanhLongBullet = new DataSkillEff((short)65, -1, super.Dir == 0);
+	}
+
+	private void updateThanhLongActive4021()
+	{
+		if (super.f >= super.fRemove)
+		{
+			this.removeEff();
+			return;
+		}
+
+		if (this.effThanhLongBullet != null)
+		{
+			this.effThanhLongBullet.update();
+		}
+
+		if (this.VecEff != null && this.VecEff.size() > 0)
+		{
+			Point bullet = (Point)this.VecEff.elementAt(0);
+			if (bullet != null)
+			{
+				bullet.f++;
+				if (bullet.obj != null && !bullet.obj.isDie && !bullet.obj.isRemove)
+				{
+					bullet.x2 = bullet.obj.x;
+					bullet.y2 = bullet.obj.y;
+				}
+
+				int startX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+				int startY = ((super.objFireMain != null) ? super.objFireMain.y : super.y) - 20;
+				int progress = bullet.f - bullet.fSmall;
+				int totalDur = bullet.fRe - bullet.fSmall;
+
+				if (progress > 0 && progress < totalDur)
+				{
+					bullet.x = startX + (bullet.x2 - startX) * progress / totalDur;
+					bullet.y = startY + (bullet.y2 - startY) * progress / totalDur;
+				}
+				else if (progress >= totalDur && !bullet.AW)
+				{
+					bullet.AW = true;
+					bullet.x = bullet.x2;
+					bullet.y = bullet.y2;
+
+					// Kich hoat Than Long ngoam nat muc tieu (4025)
+					GameScreen.addHightDataeff((short)4025, bullet.x2, bullet.y2, super.Dir == 0);
+					this.addSound(51);
+					LoadMap.timeVibrateScreen = 8;
+				}
+			}
+		}
+	}
+
+	private void paintThanhLongActive4021(mGraphics g)
+	{
+		if (this.VecEff != null && this.VecEff.size() > 0)
+		{
+			Point bullet = (Point)this.VecEff.elementAt(0);
+			if (bullet != null && bullet.f >= bullet.fSmall && !bullet.AW)
+			{
+				if (this.effThanhLongBullet != null)
+				{
+					this.effThanhLongBullet.paint(g, bullet.x, bullet.y);
+				}
+			}
+		}
+	}
+
+	// --- SKILL 2 (4022): THAN LONG GIANG LOI ---
+	private void createThanhLongActive4022()
+	{
+		this.VecEff = new mVector();
+		super.fRemove = 55;
+		super.levelPaint = 0;
+
+		MainObject target = null;
+		if (GameScreen.objFocus != null && !GameScreen.objFocus.isDie && !GameScreen.objFocus.isRemove && GameScreen.objFocus != super.objFireMain)
+		{
+			target = GameScreen.objFocus;
+		}
+		else if (this.objBeFireMain != null && this.objBeFireMain != super.objFireMain && !this.objBeFireMain.isDie && !this.objBeFireMain.isRemove)
+		{
+			target = this.objBeFireMain;
+		}
+		else if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > 0)
+		{
+			for (int i = 0; i < super.vecObjsBeFire.size(); i++)
+			{
+				Object_Effect_Skill o = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
+				if (o != null)
+				{
+					MainObject mob = MainObject.get_Object((int)o.ID, (byte)o.tem);
+					if (mob != null && !mob.isDie && !mob.isRemove && mob != super.objFireMain)
+					{
+						target = mob;
+						break;
+					}
+				}
+			}
+		}
+
+		int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+		int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+		int targetX = (target != null) ? target.x : ((super.toX != 0) ? super.toX : (casterX + ((super.Dir == 2) ? 140 : -140)));
+		int targetY = (target != null) ? target.y : ((super.toY != 0) ? super.toY : casterY);
+
+		if (super.objFireMain != null)
+		{
+			super.Dir = (byte)((targetX >= casterX) ? 2 : 0);
+			super.objFireMain.type_left_right = super.Dir;
+			super.objFireMain.Dir = super.Dir;
+		}
+		super.toX = targetX;
+		super.toY = targetY;
+
+		// 1. Than Long xuat hien tai Caster (4022)
+		GameScreen.addHightDataeff((short)4022, casterX, casterY, super.Dir == 0);
+		this.addSound(10);
+
+		// 2. Set offset mieng rong: dx = (Dir == 2 ? 48 : -48), dy = -75
+		int mouthX = casterX + ((super.Dir == 2) ? 48 : -48);
+		int mouthY = casterY - 75;
+
+		// 3. Ban 3 Loi Cau 56 tu mieng rong toi muc tieu
+		int[] fStarts = new int[] { 8, 14, 20 };
+		for (int i = 0; i < 3; i++)
+		{
+			Point p = new Point();
+			p.x = mouthX;
+			p.y = mouthY;
+			MainObject tObj = target;
+			if (super.vecObjsBeFire != null && super.vecObjsBeFire.size() > i)
+			{
+				Object_Effect_Skill o = (Object_Effect_Skill)super.vecObjsBeFire.elementAt(i);
+				if (o != null)
+				{
+					MainObject mob = MainObject.get_Object((int)o.ID, (byte)o.tem);
+					if (mob != null && !mob.isDie && !mob.isRemove) tObj = mob;
+				}
+			}
+			p.obj = tObj;
+			p.x2 = (tObj != null) ? tObj.x : targetX;
+			p.y2 = (tObj != null) ? tObj.y : targetY;
+			p.fSmall = fStarts[i];
+			p.fRe = fStarts[i] + 8;
+			p.f = 0;
+			p.AW = false;
+			p.color = i;
+			this.VecEff.addElement(p);
+		}
+
+		this.effThanhLongThunderBullet = new DataSkillEff((short)56, -1, super.Dir == 0);
+	}
+
+	private void updateThanhLongActive4022()
+	{
+		if (super.f >= super.fRemove)
+		{
+			this.removeEff();
+			return;
+		}
+
+		int casterX = (super.objFireMain != null) ? super.objFireMain.x : super.x;
+		int casterY = (super.objFireMain != null) ? super.objFireMain.y : super.y;
+		int mouthX = casterX + ((super.Dir == 2) ? 48 : -48);
+		int mouthY = casterY - 75;
+
+		if (this.effThanhLongThunderBullet != null)
+		{
+			this.effThanhLongThunderBullet.update();
+		}
+
+		if (this.VecEff != null)
+		{
+			for (int i = 0; i < this.VecEff.size(); i++)
+			{
+				Point bullet = (Point)this.VecEff.elementAt(i);
+				if (bullet == null) continue;
+
+				bullet.f++;
+				if (bullet.obj != null && !bullet.obj.isDie && !bullet.obj.isRemove)
+				{
+					bullet.x2 = bullet.obj.x;
+					bullet.y2 = bullet.obj.y;
+				}
+
+				int progress = bullet.f - bullet.fSmall;
+				int totalDur = bullet.fRe - bullet.fSmall;
+
+				if (progress > 0 && progress < totalDur)
+				{
+					bullet.x = mouthX + (bullet.x2 - mouthX) * progress / totalDur;
+					bullet.y = mouthY + (bullet.y2 - mouthY) * progress / totalDur;
+				}
+				else if (progress >= totalDur && !bullet.AW)
+				{
+					bullet.AW = true;
+					bullet.x = bullet.x2;
+					bullet.y = bullet.y2;
+
+					// IMPACT: Boc pha loi dien sam set 57 tai muc tieu
+					GameScreen.addHightDataeff((short)57, bullet.x2, bullet.y2, super.Dir == 0);
+					this.addSound(51);
+					LoadMap.timeVibrateScreen = (bullet.color == 2) ? 10 : 6;
+				}
+			}
+		}
+	}
+
+	private void paintThanhLongActive4022(mGraphics g)
+	{
+		if (this.VecEff != null)
+		{
+			for (int i = 0; i < this.VecEff.size(); i++)
+			{
+				Point bullet = (Point)this.VecEff.elementAt(i);
+				if (bullet != null && bullet.f >= bullet.fSmall && !bullet.AW)
+				{
+					if (this.effThanhLongThunderBullet != null)
+					{
+						this.effThanhLongThunderBullet.paint(g, bullet.x, bullet.y);
+					}
+				}
+			}
+		}
+	}
+
+	// --- SKILL 3 (4023): LONG THAN HO THE (BUFF) ---
+	private void createThanhLongBuff4023()
+	{
+		super.fRemove = 1200;
+		int buffMs = 18000;
+		super.timeEnd = (short)Math.min(32000, buffMs);
+		this.addSound(10);
+	}
+
+	private void updateThanhLongBuff4023()
+	{
+		// Kich hoat tai frame 6 (~0.2s)
+		if (super.f == 6)
+		{
+			this.addSound(14);
+			this.addSound(51);
+			LoadMap.timeVibrateScreen = 6;
+
+			if (super.objFireMain != null)
+			{
+				super.objFireMain.addDataEff((short)4023, (int)super.timeEnd, (byte)0, (byte)0);
+			}
+		}
+
+		if (super.timeEnd > 0 && GameCanvas.timeNow - super.timeBegin >= (long)super.timeEnd)
+		{
+			this.removeEff();
+			return;
+		}
+
+		if (super.objFireMain != null && (super.objFireMain.isDie || super.objFireMain.Hp <= 0 || super.objFireMain.isRemove))
+		{
+			this.removeEff();
+			return;
+		}
+	}
+
+	private void paintThanhLongBuff4023(mGraphics g)
+	{
+		// DataEffect 4023 duoc MainObject tu dong ve quanh nhan vat
+	}
+
 }
