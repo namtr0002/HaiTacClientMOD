@@ -2819,7 +2819,7 @@ public class GameScreen : MainScreen
 
 	public override void updatekey()
 	{
-		if (player.isNauBanh && GameCanvas.keyMyHold[5] && center != null)
+		if (player != null && player.isNauBanh && GameCanvas.keyMyHold[5] && center != null)
 		{
 			GameCanvas.clearKeyPressed(5);
 			GameCanvas.clearKeyHold(5);

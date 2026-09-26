@@ -2556,7 +2556,7 @@ public final class GameScreen extends MainScreen {
    }
 
    public final void handleKeyPress() {
-      if (player.RZ && GameCanvas.AL[5] && super.center != null) {
+      if (player != null && player.RZ && GameCanvas.AL[5] && super.center != null) {
          GameCanvas.AA(5);
          GameCanvas.AB(5);
          super.center.AD();
