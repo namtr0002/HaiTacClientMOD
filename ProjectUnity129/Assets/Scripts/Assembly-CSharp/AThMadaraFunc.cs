@@ -1109,18 +1109,18 @@ public class AThMadaraFunc
 		if (!AThMadaraMOD.isAutoRedLine) return;
 		if (GameCanvas.loadmap == null || GameScreen.player == null) return;
 		// Chỉ sử dụng khi đang ở ngoài redline (không phải trong redline)
-		int mapId = GameCanvas.loadmap.idMapLoadMap;
+		int mapId = GameCanvas.loadmap.idMap;
 		if (mapId == 58 || mapId == 59 || mapId == 109 || mapId == 119 || mapId == 120 || mapId == 121 || mapId == 123)
 		{
 			return; // đang trong redline rồi
 		}
-		if (ListDungeon.AB) return; // đang trong dungeon/queue
-		// Tự động join redline: gửi packet AI(1)
+		if (ListDungeon.isKey) return; // đang trong dungeon/queue
+		// Tự động join redline: gửi packet Check_List_Pho_Bang(1)
 		if (GameCanvas.gameTick % 300 == 77) // check mỗi ~5 giây
 		{
 			try
 			{
-				GlobalService.getInstance().AI((byte)1);
+				GlobalService.gI().Check_List_Pho_Bang(1);
 				Interface_Game.addInfoPlayerNormal("Auto thi dau bien: Dang vao hang doi...", mFont.tahoma_7_yellow);
 			}
 			catch (Exception) {}
