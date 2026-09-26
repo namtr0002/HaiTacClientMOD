@@ -2565,7 +2565,7 @@ public class GameScreen : MainScreen
 		Interface_Game.updateNumMess();
 		Interface_Game.updateMoveTo();
 		interfaceGame.updateShowNameMap();
-		if (effMap != null)
+		if (effMap != null && AThMadaraMOD.isShowMapEffect)
 		{
 			effMap.update();
 		}

@@ -44,6 +44,7 @@ public class HieuUngManager {
     }
 
     public static boolean isMasteryDisabled() {
+        if (!AThMadaraMOD.isShowMasteryEffect) return true;
         init();
         return isEffectDisabled(8);
     }

@@ -661,6 +661,16 @@ public final class AThMadaraFunc {
             }
             mFont.tahoma_7_yellow.drawString(g, fpsSpeedStr, drawX2, textY + 11, 0);
 
+            // Hiện trạng thái mod quan trọng
+            String modStatus = "";
+            if (AThMadaraMOD.isAutoRedLine) modStatus += "[R] ";
+            if (AThMadaraMOD.isAutoReconnect2) modStatus += "[RC] ";
+            if (AThMadaraMOD.isOptimizeGame) modStatus += "[OPT] ";
+            if (AThMadaraMOD.isReduceParticle) modStatus += "[PT-] ";
+            if (!modStatus.equals("")) {
+                mFont.tahoma_7b_yellow.drawString(g, modStatus.trim(), drawX2, textY + 22, 0);
+            }
+
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -743,5 +753,23 @@ public final class AThMadaraFunc {
     public static boolean isPlayerFullyRevived(Player p) {
         if (p == null) return false;
         return p.Hp > 0 && !p.isDie && GameCanvas.loadmap != null;
+    }
+
+    public static void autoUpdateRedLine() {
+        if (!AThMadaraMOD.isAutoRedLine) return;
+        if (GameCanvas.loadmap == null || GameScreen.player == null) return;
+        // Chỉ sử dụng khi đang ở ngoài redline (không phải trong redline)
+        int mapId = GameCanvas.loadmap.idMapLoadMap;
+        if (mapId == 58 || mapId == 59 || mapId == 109 || mapId == 119 || mapId == 120 || mapId == 121 || mapId == 123) {
+            return; // đang trong redline rồi
+        }
+        if (ListDungeon.AB) return; // đang trong dungeon/queue
+        // Tự động join redline: gửi packet AI(1)
+        if (GameCanvas.gameTick % 300 == 77) { // check mỗi ~5 giây (60fps * 5)
+            try {
+                GlobalService.getInstance().AI((byte)1);
+                Interface_Game.addInfoPlayerNormal("Auto thi dau bien: Dang vao hang doi...", mFont.tahoma_7_yellow);
+            } catch (Exception ignored) {}
+        }
     }
 }

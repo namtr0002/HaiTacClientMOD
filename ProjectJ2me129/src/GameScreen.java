@@ -2348,7 +2348,7 @@ public final class GameScreen extends MainScreen {
          Interface_Game.AO();
          Interface_Game var10000 = interfaceGame;
          Interface_Game.AP();
-         if (effMap != null) {
+         if (effMap != null && AThMadaraMOD.isShowMapEffect) {
             effMap.AB();
          }
 
@@ -2435,6 +2435,8 @@ public final class GameScreen extends MainScreen {
          if (isOnAutoPB) {
             AutoBattlefield.StartAutoBattlefield();
          }
+
+         AThMadaraFunc.autoUpdateRedLine();
 
          if (_dbgGSUpdateCount <= 10) System.out.println("[GS.update] #" + _dbgGSUpdateCount + " FINISHED OK!");
       }

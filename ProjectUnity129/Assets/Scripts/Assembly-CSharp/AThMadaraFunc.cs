@@ -967,6 +967,17 @@ public class AThMadaraFunc
 				drawX2 = MotherCanvas.w - 2 - textW2;
 			}
 			mFont.tahoma_7_yellow.drawString(g, fpsSpeedStr, drawX2, textY + 11, 0);
+
+			// Hien trang thai mod quan trong
+			string modStatus = "";
+			if (AThMadaraMOD.isAutoRedLine) modStatus += "[R] ";
+			if (AThMadaraMOD.isAutoReconnect2) modStatus += "[RC] ";
+			if (AThMadaraMOD.isOptimizeGame) modStatus += "[OPT] ";
+			if (AThMadaraMOD.isReduceParticle) modStatus += "[PT-] ";
+			if (modStatus.Length > 0)
+			{
+				mFont.tahoma_7b_yellow.drawString(g, modStatus.Trim(), drawX2, textY + 22, 0);
+			}
 		}
 		catch (Exception)
 		{
