@@ -3,7 +3,7 @@ import java.util.Calendar;
 
 public final class AThMadaraFunc {
     private static final int TELEPORT_MAX_TILES = 6;
-    private static java.util.Map<MainMonster,int[]> gomSavedGlobal = null;
+    private static java.util.Map<MainObject,int[]> gomSavedGlobal = null;
     private static boolean gomFollowPlayer = false;
     static boolean gomUseMapCenter = false;
     public static int gomOffsetX = 0;
@@ -14,7 +14,7 @@ public final class AThMadaraFunc {
 
     public static boolean isUserInteracting(Player p) {
         boolean interacting = false;
-        if (GameCanvas.isPointerDown || GameCanvas.isPointerSelect) {
+        if (GameCanvas.isPointerDown || GameCanvas.isPointerSelect || GameCanvas.AQ) {
             interacting = true;
         }
         if (GameCanvas.isKeyPressed(0) || GameCanvas.isKeyPressed(1) || GameCanvas.isKeyPressed(2) || GameCanvas.isKeyPressed(3)) {
@@ -26,7 +26,7 @@ public final class AThMadaraFunc {
                 interacting = true;
             }
         }
-        if (p != null && (p.posTransRoad != null || p.Action == 1)) {
+        if (p != null && (p.vx != 0 || p.vy != 0 || p.posTransRoad != null)) {
             interacting = true;
         }
 
@@ -34,7 +34,22 @@ public final class AThMadaraFunc {
             lastUserInteractionTime = GameCanvas.timeNow;
             return true;
         }
-        return (GameCanvas.timeNow - lastUserInteractionTime < 2500L);
+        return (GameCanvas.timeNow - lastUserInteractionTime < 2000L);
+    }
+
+    public static boolean isNearVgo(int x, int y, int radius) {
+        if (LoadMap.vecPointChange == null) return false;
+        for (int i = 0; i < LoadMap.vecPointChange.size(); i++) {
+            Point pt = (Point) LoadMap.vecPointChange.elementAt(i);
+            if (pt != null) {
+                int dx = x - pt.x;
+                int dy = y - pt.y;
+                if (dx * dx + dy * dy < radius * radius) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static boolean isSkillEnabledInAuto(short skillId) {
@@ -76,14 +91,19 @@ public final class AThMadaraFunc {
             }
         }
 
-        if (!isSkillEnabledInAuto(sk.ID)) return false;
+        if (!isAttackSkill) {
+            if (!isSkillEnabledInAuto(sk.ID)) return false;
+        }
 
         DelaySkill d = DelaySkill.getDelay(sk.indexHotKey);
         if (d != null && !d.isCoolDown()) return false;
 
-        if (p != null && p.getManaNeedUse((int) sk.manaLost) > p.Mp) return false;
-
         if (p != null) {
+            int manaNeed = Math.max((int) sk.manaLost, p.getManaNeedUse((int) sk.manaLost));
+            if (p.Mp < manaNeed || p.Mp <= 0) {
+                updateAutoPotion(p);
+                return false;
+            }
             if (p.Hp <= 0 || p.isDie || p.Action == 4) return false;
             if (p.vecEffspec != null) {
                 for (int i = 0; i < p.vecEffspec.size(); i++) {
@@ -103,8 +123,16 @@ public final class AThMadaraFunc {
         if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang()) return;
         if (p.skillCurrent != null) return;
 
-        boolean isAutoActive = p.isAutoFireNew108 || (Player.AutoFireCur > 0 && Interface_Game.isAutoFireInterface);
+        boolean isAutoActive = p.isAutoFireNew108 || AThMadaraMOD.isSlaughterActive;
         if (!isAutoActive) return;
+
+        // Nếu người chơi chạm D-pad hoặc ấn phím di chuyển, tạm dừng auto ngay và nhả đường đi
+        if (isUserInteracting(p)) {
+            if (p.posTransRoad != null && AThMadaraMOD.autoCombatMoveMode != 0) {
+                p.posTransRoad = null;
+            }
+            return;
+        }
 
         try {
             if (Player.typeAutoBuff == 1 && MsgAutoFire.value != null && !isUserInteracting(p)) {
@@ -128,7 +156,7 @@ public final class AThMadaraFunc {
             }
         } catch (Throwable t) { t.printStackTrace(); }
 
-        if (gomSavedGlobal != null && gomUseMapCenter) {
+        if (gomSavedGlobal != null && gomUseMapCenter && gomFixedX > 0 && gomFixedY > 0 && !isUserInteracting(p)) {
             try {
                 p.x = gomFixedX;
                 p.y = gomFixedY;
@@ -140,7 +168,7 @@ public final class AThMadaraFunc {
         }
 
         MainObject tgt = GameScreen.objFocus;
-        if (tgt == null || !isAllowedTargetForAuto(p, tgt) || tgt.isRemove || tgt.Hp <= 0 || tgt.isDie) {
+        if (tgt == null || !isAllowedTargetForAuto(p, tgt) || tgt.isRemove || (tgt.Hp <= 0 && tgt.maxHp > 0) || tgt.isDie || tgt.Action == 4) {
             GameScreen.objFocus = null;
             int best = Integer.MAX_VALUE;
             MainObject bestObj = null;
@@ -149,7 +177,7 @@ public final class AThMadaraFunc {
                     MainObject o = (MainObject) GameScreen.vecPlayers.elementAt(i);
                     if (o == null) continue;
                     if (!isAllowedTargetForAuto(p, o)) continue;
-                    if (o.isRemove || o.isDie || o.Hp <= 0) continue;
+                    if (o.isRemove || o.isDie || (o.Hp <= 0 && o.maxHp > 0) || o.Action == 4) continue;
                     int d = MainObject.getDistance(p.x, p.y, o.x, o.y);
                     if (d < best) {
                         best = d;
@@ -215,6 +243,9 @@ public final class AThMadaraFunc {
                         if (AThMadaraMOD.autoCombatMoveMode == 0) {
                             int tx = (tgt.x / tileSize) * tileSize + tileSize / 2;
                             int ty = (tgt.y / tileSize) * tileSize + tileSize / 2;
+                            if (isNearVgo(tx, ty, 85)) {
+                                return;
+                            }
                             sendTeleport(p, tx, ty);
                             p.posTransRoad = null;
                             try { p.vx = 0; p.vy = 0; } catch (Throwable ignored) {}
@@ -263,6 +294,9 @@ public final class AThMadaraFunc {
                     if (AThMadaraMOD.autoCombatMoveMode == 0) {
                         int tx = (tgt.x / tileSize) * tileSize + tileSize / 2;
                         int ty = (tgt.y / tileSize) * tileSize + tileSize / 2;
+                        if (isNearVgo(tx, ty, 85)) {
+                            return;
+                        }
                         sendTeleport(p, tx, ty);
                         p.posTransRoad = null;
                         try { p.vx = 0; p.vy = 0; } catch (Throwable ignored) {}
@@ -343,11 +377,29 @@ public final class AThMadaraFunc {
         }
     }
 
-    // Chỉ đánh: quái/boss (typeObject==1), còn sống, có thể tấn công và không phải trong làng
+    public static boolean isPvpMap() {
+        if (GameScreen.isPvPNew) return true;
+        if (GameCanvas.loadmap == null) return false;
+        int id = GameCanvas.loadmap.idMapLoadMap;
+        if (LoadMap.specMap == 1 || LoadMap.specMap == 7) return true;
+        return id == 58 || id == 120 || id == 122 || id == 123 || id == 260 
+            || (id >= 70 && id <= 74 && id != 73) // Dau Truong Tu Do
+            || id == 81 // Pho Ban Khong Lo (Little Garden)
+            || (id >= 254 && id <= 258) || (id >= 261 && id <= 265) // Chiem Dao
+            || (id >= 267 && id <= 271) // Bao Ve Phao Dai
+            || (id >= 272 && id <= 275) // Dai Chien The Gioi / World War
+            || (id >= 280 && id <= 290);
+    }
+
+    // Cho phép đánh quái (typeObject=1), vật thể (typeObject=5, 7), người chơi trong PvP (typeObject=0)
     private static boolean isAllowedTargetForAuto(Player p, MainObject t) {
         if (t == null) return false;
         if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang()) return false;
-        if (t.typeObject == 1 && !t.isDie && t.Hp > 0 && !t.isRemove) {
+        if (t.isDie || (t.Hp <= 0 && t.maxHp > 0) || t.isRemove || t.Action == 4) return false;
+        if (isNearVgo(t.x, t.y, 85)) return false;
+
+        // Quái/Boss (typeObject == 1)
+        if (t.typeObject == 1) {
             if (p != null && !p.AC(t)) return false;
             if (AThMadaraMOD.isSlaughterActive && AThMadaraMOD.slaughterTargetName != null) {
                 if (!AThMadaraMOD.slaughterTargetName.equals(t.name)) return false;
@@ -355,27 +407,91 @@ public final class AThMadaraFunc {
             }
             return true;
         }
+
+        // Vật thể phá hủy được (thùng gỗ, tháp, đá, cờ, trụ...)
+        if (t.typeObject == 5 || t.typeObject == 7) {
+            if (p != null && !p.AC(t)) return false;
+            return true;
+        }
+
+        // Người chơi trong map PvP hoặc cờ đối địch
+        if (t.typeObject == 0 && t != p) {
+            if (p != null && p.AC(t)) return true;
+        }
+
         return false;
     }
 
-    public static java.util.Map<MainMonster,int[]> startGomAllFollow(Player p, int offsetX, int offsetY, boolean follow, boolean useMapCenter) {
-        java.util.Map<MainMonster,int[]> saved = new java.util.HashMap<>();
+    public static int[] findSafeGomPosition(Player p, int prefX, int prefY) {
+        if (GameCanvas.loadmap == null) return new int[]{prefX, prefY};
+        int wTile = LoadMap.wTile > 0 ? LoadMap.wTile : 24;
+        int minX = 80;
+        int maxX = Math.max(minX + 50, GameCanvas.loadmap.maxWMap - 80);
+        int minY = 80;
+        int maxY = Math.max(minY + 50, GameCanvas.loadmap.maxHMap - 80);
+
+        for (int r = 0; r <= 15; r++) {
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dy = -r; dy <= r; dy++) {
+                    if (Math.abs(dx) != r && Math.abs(dy) != r) continue;
+                    int cx = prefX + dx * wTile;
+                    int cy = prefY + dy * wTile;
+
+                    if (cx < minX || cx > maxX || cy < minY || cy > maxY) continue;
+                    int tile = GameCanvas.loadmap.AA(cx, cy);
+                    if (tile == 1 || tile == -1) continue;
+
+                    boolean nearVgo = false;
+                    if (LoadMap.vecPointChange != null) {
+                        for (int i = 0; i < LoadMap.vecPointChange.size(); i++) {
+                            Point pt = (Point) LoadMap.vecPointChange.elementAt(i);
+                            if (pt != null) {
+                                int distVgo = MainObject.getDistance(cx, cy, pt.x, pt.y);
+                                if (distVgo < 130) {
+                                    nearVgo = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (nearVgo) continue;
+
+                    return new int[]{cx, cy};
+                }
+            }
+        }
+        return new int[]{prefX, prefY};
+    }
+
+    public static java.util.Map<MainObject,int[]> startGomAllFollow(Player p, int offsetX, int offsetY, boolean follow, boolean useMapCenter) {
+        java.util.Map<MainObject,int[]> saved = new java.util.HashMap<>();
         if (p == null) return saved;
 
         try {
             mVector vec = GameScreen.vecPlayers;
             if (vec == null) return saved;
 
-            int targetX = p.x + offsetX;
-            int targetY = p.y + offsetY;
+            int prefX;
+            int prefY;
+            if (useMapCenter && GameCanvas.loadmap != null) {
+                prefX = GameCanvas.loadmap.maxWMap / 2;
+                prefY = GameCanvas.loadmap.maxHMap / 2;
+            } else {
+                prefX = p.x + offsetX;
+                prefY = p.y + offsetY;
+            }
+
+            int[] safePos = findSafeGomPosition(p, prefX, prefY);
+            int targetX = safePos[0];
+            int targetY = safePos[1];
             gomFixedX = targetX; gomFixedY = targetY;
             gomUseMapCenter = useMapCenter;
 
             for (int i = 0; i < vec.size(); ++i) {
                 Object o = vec.elementAt(i);
-                if (o instanceof MainMonster) {
-                    MainMonster m = (MainMonster) o;
-                    if (m == null || m.isRemove) continue;
+                if (o instanceof MainObject) {
+                    MainObject m = (MainObject) o;
+                    if (m == null || m.isRemove || m.typeObject != 1) continue;
                     try {
                         saved.put(m, new int[]{m.x, m.y, m.toX, m.toY, m.toXNew, m.toYNew, m.vx, m.vy});
                     } catch (Throwable ignored) {}
@@ -404,15 +520,21 @@ public final class AThMadaraFunc {
             int targetX;
             int targetY;
             if (gomUseMapCenter) {
+                if (gomFixedX == 0 && gomFixedY == 0 && GameCanvas.loadmap != null) {
+                    int[] safePos = findSafeGomPosition(p, GameCanvas.loadmap.maxWMap / 2, GameCanvas.loadmap.maxHMap / 2);
+                    gomFixedX = safePos[0];
+                    gomFixedY = safePos[1];
+                }
                 targetX = gomFixedX;
                 targetY = gomFixedY;
             } else if (gomFollowPlayer) {
-                targetX = p.x + gomOffsetX;
-                targetY = p.y + gomOffsetY;
+                int[] safePos = findSafeGomPosition(p, p.x + gomOffsetX, p.y + gomOffsetY);
+                targetX = safePos[0];
+                targetY = safePos[1];
             } else {
-                java.util.Iterator<java.util.Map.Entry<MainMonster,int[]>> it = gomSavedGlobal.entrySet().iterator();
+                java.util.Iterator<java.util.Map.Entry<MainObject,int[]>> it = gomSavedGlobal.entrySet().iterator();
                 if (!it.hasNext()) return;
-                MainMonster first = it.next().getKey();
+                MainObject first = it.next().getKey();
                 if (first == null) return;
                 targetX = first.gomX;
                 targetY = first.gomY;
@@ -421,9 +543,9 @@ public final class AThMadaraFunc {
             if (GameScreen.vecPlayers != null) {
                 for (int i = 0; i < GameScreen.vecPlayers.size(); ++i) {
                     Object o = GameScreen.vecPlayers.elementAt(i);
-                    if (o instanceof MainMonster) {
-                        MainMonster m = (MainMonster) o;
-                        if (m == null || m.isRemove || m.isDie || m.Hp <= 0) continue;
+                    if (o instanceof MainObject) {
+                        MainObject m = (MainObject) o;
+                        if (m == null || m.isRemove || m.isDie || m.Hp <= 0 || m.typeObject != 1) continue;
                         if (!gomSavedGlobal.containsKey(m)) {
                             try {
                                 gomSavedGlobal.put(m, new int[]{m.x, m.y, m.toX, m.toY, m.toXNew, m.toYNew, m.vx, m.vy});
@@ -443,12 +565,12 @@ public final class AThMadaraFunc {
         }
     }
 
-    public static void stopGomAll(java.util.Map<MainMonster,int[]> saved) {
-        java.util.Map<MainMonster,int[]> toRestore = saved != null ? saved : gomSavedGlobal;
+    public static void stopGomAll(java.util.Map<MainObject,int[]> saved) {
+        java.util.Map<MainObject,int[]> toRestore = saved != null ? saved : gomSavedGlobal;
         if (toRestore == null) return;
         try {
-            for (java.util.Map.Entry<MainMonster,int[]> e : toRestore.entrySet()) {
-                MainMonster m = e.getKey();
+            for (java.util.Map.Entry<MainObject,int[]> e : toRestore.entrySet()) {
+                MainObject m = e.getKey();
                 int[] s = e.getValue();
                 if (m == null || s == null || s.length < 8) continue;
                 try {
@@ -470,6 +592,19 @@ public final class AThMadaraFunc {
             gomOffsetX = gomOffsetY = 0;
             gomFixedX = gomFixedY = 0;
         }
+    }
+
+    public static void resetGomData() {
+        if (gomSavedGlobal != null) {
+            gomSavedGlobal.clear();
+            gomSavedGlobal = null;
+        }
+        gomFixedX = 0;
+        gomFixedY = 0;
+        gomFollowPlayer = false;
+        gomUseMapCenter = false;
+        gomOffsetX = 0;
+        gomOffsetY = 0;
     }
     private static boolean isAttackable(MainObject t) {
         return t != null && !t.returnAction() && !t.isDie && t.Hp > 0 && !t.isRemove;

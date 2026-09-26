@@ -103,6 +103,10 @@ public class AThMadaraMOD
 	public static bool isShowPlayerNames = true;
 	public static bool isShowMonsterNames = true;
 	public static bool isHutItem = false;
+	public static bool isShowMapEffect = true;
+	public static bool isReduceParticle = false;
+	public static bool isAutoRedLine = false;
+	public static bool isAutoReconnect2 = false; // Auto reconnect thực sự
 	public static int pcScreenScale = 100;
 	public static InputDialog inputDialogScale;
 
@@ -116,6 +120,23 @@ public class AThMadaraMOD
 	public static bool pendingDisconnect = false;
 	public static void triggerAutoReconnect()
 	{
+		if (!isAutoReconnect2) return;
+		try
+		{
+			if (TcpClient.getInstant() != null)
+			{
+				TcpClient.getInstant().reconnect();
+				Interface_Game.addInfoPlayerNormal("Dang ket noi lai...", mFont.tahoma_7_yellow);
+			}
+			else
+			{
+				Interface_Game.addInfoPlayerNormal("Khong tim thay ket noi!", mFont.tahoma_7_yellow);
+			}
+		}
+		catch (Exception e)
+		{
+			Interface_Game.addInfoPlayerNormal("Loi reconnect: " + e.Message, mFont.tahoma_7_yellow);
+		}
 	}
 	public static void cancelAutoReconnect()
 	{
@@ -167,6 +188,7 @@ public class AThMadaraMOD
 			loadGraphicsSettings();
 			loadSpeedSetting();
 			loadAutoSellList();
+			loadAutoRedLineSettings();
 		}
 		return instance;
 	}
@@ -190,6 +212,8 @@ public class AThMadaraMOD
 			dos.writeBoolean(isShowWeather);
 			dos.writeBoolean(isShowPet);
 			dos.writeBoolean(isOptimizeGame);
+			dos.writeBoolean(isShowMapEffect);
+			dos.writeBoolean(isReduceParticle);
 			CRes.saveRMS("MOD_GRAPHICS_OPT", baos.toByteArray());
 			dos.close();
 		}
@@ -218,6 +242,8 @@ public class AThMadaraMOD
 				isShowWeather = dis.readBoolean();
 				isShowPet = dis.readBoolean();
 				isOptimizeGame = dis.readBoolean();
+				try { isShowMapEffect = dis.readBoolean(); } catch (Exception) {}
+				try { isReduceParticle = dis.readBoolean(); } catch (Exception) {}
 				dis.close();
 			}
 		}
@@ -234,8 +260,10 @@ public class AThMadaraMOD
 		isShowTopTitle = false;
 		isShowMasteryEffect = false;
 		isOptimizeGame = true;
+		isShowMapEffect = false;
+		isReduceParticle = true;
 		saveGraphicsSettings();
-		Interface_Game.addInfoPlayerNormal("Đã bật Tối Ưu Max (Tắt hết đồ họa nặng)!", mFont.tahoma_7_yellow);
+		Interface_Game.addInfoPlayerNormal("Da bat Toi Uu Max (Tat het do hoa nang)!", mFont.tahoma_7_yellow);
 	}
 
 	public static void setPresetResetGraphics()
@@ -252,8 +280,61 @@ public class AThMadaraMOD
 		isShowMobID = false;
 		isShowCharID = false;
 		isOptimizeGame = false;
+		isShowMapEffect = true;
+		isReduceParticle = false;
 		saveGraphicsSettings();
-		Interface_Game.addInfoPlayerNormal("Đã khôi phục đồ họa mặc định!", mFont.tahoma_7_yellow);
+		Interface_Game.addInfoPlayerNormal("Da khoi phuc do hoa mac dinh!", mFont.tahoma_7_yellow);
+	}
+
+	public static void setPresetBalanced()
+	{
+		isShowOtherPlayers = true;
+		isShowWeather = false;
+		isShowPet = false;
+		GameScreen.isShowSkillPlayer = true;
+		isShowShadows = false;
+		isShowPlayerNames = true;
+		isShowMonsterNames = true;
+		isShowTopTitle = true;
+		isShowMasteryEffect = false;
+		isShowMobID = false;
+		isShowCharID = false;
+		isHutItem = false;
+		isShowMapEffect = false;
+		isReduceParticle = true;
+		isOptimizeGame = false;
+		saveGraphicsSettings();
+		Interface_Game.addInfoPlayerNormal("Da bat Preset Can Bang (Toi uu + giu can ban)!", mFont.tahoma_7_yellow);
+	}
+
+	public static void saveAutoRedLineSettings()
+	{
+		try
+		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(baos);
+			dos.writeBoolean(isAutoRedLine);
+			dos.writeBoolean(isAutoReconnect2);
+			CRes.saveRMS("MOD_AUTO_REDLINE", baos.toByteArray());
+			dos.close();
+		}
+		catch (Exception) {}
+	}
+
+	public static void loadAutoRedLineSettings()
+	{
+		try
+		{
+			sbyte[] data = CRes.loadRMS("MOD_AUTO_REDLINE");
+			if (data != null && data.Length > 0)
+			{
+				DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+				try { isAutoRedLine = dis.readBoolean(); } catch (Exception) {}
+				try { isAutoReconnect2 = dis.readBoolean(); } catch (Exception) {}
+				dis.close();
+			}
+		}
+		catch (Exception) {}
 	}
 
 	public static void openGraphicsMenu()
@@ -271,7 +352,10 @@ public class AThMadaraMOD
 		menu.addElement(new iCommand("Hien ID Quai / Boss [" + (isShowMobID ? "Bat" : "Tat") + "]", 355, 0, GameCanvas.gameScr));
 		menu.addElement(new iCommand("Hien ID Nguoi choi [" + (isShowCharID ? "Bat" : "Tat") + "]", 356, 0, GameCanvas.gameScr));
 		menu.addElement(new iCommand("Hut vat pham [" + (isHutItem ? "Bat" : "Tat") + "]", 371, 0, GameCanvas.gameScr));
+		menu.addElement(new iCommand("Hieu ung Map nen [" + (isShowMapEffect ? "Bat" : "Tat") + "]", 373, 0, GameCanvas.gameScr));
+		menu.addElement(new iCommand("Giam Particle / Hieu ung [" + (isReduceParticle ? "Bat" : "Tat") + "]", 374, 0, GameCanvas.gameScr));
 		menu.addElement(new iCommand("* Toi Uu Max (Tat Het Do Hoa)", 360, 0, GameCanvas.gameScr));
+		menu.addElement(new iCommand("# Preset Can Bang (Khuyen dung)", 375, 0, GameCanvas.gameScr));
 		menu.addElement(new iCommand("~ Khoi Phuc Mac Dinh Do Hoa", 361, 0, GameCanvas.gameScr));
 		menu.addElement(new iCommand("< Quay lai", 340, 0, GameCanvas.gameScr));
 		GameCanvas.menu.startAt(menu, 2, "Do hoa & Toi uu");
@@ -331,6 +415,7 @@ public class AThMadaraMOD
 			menu.addElement(new iCommand("Toc do game [" + gameSpeed + "/10]", 114, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("FPS [" + MotherCanvas.targetFPS + " fps]", 120, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("Che do phim [" + (Interface_Game.typeTouch == 0 ? "Keypad/D-Pad" : "Touch/Cam ung") + "]", 136, 0, GameCanvas.gameScr));
+			menu.addElement(new iCommand("Auto Reconnect [" + (isAutoReconnect2 ? "Bat" : "Tat") + "]", 376, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("< Quay lai", 340, 0, GameCanvas.gameScr));
 			GameCanvas.menu.startAt(menu, 2, "He thong & Toc do");
 		}
@@ -348,6 +433,7 @@ public class AThMadaraMOD
 			menu.addElement(new iCommand("Tien ich chien dau", 341, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("Tu hoi sinh [" + getAutoReviveModeName() + "]", 118, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("Tu dong ban do [" + (Player.isAutoFilterItems ? "Bat" : "Tat") + "]", 119, 0, GameCanvas.gameScr));
+			menu.addElement(new iCommand("Auto Thi Dau Bien [" + (isAutoRedLine ? "Bat" : "Tat") + "]", 372, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("Hoat dong & NV", 342, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("He thong & Toc do", 343, 0, GameCanvas.gameScr));
 			menu.addElement(new iCommand("Do hoa & Toi uu", 351, 0, GameCanvas.gameScr));
@@ -547,7 +633,7 @@ public class AThMadaraMOD
 	public static System.Collections.Generic.List<short> getCustomSkillEffList(Skill_Info sk, short defaultEff)
 	{
 		System.Collections.Generic.List<short> list = new System.Collections.Generic.List<short>();
-		short validDefault = (sk != null && sk.typeEffSkill > 0) ? sk.typeEffSkill : defaultEff;
+		short validDefault = (defaultEff > 0) ? defaultEff : ((sk != null && sk.typeEffSkill > 0) ? sk.typeEffSkill : (short)0);
 		if (!isModSkill || sk == null)
 		{
 			if (validDefault > 0) list.Add(validDefault);
@@ -582,7 +668,7 @@ public class AThMadaraMOD
 	{
 		if (!isModSkill)
 		{
-			return (sk != null && sk.typeEffSkill > 0) ? sk.typeEffSkill : defaultEff;
+			return (defaultEff > 0) ? defaultEff : ((sk != null && sk.typeEffSkill > 0) ? sk.typeEffSkill : defaultEff);
 		}
 		System.Collections.Generic.List<short> list = getCustomSkillEffList(sk, defaultEff);
 		return (list.Count > 0) ? list[0] : defaultEff;

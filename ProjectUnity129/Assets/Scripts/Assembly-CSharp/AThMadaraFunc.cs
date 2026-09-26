@@ -5,7 +5,7 @@ public class AThMadaraFunc
 {
 	private const int TELEPORT_MAX_TILES = 6;
 
-	private static Dictionary<MainMonster, int[]> gomSavedGlobal = null;
+	private static Dictionary<MainObject, int[]> gomSavedGlobal = null;
 
 	private static bool gomFollowPlayer = false;
 
@@ -24,10 +24,6 @@ public class AThMadaraFunc
 	public static bool isUserInteracting(Player p)
 	{
 		bool interacting = false;
-		if (GameCanvas.isPointerDown || GameCanvas.isPointerSelect)
-		{
-			interacting = true;
-		}
 		if (GameCanvas.keyMove(0) || GameCanvas.keyMove(1) || GameCanvas.keyMove(2) || GameCanvas.keyMove(3)
 			|| GameCanvas.isKeyPressed(0) || GameCanvas.isKeyPressed(1) || GameCanvas.isKeyPressed(2) || GameCanvas.isKeyPressed(3))
 		{
@@ -41,7 +37,7 @@ public class AThMadaraFunc
 				interacting = true;
 			}
 		}
-		if (p != null && (p.posTransRoad != null || p.Action == 1))
+		if (GameCanvas.isDialogOrMenuShow())
 		{
 			interacting = true;
 		}
@@ -51,7 +47,26 @@ public class AThMadaraFunc
 			lastUserInteractionTime = GameCanvas.timeNow;
 			return true;
 		}
-		return (GameCanvas.timeNow - lastUserInteractionTime < 2500L);
+		return (GameCanvas.timeNow - lastUserInteractionTime < 500L);
+	}
+
+	public static bool isNearVgo(int x, int y, int radius)
+	{
+		if (LoadMap.vecPointChange == null) return false;
+		for (int i = 0; i < LoadMap.vecPointChange.size(); i++)
+		{
+			Point pt = (Point)LoadMap.vecPointChange.elementAt(i);
+			if (pt != null)
+			{
+				int dx = x - pt.x;
+				int dy = y - pt.y;
+				if (dx * dx + dy * dy < radius * radius)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public static bool isSkillEnabledInAuto(short skillId)
@@ -104,7 +119,15 @@ public class AThMadaraFunc
 		DelaySkill d = DelaySkill.getDelay(sk.indexHotKey);
 		if (d != null && !d.isCoolDown()) return false;
 
-		if (p != null && p.getManaNeedUse((int)sk.manaLost) > p.Mp) return false;
+		if (p != null)
+		{
+			int manaNeed = Math.Max((int)sk.manaLost, p.getManaNeedUse((int)sk.manaLost));
+			if (p.Mp < manaNeed)
+			{
+				updateAutoPotion(p);
+				if (p.Mp < manaNeed) return false;
+			}
+		}
 
 		if (p != null)
 		{
@@ -130,9 +153,19 @@ public class AThMadaraFunc
 			return;
 		}
 
-		bool isAutoActive = p.isAutoFireNew108 || (Player.AutoFireCur > 0 && Interface_Game.isAutoFireInterface);
+		bool isAutoActive = p.isAutoFireNew108 || AThMadaraMOD.isSlaughterActive || (Interface_Game.isAutoFireInterface && Player.AutoFireCur > 0);
 		if (!isAutoActive)
 		{
+			return;
+		}
+
+		if (isUserInteracting(p))
+		{
+			if (p.posTransRoad != null && AThMadaraMOD.autoCombatMoveMode != 0)
+			{
+				p.posTransRoad = null;
+				p.countAutoMove = 0;
+			}
 			return;
 		}
 
@@ -179,7 +212,7 @@ public class AThMadaraFunc
 		{
 		}
 
-		if (gomSavedGlobal != null && gomUseMapCenter)
+		if (gomSavedGlobal != null && gomUseMapCenter && !isUserInteracting(p) && gomFixedX > 0 && gomFixedY > 0)
 		{
 			try
 			{
@@ -190,6 +223,7 @@ public class AThMadaraFunc
 				p.vx = 0;
 				p.vy = 0;
 				p.posTransRoad = null;
+				p.countAutoMove = 0;
 			}
 			catch (Exception)
 			{
@@ -197,7 +231,7 @@ public class AThMadaraFunc
 		}
 
 		MainObject tgt = GameScreen.objFocus;
-		if (tgt == null || !isAllowedTargetForAuto(p, tgt) || tgt.isRemove || tgt.Hp <= 0 || tgt.isDie)
+		if (tgt == null || !isAllowedTargetForAuto(p, tgt) || tgt.isRemove || (tgt.Hp <= 0 && tgt.maxHp > 0) || tgt.isDie || tgt.Action == 4)
 		{
 			GameScreen.objFocus = null;
 			int best = int.MaxValue;
@@ -215,7 +249,7 @@ public class AThMadaraFunc
 					{
 						continue;
 					}
-					if (o.isRemove || o.isDie || o.Hp <= 0)
+					if (o.isRemove || o.isDie || (o.Hp <= 0 && o.maxHp > 0) || o.Action == 4)
 					{
 						continue;
 					}
@@ -301,11 +335,21 @@ public class AThMadaraFunc
 					{
 						if (AThMadaraMOD.autoCombatMoveMode == 0)
 						{
-							int tx = (tgt.x / tileSize) * tileSize + tileSize / 2;
-							int ty = (tgt.y / tileSize) * tileSize + tileSize / 2;
+							int approachDist = Math.Min(32, skillRange > 10 ? skillRange - 10 : 30);
+							if (approachDist < 20) approachDist = 20;
+							int tx = tgt.x + (p.x < tgt.x ? -approachDist : approachDist);
+							int ty = tgt.y;
+							if (isNearVgo(tx, ty, 85))
+							{
+								return;
+							}
+							p.Dir = (sbyte)((p.x < tgt.x) ? 2 : 0);
 							sendTeleport(p, tx, ty);
 							p.posTransRoad = null;
-							try { p.vx = 0; p.vy = 0; } catch (Exception) {}
+							p.countAutoMove = 0;
+							p.vx = 0;
+							p.vy = 0;
+							p.isMoveNor = false;
 						}
 						else
 						{
@@ -316,6 +360,18 @@ public class AThMadaraFunc
 							if (p.posTransRoad == null && GameCanvas.loadmap != null)
 							{
 								p.posTransRoad = GameCanvas.loadmap.updateFindRoad(targetTileX, targetTileY, playerTileX, playerTileY, 30, p);
+								if (p.posTransRoad != null)
+								{
+									if (p.posTransRoad.Length > 30)
+									{
+										p.posTransRoad = null;
+										p.countAutoMove = 0;
+									}
+									else
+									{
+										p.countAutoMove = 1;
+									}
+								}
 							}
 							if (p.posTransRoad == null)
 							{
@@ -325,9 +381,21 @@ public class AThMadaraFunc
 							return;
 						}
 					}
+					else
+					{
+						if (p.posTransRoad != null)
+						{
+							p.posTransRoad = null;
+							p.countAutoMove = 0;
+							p.vx = 0;
+							p.vy = 0;
+							p.isMoveNor = false;
+						}
+					}
 
 					try
 					{
+						p.Dir = (sbyte)((p.x < tgt.x) ? 2 : 0);
 						bool started = p.beginPlayerFire(sk);
 						if (started)
 						{
@@ -360,11 +428,21 @@ public class AThMadaraFunc
 				{
 					if (AThMadaraMOD.autoCombatMoveMode == 0)
 					{
-						int tx = (tgt.x / tileSize) * tileSize + tileSize / 2;
-						int ty = (tgt.y / tileSize) * tileSize + tileSize / 2;
+						int approachDist = Math.Min(32, skillRange > 10 ? skillRange - 10 : 30);
+						if (approachDist < 20) approachDist = 20;
+						int tx = tgt.x + (p.x < tgt.x ? -approachDist : approachDist);
+						int ty = tgt.y;
+						if (isNearVgo(tx, ty, 85))
+						{
+							return;
+						}
+						p.Dir = (sbyte)((p.x < tgt.x) ? 2 : 0);
 						sendTeleport(p, tx, ty);
 						p.posTransRoad = null;
-						try { p.vx = 0; p.vy = 0; } catch (Exception) {}
+						p.countAutoMove = 0;
+						p.vx = 0;
+						p.vy = 0;
+						p.isMoveNor = false;
 					}
 					else
 					{
@@ -375,6 +453,18 @@ public class AThMadaraFunc
 						if (p.posTransRoad == null && GameCanvas.loadmap != null)
 						{
 							p.posTransRoad = GameCanvas.loadmap.updateFindRoad(targetTileX, targetTileY, playerTileX, playerTileY, 30, p);
+							if (p.posTransRoad != null)
+							{
+								if (p.posTransRoad.Length > 30)
+								{
+									p.posTransRoad = null;
+									p.countAutoMove = 0;
+								}
+								else
+								{
+									p.countAutoMove = 1;
+								}
+							}
 						}
 						if (p.posTransRoad == null)
 						{
@@ -384,9 +474,21 @@ public class AThMadaraFunc
 						return;
 					}
 				}
+				else
+				{
+					if (p.posTransRoad != null)
+					{
+						p.posTransRoad = null;
+						p.countAutoMove = 0;
+						p.vx = 0;
+						p.vy = 0;
+						p.isMoveNor = false;
+					}
+				}
 
 				try
 				{
+					p.Dir = (sbyte)((p.x < tgt.x) ? 2 : 0);
 					bool started = p.beginPlayerFire(skNorm);
 					if (started)
 					{
@@ -464,41 +566,109 @@ public class AThMadaraFunc
 		}
 	}
 
+	public static bool isPvpMap()
+	{
+		if (GameScreen.isPvPNew) return true;
+		if (GameCanvas.loadmap == null) return false;
+		int id = GameCanvas.loadmap.idMap;
+		if (LoadMap.specMap == 1 || LoadMap.specMap == 7) return true;
+		return id == 58 || id == 120 || id == 122 || id == 123 || id == 260 
+			|| (id >= 70 && id <= 74 && id != 73) // Dau Truong Tu Do
+			|| id == 81 // Pho Ban Khong Lo (Little Garden)
+			|| (id >= 254 && id <= 258) || (id >= 261 && id <= 265) // Chiem Dao
+			|| (id >= 267 && id <= 271) // Bao Ve Phao Dai
+			|| (id >= 272 && id <= 275) // Dai Chien The Gioi / World War
+			|| (id >= 280 && id <= 290);
+	}
+
+	// Cho phep danh: quai/boss (typeObject==1), vat the (typeObject==5, 7), nguoi choi trong PvP (typeObject==0)
 	private static bool isAllowedTargetForAuto(Player p, MainObject t)
 	{
-		if (t == null)
+		if (t == null) return false;
+		if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang()) return false;
+		if (t.isDie || (t.Hp <= 0 && t.maxHp > 0) || t.isRemove || t.Action == 4) return false;
+		if (isNearVgo(t.x, t.y, 85)) return false;
+
+		// Quai / Boss (typeObject == 1)
+		if (t.typeObject == 1)
 		{
-			return false;
-		}
-		if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang())
-		{
-			return false;
-		}
-		if (t.typeObject == 1 && !t.isDie && t.Hp > 0 && !t.isRemove)
-		{
-			if (p != null && !p.setFightPk(t))
-			{
-				return false;
-			}
+			if (p != null && !p.setFightPk(t)) return false;
 			if (AThMadaraMOD.isSlaughterActive && AThMadaraMOD.slaughterTargetName != null)
 			{
-				if (!AThMadaraMOD.slaughterTargetName.Equals(t.name))
-				{
-					return false;
-				}
-				if (AThMadaraMOD.slaughterTargetLevel > 0 && t.Lv != AThMadaraMOD.slaughterTargetLevel)
-				{
-					return false;
-				}
+				if (!AThMadaraMOD.slaughterTargetName.Equals(t.name)) return false;
+				if (AThMadaraMOD.slaughterTargetLevel > 0 && t.Lv != AThMadaraMOD.slaughterTargetLevel) return false;
 			}
 			return true;
 		}
+
+		// Vat the pha huy duoc (thung go, thap, cot, tru...)
+		if (t.typeObject == 5 || t.typeObject == 7)
+		{
+			if (p != null && !p.setFightPk(t)) return false;
+			return true;
+		}
+
+		// Nguoi choi trong map PvP hoac co doi dich
+		if (t.typeObject == 0 && t != p)
+		{
+			if (p != null && p.setFightPk(t)) return true;
+		}
+
 		return false;
 	}
 
-	public static Dictionary<MainMonster, int[]> startGomAllFollow(Player p, int offsetX, int offsetY, bool follow, bool useMapCenter)
+	public static int[] findSafeGomPosition(Player p, int prefX, int prefY)
 	{
-		Dictionary<MainMonster, int[]> saved = new Dictionary<MainMonster, int[]>();
+		if (GameCanvas.loadmap == null) return new int[] { prefX, prefY };
+		int wTile = LoadMap.wTile > 0 ? LoadMap.wTile : 24;
+		int minX = 80;
+		int maxX = Math.Max(minX + 50, GameCanvas.loadmap.maxWMap - 80);
+		int minY = 80;
+		int maxY = Math.Max(minY + 50, GameCanvas.loadmap.maxHMap - 80);
+
+		for (int r = 0; r <= 15; r++)
+		{
+			for (int dx = -r; dx <= r; dx++)
+			{
+				for (int dy = -r; dy <= r; dy++)
+				{
+					if (Math.Abs(dx) != r && Math.Abs(dy) != r) continue;
+					int cx = prefX + dx * wTile;
+					int cy = prefY + dy * wTile;
+
+					if (cx < minX || cx > maxX || cy < minY || cy > maxY) continue;
+					int tile = GameCanvas.loadmap.getTile(cx, cy);
+					if (tile == 1 || tile == -1) continue;
+
+					bool nearVgo = false;
+					if (LoadMap.vecPointChange != null)
+					{
+						for (int i = 0; i < LoadMap.vecPointChange.size(); i++)
+						{
+							Point pt = (Point)LoadMap.vecPointChange.elementAt(i);
+							if (pt != null)
+							{
+								int distVgo = MainObject.getDistance(cx, cy, pt.x, pt.y);
+								if (distVgo < 130)
+								{
+									nearVgo = true;
+									break;
+								}
+							}
+						}
+					}
+					if (nearVgo) continue;
+
+					return new int[] { cx, cy };
+				}
+			}
+		}
+		return new int[] { prefX, prefY };
+	}
+
+	public static Dictionary<MainObject, int[]> startGomAllFollow(Player p, int offsetX, int offsetY, bool follow, bool useMapCenter)
+	{
+		Dictionary<MainObject, int[]> saved = new Dictionary<MainObject, int[]>();
 		if (p == null)
 		{
 			return saved;
@@ -512,8 +682,22 @@ public class AThMadaraFunc
 				return saved;
 			}
 
-			int targetX = p.x + offsetX;
-			int targetY = p.y + offsetY;
+			int prefX;
+			int prefY;
+			if (useMapCenter && GameCanvas.loadmap != null)
+			{
+				prefX = GameCanvas.loadmap.maxWMap / 2;
+				prefY = GameCanvas.loadmap.maxHMap / 2;
+			}
+			else
+			{
+				prefX = p.x + offsetX;
+				prefY = p.y + offsetY;
+			}
+
+			int[] safePos = findSafeGomPosition(p, prefX, prefY);
+			int targetX = safePos[0];
+			int targetY = safePos[1];
 			gomFixedX = targetX;
 			gomFixedY = targetY;
 			gomUseMapCenter = useMapCenter;
@@ -521,10 +705,10 @@ public class AThMadaraFunc
 			for (int i = 0; i < vec.size(); ++i)
 			{
 				object o = vec.elementAt(i);
-				if (o is MainMonster)
+				if (o is MainObject)
 				{
-					MainMonster m = (MainMonster)o;
-					if (m == null || m.isRemove)
+					MainObject m = (MainObject)o;
+					if (m == null || m.isRemove || m.typeObject != 1)
 					{
 						continue;
 					}
@@ -572,13 +756,20 @@ public class AThMadaraFunc
 			int targetY;
 			if (gomUseMapCenter)
 			{
+				if (gomFixedX == 0 && gomFixedY == 0 && GameCanvas.loadmap != null)
+				{
+					int[] safePos = findSafeGomPosition(p, GameCanvas.loadmap.maxWMap / 2, GameCanvas.loadmap.maxHMap / 2);
+					gomFixedX = safePos[0];
+					gomFixedY = safePos[1];
+				}
 				targetX = gomFixedX;
 				targetY = gomFixedY;
 			}
 			else if (gomFollowPlayer)
 			{
-				targetX = p.x + gomOffsetX;
-				targetY = p.y + gomOffsetY;
+				int[] safePos = findSafeGomPosition(p, p.x + gomOffsetX, p.y + gomOffsetY);
+				targetX = safePos[0];
+				targetY = safePos[1];
 			}
 			else
 			{
@@ -587,7 +778,7 @@ public class AThMadaraFunc
 				{
 					return;
 				}
-				MainMonster first = it.Current.Key;
+				MainObject first = it.Current.Key;
 				if (first == null)
 				{
 					return;
@@ -601,10 +792,10 @@ public class AThMadaraFunc
 				for (int i = 0; i < GameScreen.vecPlayers.size(); ++i)
 				{
 					object o = GameScreen.vecPlayers.elementAt(i);
-					if (o is MainMonster)
+					if (o is MainObject)
 					{
-						MainMonster m = (MainMonster)o;
-						if (m == null || m.isRemove || m.isDie || m.Hp <= 0) continue;
+						MainObject m = (MainObject)o;
+						if (m == null || m.isRemove || m.isDie || m.Hp <= 0 || m.typeObject != 1) continue;
 						if (!gomSavedGlobal.ContainsKey(m))
 						{
 							try { gomSavedGlobal.Add(m, new int[8] { m.x, m.y, m.toX, m.toY, m.toXNew, m.toYNew, m.vx, m.vy }); } catch (Exception) {}
@@ -629,9 +820,9 @@ public class AThMadaraFunc
 		}
 	}
 
-	public static void stopGomAll(Dictionary<MainMonster, int[]> saved)
+	public static void stopGomAll(Dictionary<MainObject, int[]> saved)
 	{
-		Dictionary<MainMonster, int[]> toRestore = (saved != null) ? saved : gomSavedGlobal;
+		Dictionary<MainObject, int[]> toRestore = (saved != null) ? saved : gomSavedGlobal;
 		if (toRestore == null)
 		{
 			return;
@@ -640,7 +831,7 @@ public class AThMadaraFunc
 		{
 			foreach (var pair in toRestore)
 			{
-				MainMonster m = pair.Key;
+				MainObject m = pair.Key;
 				int[] s = pair.Value;
 				if (m == null || s == null || s.Length < 8)
 				{
@@ -682,6 +873,19 @@ public class AThMadaraFunc
 		}
 	}
 
+	public static void resetGomData()
+	{
+		if (gomSavedGlobal != null)
+		{
+			gomSavedGlobal.Clear();
+		}
+		gomSavedGlobal = null;
+		gomFollowPlayer = false;
+		gomUseMapCenter = false;
+		gomOffsetX = (gomOffsetY = 0);
+		gomFixedX = (gomFixedY = 0);
+	}
+
 	private static bool isAttackable(MainObject t)
 	{
 		return t != null && !t.returnAction() && !t.isDie && t.Hp > 0 && !t.isRemove;
@@ -696,6 +900,15 @@ public class AThMadaraFunc
 			p.y = y;
 			p.xLast = x;
 			p.yLast = y;
+			p.toX = x;
+			p.toY = y;
+			p.xStand = x;
+			p.yStand = y;
+			p.vx = 0;
+			p.vy = 0;
+			p.isMoveNor = false;
+			p.posTransRoad = null;
+			p.countAutoMove = 0;
 			Player.isSendMove = true;
 		}
 		catch (Exception)

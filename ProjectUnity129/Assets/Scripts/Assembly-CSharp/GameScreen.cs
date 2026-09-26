@@ -15,6 +15,10 @@ public class GameScreen : MainScreen
 	public static mVector vecPlayers = new mVector("GameScreen.vecPlayers");
 
 	public static bool isVecPlayersDirty = false;
+	private static string s_cachedDbgStr = string.Empty;
+	private static int s_lastDbgX = -99999;
+	private static int s_lastDbgY = -99999;
+	private static int s_lastDbgMap = -99999;
 
 	public static void updateCameraBounds()
 	{
@@ -268,6 +272,8 @@ public class GameScreen : MainScreen
 
 	public bool isFullScreen;
 
+	public float fullScreenAlpha;
+
 	public static bool isOnRepeatQuest = false;
 
 	public static short numDot = 0;
@@ -472,11 +478,8 @@ public class GameScreen : MainScreen
 		cmdSudo = new iCommand(T.suPhu, 63, this);
 		cmdBaisu = new iCommand(T.baisu, 64, this);
 		cmdPet = new iCommand(T.pet, 65, this);
-		if (!GameCanvas.isTouch)
-		{
-			right = cmdNextFocus;
-			left = cmdInfoMe;
-		}
+		right = cmdNextFocus;
+		left = cmdInfoMe;
 		if (GameMidlet.DEVICE == 0)
 		{
 			new Effect_Skill();
@@ -485,6 +488,18 @@ public class GameScreen : MainScreen
 
 	public override void commandPointer(int index, int subIndex)
 	{
+		if (index >= 1251 && index < 1251 + UIThemeManager.TOTAL_THEMES)
+		{
+			int selTheme = index - 1251;
+			UIThemeManager.setTheme(selTheme);
+			GameCanvas.menu.doCloseMenu();
+			return;
+		}
+		if (index == 1250)
+		{
+			openSelectThemeMenu();
+			return;
+		}
 		switch (index)
 		{
 		case -52:
@@ -1059,7 +1074,9 @@ public class GameScreen : MainScreen
 			}
 			break;
 		case 65:
-			GlobalService.gI().Send_Pet(3);
+			DualTabScreen.gI().curMainTab = 4;
+			DualTabScreen.gI().openPetSubView();
+			DualTabScreen.gI().Show(this);
 			break;
 		case 99:
 			if (isOnRepeatQuest)
@@ -1194,7 +1211,7 @@ public class GameScreen : MainScreen
 		{
 			MsgAutoFire autoFireDlg = new MsgAutoFire();
 			autoFireDlg.setinfoAuto_Fire();
-			GameCanvas.Start_Sub_Dialog(autoFireDlg);
+			GameCanvas.Start_Current_Dialog(autoFireDlg);
 			break;
 		}
 		case 114: // Mở menu chọn tốc độ game (1-10)
@@ -1490,6 +1507,32 @@ public class GameScreen : MainScreen
 			AThMadaraMOD.saveGraphicsSettings();
 			AThMadaraMOD.openGraphicsMenu();
 			break;
+		case 372: // Auto Thi Đấu Biển (RedLine)
+			AThMadaraMOD.isAutoRedLine = !AThMadaraMOD.isAutoRedLine;
+			AThMadaraMOD.saveAutoRedLineSettings();
+			Interface_Game.addInfoPlayerNormal("Auto Thi Dau Bien: " + (AThMadaraMOD.isAutoRedLine ? "Bat" : "Tat"), mFont.tahoma_7_yellow);
+			AThMadaraMOD.getInstance().openMenuAuto();
+			break;
+		case 373: // Hiệu ứng Map nền
+			AThMadaraMOD.isShowMapEffect = !AThMadaraMOD.isShowMapEffect;
+			AThMadaraMOD.saveGraphicsSettings();
+			AThMadaraMOD.openGraphicsMenu();
+			break;
+		case 374: // Giảm Particle / Hiệu ứng
+			AThMadaraMOD.isReduceParticle = !AThMadaraMOD.isReduceParticle;
+			AThMadaraMOD.saveGraphicsSettings();
+			AThMadaraMOD.openGraphicsMenu();
+			break;
+		case 375: // Preset Cân Bằng
+			AThMadaraMOD.setPresetBalanced();
+			AThMadaraMOD.openGraphicsMenu();
+			break;
+		case 376: // Auto Reconnect
+			AThMadaraMOD.isAutoReconnect2 = !AThMadaraMOD.isAutoReconnect2;
+			AThMadaraMOD.saveAutoRedLineSettings();
+			Interface_Game.addInfoPlayerNormal("Auto Reconnect: " + (AThMadaraMOD.isAutoReconnect2 ? "Bat" : "Tat"), mFont.tahoma_7_yellow);
+			AThMadaraMOD.openSystemMenu();
+			break;
 		}
 	}
 
@@ -1585,6 +1628,9 @@ public class GameScreen : MainScreen
 		mVector2.addElement(o4);
 		iCommand o5 = new iCommand(T.chooseSpeedUpMenu, 103, this);
 		mVector2.addElement(o5);
+		UITheme curTheme = UIThemeManager.getCurrentTheme();
+		string curThemeName = (curTheme != null) ? curTheme.displayName : "Gốc";
+		mVector2.addElement(new iCommand("🎨 Giao diện: " + curThemeName, 1250, this));
 		mVector2.addElement(o);
 		mVector2.addElement(cmdMPHP);
 		mVector2.addElement(cmdGetItem);
@@ -1642,6 +1688,23 @@ public class GameScreen : MainScreen
 	private void setCaptionCmdAutoGetItem()
 	{
 		GameCanvas.menuCur.updateMenuGame(getMenuGameNew());
+	}
+
+	public void openSelectThemeMenu()
+	{
+		mVector vec = new mVector();
+		string[] names = UIThemeManager.getThemeNames();
+		int curTheme = UIThemeManager.getCurrentThemeId();
+		for (int i = 0; i < names.Length; i++)
+		{
+			iCommand cmd = new iCommand(names[i], 1251 + i, this);
+			vec.addElement(cmd);
+		}
+		GameCanvas.menu.startAt(vec, 2, "Chọn Giao Diện");
+		if (curTheme >= 0 && curTheme < names.Length)
+		{
+			GameCanvas.menu.menuSelectedItem = curTheme;
+		}
 	}
 
 	private void doMenuSettingView()
@@ -1833,17 +1896,23 @@ public class GameScreen : MainScreen
 		GameCanvas.loadmap.paint(g);
 		if (isFullScreen)
 		{
-			g.drawRecAlpa(0, 0, GameCanvas.loadmap.mapW * 24, GameCanvas.loadmap.mapH * 24, colorRec);
+			int camX = (MainScreen.cameraMain != null) ? MainScreen.cameraMain.xCam : 0;
+			int camY = (MainScreen.cameraMain != null) ? MainScreen.cameraMain.yCam : 0;
+			int sW = (GameCanvas.w > 0) ? GameCanvas.w : MotherCanvas.w;
+			int sH = (GameCanvas.h > 0) ? GameCanvas.h : MotherCanvas.h;
+			float baseAlpha = (fullScreenAlpha > 0f) ? (fullScreenAlpha * 0.45f) : 0.35f;
+			g.setColor(colorRec, baseAlpha);
+			g.fillRect(camX - 60, camY - 60, sW + 120, sH + 120, isA: false);
 		}
 		else if (wRec > 0)
 		{
 			g.fillRecAlpla(xRec, yRec, wRec, hRec, colorRec);
 		}
-		if (GameCanvas.mapBack != null)
+		if (!isFullScreen && GameCanvas.mapBack != null)
 		{
 			GameCanvas.mapBack.paintLast(g);
 		}
-		if (effSea != null)
+		if (!isFullScreen && effSea != null)
 		{
 			effSea.paintSea(g);
 		}
@@ -1915,7 +1984,11 @@ public class GameScreen : MainScreen
 					{
 						numo++;
 					}
-					if (checkPaintLow(ob))
+					if (ob == null || ob.isRemove || ob.isStop)
+					{
+						// Bỏ qua object bị đánh dấu xóa hoặc dừng
+					}
+					else if (checkPaintLow(ob))
 					{
 						ob.paintOnlyShadown(g);
 					}
@@ -1965,6 +2038,16 @@ public class GameScreen : MainScreen
 			Point point2 = (Point)LoadMap.vecPointChange.elementAt(n);
 			g.drawRegion(AvMain.imgSelect, 0, 0, 12, 16, LoadMap.mTranPointChangeMap[point2.dis], point2.x + GameCanvas.gameTick % 6 * point2.vx, point2.y + GameCanvas.gameTick % 6 * point2.vy, 3);
 			AvMain.Font3dWhite(g, point2.name, point2.x2 + GameCanvas.gameTick % 6 * point2.vx, point2.y2 + GameCanvas.gameTick % 6 * point2.vy, point2.f);
+		}
+		if (isFullScreen)
+		{
+			int camX = (MainScreen.cameraMain != null) ? MainScreen.cameraMain.xCam : 0;
+			int camY = (MainScreen.cameraMain != null) ? MainScreen.cameraMain.yCam : 0;
+			int sW = (GameCanvas.w > 0) ? GameCanvas.w : MotherCanvas.w;
+			int sH = (GameCanvas.h > 0) ? GameCanvas.h : MotherCanvas.h;
+			float alpha = (fullScreenAlpha > 0f) ? fullScreenAlpha : 0.80f;
+			g.setColor(colorRec, alpha);
+			g.fillRect(camX - 60, camY - 60, sW + 120, sH + 120, isA: false);
 		}
 		if (isShowSkillPlayer)
 		{
@@ -2088,11 +2171,17 @@ public class GameScreen : MainScreen
 			}
 			if (GameCanvas.loadmap != null && player != null)
 			{
-				string debugStr = "Map: " + GameCanvas.loadmap.idMap + " | X: " + player.x + " (" + (player.x / 24) + ") | Y: " + player.y + " (" + (player.y / 24) + ") | W: " + GameCanvas.loadmap.maxWMap + " H: " + GameCanvas.loadmap.maxHMap;
+				if (player.x != s_lastDbgX || player.y != s_lastDbgY || GameCanvas.loadmap.idMap != s_lastDbgMap)
+				{
+					s_lastDbgX = player.x;
+					s_lastDbgY = player.y;
+					s_lastDbgMap = GameCanvas.loadmap.idMap;
+					s_cachedDbgStr = "Map: " + GameCanvas.loadmap.idMap + " | X: " + player.x + " (" + (player.x / 24) + ") | Y: " + player.y + " (" + (player.y / 24) + ") | W: " + GameCanvas.loadmap.maxWMap + " H: " + GameCanvas.loadmap.maxHMap;
+				}
 				int strH = mFont.tahoma_7_yellow.getHeight();
 				int debugX = 4;
 				int debugY = MotherCanvas.h - strH - 4 - (GameCanvas.isTouch ? 0 : 15);
-				mFont.tahoma_7_yellow.drawString(g, debugStr, debugX + 4, debugY + 2, 0);
+				mFont.tahoma_7_yellow.drawString(g, s_cachedDbgStr, debugX + 4, debugY + 2, 0);
 			}
 		}
 		else if (GameCanvas.currentScreen == GameCanvas.gameScr && !GameCanvas.menuCur.isShowMenu && GameCanvas.currentDialog == null)
@@ -2181,7 +2270,7 @@ public class GameScreen : MainScreen
 
 	public bool checkPaintOB(MainObject obj)
 	{
-		if (obj == null)
+		if (obj == null || obj.isRemove || obj.isStop)
 		{
 			return false;
 		}
@@ -2332,9 +2421,13 @@ public class GameScreen : MainScreen
 					mainObject.isRemove = true;
 				}
 			}
-			if (isPvPNew && mainObject != player && objPvPNew == null)
+			if (isPvPNew && mainObject != player && mainObject.typeObject == 0 && (objPvPNew == null || objPvPNew.isRemove || objPvPNew.typeObject != 0))
 			{
 				objPvPNew = mainObject;
+			}
+			if (objPvPNew != null && objPvPNew.isRemove)
+			{
+				objPvPNew = null;
 			}
 		}
 		for (int l = 0; l < vecHighDataEff.size(); l++)
@@ -2346,6 +2439,7 @@ public class GameScreen : MainScreen
 				if (dataSkillEff.wantDestroy)
 				{
 					vecHighDataEff.removeElementAt(l);
+					l--;
 				}
 			}
 		}
@@ -2447,21 +2541,27 @@ public class GameScreen : MainScreen
 		int num3 = vecEffTam.size();
 		for (int num4 = 0; num4 < num3; num4++)
 		{
-			MainEffect mainEffect3 = (MainEffect)vecEffTam.elementAt(0);
-			if (mainEffect3.CreateEffectSkill())
+			MainEffect mainEffect3 = (MainEffect)vecEffTam.elementAt(num4);
+			try
 			{
-				int num5 = find_Index_Stop(VecEffect);
-				if (num5 == VecEffect.size())
+				if (mainEffect3 != null && mainEffect3.CreateEffectSkill())
 				{
-					VecEffect.addElement(mainEffect3);
-				}
-				else
-				{
-					VecEffect.setElementAt(mainEffect3, num5);
+					int num5 = find_Index_Stop(VecEffect);
+					if (num5 == VecEffect.size())
+					{
+						VecEffect.addElement(mainEffect3);
+					}
+					else
+					{
+						VecEffect.setElementAt(mainEffect3, num5);
+					}
 				}
 			}
-			vecEffTam.removeElementAt(0);
+			catch (Exception)
+			{
+			}
 		}
+		vecEffTam.removeAllElements();
 		Interface_Game.updateNumMess();
 		Interface_Game.updateMoveTo();
 		interfaceGame.updateShowNameMap();
@@ -2686,7 +2786,25 @@ public class GameScreen : MainScreen
 				{
 					return;
 				}
-				if (mainObject.Action != 2 && mainObject.Action != 4 && mainObject.skillCurrent == null)
+				if (mainObject.Action == 4 || MainObject.getDistance(mainObject.x, mainObject.y, obj.x, obj.y) > 150)
+				{
+					mainObject.x = obj.x;
+					mainObject.y = obj.y;
+					mainObject.toX = obj.x;
+					mainObject.toY = obj.y;
+					mainObject.toXNew = obj.x;
+					mainObject.toYNew = obj.y;
+					mainObject.xStand = obj.x;
+					mainObject.yStand = obj.y;
+					mainObject.vx = 0;
+					mainObject.vy = 0;
+					mainObject.isMoveNor = false;
+					if (mainObject.Action == 4 && mainObject.Hp > 0)
+					{
+						mainObject.Reveive();
+					}
+				}
+				else if (mainObject.Action != 2 && mainObject.skillCurrent == null)
 				{
 					if (mainObject.timeBeginUpdateMove < 0)
 					{
@@ -2723,42 +2841,17 @@ public class GameScreen : MainScreen
 				GameCanvas.clearKeyPressed(45);
 				QuickMenu.gI().startAt();
 			}
-			else if (GameCanvas.keyMyHold[34] || GameCanvas.keyMyPressed[34]) // Phim A -> Auto Fire
-			{
-				GameCanvas.clearKeyHold(34);
-				GameCanvas.clearKeyPressed(34);
-				if (Interface_Game.isAutoFireInterface || Player.typeAutoFireMain != -1)
-				{
-					Interface_Game.isAutoFireInterface = !Interface_Game.isAutoFireInterface;
-				}
-				else
-				{
-					Interface_Game.addInfoPlayerNormal("Chưa cài đặt auto hoặc chưa nhận nhiệm vụ", mFont.tahoma_7_yellow);
-				}
-			}
 			else if (GameCanvas.keyMyHold[48] || GameCanvas.keyMyPressed[48]) // Phim T -> Tan Sat
 			{
 				GameCanvas.clearKeyHold(48);
 				GameCanvas.clearKeyPressed(48);
 				commandPointer(108, 0);
 			}
-			else if (GameCanvas.keyMyHold[51] || GameCanvas.keyMyPressed[51]) // Phim B -> Dong Bang Quai
+			else if (GameCanvas.keyMyHold[51] || GameCanvas.keyMyPressed[51]) // Phim I -> Dong Bang Quai
 			{
 				GameCanvas.clearKeyHold(51);
 				GameCanvas.clearKeyPressed(51);
 				commandPointer(111, 0);
-			}
-			else if (GameCanvas.keyMyHold[31] || GameCanvas.keyMyPressed[31]) // Phim G -> Gom Quai
-			{
-				GameCanvas.clearKeyHold(31);
-				GameCanvas.clearKeyPressed(31);
-				commandPointer(112, 0);
-			}
-			else if (GameCanvas.keyMyHold[37] || GameCanvas.keyMyPressed[37]) // Phim K -> Doi Khu
-			{
-				GameCanvas.clearKeyHold(37);
-				GameCanvas.clearKeyPressed(37);
-				commandPointer(16, 0);
 			}
 		}
 
@@ -2877,7 +2970,25 @@ public class GameScreen : MainScreen
 
 	public static void addPlayer(MainObject obj)
 	{
+		if (obj == null) return;
+		for (int i = 0; i < vecPlayers.size(); i++)
+		{
+			MainObject existing = (MainObject)vecPlayers.elementAt(i);
+			if (existing != null && existing.typeObject == obj.typeObject)
+			{
+				short existingId = (existing.typeObject == 10) ? existing.IDMainShiper : existing.ID;
+				short newId = (obj.typeObject == 10) ? obj.IDMainShiper : obj.ID;
+				if (existingId == newId)
+				{
+					// Đã tồn tại object cùng ID và type -> thay thế instance cũ, tránh duplicate ghost bot
+					vecPlayers.setElementAt(obj, i);
+					isVecPlayersDirty = true;
+					return;
+				}
+			}
+		}
 		vecPlayers.addElement(obj);
+		isVecPlayersDirty = true;
 	}
 
 	public static MainItemMap addEffectAuto(string key, string value)
@@ -2892,10 +3003,23 @@ public class GameScreen : MainScreen
 			MainObject mainObject = (MainObject)vecPlayers.elementAt(i);
 			if (mainObject != player && (mainObject.typeObject != 10 || mainObject.IDMainShiper != player.ID))
 			{
-				mainObject.isRemove = true;
+				vecPlayers.removeElementAt(i);
+				i--;
 			}
 		}
+		isVecPlayersDirty = true;
 		vecBoat.removeAllElements();
+		try
+		{
+			AThMadaraFunc.resetGomData();
+			if (player != null)
+			{
+				player.oldMonsterPos = null;
+			}
+		}
+		catch (Exception)
+		{
+		}
 		GameCanvas.gameScr.resetRecAlpha();
 	}
 
@@ -2914,16 +3038,17 @@ public class GameScreen : MainScreen
 
 	public static int find_Index_Stop(mVector vec)
 	{
-		int result = vec.size();
-		for (int i = 0; i < vec.size(); i++)
+		if (vec == null) return 0;
+		int sz = vec.size();
+		for (int i = 0; i < sz; i++)
 		{
 			MainEffect mainEffect = (MainEffect)vec.elementAt(i);
-			if (mainEffect.isStop && !mainEffect.isRemove)
+			if (mainEffect != null && (mainEffect.isStop || mainEffect.isRemove))
 			{
 				return i;
 			}
 		}
-		return result;
+		return sz;
 	}
 
 	public static void addLazer(sbyte type, int x, int y, int xto, int yto)
@@ -3033,6 +3158,11 @@ public class GameScreen : MainScreen
 			}
 			mVector clonedTargets = cloneTargetVector(vecObjsBeFire);
 			Effect_Skill o = new Effect_Skill(effId, (skill != null) ? skill.typeSub : 0, objkill, clonedTargets);
+			if (skill != null)
+			{
+				o.skill = skill;
+				o.timeEnd = skill.timebuff;
+			}
 			vecEffTam.addElement(o);
 		}
 	}
@@ -3060,7 +3190,12 @@ public class GameScreen : MainScreen
 				x = skill.x,
 				y = skill.y,
 				vecPos = skill.vecPos,
-				lvDevil = (skill != null) ? skill.lvDevil : (sbyte)0
+				lvDevil = (skill != null) ? skill.lvDevil : (sbyte)0,
+				typeEffBuff = (skill != null) ? skill.typeEffBuff : (short)0,
+				timebuff = (skill != null) ? skill.timebuff : (short)0,
+				timeBegin = (skill != null) ? skill.timeBegin : GameCanvas.timeNow,
+				typeBuff = (skill != null) ? skill.typeBuff : (sbyte)0,
+				isBuff = (skill != null) && skill.isBuff
 			};
 			Effect_Skill o = new Effect_Skill(customSk, objkill);
 			vecEffTam.addElement(o);
@@ -3082,7 +3217,12 @@ public class GameScreen : MainScreen
 				x = skill.x,
 				y = skill.y,
 				vecPos = skill.vecPos,
-				lvDevil = (skill != null) ? skill.lvDevil : (sbyte)0
+				lvDevil = (skill != null) ? skill.lvDevil : (sbyte)0,
+				typeEffBuff = (skill != null) ? skill.typeEffBuff : (short)0,
+				timebuff = (skill != null) ? skill.timebuff : (short)0,
+				timeBegin = (skill != null) ? skill.timeBegin : GameCanvas.timeNow,
+				typeBuff = (skill != null) ? skill.typeBuff : (sbyte)0,
+				isBuff = (skill != null) && skill.isBuff
 			};
 			Effect_Skill o = new Effect_Skill(customSk, objkill, customSk.x, customSk.y, customSk.vecPos);
 			vecEffTam.addElement(o);
@@ -3149,6 +3289,11 @@ public class GameScreen : MainScreen
 	public static void isPaintNormal()
 	{
 		typePaintGameScreen = 0;
+		if (GameCanvas.gameScr != null)
+		{
+			GameCanvas.gameScr.isFullScreen = false;
+			GameCanvas.gameScr.fullScreenAlpha = 0f;
+		}
 		vecEffSkillSpec.removeAllElements();
 		for (int i = 0; i < vecPlayers.size(); i++)
 		{
@@ -3426,6 +3571,12 @@ public class GameScreen : MainScreen
 	public static void addHightDataeff(short type, int x, int y, bool changeFlip)
 	{
 		DataSkillEff o = new DataSkillEff(type, x, y, changeFlip);
+		vecHighDataEff.addElement(o);
+	}
+
+	public static void addHightDataeff(short type, int x, int y, bool changeFlip, int rotate)
+	{
+		DataSkillEff o = new DataSkillEff(type, x, y, changeFlip, rotate);
 		vecHighDataEff.addElement(o);
 	}
 
