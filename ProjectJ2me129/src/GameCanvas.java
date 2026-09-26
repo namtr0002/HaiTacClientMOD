@@ -329,6 +329,9 @@ public final class GameCanvas extends MotherCanvas {
       fristLoginScr.setBeginGame();
    }
 
+   private static int _dbgPaintTick = 0;
+   private static MainScreen _dbgLastScreen = null;
+   private static int _dbgGameScrFrames = 0;
    public final void paint(Graphics g) {
       try {
          this.g.g = g;
@@ -336,8 +339,24 @@ public final class GameCanvas extends MotherCanvas {
             this.g.setColor(0);
             this.g.fillRect(0, 0, MotherCanvas.w, MotherCanvas.h);
          }
+         if (currentScreen != _dbgLastScreen) {
+            _dbgLastScreen = currentScreen;
+            String scrName = currentScreen == loadMapScr ? "loadMapScr"
+                           : currentScreen == gameScr ? "gameScr"
+                           : currentScreen == loginScr ? "loginScr"
+                           : currentScreen != null ? currentScreen.getClass().getSimpleName() : "NULL";
+            System.out.println("[paint] SCREEN CHANGED TO: " + scrName + " isNextMap=" + LoadMapScreen.isNextMap + " isLoadDataMon=" + LoadMapScreen.isLoadDataMon + " BH=" + BH);
+         }
+         if (currentScreen == gameScr && ++_dbgGameScrFrames <= 30) {
+            System.out.println("[paint gameScr] frame=" + _dbgGameScrFrames + " BH=" + BH + " isOnlineMap=" + LoadMap.isOnlineMap + " mapW=" + loadmap.mapW + " mapH=" + loadmap.mapH + " idTile=" + LoadMap.idTile + " camera=" + (MainScreen.cameraMain != null ? (MainScreen.cameraMain.xCam + "," + MainScreen.cameraMain.yCam) : "null") + " player=" + (GameScreen.player != null ? (GameScreen.player.x + "," + GameScreen.player.y) : "null"));
+         }
 
-         currentScreen.paint(this.g);
+         try {
+            currentScreen.paint(this.g);
+         } catch (Throwable t) {
+            System.out.println("[paint] CRASH IN currentScreen.paint (" + currentScreen + "): " + t);
+            t.printStackTrace();
+         }
          resetTrans(this.g);
          if (GameScreen.h12plus > 0) {
             this.g.setColor(0);
@@ -427,6 +446,19 @@ public final class GameCanvas extends MotherCanvas {
          if (GameScreen.isPvPNew) {
             Interface_Game.AL();
             Interface_Game.AM();
+         }
+
+         if (AThMadaraMOD.pendingDisconnect) {
+            AThMadaraMOD.pendingDisconnect = false;
+            String info = (AThMadaraMOD.pendingDisconnectMsg != null && AThMadaraMOD.pendingDisconnectMsg.length() > 0)
+                  ? AThMadaraMOD.pendingDisconnectMsg : T.AJ;
+            AThMadaraMOD.pendingDisconnectMsg = "";
+            Session_ME.getInstance().close();
+            GameScreen.player = null;
+            if (currentScreen != loginScr && currentScreen != fristLoginScr) {
+               loginScr.Show();
+            }
+            Start_Normal_Only_CmdClose_DiaLog(info);
          }
 
          if (currentDialog != null) {
@@ -571,6 +603,14 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
    }
 
    public final void keyPressed(int var1) {
+      try {
+         int ga = this.getGameAction(var1);
+         if (ga == 1) var1 = -1;
+         else if (ga == 6) var1 = -2;
+         else if (ga == 2) var1 = -3;
+         else if (ga == 5) var1 = -4;
+         else if (ga == 8) var1 = -5;
+      } catch (Exception e) {}
       CW = 4500;
       Player.QT = false;
       MsgDialog.isAuroReconect = false;
@@ -792,6 +832,14 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
    }
 
    public final void keyReleased(int var1) {
+      try {
+         int ga = this.getGameAction(var1);
+         if (ga == 1) var1 = -1;
+         else if (ga == 6) var1 = -2;
+         else if (ga == 2) var1 = -3;
+         else if (ga == 5) var1 = -4;
+         else if (ga == 8) var1 = -5;
+      } catch (Exception e) {}
       if (TField.AF) {
          DF = 0;
       }
@@ -910,10 +958,13 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
       switch(var1) {
       case -7:
          AL[13] = false;
+         AK[13] = false;
+         return;
       default:
          return;
       case -6:
          AL[12] = false;
+         AK[12] = false;
          return;
       case -5:
       case 10:
@@ -938,9 +989,11 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
          return;
       case 35:
          AL[11] = false;
+         AK[11] = false;
          return;
       case 42:
          AL[10] = false;
+         AK[10] = false;
          return;
       case 48:
       case 49:
@@ -953,6 +1006,8 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
       case 56:
       case 57:
          AL[var1 - 28] = false;
+         AK[var1 - 28] = false;
+         return;
       }
    }
 
@@ -1188,64 +1243,101 @@ if ((hostLower.equals("127.0.0.1") || hostLower.equals("localhost"))
    public static boolean isKeyPressed(int var0) {
       switch(var0) {
       case 0:
-         if (!AL[4] && !AL[24] && !AL[34]) {
-            break;
-         }
-
-         return true;
+         return AL[4] || AL[24] || AL[34];
       case 1:
-         if (!AL[2] && !AL[22] && !AL[32]) {
-            break;
-         }
-
-         return true;
+         return AL[2] || AL[22] || AL[32];
       case 2:
-         if (AL[6] || AL[26] || AL[36]) {
-            return true;
-         }
-         break;
+         return AL[6] || AL[26] || AL[36];
       case 3:
-         if (AL[8] || AL[28] || AL[38]) {
+         return AL[8] || AL[28] || AL[38];
+      default:
+         if (var0 >= 0 && var0 < AL.length && (AL[var0] || AK[var0])) {
             return true;
          }
+         return false;
       }
+   }
 
-      return false;
+   public static boolean keyMovePressed(int var0) {
+      switch(var0) {
+      case 0:
+         return AK[4] || AK[24] || AK[34];
+      case 1:
+         return AK[2] || AK[22] || AK[32];
+      case 2:
+         return AK[6] || AK[26] || AK[36];
+      case 3:
+         return AK[8] || AK[28] || AK[38];
+      default:
+         return false;
+      }
    }
 
    public static void ClearkeyMove(int var0) {
       clearKeyPressed(var0);
    }
 
-       public static void clearKeyPressed() {
-        clearKeyPressed(0);
-        clearKeyPressed(1);
-        clearKeyPressed(2);
-        clearKeyPressed(3);
-    }
+   public static void clearKeyPressed() {
+      for (int i = 0; i < AL.length; i++) {
+         AL[i] = false;
+         AK[i] = false;
+      }
+   }
 
-public static void clearKeyPressed(int var0) {
+   public static void clearKeyPressed(int var0) {
       switch(var0) {
       case 0:
          AL[4] = false;
          AL[24] = false;
          AL[34] = false;
+         AK[4] = false;
+         AK[24] = false;
+         AK[34] = false;
          return;
       case 1:
          AL[2] = false;
          AL[22] = false;
          AL[32] = false;
+         AK[2] = false;
+         AK[22] = false;
+         AK[32] = false;
          return;
       case 2:
          AL[6] = false;
          AL[26] = false;
          AL[36] = false;
-      default:
+         AK[6] = false;
+         AK[26] = false;
+         AK[36] = false;
          return;
       case 3:
          AL[8] = false;
          AL[28] = false;
          AL[38] = false;
+         AK[8] = false;
+         AK[28] = false;
+         AK[38] = false;
+         return;
+      case 12:
+      case 40:
+         AL[12] = false;
+         AL[40] = false;
+         AK[12] = false;
+         AK[40] = false;
+         return;
+      case 13:
+      case 41:
+         AL[13] = false;
+         AL[41] = false;
+         AK[13] = false;
+         AK[41] = false;
+         return;
+      default:
+         if (var0 >= 0 && var0 < AL.length) {
+            AL[var0] = false;
+            AK[var0] = false;
+         }
+         return;
       }
    }
 
@@ -1345,42 +1437,62 @@ public static void clearKeyPressed(int var0) {
       case 0:
          AB(12);
          AB(40);
+         AA(12);
+         AA(40);
          return;
       case 1:
          AB(21);
          AB(31);
+         AA(21);
+         AA(31);
          return;
       case 2:
          AB(13);
          AB(41);
+         AA(13);
+         AA(41);
          return;
       case 3:
          AB(23);
          AB(33);
+         AA(23);
+         AA(33);
          return;
       case 4:
          AB(42);
+         AA(42);
          return;
       case 5:
          AB(5);
          AB(25);
          AB(35);
+         AA(5);
+         AA(25);
+         AA(35);
          return;
       case 6:
          AB(20);
          AB(43);
+         AA(20);
+         AA(43);
          return;
       case 7:
          AB(27);
          AB(37);
+         AA(27);
+         AA(37);
          return;
       case 8:
          AB(11);
          AB(44);
+         AA(11);
+         AA(44);
          return;
       case 9:
          AB(29);
          AB(39);
+         AA(29);
+         AA(39);
          return;
       case 10:
          AB(10);
@@ -1390,21 +1502,27 @@ public static void clearKeyPressed(int var0) {
          return;
       case 11:
          AB(46);
+         AA(46);
          return;
       case 12:
          AB(47);
+         AA(47);
          return;
       case 13:
          AB(48);
+         AA(48);
          return;
       case 14:
          AB(49);
+         AA(49);
          return;
       case 15:
          AB(50);
+         AA(50);
          return;
       case 16:
          AB(51);
+         AA(51);
       default:
       }
    }
