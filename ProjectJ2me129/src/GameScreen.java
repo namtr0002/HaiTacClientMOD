@@ -1327,6 +1327,7 @@ public final class GameScreen extends MainScreen {
          return;
       case 376: // Auto Reconnect
          AThMadaraMOD.isAutoReconnect2 = !AThMadaraMOD.isAutoReconnect2;
+         AThMadaraMOD.isAutoReconnect = AThMadaraMOD.isAutoReconnect2;
          AThMadaraMOD.saveAutoRedLineSettings();
          Interface_Game.addInfoPlayerNormal("Auto Reconnect: " + (AThMadaraMOD.isAutoReconnect2 ? "Bat" : "Tat"), mFont.tahoma_7_yellow);
          AThMadaraMOD.openSystemMenu();

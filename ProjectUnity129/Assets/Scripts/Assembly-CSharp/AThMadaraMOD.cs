@@ -120,18 +120,11 @@ public class AThMadaraMOD
 	public static bool pendingDisconnect = false;
 	public static void triggerAutoReconnect()
 	{
-		if (!isAutoReconnect2) return;
+		if (!isAutoReconnect2 && !isAutoReconnect) return;
 		try
 		{
-			if (TcpClient.getInstant() != null)
-			{
-				TcpClient.getInstant().reconnect();
-				Interface_Game.addInfoPlayerNormal("Dang ket noi lai...", mFont.tahoma_7_yellow);
-			}
-			else
-			{
-				Interface_Game.addInfoPlayerNormal("Khong tim thay ket noi!", mFont.tahoma_7_yellow);
-			}
+			GameCanvas.connectServerP();
+			Interface_Game.addInfoPlayerNormal("Dang ket noi lai...", mFont.tahoma_7_yellow);
 		}
 		catch (Exception e)
 		{
@@ -141,6 +134,7 @@ public class AThMadaraMOD
 	public static void cancelAutoReconnect()
 	{
 		isAutoReconnect = false;
+		isAutoReconnect2 = false;
 	}
 
 	public static int autoReviveMode = 0;
@@ -330,7 +324,12 @@ public class AThMadaraMOD
 			{
 				DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
 				try { isAutoRedLine = dis.readBoolean(); } catch (Exception) {}
-				try { isAutoReconnect2 = dis.readBoolean(); } catch (Exception) {}
+				try
+				{
+					isAutoReconnect2 = dis.readBoolean();
+					isAutoReconnect = isAutoReconnect2;
+				}
+				catch (Exception) {}
 				dis.close();
 			}
 		}
