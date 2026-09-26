@@ -344,9 +344,10 @@ public final class AThMadaraFunc {
     }
 
     public static void updateHutItem(Player p) {
+        if (!AThMadaraMOD.isHutItem) return;
         if (p == null || p.isDie || p.Hp <= 0) return;
         if (GameCanvas.gameTick % 6 != 0) return;
-        int maxDist = AThMadaraMOD.isHutItem ? 1000 : 140;
+        int maxDist = 1000;
 
         if (GameScreen.vecPlayers != null) {
             for (int i = 0; i < GameScreen.vecPlayers.size(); i++) {
