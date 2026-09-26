@@ -107,7 +107,7 @@ public class mGraphics
 
 	private Material lineMaterial;
 
-	private void cache(string key, Texture value)
+	private void cache(object key, Texture value)
 	{
 		if (cachedTextures.Count > 400)
 		{
@@ -115,7 +115,7 @@ public class mGraphics
 		}
 		if (value.width * value.height < MotherCanvas.w * MotherCanvas.h)
 		{
-			cachedTextures.Add(key, value);
+			cachedTextures[key] = value;
 		}
 	}
 
@@ -250,10 +250,6 @@ public class mGraphics
 	{
 		w = System.Math.Max(0, w);
 		h = System.Math.Max(0, h);
-		int zx = x * zoomLevel;
-		int zy = y * zoomLevel;
-		int zw = w * zoomLevel;
-		int zh = h * zoomLevel;
 
 		if (!isClip)
 		{
@@ -261,26 +257,28 @@ public class mGraphics
 			return;
 		}
 
-		int curX = clipX;
-		int curY = clipY;
-		int curW = clipW;
-		int curH = clipH;
+		int curScreenX = clipX + (isTranslate ? clipTX : 0);
+		int curScreenY = clipY + (isTranslate ? clipTY : 0);
+		int targetScreenX = (x * zoomLevel) + (isTranslate ? translateX : 0);
+		int targetScreenY = (y * zoomLevel) + (isTranslate ? translateY : 0);
+		int targetScreenW = w * zoomLevel;
+		int targetScreenH = h * zoomLevel;
 
-		int newX = System.Math.Max(zx, curX);
-		int newY = System.Math.Max(zy, curY);
-		int newRight = System.Math.Min(zx + zw, curX + curW);
-		int newBottom = System.Math.Min(zy + zh, curY + curH);
-		int newW = newRight - newX;
-		int newH = newBottom - newY;
+		int interLeft = System.Math.Max(curScreenX, targetScreenX);
+		int interTop = System.Math.Max(curScreenY, targetScreenY);
+		int interRight = System.Math.Min(curScreenX + clipW, targetScreenX + targetScreenW);
+		int interBottom = System.Math.Min(curScreenY + clipH, targetScreenY + targetScreenH);
+		int interW = interRight - interLeft;
+		int interH = interBottom - interTop;
 
-		if (newW > 0 && newH > 0)
+		if (interW > 0 && interH > 0)
 		{
-			clipX = newX;
-			clipY = newY;
-			clipW = newW;
-			clipH = newH;
-			clipTX = translateX;
-			clipTY = translateY;
+			clipTX = isTranslate ? translateX : 0;
+			clipTY = isTranslate ? translateY : 0;
+			clipX = interLeft - clipTX;
+			clipY = interTop - clipTY;
+			clipW = interW;
+			clipH = interH;
 			isClip = true;
 		}
 		else
@@ -305,10 +303,6 @@ public class mGraphics
 
 	public void drawLine(int x1, int y1, int x2, int y2, bool isA)
 	{
-		x1 *= zoomLevel;
-		y1 *= zoomLevel;
-		x2 *= zoomLevel;
-		y2 *= zoomLevel;
 		if (y1 == y2)
 		{
 			if (x1 > x2)
@@ -331,22 +325,16 @@ public class mGraphics
 			fillRect(x1, y1, 1, y2 - y1, isA);
 			return;
 		}
+		x1 *= zoomLevel;
+		y1 *= zoomLevel;
+		x2 *= zoomLevel;
+		y2 *= zoomLevel;
 		if (isTranslate)
 		{
 			x1 += translateX;
 			y1 += translateY;
 			x2 += translateX;
 			y2 += translateY;
-		}
-		string key = "dl" + r + g + b;
-		Texture2D texture2D = (Texture2D)cachedTextures[key];
-		if (texture2D == null)
-		{
-			texture2D = new Texture2D(1, 1);
-			Color color = new Color(r, g, b);
-			texture2D.SetPixel(0, 0, color);
-			texture2D.Apply();
-			cache(key, texture2D);
 		}
 		Vector2 vector = new Vector2(x1, y1);
 		Vector2 vector2 = new Vector2(x2, y2) - vector;
@@ -373,15 +361,18 @@ public class mGraphics
 				num6 += clipTY;
 			}
 		}
+		Color prevLineColor = GUI.color;
+		GUI.color = new Color(r, g, b, a);
 		if (isClip)
 		{
 			GUI.BeginGroup(new Rect(num5, num6, num7, num8));
 		}
-		Graphics.DrawTexture(new Rect(vector.x - (float)num5, vector.y - (float)num4 - (float)num6, vector2.magnitude, 1f), texture2D);
+		GUI.DrawTexture(new Rect(vector.x - (float)num5, vector.y - (float)num4 - (float)num6, vector2.magnitude, 1f), Texture2D.whiteTexture);
 		if (isClip)
 		{
 			GUI.EndGroup();
 		}
+		GUI.color = prevLineColor;
 		GUIUtility.RotateAroundPivot(0f - num3, vector);
 	}
 
@@ -451,18 +442,6 @@ public class mGraphics
 			x += translateX;
 			y += translateY;
 		}
-		int width = 1;
-		int height = 1;
-		string key = "fr" + width + height + r + g + b + a;
-		Texture2D texture2D = (Texture2D)cachedTextures[key];
-		if (texture2D == null)
-		{
-			texture2D = new Texture2D(width, height);
-			Color color = new Color(r, g, b, a);
-			texture2D.SetPixel(0, 0, color);
-			texture2D.Apply();
-			cache(key, texture2D);
-		}
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
@@ -479,15 +458,18 @@ public class mGraphics
 				num2 += clipTY;
 			}
 		}
+		Color prevColor = GUI.color;
+		GUI.color = new Color(r, g, b, a);
 		if (isClip)
 		{
 			GUI.BeginGroup(new Rect(num, num2, num3, num4));
 		}
-		GUI.DrawTexture(new Rect(x - num, y - num2, w, h), texture2D);
+		GUI.DrawTexture(new Rect(x - num, y - num2, w, h), Texture2D.whiteTexture);
 		if (isClip)
 		{
 			GUI.EndGroup();
 		}
+		GUI.color = prevColor;
 	}
 
 	public void fillArc(int x, int y, int w, int h, int a, int b, bool isSetClip)
@@ -503,7 +485,7 @@ public class mGraphics
 		b = (float)num / 256f;
 		g = (float)num2 / 256f;
 		r = (float)num3 / 256f;
-		a = 255f;
+		a = 1f;
 	}
 
 	public void setColor(Color color)
@@ -511,6 +493,7 @@ public class mGraphics
 		b = color.b;
 		g = color.g;
 		r = color.r;
+		a = color.a;
 	}
 
 	public void setBgColor(int rgb)
@@ -657,28 +640,64 @@ public class mGraphics
 
 	public void drawRegion(Image arg0, int x0, int y0, int w0, int h0, int arg5, int x, int y, int arg8, bool isA)
 	{
-		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8);
+		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8, 0);
 	}
 
 	public void drawRegion(Image arg0, int x0, int y0, int w0, int h0, int arg5, int x, int y, int arg8)
 	{
-		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8);
+		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8, 0);
+	}
+
+	public void drawRegion(Image arg0, int x0, int y0, int w0, int h0, int arg5, int x, int y, int arg8, int rotate)
+	{
+		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8, rotate, 1f, 1f);
+	}
+
+	public void drawRegion(Image arg0, int x0, int y0, int w0, int h0, int arg5, int x, int y, int arg8, int rotate, float scale, float alpha)
+	{
+		_drawRegion(arg0, x0, y0, w0, h0, arg5, x, y, arg8, rotate, scale, alpha);
 	}
 
 	public void drawRegion(mImage arg0, int x0, int y0, int w0, int h0, int arg5, float x, float y, int arg8)
 	{
 		if (arg0 != null && arg0.image != null)
 		{
-			_drawRegion(arg0.image, x0, y0, w0, h0, arg5, (int)x, (int)y, arg8);
+			_drawRegion(arg0.image, x0, y0, w0, h0, arg5, (int)x, (int)y, arg8, 0, 1f, 1f);
+		}
+	}
+
+	public void drawRegion(mImage arg0, int x0, int y0, int w0, int h0, int arg5, float x, float y, int arg8, int rotate)
+	{
+		if (arg0 != null && arg0.image != null)
+		{
+			_drawRegion(arg0.image, x0, y0, w0, h0, arg5, (int)x, (int)y, arg8, rotate, 1f, 1f);
+		}
+	}
+
+	public void drawRegion(mImage arg0, int x0, int y0, int w0, int h0, int arg5, float x, float y, int arg8, int rotate, float scale, float alpha)
+	{
+		if (arg0 != null && arg0.image != null)
+		{
+			_drawRegion(arg0.image, x0, y0, w0, h0, arg5, (int)x, (int)y, arg8, rotate, scale, alpha);
 		}
 	}
 
 	public void __drawRegion(Image image, int x0, int y0, int w, int h, int transform, float x, float y, int anchor)
 	{
-		_drawRegion(image, (float)x0, (float)y0, w, h, transform, (int)x, (int)y, anchor);
+		_drawRegion(image, (float)x0, (float)y0, w, h, transform, (int)x, (int)y, anchor, 0);
 	}
 
 	public void _drawRegion(Image image, float x0, float y0, int w, int h, int transform, int x, int y, int anchor)
+	{
+		_drawRegion(image, x0, y0, w, h, transform, x, y, anchor, 0);
+	}
+
+	public void _drawRegion(Image image, float x0, float y0, int w, int h, int transform, int x, int y, int anchor, int rotate)
+	{
+		_drawRegion(image, x0, y0, w, h, transform, x, y, anchor, rotate, 1f, 1f);
+	}
+
+	public void _drawRegion(Image image, float x0, float y0, int w, int h, int transform, int x, int y, int anchor, int rotate, float scale, float alpha)
 	{
 		if (image == null || image.texture == null || w <= 0 || h <= 0)
 		{
@@ -701,8 +720,8 @@ public class mGraphics
 		if (uv_y + uv_h > 1f) uv_h = 1f - uv_y;
 		if (uv_w <= 0f || uv_h <= 0f) return;
 
-		float sw = (float)w * (float)zoomLevel;
-		float sh = (float)h * (float)zoomLevel;
+		float sw = (float)w * (float)zoomLevel * scale;
+		float sh = (float)h * (float)zoomLevel * scale;
 		float sx = (float)x * (float)zoomLevel;
 		float sy = (float)y * (float)zoomLevel;
 		if (isTranslate)
@@ -720,7 +739,14 @@ public class mGraphics
 		if ((anchor & VCENTER) != 0) sy -= dispH / 2f;
 		else if ((anchor & BOTTOM) != 0) sy -= dispH;
 
-		if (isClip)
+		if (!isClip)
+		{
+			if (sx + dispW < -100f || sx > (float)Screen.width + 100f || sy + dispH < -100f || sy > (float)Screen.height + 100f)
+			{
+				return;
+			}
+		}
+		else
 		{
 			float cx = (float)clipX + (float)(isTranslate ? clipTX : 0);
 			float cy = (float)clipY + (float)(isTranslate ? clipTY : 0);
@@ -773,21 +799,28 @@ public class mGraphics
 			drawUvY = uv_y + uv_h;
 			drawUvH = -uv_h;
 		}
-		else if (transform == 4 || transform == 5 || transform == 6 || transform == 7)
+
+		bool hasMatrixRotation = (rotate != 0) || (transform == 4 || transform == 5 || transform == 6 || transform == 7);
+		if (hasMatrixRotation)
 		{
 			matrixBackup = GUI.matrix;
 			Vector2 pivotPoint = new Vector2(sx + dispW * 0.5f, sy + dispH * 0.5f);
-			float angle = 0f;
-			if (transform == 5) angle = 90f;
-			else if (transform == 6) angle = 270f;
-			else if (transform == 4) { angle = 270f; drawUvX = uv_x + uv_w; drawUvW = -uv_w; }
-			else if (transform == 7) { angle = 270f; drawUvY = uv_y + uv_h; drawUvH = -uv_h; }
+			float angle = (float)rotate;
+			if (transform == 5) angle += 90f;
+			else if (transform == 6) angle += 270f;
+			else if (transform == 4) { angle += 270f; drawUvX = uv_x + uv_w; drawUvW = -uv_w; }
+			else if (transform == 7) { angle += 270f; drawUvY = uv_y + uv_h; drawUvH = -uv_h; }
 			GUIUtility.RotateAroundPivot(angle, pivotPoint);
 		}
 
+		// Fix: Save/restore GUI.color quanh Graphics.DrawTexture
+		// GUI.color bị set bởi fillRect trước đó → tint màu sai lên texture → sọc dọc
+		Color prevGuiColor = GUI.color;
+		GUI.color = (alpha < 1f && alpha >= 0f) ? new Color(1f, 1f, 1f, alpha) : Color.white;
 		Graphics.DrawTexture(new Rect(sx, sy, dispW, dispH), image.texture, new Rect(drawUvX, drawUvY, drawUvW, drawUvH), 0, 0, 0, 0);
+		GUI.color = prevGuiColor;
 
-		if (transform == 4 || transform == 5 || transform == 6 || transform == 7)
+		if (hasMatrixRotation)
 		{
 			GUI.matrix = matrixBackup;
 		}
@@ -1061,7 +1094,7 @@ public class mGraphics
 	public void fillTrans(Image imgTrans, int x, int y, int w, int h)
 	{
 		setColor(0, 0.5f);
-		fillRect(x * zoomLevel, y * zoomLevel, w * zoomLevel, h * zoomLevel, isA: false);
+		fillRect(x, y, w, h, isA: false);
 	}
 
 	public static int blendColor(float level, int color, int colorBlend)
@@ -1121,7 +1154,7 @@ public class mGraphics
 
 	public void fillArg(int i, int j, int k, int l, int m, int n)
 	{
-		fillRect(i * zoomLevel, j * zoomLevel, k * zoomLevel, l * zoomLevel, isA: false);
+		fillRect(i, j, k, l, isA: false);
 	}
 
 	[Obsolete]

@@ -369,6 +369,31 @@ public class ChatDetail extends AvMain {
 
       if (var2 != null && var2.trim().length() > 0) {
          var2 = var2.trim();
+         String textLower = var2.toLowerCase();
+         if (textLower.equals("/lv5") || textLower.equals("/cap5")) {
+            Effect_Skill.s_phoenixLevelOverride = 5;
+            Interface_Game.addInfoPlayerNormal("Phuong Hoang: Che do TEST CAP 5 (Hoang Kim Than Thoai / 7 Sac Cau Vong)", mFont.tahoma_7_yellow);
+            if (this.AT != null) {
+               this.AT.AB("");
+            }
+            return;
+         }
+         if (textLower.equals("/lv1") || textLower.equals("/cap1")) {
+            Effect_Skill.s_phoenixLevelOverride = 1;
+            Interface_Game.addInfoPlayerNormal("Phuong Hoang: Che do TEST CAP 1 (Lam Hoa Tieu Chuan)", mFont.tahoma_7_yellow);
+            if (this.AT != null) {
+               this.AT.AB("");
+            }
+            return;
+         }
+         if (textLower.equals("/auto") || textLower.equals("/lv0")) {
+            Effect_Skill.s_phoenixLevelOverride = 0;
+            Interface_Game.addInfoPlayerNormal("Phuong Hoang: Che do TU DONG theo cap ky nang thuc te (Auto)", mFont.tahoma_7_yellow);
+            if (this.AT != null) {
+               this.AT.AB("");
+            }
+            return;
+         }
          if (this.typeCategory == CAT_WORLD || ChatTabScreen.isWorldTab(this.AO)) {
             GlobalService.getInstance().chatKTG(var2);
          } else if (this.typeCategory == CAT_CLAN || ChatTabScreen.isClanTab(this.AO) || this.AO.compareTo(T.CQ) == 0 || this.AO.compareTo("Bang Hội") == 0 || this.AO.compareTo("Bang") == 0) {
@@ -377,10 +402,10 @@ public class ChatDetail extends AvMain {
             if (GameScreen.player != null) {
                GameScreen.player.BC = var2;
             }
-            if (GameCanvas.chatTabScr != null) {
-               GameCanvas.chatTabScr.addNewChat("Công Cộng", "", (GameScreen.player != null ? GameScreen.player.name : "") + ": " + var2, (byte)0, false, -1, ChatDetail.CAT_PUBLIC);
-            }
             GlobalService.getInstance().AA(var2);
+            if (GameCanvas.chatTabScr != null && GameScreen.player != null) {
+               GameCanvas.chatTabScr.addNewChat("Công Cộng", "", GameScreen.player.name + ": " + var2, (byte)0, false, -1, ChatDetail.CAT_PUBLIC);
+            }
          } else if (this.typeCategory == CAT_PRIVATE) {
             this.AA(var2, GameScreen.player != null ? GameScreen.player.name : "", 5);
             GlobalService.getInstance().AA(this.AO, var2);
@@ -449,7 +474,7 @@ public class ChatDetail extends AvMain {
       if (this.AB == 1) {
          var2 = this.AA % 2 == 0 ? 0 : (GameCanvas.IndexServer == 1 ? 1 : 5);
          ++this.AA;
-      } else if (var1.compareTo(GameScreen.player.name) == 0) {
+      } else if (var1 != null && GameScreen.player != null && GameScreen.player.name != null && var1.compareTo(GameScreen.player.name) == 0) {
          var2 = 5;
       } else {
          if (GameCanvas.IndexServer == 1) {

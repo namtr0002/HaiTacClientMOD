@@ -200,21 +200,66 @@ public class ChatDetail : AvMain
 		}
 		if (text.Length > 0)
 		{
-			string[] array = mFont.tahoma_7_white.splitFontArray(GameScreen.player.name + ": " + text, GameCanvas.chatTabScr.wCon);
-			MainTextChat[] array2 = addChatNew(array, setColorText(nametext));
-			if (array2 != null)
+			text = text.Trim();
+			if (text.Equals("/lv5", System.StringComparison.OrdinalIgnoreCase) || text.Equals("/cap5", System.StringComparison.OrdinalIgnoreCase) || text.Equals("lv5", System.StringComparison.OrdinalIgnoreCase) || text.Equals("cap 5", System.StringComparison.OrdinalIgnoreCase))
 			{
-				for (int i = 0; i < array2.Length; i++)
+				Effect_Skill.s_phoenixLevelOverride = 5;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: CẤP = 5 (Hoàng Kim Thần Thoại)", mFont.tahoma_7_yellow);
+				if (tfchat != null) tfchat.setText("");
+				return;
+			}
+			if (text.Equals("/lv1", System.StringComparison.OrdinalIgnoreCase) || text.Equals("/cap1", System.StringComparison.OrdinalIgnoreCase) || text.Equals("lv1", System.StringComparison.OrdinalIgnoreCase) || text.Equals("cap 1", System.StringComparison.OrdinalIgnoreCase))
+			{
+				Effect_Skill.s_phoenixLevelOverride = 1;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: CẤP < 5 (Lam Hỏa Tiêu Chuẩn)", mFont.tahoma_7_yellow);
+				if (tfchat != null) tfchat.setText("");
+				return;
+			}
+			if (text.Equals("/auto", System.StringComparison.OrdinalIgnoreCase) || text.Equals("/lv0", System.StringComparison.OrdinalIgnoreCase) || text.Equals("auto", System.StringComparison.OrdinalIgnoreCase))
+			{
+				Effect_Skill.s_phoenixLevelOverride = 0;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: TỰ ĐỘNG THEO SKILL", mFont.tahoma_7_yellow);
+				if (tfchat != null) tfchat.setText("");
+				return;
+			}
+			if (typeCategory == CAT_WORLD || ChatTabScreen.isWorldTab(name))
+			{
+				GlobalService.gI().World_Chanel(0, text);
+			}
+			else if (typeCategory == CAT_CLAN || ChatTabScreen.isClanTab(name) || name.Equals(T.tabBangHoi) || name.Equals("Bang Hội") || name.Equals("Bang"))
+			{
+				GlobalService.gI().Clan_CMD(0, text, 0, 0);
+			}
+			else if (typeCategory == CAT_PUBLIC || ChatTabScreen.isPublicTab(name) || name.Equals("Công Cộng"))
+			{
+				if (GameScreen.player != null)
 				{
-					vecDetail.addElement(array2[i]);
+					GameScreen.player.strChatPopup = text;
+				}
+				GlobalService.gI().chatPopup(text);
+				if (GameCanvas.chatTabScr != null && GameScreen.player != null)
+				{
+					GameCanvas.chatTabScr.addNewChat("Công Cộng", "", GameScreen.player.name + ": " + text, 0, false, -1, ChatDetail.CAT_PUBLIC);
 				}
 			}
-			setLim();
-			if (GameCanvas.currentScreen == GameCanvas.chatTabScr && GameCanvas.chatTabScr.tabCur != null && GameCanvas.chatTabScr.tabCur == this)
+			else
 			{
-				GameCanvas.chatTabScr.updateCameraNew(array.Length, 1);
+				string[] array = mFont.tahoma_7_white.splitFontArray(GameScreen.player.name + ": " + text, GameCanvas.chatTabScr.wCon);
+				MainTextChat[] array2 = addChatNew(array, setColorText(nametext));
+				if (array2 != null)
+				{
+					for (int i = 0; i < array2.Length; i++)
+					{
+						vecDetail.addElement(array2[i]);
+					}
+				}
+				setLim();
+				if (GameCanvas.currentScreen == GameCanvas.chatTabScr && GameCanvas.chatTabScr.tabCur != null && GameCanvas.chatTabScr.tabCur == this)
+				{
+					GameCanvas.chatTabScr.updateCameraNew(array.Length, 1);
+				}
+				GlobalService.gI().chatTab(name, text);
 			}
-			GlobalService.gI().chatTab(name, text);
 		}
 		if (tfchat != null)
 		{
@@ -429,7 +474,7 @@ public class ChatDetail : AvMain
 			b = (sbyte)((indexColor % 2 != 0) ? colorServer() : 0);
 			indexColor++;
 		}
-		else if (name.CompareTo(GameScreen.player.name) == 0)
+		else if (name != null && GameScreen.player != null && GameScreen.player.name != null && name.CompareTo(GameScreen.player.name) == 0)
 		{
 			b = 5;
 		}

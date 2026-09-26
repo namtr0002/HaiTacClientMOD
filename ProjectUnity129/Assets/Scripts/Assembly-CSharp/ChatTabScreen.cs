@@ -98,7 +98,7 @@ public class ChatTabScreen : MainScreen
 	{
 		if (string.IsNullOrEmpty(name)) return false;
 		string lower = name.Trim().ToLower();
-		return lower.Equals("công cộng") || lower.Equals("cong cong") || lower.Equals("khu vực") || lower.Equals("khu vuc") || lower.Equals("map") || lower.Equals("public") || name.Equals("Công Cộng") || name.Equals(T.tabServer) || lower.Equals("tin đến") || lower.Equals("tin den");
+		return lower.Equals("công cộng") || lower.Equals("cong cong") || lower.Equals("khu vực") || lower.Equals("khu vuc") || lower.Equals("map") || lower.Equals("public") || name.Equals("Công Cộng");
 	}
 
 	public static bool isClanTab(string name)
@@ -338,6 +338,8 @@ public class ChatTabScreen : MainScreen
 	public static void drawModalBackdrop(mGraphics g)
 	{
 		if (g == null) return;
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme == null || currentTheme.id == 0) return;
 		g.setColor(0x000000);
 		for (int y = 0; y < MotherCanvas.h; y += 2)
 		{
@@ -392,6 +394,12 @@ public class ChatTabScreen : MainScreen
 	public static void drawParchmentPanel(mGraphics g, int x, int y, int w, int h)
 	{
 		if (g == null || w <= 0 || h <= 0) return;
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme == null || currentTheme.id == 0)
+		{
+			AvMain.paintRect(g, x, y, w, h, 0, 1);
+			return;
+		}
 		// Aged pirate parchment paper
 		ModernUI.fillGradientRect(g, x, y, w, h, 0x271C13, 0x18100A);
 		g.setColor(0x664825);
@@ -660,13 +668,30 @@ public class ChatTabScreen : MainScreen
 
 		GameCanvas.resetTrans(g);
 
-		// 0. Modal Backdrop Dim (Chống chói/đè giao diện phía sau)
-		drawModalBackdrop(g);
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
 
-		// 1. Royal Pirate Mahogany Wood Frame with Brass Trim & Rivets
-		drawPirateWindowFrame(g, x, y, w, h);
+		if (!isDefaultTheme)
+		{
+			// 0. Modal Backdrop Dim (Chống chói/đè giao diện phía sau)
+			drawModalBackdrop(g);
 
-		// 2. 6 Pirate Deck Plank Tabs on Top
+			// 1. Royal Pirate Mahogany Wood Frame with Brass Trim & Rivets
+			drawPirateWindowFrame(g, x, y, w, h);
+		}
+		else
+		{
+			paintPaper(g, x, y, w, h, 0);
+			if (Interface_Game.imgHoavan != null)
+			{
+				g.drawImage(Interface_Game.imgHoavan, x + 6, y + 6, 0);
+				g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 2, x + w - 29, y + 6, 0);
+				g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 1, x + 6, y + h - 29, 0);
+				g.drawRegion(Interface_Game.imgHoavan, 0, 0, 23, 23, 3, x + w - 29, y + h - 29, 0);
+			}
+		}
+
+		// 2. 6 Category Tabs on Top
 		int numCats = 6;
 		int tabH = 20;
 		int tabY = y + 8;
@@ -681,23 +706,42 @@ public class ChatTabScreen : MainScreen
 			int unreadCount = getUnreadCountInCat(i);
 			bool hasNew = (unreadCount > 0);
 
-			if (isSelected)
+			if (isDefaultTheme)
 			{
-				// Golden Oak Plank
-				ModernUI.fillGradientRect(g, curX, tabY, thisTabW, tabH, 0x8C561E, 0x54320F);
-				g.setColor(0xD4AF37);
-				g.drawRect(curX, tabY, thisTabW - 1, tabH - 1);
-				g.setColor(0xFFE066);
-				g.fillRect(curX + 1, tabY + 1, thisTabW - 2, 1);
-				mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				AvMain.paintRect(g, curX, tabY, thisTabW - 1, tabH, (sbyte)(isSelected ? 1 : 0), isSelected ? 0 : 1);
+				if (isSelected && AvMain.imgNenfocus != null)
+				{
+					g.drawRegion(AvMain.imgNenfocus, 2, 2, thisTabW - 1, tabH, 0, curX, tabY, 0);
+				}
+				if (isSelected)
+				{
+					mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				}
+				else
+				{
+					mFont.tahoma_7_black.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				}
 			}
 			else
 			{
-				// Weathered Teak Plank
-				ModernUI.fillGradientRect(g, curX, tabY, thisTabW, tabH, 0x281A10, 0x180F09);
-				g.setColor(0x4E341F);
-				g.drawRect(curX, tabY, thisTabW - 1, tabH - 1);
-				mFont.tahoma_7_white.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				if (isSelected)
+				{
+					// Golden Oak Plank
+					ModernUI.fillGradientRect(g, curX, tabY, thisTabW, tabH, 0x8C561E, 0x54320F);
+					g.setColor(0xD4AF37);
+					g.drawRect(curX, tabY, thisTabW - 1, tabH - 1);
+					g.setColor(0xFFE066);
+					g.fillRect(curX + 1, tabY + 1, thisTabW - 2, 1);
+					mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				}
+				else
+				{
+					// Weathered Teak Plank
+					ModernUI.fillGradientRect(g, curX, tabY, thisTabW, tabH, 0x281A10, 0x180F09);
+					g.setColor(0x4E341F);
+					g.drawRect(curX, tabY, thisTabW - 1, tabH - 1);
+					mFont.tahoma_7_white.drawStringAutoCenter(g, mCatNames[i], curX + thisTabW / 2, tabY + 3, thisTabW - 4);
+				}
 			}
 
 			// Unread Ruby Wax Seal
@@ -712,13 +756,21 @@ public class ChatTabScreen : MainScreen
 			}
 		}
 
-		// NÚT ĐÓNG (X) GÓC TRÊN BÊN PHẢI (Pirate Brass Button)
+		// NÚT ĐÓNG (X) GÓC TRÊN BÊN PHẢI
 		int xClose = x + w - 19;
 		int yClose = y + 8;
-		ModernUI.fillGradientRect(g, xClose, yClose, 16, 16, 0x8C2020, 0x4D1010);
-		g.setColor(0xD4AF37);
-		g.drawRect(xClose, yClose, 15, 15);
-		mFont.tahoma_7b_white.drawString(g, "X", xClose + 8, yClose + 2, 2);
+		if (isDefaultTheme)
+		{
+			AvMain.paintRect(g, xClose, yClose, 16, 16, 1, 1);
+			mFont.tahoma_7b_yellow.drawString(g, "X", xClose + 8, yClose + 2, 2);
+		}
+		else
+		{
+			ModernUI.fillGradientRect(g, xClose, yClose, 16, 16, 0x8C2020, 0x4D1010);
+			g.setColor(0xD4AF37);
+			g.drawRect(xClose, yClose, 15, 15);
+			mFont.tahoma_7b_white.drawString(g, "X", xClose + 8, yClose + 2, 2);
+		}
 
 		// 3. NỘI DUNG TỪNG CATEGORY
 		if (catSelect == ChatDetail.CAT_MAIL)
@@ -776,6 +828,9 @@ public class ChatTabScreen : MainScreen
 		int listY = yList + 42;
 		int listH = hArea - 64;
 
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
+
 		try
 		{
 			// 1. Thanh phân loại 4 tab con (Tất cả, Lời mời, Quà, Hệ thống)
@@ -792,21 +847,36 @@ public class ChatTabScreen : MainScreen
 					int bx = xList + col * (bW + 2);
 					int by = yList + row * (subH + 2);
 					bool isSel = (i == subFilterMail);
-					int topCol = isSel ? 0x8C561E : 0x281B12;
-					int botCol = isSel ? 0x54320F : 0x180F09;
-					int bdrCol = isSel ? 0xD4AF37 : 0x4A3320;
-					ModernUI.fillGradientRect(g, bx, by, bW, subH, topCol, botCol);
-					g.setColor(bdrCol);
-					g.drawRect(bx, by, bW - 1, subH - 1);
-					if (isSel)
+					if (isDefaultTheme)
 					{
-						g.setColor(0xFFE066);
-						g.fillRect(bx + 1, by + 1, bW - 2, 1);
-						mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						AvMain.paintRect(g, bx, by, bW, subH, (sbyte)(isSel ? 1 : 0), isSel ? 0 : 1);
+						if (isSel)
+						{
+							mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						}
+						else
+						{
+							mFont.tahoma_7_black.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						}
 					}
 					else
 					{
-						mFont.tahoma_7_white.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						int topCol = isSel ? 0x8C561E : 0x281B12;
+						int botCol = isSel ? 0x54320F : 0x180F09;
+						int bdrCol = isSel ? 0xD4AF37 : 0x4A3320;
+						ModernUI.fillGradientRect(g, bx, by, bW, subH, topCol, botCol);
+						g.setColor(bdrCol);
+						g.drawRect(bx, by, bW - 1, subH - 1);
+						if (isSel)
+						{
+							g.setColor(0xFFE066);
+							g.fillRect(bx + 1, by + 1, bW - 2, 1);
+							mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						}
+						else
+						{
+							mFont.tahoma_7_white.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, by + 2, bW - 2);
+						}
 					}
 				}
 			}
@@ -817,21 +887,36 @@ public class ChatTabScreen : MainScreen
 				{
 					int bx = xList + i * (bW + 2);
 					bool isSel = (i == subFilterMail);
-					int topCol = isSel ? 0x8C561E : 0x281B12;
-					int botCol = isSel ? 0x54320F : 0x180F09;
-					int bdrCol = isSel ? 0xD4AF37 : 0x4A3320;
-					ModernUI.fillGradientRect(g, bx, yList, bW, subH, topCol, botCol);
-					g.setColor(bdrCol);
-					g.drawRect(bx, yList, bW - 1, subH - 1);
-					if (isSel)
+					if (isDefaultTheme)
 					{
-						g.setColor(0xFFE066);
-						g.fillRect(bx + 1, yList + 1, bW - 2, 1);
-						mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						AvMain.paintRect(g, bx, yList, bW, subH, (sbyte)(isSel ? 1 : 0), isSel ? 0 : 1);
+						if (isSel)
+						{
+							mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						}
+						else
+						{
+							mFont.tahoma_7_black.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						}
 					}
 					else
 					{
-						mFont.tahoma_7_white.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						int topCol = isSel ? 0x8C561E : 0x281B12;
+						int botCol = isSel ? 0x54320F : 0x180F09;
+						int bdrCol = isSel ? 0xD4AF37 : 0x4A3320;
+						ModernUI.fillGradientRect(g, bx, yList, bW, subH, topCol, botCol);
+						g.setColor(bdrCol);
+						g.drawRect(bx, yList, bW - 1, subH - 1);
+						if (isSel)
+						{
+							g.setColor(0xFFE066);
+							g.fillRect(bx + 1, yList + 1, bW - 2, 1);
+							mFont.tahoma_7b_yellow.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						}
+						else
+						{
+							mFont.tahoma_7_white.drawStringAutoCenter(g, mSubFilterNames[i], bx + bW / 2, yList + 2, bW - 2);
+						}
 					}
 				}
 			}
@@ -845,26 +930,44 @@ public class ChatTabScreen : MainScreen
 				tfSearchMail.width = wArea - 20;
 				tfSearchMail.height = searchH;
 
-				ModernUI.fillGradientRect(g, xList, searchY, wArea - 20, searchH, 0x140D08, 0x1F140C);
-				g.setColor(0x563B22);
-				g.drawRect(xList, searchY, wArea - 21, searchH - 1);
-
-				string q = tfSearchMail.getText();
-				if (!string.IsNullOrEmpty(q))
+				int clrX = xList + wArea - 18;
+				if (isDefaultTheme)
 				{
-					mFont.tahoma_7_white.drawString(g, q, xList + 5, searchY + 2, 0);
+					AvMain.paintRect(g, xList, searchY, wArea - 20, searchH, 0, 3);
+					string q = tfSearchMail.getText();
+					if (!string.IsNullOrEmpty(q))
+					{
+						mFont.tahoma_7_white.drawString(g, q, xList + 5, searchY + 2, 0);
+					}
+					else
+					{
+						mFont.tahoma_7_white.drawString(g, "Tìm kiếm...", xList + 5, searchY + 2, 0);
+					}
+					AvMain.paintRect(g, clrX, searchY, 18, searchH, 1, 1);
+					mFont.tahoma_7b_yellow.drawString(g, "✕", clrX + 9, searchY + 2, 2);
 				}
 				else
 				{
-					mFont.tahoma_7_white.drawString(g, "Tìm kiếm...", xList + 5, searchY + 2, 0);
-				}
+					ModernUI.fillGradientRect(g, xList, searchY, wArea - 20, searchH, 0x140D08, 0x1F140C);
+					g.setColor(0x563B22);
+					g.drawRect(xList, searchY, wArea - 21, searchH - 1);
 
-				// Nút Clear search [✕]
-				int clrX = xList + wArea - 18;
-				ModernUI.fillGradientRect(g, clrX, searchY, 18, searchH, 0x3D1A1A, 0x260E0E);
-				g.setColor(0x8C3333);
-				g.drawRect(clrX, searchY, 17, searchH - 1);
-				mFont.tahoma_7b_white.drawString(g, "✕", clrX + 9, searchY + 2, 2);
+					string q = tfSearchMail.getText();
+					if (!string.IsNullOrEmpty(q))
+					{
+						mFont.tahoma_7_white.drawString(g, q, xList + 5, searchY + 2, 0);
+					}
+					else
+					{
+						mFont.tahoma_7_white.drawString(g, "Tìm kiếm...", xList + 5, searchY + 2, 0);
+					}
+
+					// Nút Clear search [✕]
+					ModernUI.fillGradientRect(g, clrX, searchY, 18, searchH, 0x3D1A1A, 0x260E0E);
+					g.setColor(0x8C3333);
+					g.drawRect(clrX, searchY, 17, searchH - 1);
+					mFont.tahoma_7b_white.drawString(g, "✕", clrX + 9, searchY + 2, 2);
+				}
 			}
 
 			// 3. Khung cuộn danh sách 10 mục
@@ -888,21 +991,31 @@ public class ChatTabScreen : MainScreen
 				if (cd == null) continue;
 
 				int rowY = listY + i * (itemH + 2);
+				int screenY = rowY - camOffset;
+				if (screenY + itemH < listY || screenY > listY + listH) continue;
+
 				bool isRowSelected = (tabCur == cd);
 
-				if (isRowSelected)
+				if (isDefaultTheme)
 				{
-					ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x5C3A1A, 0x3A220E);
-					g.setColor(0xD4AF37);
-					g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
-					g.setColor(0xFFE066);
-					g.fillRect(xList + 2, rowY + 1, wArea - 5, 1);
+					AvMain.paintRect(g, xList + 1, rowY, wArea - 2, itemH, (sbyte)(isRowSelected ? 1 : 0), isRowSelected ? 0 : 3);
 				}
 				else
 				{
-					ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x24180E, 0x160E08);
-					g.setColor(0x422D1B);
-					g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+					if (isRowSelected)
+					{
+						ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x5C3A1A, 0x3A220E);
+						g.setColor(0xD4AF37);
+						g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+						g.setColor(0xFFE066);
+						g.fillRect(xList + 2, rowY + 1, wArea - 5, 1);
+					}
+					else
+					{
+						ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x24180E, 0x160E08);
+						g.setColor(0x422D1B);
+						g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+					}
 				}
 
 				// Biểu tượng thư
@@ -941,7 +1054,8 @@ public class ChatTabScreen : MainScreen
 
 			if (pageItems.size() == 0)
 			{
-				mFont.tahoma_7_white.drawString(g, "Không có thư nào", xList + wArea / 2, listY + listH / 2 - 5, 2);
+				mFont emptyF = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7_white;
+				emptyF.drawString(g, "Không có thư nào", xList + wArea / 2, listY + listH / 2 - 5, 2);
 			}
 		}
 		catch (Exception e)
@@ -954,33 +1068,55 @@ public class ChatTabScreen : MainScreen
 			GameCanvas.resetTrans(g);
 		}
 
-		// 4. Thanh phân trang Hải Tặc ở đáy
+		// 4. Thanh phân trang ở đáy
 		try
 		{
 			int pageBarY = yList + hArea - pageBarH;
 			int arrowBtnW = 20;
 
-			// Nút Lùi trang [◀]
-			ModernUI.fillGradientRect(g, xList, pageBarY, arrowBtnW, 18, 0x332214, 0x1F140A);
-			g.setColor(curPageMail > 0 ? 0xD4AF37 : 0x4D3622);
-			g.drawRect(xList, pageBarY, arrowBtnW - 1, 17);
-			mFont.tahoma_7b_white.drawString(g, "◀", xList + arrowBtnW / 2, pageBarY + 3, 2);
+			if (isDefaultTheme)
+			{
+				// Nút Lùi trang [◀]
+				AvMain.paintRect(g, xList, pageBarY, arrowBtnW, 18, (sbyte)(curPageMail > 0 ? 1 : 0), curPageMail > 0 ? 0 : 1);
+				mFont.tahoma_7b_yellow.drawString(g, "◀", xList + arrowBtnW / 2, pageBarY + 3, 2);
 
-			// Nút Tiến trang [▶]
-			int nextX = xList + wArea - arrowBtnW;
-			ModernUI.fillGradientRect(g, nextX, pageBarY, arrowBtnW, 18, 0x332214, 0x1F140A);
-			g.setColor(curPageMail < totalPagesMail - 1 ? 0xD4AF37 : 0x4D3622);
-			g.drawRect(nextX, pageBarY, arrowBtnW - 1, 17);
-			mFont.tahoma_7b_white.drawString(g, "▶", nextX + arrowBtnW / 2, pageBarY + 3, 2);
+				// Nút Tiến trang [▶]
+				int nextX = xList + wArea - arrowBtnW;
+				bool canNext = curPageMail < totalPagesMail - 1;
+				AvMain.paintRect(g, nextX, pageBarY, arrowBtnW, 18, (sbyte)(canNext ? 1 : 0), canNext ? 0 : 1);
+				mFont.tahoma_7b_yellow.drawString(g, "▶", nextX + arrowBtnW / 2, pageBarY + 3, 2);
 
-			// Ô Trang giữa: "Trang X / Y"
-			int centerW = wArea - arrowBtnW * 2 - 4;
-			int centerX = xList + arrowBtnW + 2;
-			ModernUI.fillGradientRect(g, centerX, pageBarY, centerW, 18, 0x1C130B, 0x140D07);
-			g.setColor(0x563B22);
-			g.drawRect(centerX, pageBarY, centerW - 1, 17);
-			string pageStr = (curPageMail + 1) + "/" + totalPagesMail;
-			mFont.tahoma_7b_yellow.drawString(g, pageStr, centerX + centerW / 2, pageBarY + 3, 2);
+				// Ô Trang giữa: "Trang X / Y"
+				int centerW = wArea - arrowBtnW * 2 - 4;
+				int centerX = xList + arrowBtnW + 2;
+				AvMain.paintRect(g, centerX, pageBarY, centerW, 18, 0, 1);
+				string pageStr = (curPageMail + 1) + "/" + totalPagesMail;
+				mFont.tahoma_7b_black.drawString(g, pageStr, centerX + centerW / 2, pageBarY + 3, 2);
+			}
+			else
+			{
+				// Nút Lùi trang [◀]
+				ModernUI.fillGradientRect(g, xList, pageBarY, arrowBtnW, 18, 0x332214, 0x1F140A);
+				g.setColor(curPageMail > 0 ? 0xD4AF37 : 0x4D3622);
+				g.drawRect(xList, pageBarY, arrowBtnW - 1, 17);
+				mFont.tahoma_7b_white.drawString(g, "◀", xList + arrowBtnW / 2, pageBarY + 3, 2);
+
+				// Nút Tiến trang [▶]
+				int nextX = xList + wArea - arrowBtnW;
+				ModernUI.fillGradientRect(g, nextX, pageBarY, arrowBtnW, 18, 0x332214, 0x1F140A);
+				g.setColor(curPageMail < totalPagesMail - 1 ? 0xD4AF37 : 0x4D3622);
+				g.drawRect(nextX, pageBarY, arrowBtnW - 1, 17);
+				mFont.tahoma_7b_white.drawString(g, "▶", nextX + arrowBtnW / 2, pageBarY + 3, 2);
+
+				// Ô Trang giữa: "Trang X / Y"
+				int centerW = wArea - arrowBtnW * 2 - 4;
+				int centerX = xList + arrowBtnW + 2;
+				ModernUI.fillGradientRect(g, centerX, pageBarY, centerW, 18, 0x1C130B, 0x140D07);
+				g.setColor(0x563B22);
+				g.drawRect(centerX, pageBarY, centerW - 1, 17);
+				string pageStr = (curPageMail + 1) + "/" + totalPagesMail;
+				mFont.tahoma_7b_yellow.drawString(g, pageStr, centerX + centerW / 2, pageBarY + 3, 2);
+			}
 		}
 		catch (Exception e)
 		{
@@ -995,10 +1131,14 @@ public class ChatTabScreen : MainScreen
 
 	public void paintMailDetailView(mGraphics g, int xDetail, int yDetail, int wArea, int hArea, bool isSmallMode)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
+
 		if (tabCur == null)
 		{
 			drawParchmentPanel(g, xDetail - 1, yDetail - 1, wArea + 2, hArea + 2);
-			mFont.tahoma_7_white.drawString(g, "Chọn một thư để xem nội dung", xDetail + wArea / 2, yDetail + hArea / 2 - 6, 2);
+			mFont emptyF = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7_white;
+			emptyF.drawString(g, "Chọn một thư để xem nội dung", xDetail + wArea / 2, yDetail + hArea / 2 - 6, 2);
 			return;
 		}
 
@@ -1014,9 +1154,43 @@ public class ChatTabScreen : MainScreen
 		drawParchmentPanel(g, xDetail - 1, yDetail + topHeaderH - 1, wArea + 2, hArea - topHeaderH + 2);
 
 		int btnBarH = 26;
-		int contentY = yDetail + topHeaderH + 2;
-		int contentH = hArea - topHeaderH - btnBarH - 4;
-		if (contentH < 10) contentH = 10;
+		int contentY = yDetail + topHeaderH + 4;
+		int contentH = hArea - topHeaderH - btnBarH - 8;
+		if (contentH < 20) contentH = 20;
+
+		// Tiêu đề thư & người gửi
+		string senderName = (!string.IsNullOrEmpty(tabCur.name)) ? tabCur.name : "Hệ thống";
+		string subjectName = (!string.IsNullOrEmpty(tabCur.mailTitle)) ? tabCur.mailTitle : "";
+
+		if (isDefaultTheme)
+		{
+			mFont.tahoma_7b_brown.drawString(g, "Người gửi: " + senderName, xDetail + 4, contentY, 0);
+			contentY += 13;
+			if (subjectName.Length > 0)
+			{
+				mFont.tahoma_7b_black.drawStringAuto(g, "Tiêu đề: " + subjectName, xDetail + 4, contentY, wArea - 8, 0);
+				contentY += 13;
+			}
+			g.setColor(0x8C681E);
+			g.fillRect(xDetail + 2, contentY, wArea - 4, 1);
+			contentY += 4;
+		}
+		else
+		{
+			mFont.tahoma_7b_yellow.drawString(g, "Người gửi: " + senderName, xDetail + 4, contentY, 0);
+			contentY += 13;
+			if (subjectName.Length > 0)
+			{
+				mFont.tahoma_7b_white.drawStringAuto(g, "Tiêu đề: " + subjectName, xDetail + 4, contentY, wArea - 8, 0);
+				contentY += 13;
+			}
+			g.setColor(0x8C681E);
+			g.fillRect(xDetail + 2, contentY, wArea - 4, 1);
+			g.setColor(0xD4AF37);
+			g.fillRect(xDetail + 10, contentY, wArea - 20, 1);
+			contentY += 4;
+		}
+		contentH -= (subjectName.Length > 0 ? 30 : 17);
 
 		try
 		{
@@ -1037,7 +1211,11 @@ public class ChatTabScreen : MainScreen
 						MainTextChat tc = (MainTextChat)tabCur.vecDetail.elementAt(var7);
 						if (tc != null)
 						{
-							AvMain.setTextColor(tc.color).drawString(g, tc.text, xDetail + 6, contentY + var7 * GameCanvas.hText, 0);
+							int itemScreenY = (contentY + var7 * GameCanvas.hText) - camOffset;
+							if (itemScreenY + GameCanvas.hText < contentY || itemScreenY > contentY + contentH) continue;
+							mFont f = AvMain.setTextColor(tc.color);
+							if (f == null || (isDefaultTheme && tc.color == 0)) f = isDefaultTheme ? mFont.tahoma_7_black : mFont.tahoma_7_white;
+							f.drawString(g, tc.text, xDetail + 6, contentY + var7 * GameCanvas.hText, 0);
 						}
 					}
 				}
@@ -1049,11 +1227,19 @@ public class ChatTabScreen : MainScreen
 			if (tabCur.isInvite && tabCur.typeInvite == 3)
 			{
 				int boxH = 22;
-				ModernUI.fillGradientRect(g, xDetail + 4, giftY, wArea - 8, boxH, 0x3D1A1A, 0x260E0E);
-				g.setColor(0x8C3333);
-				g.drawRect(xDetail + 4, giftY, wArea - 9, boxH - 1);
+				if (isDefaultTheme)
+				{
+					AvMain.paintRect(g, xDetail + 4, giftY, wArea - 8, boxH, 0, 1);
+				}
+				else
+				{
+					ModernUI.fillGradientRect(g, xDetail + 4, giftY, wArea - 8, boxH, 0x3D1A1A, 0x260E0E);
+					g.setColor(0x8C3333);
+					g.drawRect(xDetail + 4, giftY, wArea - 9, boxH - 1);
+				}
 				string betText = "Mức cược: " + tabCur.priceFight + (tabCur.typeFight == 1 ? " Ruby (thua trả phí)" : " Beri");
-				mFont.tahoma_7b_yellow.drawString(g, betText, xDetail + 8, giftY + 4, 0);
+				mFont betFont = isDefaultTheme ? mFont.tahoma_7b_brown : mFont.tahoma_7b_yellow;
+				betFont.drawString(g, betText, xDetail + 8, giftY + 4, 0);
 				giftY += boxH + 6;
 			}
 
@@ -1064,13 +1250,20 @@ public class ChatTabScreen : MainScreen
 				int cardH = 32;
 				int giftBoxH = 22 + numRows * cardH + 4;
 
-				ModernUI.fillGradientRect(g, xDetail + 2, giftY, wArea - 4, giftBoxH, 0x332214, 0x1E130A);
-				g.setColor(0x8C681E);
-				g.drawRect(xDetail + 2, giftY, wArea - 5, giftBoxH - 1);
-
-				mFont.tahoma_7b_yellow.drawString(g, "🎁 " + T.quatt + ":", xDetail + 6, giftY + 4, 0);
-				g.setColor(0x543A1B);
-				g.fillRect(xDetail + 4, giftY + 18, wArea - 8, 1);
+				if (isDefaultTheme)
+				{
+					AvMain.paintRect(g, xDetail + 2, giftY, wArea - 4, giftBoxH, 0, 1);
+					mFont.tahoma_7b_brown.drawString(g, "🎁 " + T.quatt + ":", xDetail + 6, giftY + 4, 0);
+				}
+				else
+				{
+					ModernUI.fillGradientRect(g, xDetail + 2, giftY, wArea - 4, giftBoxH, 0x332214, 0x1E130A);
+					g.setColor(0x8C681E);
+					g.drawRect(xDetail + 2, giftY, wArea - 5, giftBoxH - 1);
+					mFont.tahoma_7b_yellow.drawString(g, "🎁 " + T.quatt + ":", xDetail + 6, giftY + 4, 0);
+					g.setColor(0x543A1B);
+					g.fillRect(xDetail + 4, giftY + 18, wArea - 8, 1);
+				}
 
 				int colW = (wArea - 12) / 2;
 				if (colW < 40) colW = wArea - 12;
@@ -1121,7 +1314,8 @@ public class ChatTabScreen : MainScreen
 					if (gItem.name != null && gItem.name.Length > 0)
 					{
 						int maxItemNameW = System.Math.Max(10, colW - 32);
-						mFont.tahoma_7b_white.drawStringAuto(g, gItem.name, itemX + 29, itemY + 1, maxItemNameW, 0);
+						mFont nameFont = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7b_white;
+						nameFont.drawStringAuto(g, gItem.name, itemX + 29, itemY + 1, maxItemNameW, 0);
 						string numStr = (gItem.num > 1) ? ("x" + AvMain.getDotNumber(gItem.num)) : "x1";
 						mFont.tahoma_7_yellow.drawString(g, numStr, itemX + 29, itemY + 13, 0);
 					}
@@ -1144,7 +1338,7 @@ public class ChatTabScreen : MainScreen
 			int btnY = yDetail + hArea - btnBarH - 2;
 			int btnH = 22;
 
-			g.setColor(0x8C681E);
+			g.setColor(isDefaultTheme ? 0xD4AF37 : 0x8C681E);
 			g.fillRect(xDetail, btnY - 3, wArea, 1);
 
 			if (tabCur.isInvite)
@@ -1230,6 +1424,9 @@ public class ChatTabScreen : MainScreen
 
 	public void paintPrivateListView(mGraphics g, int xList, int yList, int wArea, int hArea)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
+
 		try
 		{
 			drawParchmentPanel(g, xList - 1, yList - 1, wArea + 2, hArea + 2);
@@ -1249,19 +1446,26 @@ public class ChatTabScreen : MainScreen
 				int rowY = yList + i * (itemH + 2);
 				bool isRowSelected = (tabCur == cd);
 
-				if (isRowSelected)
+				if (isDefaultTheme)
 				{
-					ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x5C3A1A, 0x3A220E);
-					g.setColor(0xD4AF37);
-					g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
-					g.setColor(0xFFE066);
-					g.fillRect(xList + 2, rowY + 1, wArea - 5, 1);
+					AvMain.paintRect(g, xList + 1, rowY, wArea - 2, itemH, (sbyte)(isRowSelected ? 1 : 0), isRowSelected ? 0 : 3);
 				}
 				else
 				{
-					ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x24180E, 0x160E08);
-					g.setColor(0x422D1B);
-					g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+					if (isRowSelected)
+					{
+						ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x5C3A1A, 0x3A220E);
+						g.setColor(0xD4AF37);
+						g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+						g.setColor(0xFFE066);
+						g.fillRect(xList + 2, rowY + 1, wArea - 5, 1);
+					}
+					else
+					{
+						ModernUI.fillGradientRect(g, xList + 1, rowY, wArea - 2, itemH, 0x24180E, 0x160E08);
+						g.setColor(0x422D1B);
+						g.drawRect(xList + 1, rowY, wArea - 3, itemH - 1);
+					}
 				}
 
 				string displayName = cd.name;
@@ -1281,7 +1485,8 @@ public class ChatTabScreen : MainScreen
 
 			if (listItems.size() == 0)
 			{
-				mFont.tahoma_7_white.drawString(g, "Trống", xList + wArea / 2, yList + hArea / 2 - 6, 2);
+				mFont emptyF = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7_white;
+				emptyF.drawString(g, "Trống", xList + wArea / 2, yList + hArea / 2 - 6, 2);
 			}
 		}
 		catch (Exception e)
@@ -1297,10 +1502,14 @@ public class ChatTabScreen : MainScreen
 
 	public void paintChatDetailView(mGraphics g, int xDetail, int yDetail, int wArea, int hArea, bool isSmallMode)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
+
 		if (tabCur == null)
 		{
 			drawParchmentPanel(g, xDetail - 1, yDetail - 1, wArea + 2, hArea + 2);
-			mFont.tahoma_7_white.drawString(g, "Chưa có cuộc trò chuyện", xDetail + wArea / 2, yDetail + hArea / 2 - 6, 2);
+			mFont emptyF = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7_white;
+			emptyF.drawString(g, "Chưa có cuộc trò chuyện", xDetail + wArea / 2, yDetail + hArea / 2 - 6, 2);
 			return;
 		}
 
@@ -1351,19 +1560,35 @@ public class ChatTabScreen : MainScreen
 								int textW = mFont.tahoma_7_white.getWidth(var8.text);
 								int msgX = xDetail + wArea - 10 - textW;
 								if (msgX < xDetail + 6) msgX = xDetail + 6;
-								ModernUI.fillGradientRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 0x5C3A1A, 0x3A220E);
-								g.setColor(0xD4AF37);
-								g.drawRect(msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 7, GameCanvas.hText - 1);
-								mFont.tahoma_7b_white.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								if (isDefaultTheme)
+								{
+									AvMain.paintRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 1, 0);
+									mFont.tahoma_7b_yellow.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								}
+								else
+								{
+									ModernUI.fillGradientRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 0x5C3A1A, 0x3A220E);
+									g.setColor(0xD4AF37);
+									g.drawRect(msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 7, GameCanvas.hText - 1);
+									mFont.tahoma_7b_white.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								}
 							}
 							else
 							{
 								int textW = mFont.tahoma_7_white.getWidth(var8.text);
 								int msgX = xDetail + 6;
-								ModernUI.fillGradientRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 0x24180E, 0x160E08);
-								g.setColor(0x422D1B);
-								g.drawRect(msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 7, GameCanvas.hText - 1);
-								mFont.tahoma_7_white.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								if (isDefaultTheme)
+								{
+									AvMain.paintRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 0, 3);
+									mFont.tahoma_7b_white.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								}
+								else
+								{
+									ModernUI.fillGradientRect(g, msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 8, GameCanvas.hText, 0x24180E, 0x160E08);
+									g.setColor(0x422D1B);
+									g.drawRect(msgX - 4, contentY + var7 * GameCanvas.hText - 1, textW + 7, GameCanvas.hText - 1);
+									mFont.tahoma_7_white.drawString(g, var8.text, msgX, contentY + var7 * GameCanvas.hText + 1, 0);
+								}
 							}
 						}
 					}
@@ -1383,6 +1608,9 @@ public class ChatTabScreen : MainScreen
 
 	public void paintNormalChatView(mGraphics g)
 	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		bool isDefaultTheme = (currentTheme == null || currentTheme.id == 0);
+
 		drawParchmentPanel(g, xBe - 1, yBe - 1, wPaintTab + 2, hItem + 2);
 
 		if (tabCur != null)
@@ -1417,7 +1645,9 @@ public class ChatTabScreen : MainScreen
 							MainTextChat tc = (MainTextChat)tabCur.vecDetail.elementAt(j);
 							if (tc != null)
 							{
-								AvMain.setTextColor(tc.color).drawString(g, tc.text, xBe + 4, yBe + j * GameCanvas.hText, 0);
+								mFont f = AvMain.setTextColor(tc.color);
+								if (f == null || (isDefaultTheme && tc.color == 0)) f = isDefaultTheme ? mFont.tahoma_7_black : mFont.tahoma_7_white;
+								f.drawString(g, tc.text, xBe + 4, yBe + j * GameCanvas.hText, 0);
 							}
 						}
 					}
@@ -1436,7 +1666,8 @@ public class ChatTabScreen : MainScreen
 		else
 		{
 			string title = mCatNames[catSelect];
-			mFont.tahoma_7_white.drawString(g, "Không có dữ liệu " + title, xBe + wPaintTab / 2, yBe + hItem / 2 - 6, 2);
+			mFont emptyF = isDefaultTheme ? mFont.tahoma_7b_black : mFont.tahoma_7_white;
+			emptyF.drawString(g, "Không có dữ liệu " + title, xBe + wPaintTab / 2, yBe + hItem / 2 - 6, 2);
 		}
 	}
 
@@ -1539,9 +1770,9 @@ public class ChatTabScreen : MainScreen
 
 	public override void updatekey()
 	{
-		if (GameCanvas.keyMyHold[4]) // Trái
+		if (GameCanvas.keyMove(0)) // Trái
 		{
-			GameCanvas.clearKeyHold(4);
+			GameCanvas.ClearkeyMove(0);
 			if (catSelect == ChatDetail.CAT_MAIL && curPageMail > 0)
 			{
 				curPageMail--;
@@ -1558,9 +1789,9 @@ public class ChatTabScreen : MainScreen
 				selectCategory(catSelect - 1);
 			}
 		}
-		else if (GameCanvas.keyMyHold[6]) // Phải
+		else if (GameCanvas.keyMove(2)) // Phải
 		{
-			GameCanvas.clearKeyHold(6);
+			GameCanvas.ClearkeyMove(2);
 			if (catSelect == ChatDetail.CAT_MAIL && curPageMail < totalPagesMail - 1)
 			{
 				curPageMail++;
@@ -1577,9 +1808,9 @@ public class ChatTabScreen : MainScreen
 				selectCategory(catSelect + 1);
 			}
 		}
-		else if (GameCanvas.keyMyHold[2]) // Lên
+		else if (GameCanvas.keyMove(1)) // Lên
 		{
-			GameCanvas.clearKeyHold(2);
+			GameCanvas.ClearkeyMove(1);
 			if (catSelect == ChatDetail.CAT_MAIL && smallScreenState == 0)
 			{
 				CamLeftList.cmtoX -= 26;
@@ -1591,9 +1822,9 @@ public class ChatTabScreen : MainScreen
 				if (CamDetailChat.cmtoX < 0) CamDetailChat.cmtoX = 0;
 			}
 		}
-		else if (GameCanvas.keyMyHold[8]) // Xuống
+		else if (GameCanvas.keyMove(3)) // Xuống
 		{
-			GameCanvas.clearKeyHold(8);
+			GameCanvas.ClearkeyMove(3);
 			if (catSelect == ChatDetail.CAT_MAIL && smallScreenState == 0)
 			{
 				CamLeftList.cmtoX += 26;
@@ -2242,6 +2473,26 @@ public class ChatTabScreen : MainScreen
 			CamDetailChat.cmx = 0;
 			break;
 		}
+	}
+
+	public void addWorldChat(string sender, string text)
+	{
+		addNewChat("Thế Giới", (!string.IsNullOrEmpty(sender)) ? (sender + ": ") : "", text, 0, false, -1, ChatDetail.CAT_WORLD);
+	}
+
+	public void addPublicChat(string sender, string text)
+	{
+		addNewChat("Công Cộng", (!string.IsNullOrEmpty(sender)) ? (sender + ": ") : "", text, 0, false, -1, ChatDetail.CAT_PUBLIC);
+	}
+
+	public void addSystemChat(string text)
+	{
+		addNewChat("Hệ Thống", "", text, 1, false, -1, ChatDetail.CAT_SYSTEM);
+	}
+
+	public void addClanChat(string sender, string text)
+	{
+		addNewChat(T.tabBangHoi, (!string.IsNullOrEmpty(sender)) ? (sender + ": ") : "", text, 0, false, -1, ChatDetail.CAT_CLAN);
 	}
 
 	public void addNewChat(string name, string FristContent, string content, sbyte type, bool isFocus)

@@ -506,7 +506,15 @@ public abstract class AbsBoss extends Mob implements iBoss {
         try {
             this.isdie = true;
             this.timeDeath = System.currentTimeMillis();
-            pKill.map.remove_obj(this.index, 1);
+            if (this.map != null) {
+                this.map.remove_obj(this.index, 1);
+                if (this.index_mob_save != this.index) {
+                    this.map.remove_obj(this.index_mob_save, 1);
+                }
+            }
+            if (pKill != null && pKill.map != null && pKill.map != this.map) {
+                pKill.map.remove_obj(this.index, 1);
+            }
 
             List<GiftBox> list_gift = new ArrayList<>();
             dropReward(pKill, list_gift);

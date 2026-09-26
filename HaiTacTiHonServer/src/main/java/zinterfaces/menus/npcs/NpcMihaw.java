@@ -42,7 +42,16 @@ public class NpcMihaw implements iNpc {
         p.menus.clear();
         if (p.clan != null) {
             boolean isLeader = p.clan.members != null && !p.clan.members.isEmpty() && p.clan.members.get(0).name.equals(p.name);
-            p.menus.add(new Menu("Nhiệm vụ băng", (short) 141, () -> { try { handleNhiemVuBang(p); } catch (IOException ex) { ex.printStackTrace(); } }));
+            QuestP questP = null;
+            for (int i = 0; i < p.list_quest.size(); i++) {
+                if (p.list_quest.get(i).template.id < -2000) {
+                    questP = p.list_quest.get(i);
+                    break;
+                }
+            }
+            boolean isFinished = isQuestFinished(questP);
+            String menuQuestName = isFinished ? "Trả nhiệm vụ băng" : "Nhiệm vụ băng";
+            p.menus.add(new Menu(menuQuestName, (short) 141, () -> { try { handleNhiemVuBang(p); } catch (IOException ex) { ex.printStackTrace(); } }));
             p.menus.add(new Menu("Huy hiệu hành trình", (short) 171, () -> { try { openHuyHieuHanhTrinhMenu(p); } catch (IOException ex) { ex.printStackTrace(); } }));
             p.menus.add(new Menu("Phó bản băng", (short) 146, () -> { try { openPhoBanBangMenu(p); } catch (IOException ex) { ex.printStackTrace(); } }));
             if (isLeader) {
@@ -66,6 +75,22 @@ public class NpcMihaw implements iNpc {
         p.getService().openDynamicMenu(type, "Băng hải tặc", p.menus);
     }
 
+    public static boolean isQuestFinished(QuestP q) {
+        if (q == null || q.template == null) return false;
+        if (q.template.statusQuest == 2) return true;
+        if (q.data != null && q.data.length > 0) {
+            for (int i = 0; i < q.data.length; i++) {
+                if (q.data[i] != null && q.data[i].length >= 4) {
+                    if (q.data[i][3] < q.data[i][2]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     public static void handleNhiemVuBang(Player p) throws IOException {
         if (p.clan == null) return;
         ClanMember clan_mem = null;
@@ -80,10 +105,6 @@ public class NpcMihaw implements iNpc {
                 p.getService().send_box_ThongBao_OK("Tham gia băng trên 24h mới có thể làm nhiệm vụ băng");
                 return;
             }
-            if (clan_mem.numquest >= 3) {
-                p.getService().send_box_ThongBao_OK("Hôm nay đã hết nhiệm vụ, hãy quay lại vào ngày mai");
-                return;
-            }
             QuestP questP = null;
             for (int i = 0; i < p.list_quest.size(); i++) {
                 if (p.list_quest.get(i).template.id < -2000) {
@@ -92,12 +113,31 @@ public class NpcMihaw implements iNpc {
                 }
             }
             if (questP == null) {
+                if (clan_mem.numquest >= 3) {
+                    p.getService().send_box_ThongBao_OK("Hôm nay đã hết nhiệm vụ, hãy quay lại vào ngày mai");
+                    return;
+                }
                 p.setyesNoDialog(new YesNoDialog(p, 42, "Thông báo",
                         ("Bạn muốn nhận nhiệm vụ Băng hải tặc cấp " + (clan_mem.numquest + 1)),
                         new String[]{"Đồng ý", "Hủy"}, new byte[]{-1, -1}));
                 p.getService().startYesNo();
             } else {
-                p.getService().send_box_ThongBao_OK("Nhiệm vụ hiện tại chưa hoàn thành");
+                if (isQuestFinished(questP)) {
+                    questP.template.statusQuest = 2;
+                    model.Quest.remove_old_and_send_next(p, questP);
+                    List<template.ItemBag47> list_remove = new ArrayList<>();
+                    for (int i = 0; i < p.item.bag47.size(); i++) {
+                        if (p.item.bag47.get(i).category == 5) {
+                            list_remove.add(p.item.bag47.get(i));
+                        }
+                    }
+                    p.item.bag47.removeAll(list_remove);
+                    p.item.updateInventory(false);
+                    Clan.send_info(p, false);
+                    p.getService().send_box_ThongBao_OK("Bạn đã hoàn thành và trả nhiệm vụ Băng hải tặc thành công!");
+                } else {
+                    p.getService().send_box_ThongBao_OK("Nhiệm vụ hiện tại chưa hoàn thành");
+                }
             }
         }
     }

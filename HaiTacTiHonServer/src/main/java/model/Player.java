@@ -500,7 +500,12 @@ public class Player {
     public void save_previous_map() {
         if (this.map != null && this.map.template != null) {
             int currentMapId = this.map.template.id;
-            if (!Zone.map_cant_save_site(currentMapId) && this.map.map_vp == null && this.map.map_dungeon == null) {
+            // Nếu đã lưu map ngoài hợp lệ rồi thì không ghi đè khi đang chuyển tầng phó bản
+            if (this.pre_map_id > 0 && !Zone.map_cant_save_site(this.pre_map_id) && !Zone.is_map_dungeon(this.pre_map_id)) {
+                return;
+            }
+            if (!this.map.isDungeon() && !Zone.map_cant_save_site(currentMapId) && !Zone.is_map_dungeon(currentMapId)
+                    && this.map.map_vp == null && this.map.map_dungeon == null && this.dungeon == null) {
                 this.pre_map_id = currentMapId;
                 this.pre_zone_id = this.map.zone_id;
                 this.pre_x = (this.x > 0) ? this.x : (short) (this.map.template.maxW / 2);
@@ -512,7 +517,12 @@ public class Player {
     public void save_previous_map(Zone fromZone, short fromX, short fromY) {
         if (fromZone != null && fromZone.template != null) {
             int fromMapId = fromZone.template.id;
-            if (!Zone.map_cant_save_site(fromMapId) && fromZone.map_vp == null && fromZone.map_dungeon == null) {
+            // Nếu đã lưu map ngoài hợp lệ rồi thì không ghi đè khi đang chuyển tầng phó bản
+            if (this.pre_map_id > 0 && !Zone.map_cant_save_site(this.pre_map_id) && !Zone.is_map_dungeon(this.pre_map_id)) {
+                return;
+            }
+            if (!fromZone.isDungeon() && !Zone.map_cant_save_site(fromMapId) && !Zone.is_map_dungeon(fromMapId)
+                    && fromZone.map_vp == null && fromZone.map_dungeon == null && this.dungeon == null) {
                 this.pre_map_id = fromMapId;
                 this.pre_zone_id = fromZone.zone_id;
                 this.pre_x = (fromX > 0) ? fromX : (short) (fromZone.template.maxW / 2);
@@ -538,8 +548,18 @@ public class Player {
             this.pre_x = -1;
             this.pre_y = -1;
 
-            if (targetMapId <= 0 || Zone.map_cant_save_site(targetMapId)) {
-                targetMapId = (this.id_map_save > 0 && !Zone.map_cant_save_site(this.id_map_save)) ? this.id_map_save : 1;
+            if (targetMapId <= 0 || Zone.map_cant_save_site(targetMapId) || Zone.is_map_dungeon(targetMapId)) {
+                // Ưu tiên fallback về làng của khu vực/đảo hiện tại (hoặc Thị Trấn Whiskey cho đấu trường)
+                if (this.map != null && this.map.template != null) {
+                    int village = Zone.getVillageMapId(this.map.template.id);
+                    if (village > 0 && !Zone.map_cant_save_site(village) && !Zone.is_map_dungeon(village)) {
+                        targetMapId = village;
+                    }
+                }
+                // Nếu vẫn chưa có thì lấy id_map_save của người chơi
+                if (targetMapId <= 0 || Zone.map_cant_save_site(targetMapId) || Zone.is_map_dungeon(targetMapId)) {
+                    targetMapId = (this.id_map_save > 0 && !Zone.map_cant_save_site(this.id_map_save) && !Zone.is_map_dungeon(this.id_map_save)) ? this.id_map_save : 1;
+                }
                 targetX = -1;
                 targetY = -1;
             }
@@ -644,7 +664,8 @@ public class Player {
     public int resMag;
     public int damePercent;
     public int defPercent;
-    public int[] optionParams = new int[template.ItemOptionTemplate.ENTRYS != null ? template.ItemOptionTemplate.ENTRYS.size() : 200];
+    public int[] optionParams = new int[Math.max(256, template.ItemOptionTemplate.ENTRYS != null ? template.ItemOptionTemplate.ENTRYS.size() : 200)];
+    public long time_regen_10s = 0L;
     public short level;
     public long exp;
     public long point1;
@@ -992,7 +1013,7 @@ public class Player {
         if (this.rms == null || this.rms.length == 0 || this.rms[0] == null || this.rms[0].length == 0) {
             return false;
         }
-        if (targetSkillId < 4001 || targetSkillId > 4080) {
+        if (!ThanTrangConfig.isThanTrangSkill(targetSkillId)) {
             return false;
         }
         try {
@@ -4709,6 +4730,13 @@ public class Player {
         }
         if (multi) {
             exp_up *= Manager.gI().exp;
+            // [TÍCH HỢP OPTION 33 & 67: Tăng xp đánh quái từ trang bị]
+            if (this.ability != null) {
+                int xpBonusPct = this.ability.total_param_item(33, true) + this.ability.total_param_item(67, true);
+                if (xpBonusPct > 0) {
+                    exp_up += (exp_up * (long) xpBonusPct) / 1000L;
+                }
+            }
             int vipBonus = core.VipManager.getVipExpBonusPercent(getVip());
             if (vipBonus > 0) {
                 exp_up += (exp_up * vipBonus) / 100;
@@ -4859,6 +4887,44 @@ public class Player {
                 }
             } else { // Về làng của phe (Làng Đỏ - Map 267 hoặc Làng Xanh - Map 271)
                 respawnBaoVePhaoDai();
+            }
+            return;
+        }
+        if (this.map != null && this.map.template != null && TranChienLon.isMapTranChienLon(this.map.template.id)) {
+            if (type == 1) { // Hồi sinh tại chỗ
+                if (pointPk < 20) {
+                    this.setyesNoDialog(new model.YesNoDialog(this, 14, "Thông báo",
+                            ("Hồi sinh tại chỗ mất 500 beri, bạn có muốn hồi sinh không?"),
+                            new String[]{"500", "Hủy"}, new byte[]{6, -1}));
+                    this.getService().startYesNo();
+                } else {
+                    int fee = pointPk / 4;
+                    this.setyesNoDialog(new model.YesNoDialog(this, 14, "Thông báo",
+                            ("Hồi sinh tại chỗ mất " + fee + " ruby, bạn có muốn hồi sinh không?"),
+                            new String[]{"" + fee, "Hủy"}, new byte[]{7, -1}));
+                    this.getService().startYesNo();
+                }
+            } else { // Về căn cứ phe trong Trận Chiến Lớn
+                respawnTranChienLon();
+            }
+            return;
+        }
+        if (this.map != null && this.map.template != null && (this.map.template.id == 70 || this.map.template.id == 71 || this.map.template.id == 72 || this.map.template.id == 74)) {
+            if (type == 1) { // Hồi sinh tại chỗ
+                if (pointPk < 20) {
+                    this.setyesNoDialog(new model.YesNoDialog(this, 14, "Thông báo",
+                            ("Hồi sinh tại chỗ mất 500 beri, bạn có muốn hồi sinh không?"),
+                            new String[]{"500", "Hủy"}, new byte[]{6, -1}));
+                    this.getService().startYesNo();
+                } else {
+                    int fee = pointPk / 4;
+                    this.setyesNoDialog(new model.YesNoDialog(this, 14, "Thông báo",
+                            ("Hồi sinh tại chỗ mất " + fee + " ruby, bạn có muốn hồi sinh không?"),
+                            new String[]{"" + fee, "Hủy"}, new byte[]{7, -1}));
+                    this.getService().startYesNo();
+                }
+            } else { // Về Thị Trấn Whiskey
+                respawnDauTruongTuDo();
             }
             return;
         }
@@ -5035,9 +5101,127 @@ public class Player {
             if (this.map != null) {
                 this.map.change_flag(this, this.type_pk);
             }
+            this.sendRevive();
             try {
                 bvd.SendInfoMap(this);
             } catch (Exception ignored) {}
+            this.time_can_mob_atk = System.currentTimeMillis() + 1500L;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendRevive() {
+        if (this.map == null) return;
+        try {
+            Message mRevive = new Message(6);
+            mRevive.writer().writeShort(this.index_map);
+            mRevive.writer().writeByte(0);
+            int curHp = (this.hp > 0) ? this.hp : (this.ability != null ? this.ability.get_hp_max(true) : 1000);
+            int curMp = (this.mp > 0) ? this.mp : (this.ability != null ? this.ability.get_mp_max(true) : 500);
+            mRevive.writer().writeInt(curHp);
+            mRevive.writer().writeInt(curMp);
+            this.map.send_msg_all_p(mRevive, null, true);
+            mRevive.cleanup();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void respawnTranChienLon() {
+        try {
+            if (this.map == null || this.map.template == null) return;
+            if (!TranChienLon.isMapTranChienLon(this.map.template.id)) return;
+            this.isdie = false;
+            this.time_hs_little_garden = 0;
+            if (this.ability != null) {
+                this.hp = this.ability.get_hp_max(true);
+                this.mp = this.ability.get_mp_max(true);
+            }
+            short mapW = (short) (this.map.template.maxW > 0 ? this.map.template.maxW : 1600);
+            short mapH = (short) (this.map.template.maxH > 0 ? this.map.template.maxH : 400);
+            short spawnX;
+            short spawnY = (short) (mapH / 2);
+            if (this.huongnghiep == 1 || this.type_pk == TranChienLon.TYPE_PK_HAI_QUAN) {
+                spawnX = 250; // Trại Hải Quân
+            } else if (this.huongnghiep == 2 || this.type_pk == TranChienLon.TYPE_PK_HAI_TAC) {
+                spawnX = (short) Math.max(300, mapW - 250); // Trại Hải Tặc
+            } else {
+                spawnX = (short) (mapW / 2); // Trại Quân Cách Mạng
+            }
+            this.x = spawnX;
+            this.y = spawnY;
+            this.xold = spawnX;
+            this.yold = spawnY;
+            Vgo vgo = new Vgo();
+            vgo.map_go = new Zone[]{this.map};
+            vgo.xnew = spawnX;
+            vgo.ynew = spawnY;
+            this.goto_map(vgo);
+            TranChienLon.setType(this);
+            if (this.getService() != null) {
+                this.getService().send_time_cool_down(System.currentTimeMillis(), "", 0);
+                this.getService().use_potion(0, this.hp);
+                this.getService().use_potion(1, this.mp);
+                this.getService().update_PK(this, true);
+            }
+            this.map.change_flag(this, this.type_pk);
+            this.sendRevive();
+            this.time_can_mob_atk = System.currentTimeMillis() + 1500L;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void respawnDauTruongTuDo() {
+        try {
+            if (this.map == null || this.map.template == null) return;
+            if (this.map.template.id != 70 && this.map.template.id != 71 && this.map.template.id != 72 && this.map.template.id != 74) return;
+            if (this instanceof bot.Bot) return; // Bot tự xử lý hồi sinh trong đấu trường
+            this.isdie = false;
+            this.time_hs_little_garden = 0;
+            if (this.ability != null) {
+                this.hp = this.ability.get_hp_max(true);
+                this.mp = this.ability.get_mp_max(true);
+            }
+            // Hủy cờ PK Đấu Trường Tự Do
+            this.type_pk = -1;
+            this.isBackTypePk = false;
+
+            // Map 69: Thị Trấn Whiskey (Whiskey Peak)
+            Zone[] whiskeyZones = Zone.getMapByID(69);
+            Zone targetZone = (whiskeyZones != null && whiskeyZones.length > 0) ? whiskeyZones[0] : null;
+            if (targetZone != null) {
+                short spawnX = 450;
+                short spawnY = 300;
+                if (targetZone.template != null && targetZone.template.npcs != null) {
+                    for (Npc npc : targetZone.template.npcs) {
+                        if (npc != null && (npc.idmenu == -77 || "Ms. Gym".equals(npc.namegt) || (npc.name != null && npc.name.contains("Gym")))) {
+                            spawnX = (short) (npc.x + (npc.x > 100 ? -30 : 30));
+                            spawnY = (short) npc.y;
+                            break;
+                        }
+                    }
+                }
+                Vgo vgo = new Vgo();
+                vgo.map_go = new Zone[]{targetZone};
+                vgo.xnew = spawnX;
+                vgo.ynew = spawnY;
+                this.goto_map(vgo);
+            } else {
+                this.return_to_previous_map();
+            }
+
+            if (this.getService() != null) {
+                this.getService().send_time_cool_down(System.currentTimeMillis(), "", 0);
+                this.getService().use_potion(0, this.hp);
+                this.getService().use_potion(1, this.mp);
+                this.getService().update_PK(this, false);
+            }
+            if (this.map != null) {
+                this.map.change_flag(this, this.type_pk);
+            }
+            this.sendRevive();
             this.time_can_mob_atk = System.currentTimeMillis() + 1500L;
         } catch (Exception e) {
             e.printStackTrace();
@@ -6773,13 +6957,28 @@ public class Player {
         if (Zone.isMapLang(this.map.template.id)) {
             return false;
         }
-        // Trong map đang chờ bắt đầu trận
-        if (Zone.isWaitingOrUnstartedMatch(this.map)) {
+        // Trong map đang chờ bắt đầu trận / đếm ngược
+        if (Zone.isWaitingOrUnstartedMatch(this.map) || (p.map != null && Zone.isWaitingOrUnstartedMatch(p.map))) {
             return false;
         }
 
-        // Thách đấu cá nhân / Cừu hận PvP 1v1 (Yêu cầu cả 2 bên cùng chấp nhận thách đấu)
-        if (this.targetFight != null && this.targetFight.equals(p) && p.targetFight != null && p.targetFight.equals(this)) return true;
+        // Bảo vệ tân thủ / Hồi sinh (eff 7) và chưa bật cờ (type_pk == -1) -> Không thể bị tấn công và không thể tấn công người khác
+        if ((p.get_eff(7) != null && p.type_pk == -1 && !this.isBot) || (this.get_eff(7) != null && this.type_pk == -1 && !this.isBot)) {
+            return false;
+        }
+
+        // Mục tiêu đang bất tử (eff 9 - từ chối tử thần, eff 300 - khiên miễn nhiễm)
+        if (p.get_eff(9) != null || p.get_eff(300) != null) {
+            return false;
+        }
+
+        // Thách đấu cá nhân / Cừu hận PvP 1v1 (Chỉ được đánh khi đã vào MapPvp / Lôi đài và trận đấu đã bắt đầu status_pvp == 3)
+        if (this.targetFight != null && this.targetFight.equals(p) && p.targetFight != null && p.targetFight.equals(this)) {
+            if (this.map.map_vp != null) {
+                return this.map.map_vp.status_pvp == 3;
+            }
+            return false;
+        }
 
         // Kiểm tra quan hệ Chủ nhân / Đệ tử / Lính đánh thuê — Tuyệt đối không tấn công đồng đội
         int myOwnerId = this.IDPlayer;
@@ -6802,13 +7001,13 @@ public class Player {
 
         // Map Lôi Đài / Đấu Trường PvP
         if (this.map.map_vp != null) {
-            if (this.type_pk < 4 || p.type_pk < 4) {
-                return false;
+            if (this.map.map_vp.status_pvp != 3) {
+                return false; // Chưa bắt đầu trận đấu / đang đếm ngược -> Không được đánh
             }
-            if (this.type_pk == p.type_pk) {
-                return false; // Cùng cờ PK (cùng phe) trong PvP không đánh nhau
+            if (this.type_pk >= 4 && p.type_pk >= 4) {
+                return this.type_pk != p.type_pk;
             }
-            return true; // Khác cờ / khác phe trong map PvP -> Được phép tấn công
+            return true;
         }
 
         // Tuyệt đối không tấn công đồng đội cùng Clan trong các phó bản & map thế giới
@@ -6857,7 +7056,10 @@ public class Player {
         }
 
         // 4. Map Phó bản PvP Băng (Map 120, pvpBangMapFight)
-        if (this.map.pvpBangMapFight != null || this.map.template.id == 120) {
+        if (this.map.pvpBangMapFight != null || (this.map.template != null && this.map.template.id == 120)) {
+            if (this.map.pvpBangMapFight != null && this.map.pvpBangMapFight.status_pvp != 3) {
+                return false; // Chưa bắt đầu chiến đấu -> Không cho đánh
+            }
             if (this.type_pk == 4 && p.type_pk == 5) return true;
             if (this.type_pk == 5 && p.type_pk == 4) return true;
             if (this.type_pk == 14 && p.type_pk == 15) return true;
@@ -7326,6 +7528,20 @@ public class Player {
             hp_buff += autoHp;
             mp_buff += autoMp;
         }
+
+        // [TÍCH HỢP OPTION 79: Hồi máu cuối mỗi 10s (Marco Set / Tái sinh)]
+        if (!this.isdie && this.time_regen_10s < now) {
+            this.time_regen_10s = now + 10_000L;
+            int op79 = this.ability.total_param_item(79, true);
+            if (op79 > 0) {
+                int curMax = this.ability.get_hp_max(true);
+                int heal10s = (int) ((curMax * (long) Math.min(250, op79)) / 1000L); // Tối đa 25% mỗi 10s
+                if (heal10s > 0 && this.hp < curMax && this.get_eff(202) == null) {
+                    hp_buff += heal10s;
+                }
+            }
+        }
+
         int hp_max = this.ability.get_hp_max(true);
         int mp_max = this.ability.get_mp_max(true);
         int sendHp = (!this.isdie && this.hp < hp_max && hp_buff > 0 && this.get_eff(202) == null) ? hp_buff : 0;
@@ -7553,6 +7769,7 @@ public class Player {
                         this.getService().update_PK(this, true);
                     }
                     this.map.change_flag(this, this.type_pk);
+                    this.sendRevive();
                 } catch (Exception ignored) {}
                 this.time_can_mob_atk = System.currentTimeMillis() + 1500L;
             }
@@ -7562,6 +7779,20 @@ public class Player {
         if (this.map != null && (this.map.IsMapBaoVePhaoDai() || this.map.baoVePhaoDai != null)) {
             if (this.isdie && this.time_hs_little_garden <= System.currentTimeMillis()) {
                 respawnBaoVePhaoDai();
+            }
+        }
+
+        // 16. Special map respawn in Trận Chiến Lớn (Map 272..275)
+        if (this.map != null && this.map.template != null && TranChienLon.isMapTranChienLon(this.map.template.id)) {
+            if (this.isdie && this.time_hs_little_garden <= System.currentTimeMillis()) {
+                respawnTranChienLon();
+            }
+        }
+
+        // 17. Special map respawn in Đấu Trường Tự Do (Map 70, 71, 72, 74)
+        if (this.map != null && this.map.template != null && (this.map.template.id == 70 || this.map.template.id == 71 || this.map.template.id == 72 || this.map.template.id == 74)) {
+            if (this.isdie && this.time_hs_little_garden <= System.currentTimeMillis()) {
+                respawnDauTruongTuDo();
             }
         }
         } catch (Exception e) {
@@ -7587,6 +7818,32 @@ public class Player {
                 this.ability.recalculatePlayerStats(this);
             }
         }
+    }
+
+    public Skill_info get_skill_by_id(int id) {
+        if (this.skill_point != null) {
+            for (int i = 0; i < this.skill_point.size(); i++) {
+                Skill_info sk = this.skill_point.get(i);
+                if (sk != null && sk.temp != null && sk.temp.ID == id) {
+                    return sk;
+                }
+            }
+        }
+        return null;
+    }
+
+    public long time_cooldown_haki_bv = 0;
+    public long time_cooldown_haki_qs = 0;
+
+    public void triggerHakiBaVuong(Player targetPlayer, Mob targetMob) {
+        // Neutralized to prevent unwanted auto-effects/buffs
+    }
+
+    /**
+     * Kích hoạt Haki Quan Sát: đã tắt để chống hiện rồng vàng và buff ngoài ý muốn
+     */
+    public void triggerHakiQuanSat() {
+        // Neutralized to prevent unwanted auto-effects/buffs
     }
 
     public void update_die() {
@@ -7715,14 +7972,21 @@ public class Player {
 
         int fullSetId = ThanTrangConfig.getFullSetId(this);
         if (fullSetId > 0 && fullSetId <= ThanTrangConfig.TOTAL_SETS) {
-            int skId = ThanTrangConfig.getSkillBySetId(fullSetId);
-            skill.Skill_Template st = skill.Skill_Template.get_temp_by_id(skId);
-            if (st != null) {
-                if (st.ID <= 0) st.ID = st.indexSkillInServer > 0 ? st.indexSkillInServer : skId;
-                Skill_info sinfo = new Skill_info();
-                sinfo.temp = st;
-                sinfo.exp = 0;
-                skillsToSend.add(sinfo);
+            int[] setSkills = new int[] {
+                ThanTrangConfig.getActiveSkill1(fullSetId),
+                ThanTrangConfig.getActiveSkill2(fullSetId),
+                ThanTrangConfig.getStatBuffSkill(fullSetId)
+            };
+            for (int skId : setSkills) {
+                if (skId <= 0) continue;
+                skill.Skill_Template st = skill.Skill_Template.get_temp_by_id(skId);
+                if (st != null) {
+                    if (st.ID <= 0) st.ID = st.indexSkillInServer > 0 ? st.indexSkillInServer : skId;
+                    Skill_info sinfo = new Skill_info();
+                    sinfo.temp = st;
+                    sinfo.exp = 0;
+                    skillsToSend.add(sinfo);
+                }
             }
         }
 
@@ -8239,17 +8503,37 @@ public class Player {
         if (this.skill_point != null) {
             for (int i = 0; i < this.skill_point.size(); i++) {
                 Skill_info sk = this.skill_point.get(i);
-                if (sk != null && sk.temp != null && (sk.temp.ID == idSkill || sk.temp.indexSkillInServer == idSkill || sk.temp.idIcon == idSkill)) {
-                    return sk;
+                if (sk != null && sk.temp != null) {
+                    if (sk.temp.ID == idSkill || sk.temp.indexSkillInServer == idSkill || sk.temp.idIcon == idSkill) {
+                        return sk;
+                    }
+                    // Trái Phượng Hoàng (Marco): SQL id (4025..4028) & Eff id (4024, 4029)
+                    if ((idSkill == 4025 || idSkill == 4024) && (sk.temp.indexSkillInServer == 817 || sk.temp.ID == 5032)) {
+                        return sk;
+                    }
+                    if (idSkill == 4026 && (sk.temp.indexSkillInServer == 818 || sk.temp.ID == 5033)) {
+                        return sk;
+                    }
+                    if ((idSkill == 4027 || idSkill == 4029) && (sk.temp.indexSkillInServer == 819 || sk.temp.ID == 5034)) {
+                        return sk;
+                    }
+                    if (idSkill == 4028 && (sk.temp.indexSkillInServer == 820 || sk.temp.ID == 5035)) {
+                        return sk;
+                    }
                 }
             }
+            if (idSkill == 0 && !this.skill_point.isEmpty() && this.skill_point.get(0) != null) {
+                return this.skill_point.get(0);
+            }
         }
-        if (idSkill >= 4001 && idSkill <= 4080) {
+        if (ThanTrangConfig.isThanTrangSkill(idSkill)) {
             int fullSetId = ThanTrangConfig.getFullSetId(this);
             if (fullSetId > 0) {
-                int ttSkill = ThanTrangConfig.getSkillBySetId(fullSetId);
+                int ttSkill1 = ThanTrangConfig.getActiveSkill1(fullSetId);
+                int ttSkill2 = ThanTrangConfig.getActiveSkill2(fullSetId);
+                int ttBuff = ThanTrangConfig.getStatBuffSkill(fullSetId);
                 int baseSkill = 4000 + (fullSetId - 1) * 5;
-                if (idSkill == ttSkill || idSkill == 4001 + fullSetId || idSkill == 4000 + fullSetId || (idSkill >= baseSkill + 1 && idSkill <= baseSkill + 5)) {
+                if (idSkill == ttSkill1 || idSkill == ttSkill2 || idSkill == ttBuff || idSkill == 4001 + fullSetId || (idSkill >= baseSkill + 1 && idSkill <= baseSkill + 5)) {
                     skill.Skill_Template st = skill.Skill_Template.get_temp_by_id(idSkill);
                     if (st != null) {
                         if (st.ID <= 0) st.ID = st.indexSkillInServer > 0 ? st.indexSkillInServer : idSkill;
@@ -8261,6 +8545,13 @@ public class Player {
                 }
             }
         }
+        skill.Skill_Template fallbackSt = skill.Skill_Template.get_temp_by_id(idSkill);
+        if (fallbackSt != null && (fallbackSt.typeSkill == 1 || fallbackSt.typeSkill == 4 || fallbackSt.typeSkill == 2)) {
+            Skill_info skInfo = new Skill_info();
+            skInfo.temp = fallbackSt;
+            skInfo.exp = 0;
+            return skInfo;
+        }
         return null;
     }
 
@@ -8271,9 +8562,10 @@ public class Player {
         List<Skill_info> list_remove = new ArrayList<>();
         for (int i = 0; i < this.skill_point.size(); i++) {
             Skill_info temp = this.skill_point.get(i);
-            if (temp.temp.ID > 2000
-                    && !((temp.temp.indexSkillInServer >= 660 && temp.temp.indexSkillInServer <= 666)
-                    || (temp.temp.indexSkillInServer >= 672 && temp.temp.indexSkillInServer <= 690))) {
+            if (temp != null && temp.temp != null) {
+                boolean isHaki = ((temp.temp.indexSkillInServer >= 660 && temp.temp.indexSkillInServer <= 666)
+                        || (temp.temp.indexSkillInServer >= 672 && temp.temp.indexSkillInServer <= 690));
+                if ((temp.temp.typeDevil > 0 || temp.temp.ID > 2000) && !isHaki) {
                 // exp ac quy
                 if (temp.devilpercent > 0 || temp.lvdevil > 0) {
                     int numPotion = 0;
@@ -8305,8 +8597,9 @@ public class Player {
                     }
                 }
                 //
-                Learn_Skill.remove_skill(this, temp);
-                list_remove.add(temp);
+                    Learn_Skill.remove_skill(this, temp);
+                    list_remove.add(temp);
+                }
             }
         }
         this.skill_point.removeAll(list_remove);
@@ -8569,6 +8862,42 @@ public class Player {
                 }
                 break;
             }
+            case 4912: { // Trái Venom (item 912)
+                int[] id_ = new int[]{809, 810, 811, 812};
+                for (int i = 0; i < id_.length; i++) {
+                    Skill_info sk_add = new Skill_info();
+                    sk_add.exp = 0;
+                    sk_add.temp = Skill_Template.get_temp(id_[i], sk_add.exp);
+                    if (sk_add.temp != null) {
+                        list_remove.add(sk_add);
+                    }
+                }
+                break;
+            }
+            case 4913: { // Trái Thanh Long (item 913)
+                int[] id_ = new int[]{813, 814, 815, 816};
+                for (int i = 0; i < id_.length; i++) {
+                    Skill_info sk_add = new Skill_info();
+                    sk_add.exp = 0;
+                    sk_add.temp = Skill_Template.get_temp(id_[i], sk_add.exp);
+                    if (sk_add.temp != null) {
+                        list_remove.add(sk_add);
+                    }
+                }
+                break;
+            }
+            case 4914: { // Trái Phượng Hoàng (item 914)
+                int[] id_ = new int[]{817, 818, 819, 820};
+                for (int i = 0; i < id_.length; i++) {
+                    Skill_info sk_add = new Skill_info();
+                    sk_add.exp = 0;
+                    sk_add.temp = Skill_Template.get_temp(id_[i], sk_add.exp);
+                    if (sk_add.temp != null) {
+                        list_remove.add(sk_add);
+                    }
+                }
+                break;
+            }
         }
         this.skill_point.addAll(list_remove);
         list_remove.clear();
@@ -8667,11 +8996,17 @@ public class Player {
     }
 
     public void update_new_part_boat(ItemBoatP temp_new) {
-        byte type_boat_new = ItemBoat.get_item(temp_new.id).type;
+        if (temp_new == null) return;
+        ItemBoat itbNew = ItemBoat.get_item(temp_new.id);
+        if (itbNew == null) return;
+        byte type_boat_new = itbNew.type;
         for (int i = 0; i < this.itemboat.size(); i++) {
-            if (!this.itemboat.get(i).equals(temp_new)
-                    && type_boat_new == ItemBoat.get_item(this.itemboat.get(i).id).type) {
-                this.itemboat.get(i).is_use = false;
+            ItemBoatP ib = this.itemboat.get(i);
+            if (ib != null && !ib.equals(temp_new)) {
+                ItemBoat itb = ItemBoat.get_item(ib.id);
+                if (itb != null && itb.type == type_boat_new) {
+                    ib.is_use = false;
+                }
             }
         }
     }
@@ -8679,9 +9014,12 @@ public class Player {
     public short[] get_part_boat() {
         short[] result = new short[]{0, 1, 2, 3};
         for (int i = 0; i < this.itemboat.size(); i++) {
-            if (this.itemboat.get(i).is_use) {
-                ItemBoat temp = ItemBoat.get_item(this.itemboat.get(i).id);
-                result[temp.type] = temp.idimg;
+            ItemBoatP ib = this.itemboat.get(i);
+            if (ib != null && ib.is_use) {
+                ItemBoat temp = ItemBoat.get_item(ib.id);
+                if (temp != null && temp.type >= 0 && temp.type < result.length) {
+                    result[temp.type] = temp.idimg;
+                }
             }
         }
         return result;
@@ -8746,6 +9084,10 @@ public class Player {
         Message m = new Message(57);
         m.writer().writeByte(9); // reset cooldown skill
         m.writer().writeShort(0);
+        m.writer().writeShort(this.index_map);
+        m.writer().writeByte(0);
+        m.writer().writeByte(0);
+        m.writer().writeInt(0);
         m.writer().writeShort(this.index_map);
         m.writer().writeByte(0);
         m.writer().writeByte(0);
@@ -9444,7 +9786,7 @@ public class Player {
                         }
                     }
                 }
-                dame2 = damebefore;// vuong code hiệu ứng chỉ số thời trang kaido
+                dame2 = (damebefore > 0) ? damebefore : Math.max(100L, (long) p.level * 50L);
                 eff = p_target.get_eff(23);
                 if (eff != null) { // vuong kaido thoi trang
                     dame2 /= 2;
@@ -9457,11 +9799,47 @@ public class Player {
                 dame2 = (dame2 * skDame) / baseDame0;
                 long def = p_target.ability.get_def(true);
                 def = (def * (1000L + (long) p_target.ability.get_def_percent(true))) / 1_000L;
+
+                // [TÍCH HỢP OPTION 13 (Xuyên giáp), 50 (Giảm xuyên giáp đ/t), 70 (Giảm thủ cuối)]
+                int netPierce = Math.max(0, p.ability.get_pierce(true) - p_target.ability.get_pierce_reduce());
+                if (netPierce > 0) {
+                    long piercePct = Math.min(850L, (long) netPierce); // Giới hạn xuyên giáp tối đa 85%
+                    def = (def * (1000L - piercePct)) / 1000L;
+                }
+                int defReduce = (int) p.ability.get_def_target_reduce(); // Option 70
+                if (defReduce > 0) {
+                    long defRedPct = Math.min(500L, (long) defReduce); // Giới hạn giảm thủ cuối tối đa 50%
+                    def = (def * (1000L - defRedPct)) / 1000L;
+                }
                 dame2 -= def;
                 if (dame2 <= 0) {
                     dame2 = 1;
                 }
-                crit = (crit_skill - p_target.ability.get_crit_reduce()) > ZUtil.random(1000);
+
+                // [TÍCH HỢP OPTION 26: Kháng vật lý (Soft-cap 70%)]
+                int resPhys = p_target.ability.get_dame_resist(true);
+                if (resPhys > 0 && dame2 > 0) {
+                    long resPhysPct = Math.min(700L, (long) resPhys);
+                    dame2 = (dame2 * (1000L - resPhysPct)) / 1000L;
+                    if (dame2 <= 0) {
+                        dame2 = 1;
+                    }
+                }
+
+                // [TÍCH HỢP CHỈ SỐ PVP CHUẨN XỊN: Option 81 (Sát thương PvP) & Option 82 (Giảm ST nhận từ người)]
+                int pvpAtk = p.ability.get_pvp_dame();
+                if (pvpAtk > 0 && dame2 > 0) {
+                    dame2 = (dame2 * (1000L + (long) Math.min(500, pvpAtk))) / 1000L;
+                }
+                int pvpDef = p_target.ability.get_pvp_dame_reduce();
+                if (pvpDef > 0 && dame2 > 0) {
+                    dame2 = (dame2 * (1000L - (long) Math.min(600, pvpDef))) / 1000L;
+                }
+
+                // [TÍCH HỢP OPTION 83: Kháng chí mạng của đối thủ]
+                int netCrit = crit_skill - p_target.ability.get_crit_reduce() - p_target.ability.get_crit_resist();
+                crit = netCrit > ZUtil.random(1000);
+
                 //
                 long dame_mine = 0;
                 Dame_Msg dame_inf = new Dame_Msg();
@@ -9471,6 +9849,16 @@ public class Player {
                     dame_inf.dameM
                             = (skDame * (dame_magic_plus_percent))
                             / 1000;
+                    // [TÍCH HỢP OPTION 27 (Kháng phép) & OPTION 65 (Xuyên kháng phép)]
+                    if (dame_inf.dameM > 0) {
+                        int resMag = p_target.ability.get_dame_resist_ap(true);
+                        int mPierce = p.ability.get_magic_pierce(); // Option 65
+                        int netResMag = Math.max(0, resMag - mPierce);
+                        if (netResMag > 0) {
+                            long resMagPct = Math.min(700L, (long) netResMag); // Soft-cap 70%
+                            dame_inf.dameM = (dame_inf.dameM * (1000L - resMagPct)) / 1000L;
+                        }
+                    }
                 }
                 if (dame_inf.dameM < 0) {
                     dame_inf.dameM = 0;
@@ -9489,13 +9877,13 @@ public class Player {
                     }
                 }
                 int react_dame_
-                        = p_target.ability.get_dame_react(true) - p.ability.get_dame_react_reduce();
+                        = p_target.ability.get_dame_react(true) - p.ability.get_dame_react_reduce() - p.ability.get_ignore_react();
                 int MienThuong = p_target.ability.get_dame_skip(true) - p.ability.get_dame_skip_reduce();
                 if (MienThuong < 0) {
                     MienThuong = 0;
                 }
-                if (MienThuong > 900) {
-                    MienThuong = 900;
+                if (MienThuong > 700) { // Giới hạn an toàn Hard-Cap 70%
+                    MienThuong = 700;
                 }
 
                 if (p_target.ability.getGiamDame() > ZUtil.random(1200)) {
@@ -9503,8 +9891,14 @@ public class Player {
                 }
 
                 int get_miss = p_target.ability.get_miss(true) - p.ability.get_miss_reduce();
+                // [TÍCH HỢP OPTION 77: Giảm né cuối & OPTION 90: Bỏ qua né tránh]
+                int ignoreMiss = p.ability.get_miss_target_reduce() + p.ability.get_ignore_miss();
+                if (ignoreMiss > 0) {
+                    get_miss = Math.max(0, get_miss - ignoreMiss);
+                }
                 boolean miss = ((p.get_eff(205) != null || p_target.get_eff(24) != null
                         || get_miss > ZUtil.random(1000)));
+
                 if (miss) { // miss
                     dame2 = 0;
                 }
@@ -9709,7 +10103,7 @@ public class Player {
                         if (dame2 > 1 && crit) {
                             dame2 = (dame2 * (1000L + multi_dame_skill)) / 1000L;
                             int dame_crit_decrease = p_target.ability.get_multi_dame_decrease();
-                            dame2 = (dame2 * (1000L - dame_crit_decrease)) / 1000L;
+                            dame2 = (dame2 * (1000L - Math.min(800L, (long) dame_crit_decrease))) / 1000L;
                             if (dame2 < 1) {
                                 dame2 = 1;
                             }
@@ -9739,7 +10133,7 @@ public class Player {
                 }
 
                 if ((p_target.get_eff(7) != null && p_target.type_pk == -1 && !p.isBot)
-                        || p_target.get_eff(9) != null || p_target.get_eff(300) != null || damebefore == 0 || miss) {
+                        || p_target.get_eff(9) != null || p_target.get_eff(300) != null || miss) {
                     dame2 = 0;
                     dame_inf.dameM = 0;
                     dame_mine = 0;
@@ -9747,12 +10141,25 @@ public class Player {
                 
                 dame_inf.dameP = dame2;
                 long dame_to_target = dame2 + dame_inf.dameM;
+
+                // [TÍCH HỢP OPTION 57: Sát thương chuẩn & OPTION 87: Kháng sát thương chuẩn]
+                int trueDmgPct = p.ability.get_true_dame();
+                if (trueDmgPct > 0 && !miss && p_target.get_eff(9) == null && p_target.get_eff(300) == null) {
+                    long addedTrueDmg = (skDame * (long) trueDmgPct) / 1000L;
+                    int resTrueDmg = p_target.ability.get_true_dame_resist(); // Option 87
+                    if (resTrueDmg > 0) {
+                        addedTrueDmg = (addedTrueDmg * (1000L - (long) Math.min(700, resTrueDmg))) / 1000L;
+                    }
+                    dame_to_target += addedTrueDmg;
+                }
+
                 if (p_target.get_eff(9) != null || p_target.get_eff(300) != null) {
                     dame_to_target = 0;
                 } else if (dame_to_target > 0) {
                     dame_to_target = bot.BotBalanceEngine.applyCombatDamageBalance(p, p_target, dame_to_target, crit);
                     dame_inf.dameP = Math.max(1, dame_to_target - dame_inf.dameM);
                 }
+
                 if (dame_to_target > 0) {
                     p_target.hp -= dame_to_target;
                 }
@@ -9765,15 +10172,20 @@ public class Player {
                     ((bot.Bot) p_target).onAttackedBy(p);
                 }
 
-                // [PHẢN ĐÒN CHUẨN GỐC op14: % phản đòn là tỷ lệ xuất hiện, kích hoạt phản 100% dame bỏ qua giáp]
+                // [PHẢN ĐÒN CHUẨN GỐC op14 + OPTION 38 (Kháng phản đòn) + OPTION 91 (Bỏ qua phản đòn)]
                 if (dame_to_target >= 1 && !miss && p_target.get_eff(300) == null && p_target.get_eff(9) == null) {
-                    int react_pct = p_target.ability.get_dame_react(true) - p.ability.get_dame_react_reduce();
+                    int react_pct = p_target.ability.get_dame_react(true) - p.ability.get_dame_react_reduce() - p.ability.get_ignore_react();
                     if (react_pct > 0 && react_pct > ZUtil.random(1000)) {
-                        dame_mine = dame_to_target;
+                        long reflected = dame_to_target;
+                        int antiReact = p.ability.get_anti_react(); // Option 38
+                        if (antiReact > 0) {
+                            reflected = (reflected * (1000L - Math.min(700L, (long) antiReact))) / 1000L;
+                        }
+                        dame_mine = reflected;
                     }
                 }
 
-                // [HẤP THỤ SÁT THƯƠNG DEFENDER op58 + op73]
+                // [HẤP THỤ SÁT THƯƠNG DEFENDER op58 + op73 (HP) & op74 (MP)]
                 long HapThuHP = 0;
                 if (dame_to_target >= 1 && p_target.hp > 0 && !miss) {
                     int absorb_pct = p_target.ability.total_param_item(58, true) + p_target.ability.total_param_item(73, true);
@@ -9784,20 +10196,58 @@ public class Player {
                         p_target.hp = Math.min(p_target.ability.get_hp_max(true), (int)(p_target.hp + HapThuHP));
                         p_target.getService().use_potion(0, (int) HapThuHP);
                     }
+                    // [TÍCH HỢP OPTION 74: Chuyển hóa sát thương thành MP]
+                    int absorbMpPct = p_target.ability.total_param_item(74, true);
+                    if (absorbMpPct > 0 && absorbMpPct > ZUtil.random(1000)) {
+                        long absorbMp = (dame_to_target * (long) Math.min(100, absorbMpPct)) / 1000L;
+                        long maxMpCap = (p_target.ability.get_mp_max(true) * 5L) / 100L;
+                        long actualMpHeal = Math.min(absorbMp, maxMpCap);
+                        if (actualMpHeal > 0) {
+                            p_target.mp = Math.min(p_target.ability.get_mp_max(true), (int)(p_target.mp + actualMpHeal));
+                            p_target.getService().use_potion(1, (int) actualMpHeal);
+                        }
+                    }
                 }
 
-                // [HÚT HP ATTACKER op59 + op21]
+                // [HÚT HP & MP ATTACKER op59 + op21 (HP), op22 (MP) & OPTION 92: Kháng hút máu]
                 if (dame_to_target >= 1 && p.hp > 0 && !miss) {
                     int lifesteal_pct = p.ability.get_HapThu_Hp();
                     long totalHeal = p.ability.get_hp_atk_absorb(true);
                     if (lifesteal_pct > 0) {
                         totalHeal += (dame_to_target * (long) Math.min(150, lifesteal_pct)) / 1000L;
                     }
+                    int antiLifesteal = p_target.ability.get_anti_lifesteal(); // Option 92
+                    if (antiLifesteal > 0) {
+                        totalHeal = (totalHeal * (1000L - Math.min(700L, (long) antiLifesteal))) / 1000L;
+                    }
                     if (totalHeal > 0) {
                         long maxHealCap = (p.ability.get_hp_max(true) * 8L) / 100L; // Cap 8% Max HP
                         long actualHeal = Math.min(totalHeal, maxHealCap);
                         p.hp = Math.min(p.ability.get_hp_max(true), (int)(p.hp + actualHeal));
                         p.getService().use_potion(0, (int) actualHeal);
+                    }
+                    // [TÍCH HỢP OPTION 22: Hút MP theo sát thương]
+                    int mpStealPct = p.ability.get_mp_atk_absorb(true);
+                    if (mpStealPct > 0) {
+                        long mpHeal = (dame_to_target * (long) Math.min(100, mpStealPct)) / 1000L;
+                        long maxMpHealCap = (p.ability.get_mp_max(true) * 5L) / 100L;
+                        long actualMpHeal = Math.min(mpHeal, maxMpHealCap);
+                        if (actualMpHeal > 0) {
+                            p.mp = Math.min(p.ability.get_mp_max(true), (int)(p.mp + actualMpHeal));
+                            p.getService().use_potion(1, (int) actualMpHeal);
+                        }
+                    }
+                }
+
+                // [TÍCH HỢP OPTION 40: Hút năng lượng (MP Steal flat)]
+                if (dame_to_target >= 1 && p_target.mp > 0 && !miss) {
+                    int manaStealFlat = p.ability.total_param_item(40, true);
+                    if (manaStealFlat > 0) {
+                        int stolen = Math.min(p_target.mp, manaStealFlat);
+                        p_target.mp -= stolen;
+                        p.mp = Math.min(p.ability.get_mp_max(true), p.mp + stolen);
+                        p_target.getService().use_potion(1, -stolen);
+                        p.getService().use_potion(1, stolen);
                     }
                 }
 
@@ -9873,13 +10323,28 @@ public class Player {
                         p_target.getService().send_time_cool_down(p_target.time_hs_little_garden, "Hồi sinh", 3);
                     }
                 }
+                // [KÍCH HOẠT HAKI BÁ VƯƠNG (ID 4026)]
+                if (dame_inf.dameP > 0) {
+                    p.triggerHakiBaVuong(p_target, null);
+                }
                 if (dame_inf.dameP > 0 && sk_temp.temp.idEffSpec > 0
                         && sk_temp.temp.idEffSpec < 17) {
                     eff = p_target.get_eff(200 + sk_temp.temp.idEffSpec);
                     if (eff == null) {
-                        int reduce_Eff = Math.min(1000, Math.max(0, p_target.ability.get_reduce_Eff()));
-                        int percent = sk_temp.temp.perEffSpec;
-                        percent = (percent * (1000 - reduce_Eff)) / 1000;
+                        // [TÍCH HỢP OPTION 71: Kháng hiệu ứng & OPTION 84: Kháng choáng]
+                        int ccResist = p_target.ability.get_cc_resist();
+                        int stunResist = p_target.ability.get_stun_resist();
+                        int reduce_Eff = Math.min(700, Math.max(0, p_target.ability.get_reduce_Eff() + ccResist + stunResist));
+                        int basePer = sk_temp.temp.perEffSpec;
+                        if (basePer > 0 && basePer <= 100) {
+                            basePer *= 10;
+                        }
+                        // [TÍCH HỢP OPTION 75: Tăng % choáng]
+                        int stunBoost = p.ability.get_stun_rate();
+                        if (stunBoost > 0) {
+                            basePer += stunBoost;
+                        }
+                        int percent = (basePer * (1000 - reduce_Eff)) / 1000;
                         if (percent > 0 && percent > ZUtil.random(1000)) {
                             int time = sk_temp.temp.timeEffSpec;
                             time = (time * (1000 - reduce_Eff)) / 1000;
@@ -9893,7 +10358,25 @@ public class Player {
                         }
                     }
                 }
-                if (crit) {
+                // [TÍCH HỢP OPTION 80: Tỷ lệ gây Điện giật & OPTION 85: Kháng tê liệt]
+                if (dame_inf.dameP > 0 && p_target.get_eff(207) == null) {
+                    int shockRate = p.ability.get_shock_rate();
+                    if (shockRate > 0) {
+                        int ccResist = p_target.ability.get_cc_resist();
+                        int shockResist = p_target.ability.get_shock_resist();
+                        int reduce_Eff = Math.min(700, Math.max(0, p_target.ability.get_reduce_Eff() + ccResist + shockResist));
+                        int finalShockRate = (shockRate * (1000 - reduce_Eff)) / 1000;
+                        if (finalShockRate > ZUtil.random(1000)) {
+                            int shockTime = 20; // 2.0s
+                            shockTime = (shockTime * (1000 - reduce_Eff)) / 1000;
+                            if (shockTime > 0) {
+                                p_target.add_new_eff(207, 1, shockTime * 100);
+                                dame_inf.data.add(new Option_Dame_Msg(7, 1, shockTime));
+                            }
+                        }
+                    }
+                }
+                if (crit && !miss && dame_inf.dameP > 0) {
                     dame_inf.data.add(new Option_Dame_Msg(1010, (int) dame_inf.dameP, 0));
                 }
                 if (HapThuHP > 0) {
@@ -9903,7 +10386,9 @@ public class Player {
                     dame_inf.data.add(new Option_Dame_Msg(1014, (int) dame_mine, 0));
                     dame_mine_all += dame_mine;
                 }
-                list.add(dame_inf);
+                if (dame_inf.dameP > 0 || dame_inf.dameM > 0 || !dame_inf.data.isEmpty() || (p_target.get_eff(9) == null && p_target.get_eff(300) == null && (p_target.get_eff(7) == null || p_target.type_pk != -1))) {
+                    list.add(dame_inf);
+                }
             }
         }
         if (dame_mine_all > 0) {
@@ -9983,7 +10468,7 @@ public class Player {
         int dame_magic_plus_percent = p.ability.get_dame_ap();
         int crit_skill = p.ability.get_crit(true);
         int multi_dame_skill = p.ability.get_multi_dame_when_crit(true);
-        boolean crit = (crit_skill) - p.ability.get_param_by_id(69) > ZUtil.random(1000);
+        boolean crit = crit_skill > ZUtil.random(1000);
         List<Dame_Msg> list = new ArrayList<>();
         HashMap<Integer, Integer> id_mob_die = new HashMap<>(); // quest relative to mob
         //
@@ -9998,7 +10483,7 @@ public class Player {
                 mob_target.time_refresh = 0;
             }
             if (mob_target != null && !mob_target.isdie && !p.isdie) {
-                dame2 = damebefore;
+                dame2 = (damebefore > 0) ? damebefore : Math.max(100L, (long) p.level * 50L);
                 dame2 = (dame2 * (1000L + dame_plus_percent)) / 1000L;
                 // [FIX BUG 7] Bỏ crit = crit_skill > random(1000) — đã tính crit có trừ op69 bên ngoài loop (L7668)
                 long dame_exp = dame2;
@@ -10036,6 +10521,8 @@ public class Player {
                 boolean miss = (5 + mob_target.level / 10) > ZUtil.random(1000);
                 if (miss) { // miss
                     dame2 = 0;
+                } else if (dame2 <= 0) {
+                    dame2 = Math.max(50L, (long) p.level * 20L);
                 }
                 if (dame2 > 0) {
                     dame2 -= (dame2 * ZUtil.random(10)) / 100;
@@ -10219,6 +10706,17 @@ public class Player {
                     dame2 = (dame2 * bossDmgRatio) / 1_000L;
                     dame_inf.dameM = (dame_inf.dameM * bossDmgRatio) / 1_000L;
                 }
+
+                boolean isBossTarget = isDungeonBoss || mob_target.is_boss || mob_target.isSieuTrum || mob_target.boss_inf != null;
+                if (isBossTarget) {
+                    // [TÍCH HỢP OPTION 33: Sát thương lên Boss]
+                    int bossDmgBonus = p.ability.get_boss_dame();
+                    if (bossDmgBonus > 0) {
+                        dame2 = (dame2 * (1000L + (long) bossDmgBonus)) / 1000L;
+                        dame_inf.dameM = (dame_inf.dameM * (1000L + (long) bossDmgBonus)) / 1000L;
+                    }
+                }
+
                 if ("BiNgoMa".equals(mob_target.keyflag) || "QuaiVatTuyet".equals(mob_target.keyflag) || "Zombie".equals(mob_target.keyflag) || "DoiTruongHuyenThoai".equals(mob_target.keyflag)) {
                     dame2 = 1;
                     dame_inf.dameM = 0;
@@ -10228,6 +10726,20 @@ public class Player {
                     dame_inf.dameM = 0;
                 }
                 long dame_to_target = dame2 + dame_inf.dameM;
+                if (!miss && dame_to_target <= 0 && !"BigMom".equals(mob_target.keyflag) && (mob_target.mtemplate == null || mob_target.mtemplate.mob_id != 172)) {
+                    dame_to_target = Math.max(50L, (long) p.level * 20L);
+                    dame2 = dame_to_target;
+                }
+
+                // [TÍCH HỢP OPTION 57: Sát thương chuẩn khi đánh quái & Boss]
+                int trueDmgParam = p.ability.get_true_dame();
+                if (trueDmgParam > 0 && dame2 > 0) {
+                    long addedTrue = (dame2 * (long) trueDmgParam) / 1000L;
+                    if (isBossTarget) {
+                        addedTrue = Math.min((dame2 * 25L) / 100L, addedTrue); // Giới hạn an toàn trên Boss
+                    }
+                    dame_to_target += addedTrue;
+                }
                 zabstracts.AbsBoss bossTarget = mob_target.getBoss();
                 if (bossTarget != null) {
                     dame_to_target = bossTarget.modifyIncomingDamage(p, dame_to_target);
@@ -10271,22 +10783,22 @@ public class Player {
                     bossTarget.onDamage(p, dame_to_target);
                 }
                 if (mob_target.hp == mob_target.hp_max && dame_to_target >= mob_target.hp) {
-                    dame_to_target = (mob_target.hp_max * 40L) / 100L;
-                    mob_target.hp -= dame_to_target;
-                } 
-                else {
-                    int old_mob_hp = mob_target.hp;
-                    if (map.clan_resource != null) {
-                        map.clan_resource.dame += dame_to_target;
-                    } else {
-                        mob_target.hp -= dame_to_target;
-                    }
-                    if (bossTarget != null) {
-                        bossTarget.checkHpMilestoneRewards(map, p, old_mob_hp, mob_target.hp, dame_to_target);
-                    }
-                    p.item.updateInventory(false);
-                    p.updateMoney();
+                    long maxHOne = (mob_target.mtemplate != null && mob_target.mtemplate.hOne > 0)
+                            ? (long) mob_target.mtemplate.hOne
+                            : ((mob_target.hp_max * 40L) / 100L);
+                    dame_to_target = Math.min(maxHOne, Math.max(1L, (long) mob_target.hp - 1));
                 }
+                int old_mob_hp = mob_target.hp;
+                if (map.clan_resource != null) {
+                    map.clan_resource.dame += dame_to_target;
+                } else {
+                    mob_target.hp -= dame_to_target;
+                }
+                if (bossTarget != null) {
+                    bossTarget.checkHpMilestoneRewards(map, p, old_mob_hp, mob_target.hp, dame_to_target);
+                }
+                p.item.updateInventory(false);
+                p.updateMoney();
 
                 // [HÚT HP KHI ĐÁNH QUÁI op59 + op21]
                 if (dame_to_target >= 1 && p.hp > 0 && !miss) {
@@ -10302,14 +10814,45 @@ public class Player {
                         p.getService().use_potion(0, (int) actualHeal);
                     }
                 }
+
+                // [TÍCH HỢP OPTION 22: Hút MP khi đánh quái]
+                if (dame_to_target >= 1 && p.mp < p.ability.get_mp_max(true) && !miss) {
+                    int mpSteal = p.ability.get_param_by_id(22);
+                    if (mpSteal > 0) {
+                        long mpAbsorb = (dame_to_target * (long) Math.min(100, mpSteal)) / 1000L;
+                        if (mpAbsorb > 0) {
+                            int mpMax = p.ability.get_mp_max(true);
+                            long maxMpCap = (mpMax * 5L) / 100L; // Cap 5% Max MP
+                            int actualMp = (int) Math.min(mpAbsorb, maxMpCap);
+                            p.mp = Math.min(mpMax, p.mp + actualMp);
+                            p.getService().use_potion(1, actualMp);
+                        }
+                    }
+                }
                 
-                dame_inf.dameP = dame2;
+                if (!miss && dame_to_target > 0) {
+                    dame_inf.dameP = Math.max(1, dame_to_target - dame_inf.dameM);
+                } else {
+                    dame_inf.dameP = dame2;
+                }
                 mob_target.id_target = p.index_map;
                 if (mob_target.hp <= 0 && !mob_target.isdie) {
                     mob_target.hp = 0;
                     mob_target.isdie = true;
                     Player pOwner = (p != null) ? p.getOwnerPlayer() : p;
                     mob_target.mobDie(pOwner);
+                    // [TÍCH HỢP OPTION 35: Hồi phục khi tiêu diệt mục tiêu]
+                    if (pOwner != null && pOwner.hp > 0 && !pOwner.isdie) {
+                        int killRegen = pOwner.ability.get_param_by_id(35);
+                        if (killRegen > 0) {
+                            int hpMax = pOwner.ability.get_hp_max(true);
+                            int healAmount = (int) ((hpMax * (long) Math.min(200, killRegen)) / 1000L);
+                            if (healAmount > 0) {
+                                pOwner.hp = Math.min(hpMax, pOwner.hp + healAmount);
+                                pOwner.getService().use_potion(0, healAmount);
+                            }
+                        }
+                    }
                     if (mob_target.mtemplate != null && (mob_target.mtemplate.mob_id == 132 || mob_target.mtemplate.mob_id == 133)) {
                         mob_target.time_refresh = 0; // Trụ Chiếm Đảo tuyệt đối không tự động hồi sinh theo timer
                     } else {
@@ -10460,54 +11003,22 @@ public class Player {
                             pFind = p;
                         }
 
-                        zabstracts.AbsBoss b = boss.BossManager.gI().getBossById(mob_target.boss_inf.id);
+                        zabstracts.AbsBoss b = mob_target.getBoss();
+                        if (b == null) {
+                            b = boss.BossManager.gI().getBossById(mob_target.boss_inf.id);
+                        }
+
+                        // Remove dead boss object from map immediately for all clients in zone
+                        map.remove_obj(mob_target.index, 1);
+                        if (b != null && b.index != mob_target.index) {
+                            map.remove_obj(b.index, 1);
+                        }
+                        map.mobs.remove(mob_target.index);
+
                         if (b != null) {
                             b.isdie = true;
                             b.timeDeath = System.currentTimeMillis();
                             b.onDeath(pFind);
-                        }
-                    }
-                    // boss up level
-                    if (mob_target.boss_inf != null && mob_target.boss_inf.isLevelUpOnDeath()) {
-                        if (mob_target.boss_inf.levelBoss < 10) {
-                            mob_target.boss_inf.levelBoss++;
-                            int baseHp = mob_target.boss_inf.getHpMax();
-                            long hp0 = ((long) baseHp * (100L + (mob_target.boss_inf.levelBoss - 1) * 10L)) / 100L;
-                            mob_target.hp_max = (int) Math.min(hp0, Integer.MAX_VALUE);
-                            mob_target.hp = mob_target.hp_max;
-                            mob_target.isdie = false;
-                            mob_target.index++;
-                            Message m_local = new Message(1);
-                            m_local.writer().writeByte(1);
-                            m_local.writer().writeShort(mob_target.index);
-                            m_local.writer().writeShort(mob_target.x);
-                            m_local.writer().writeShort(mob_target.y);
-                            for (int j = 0; j < map.players.size(); j++) {
-                                Player p0 = map.players.get(j);
-                                p0.addmsg(m_local);
-                            }
-                            m_local.cleanup();
-                            Manager.gI().chatKTG(0, mob_target.mtemplate.name + " bậc "
-                                    + mob_target.boss_inf.levelBoss + " đã xuất hiện!", 5);
-                        } else {
-                            mob_target.hp_max = mob_target.boss_inf.getHpMax();
-                            mob_target.hp = mob_target.hp_max;
-                            mob_target.isdie = false;
-                            mob_target.boss_inf.levelBoss = 1;
-                            mob_target.index = mob_target.boss_inf.index_mob_save;
-                            mob_target.boss_inf.timeDeath = 0;
-                            
-                            Message m_local = new Message(1);
-                            m_local.writer().writeByte(1);
-                            m_local.writer().writeShort(mob_target.index);
-                            m_local.writer().writeShort(mob_target.x);
-                            m_local.writer().writeShort(mob_target.y);
-                            for (int j = 0; j < map.players.size(); j++) {
-                                Player p0 = map.players.get(j);
-                                p0.addmsg(m_local);
-                            }
-                            m_local.cleanup();
-                            Manager.gI().chatKTG(0, mob_target.mtemplate.name + " bậc 1 đã tái sinh!", 5);
                         }
                     }
                     if (Zone.is_map_boss(map.template.id) && p.map_boss_info != null
@@ -10590,8 +11101,44 @@ public class Player {
                 if (Zone.is_map_luyentap(map.template.id)) {
                     exp_up[0] += ZUtil.random(5, 10);
                 }
-                if (crit) {
+                if (crit && !miss && dame_inf.dameP > 0) {
                     dame_inf.data.add(new Option_Dame_Msg(1010, (int) dame_inf.dameP, 0));
+                }
+                // [KÍCH HOẠT HAKI BÁ VƯƠNG (ID 4026)]
+                if (dame_inf.dameP > 0) {
+                    p.triggerHakiBaVuong(null, mob_target);
+                }
+                if (dame_inf.dameP > 0 && sk_temp != null && sk_temp.temp != null && sk_temp.temp.idEffSpec > 0
+                        && sk_temp.temp.idEffSpec < 17) {
+                    int basePer = sk_temp.temp.perEffSpec;
+                    if (basePer > 0 && basePer <= 100) {
+                        basePer *= 10;
+                    }
+                    // [TÍCH HỢP OPTION 75: Tăng % choáng lên quái]
+                    int stunBoost = p.ability.get_stun_rate();
+                    if (stunBoost > 0) {
+                        basePer += stunBoost;
+                    }
+                    if (basePer > 0 && basePer > ZUtil.random(1000)) {
+                        int time = sk_temp.temp.timeEffSpec;
+                        if (time > 0) {
+                            dame_inf.data.add(new Option_Dame_Msg(sk_temp.temp.idEffSpec, 1, time));
+                            long lockDuration = time * 100L;
+                            mob_target.isChoang = true;
+                            mob_target.timeChoang = Math.max(mob_target.timeChoang, System.currentTimeMillis() + lockDuration);
+                        }
+                    }
+                }
+                // [TÍCH HỢP OPTION 80: Tỷ lệ gây Điện giật lên quái]
+                if (dame_inf.dameP > 0 && !mob_target.isChoang) {
+                    int shockRate = p.ability.get_shock_rate();
+                    if (shockRate > 0 && shockRate > ZUtil.random(1000)) {
+                        int time = 20; // 2.0s
+                        dame_inf.data.add(new Option_Dame_Msg(7, 1, time));
+                        long lockDuration = time * 100L;
+                        mob_target.isChoang = true;
+                        mob_target.timeChoang = Math.max(mob_target.timeChoang, System.currentTimeMillis() + lockDuration);
+                    }
                 }
                 list.add(dame_inf);
                 if (Zone.is_map_luyentap(map.template.id)) {

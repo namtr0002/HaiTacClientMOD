@@ -461,7 +461,7 @@ public class Zone extends AbsMap {
 
     public void update() {
         if (!this.running) {
-            this.running = true;
+            return;
         }
         if (!tryBeginTick()) {
             return;
@@ -510,6 +510,14 @@ public class Zone extends AbsMap {
                 this.stop_map();
                 Zone.remove_map_plus(this);
             }
+            if (this.map_dungeon != null && this.map_dungeon instanceof zabstracts.AbsDungeon) {
+                zabstracts.AbsDungeon abs = (zabstracts.AbsDungeon) this.map_dungeon;
+                if (abs.isFinished) {
+                    this.map_dungeon = null;
+                    this.stop_map();
+                    Zone.remove_map_plus(this);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -542,6 +550,14 @@ public class Zone extends AbsMap {
                     && this.players.isEmpty()) {
                 this.stop_map();
                 Zone.remove_map_plus(this);
+            }
+            if (this.map_dungeon != null && this.map_dungeon instanceof zabstracts.AbsDungeon) {
+                zabstracts.AbsDungeon abs = (zabstracts.AbsDungeon) this.map_dungeon;
+                if (abs.isFinished) {
+                    this.map_dungeon = null;
+                    this.stop_map();
+                    Zone.remove_map_plus(this);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1265,7 +1281,20 @@ public class Zone extends AbsMap {
                 p0.getService().send_time_cool_down(p0.time_hs_little_garden, "Hồi sinh", 3);
             }
         }
-        //
+        // Trận Chiến Lớn / Đại Chiến Thế Giới (Map 272..275)
+        if (p0.map != null && p0.map.template != null && map.zones.TranChienLon.isMapTranChienLon(p0.map.template.id)) {
+            p0.time_hs_little_garden = System.currentTimeMillis() + 8_000L;
+            if (p0.getService() != null) {
+                p0.getService().send_time_cool_down(p0.time_hs_little_garden, "Hồi sinh", 3);
+            }
+        }
+        // Đấu Trường Tự Do (Map 70, 71, 72, 74)
+        if (p0.map != null && p0.map.template != null && (p0.map.template.id == 70 || p0.map.template.id == 71 || p0.map.template.id == 72 || p0.map.template.id == 74)) {
+            p0.time_hs_little_garden = System.currentTimeMillis() + 5_000L;
+            if (p0.getService() != null) {
+                p0.getService().send_time_cool_down(p0.time_hs_little_garden, "Về Whiskey", 3);
+            }
+        }
         //
         Message m = new Message(7);
         m.writer().writeShort(p != null ? p.index_map : p0.index_map);
@@ -1285,9 +1314,10 @@ public class Zone extends AbsMap {
         }
         //
         if (this.map_vp != null && this.map_vp.status_pvp == 3) {
-            boolean isP1Die = (this.map_vp.player1 != null && (p0.equals(this.map_vp.player1) || p0.IDPlayer == this.map_vp.idP1));
-            boolean isP2Die = (this.map_vp.player2 != null && (p0.equals(this.map_vp.player2) || p0.IDPlayer == this.map_vp.idP2));
-            if (isP1Die || isP2Die) {
+            if (p0 != null && !p0.isDe && !(p0 instanceof model.DeTu) && !(p0 instanceof bot.mercenary.MercenaryBot)) {
+                boolean isP1Die = (this.map_vp.player1 != null && (p0.equals(this.map_vp.player1) || p0.IDPlayer == this.map_vp.idP1));
+                boolean isP2Die = (this.map_vp.player2 != null && (p0.equals(this.map_vp.player2) || p0.IDPlayer == this.map_vp.idP2));
+                if (isP1Die || isP2Die) {
                 this.map_vp.status_pvp = 91;
                 this.map_vp.time_pvp = 3;
                 Player pWin = null;
@@ -1316,6 +1346,7 @@ public class Zone extends AbsMap {
             }
         }
     }
+}
 
     public static boolean isCountForZoneSlot(Player p) {
         if (p == null) return false;
@@ -1788,7 +1819,6 @@ public class Zone extends AbsMap {
                 return;
             }
             if ((p.mp - sk_temp.temp.manaLost) < 0) {
-                p.getService().send_box_ThongBao_OK("MP không đủ!");
                 return;
             }
             p.limitTime = System.currentTimeMillis() + p.calculateSkillCooldown(sk_temp.temp);
@@ -1817,6 +1847,9 @@ public class Zone extends AbsMap {
                 }
             }
             long dame = p.ability.get_dame(true);
+            if (dame <= 0) {
+                dame = Math.max(100L, (long) p.level * 50L);
+            }
             EffTemplate eff = p.get_eff(5); // combo
             if (eff != null) {
                 dame *= 2;
@@ -1934,7 +1967,7 @@ public class Zone extends AbsMap {
                     }
                 }
             }
-            int maxSkillRange = (sk_temp.temp != null && sk_temp.temp.range > 0) ? Math.max((int) sk_temp.temp.range + 150, 300) : 450;
+            int maxSkillRange = (sk_temp.temp != null && sk_temp.temp.range > 0) ? Math.max((int) sk_temp.temp.range + 800, 1500) : 1500;
             for (int idx = 0; idx < size_target; idx++) {
                 if (p_target[idx] != null && Math.hypot(p.x - p_target[idx].x, p.y - p_target[idx].y) > maxSkillRange) {
                     p_target[idx] = null;
@@ -2122,6 +2155,10 @@ public class Zone extends AbsMap {
         m.writer().writeShort(0); // point pk
         send_msg_all_p(m, null, true);
         m.cleanup();
+
+        if (targetM.isSieuTrum || targetM.boss_inf != null || targetM.is_boss) {
+            remove_obj(targetM.index, 1);
+        }
     }
 
     public void send_dame_msg(Player p, short typeEffSkill, List<Dame_Msg> list)
@@ -3087,6 +3124,7 @@ public class Zone extends AbsMap {
                 || id == 81 || id == 120 || id == 122 || id == 123 || id == 119 || id == 58 || id == 59 || id == 62 || id == 80 || (id >= 913 && id <= 917) || (id >= 9990 && id <= 9996) || (id >= 199 && id <= 211)
                 || (id >= 254 && id <= 258) || (id >= 261 && id <= 265) || (id >= 178 && id <= 184) || id == 266 || id == 301 || (id >= 267 && id <= 275)
                 || id == 260 || id == 259
+                || (id >= 70 && id <= 74 && id != 73)
                 || Zone.is_map_boss(id) || Zone.is_map_dungeon(id) || Zone.is_map_luyentap(id);
     }
 
@@ -3577,7 +3615,7 @@ public class Zone extends AbsMap {
                 this.send_active_buffs(p, p);
             }
             // Cập nhật làng hồi sinh tương ứng với map hiện tại (không áp dụng cho map phó bản/đặc biệt)
-            if (!Zone.map_cant_save_site(this.template.id) && !Zone.is_map_dungeon(this.template.id) && !(this.template.id >= 178 && this.template.id <= 184)) {
+            if (!Zone.map_cant_save_site(this.template.id) && !Zone.is_map_dungeon(this.template.id) && !this.isDungeon() && !(this.template.id >= 178 && this.template.id <= 184)) {
                 int villageSave = Zone.getVillageMapId(this.template.id);
                 if (villageSave > 0) {
                     p.id_map_save = villageSave;
