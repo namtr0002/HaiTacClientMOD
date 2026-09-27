@@ -2100,13 +2100,20 @@ public class GameScreen : MainScreen
 		}
 		if (!getIsOffAdmin(1) && objFocus != null && typeViewPlayer == 0)
 		{
-			if (objFocus.typeObject == 0 || objFocus.typeObject == 2)
+			if (objFocus.isRemove || objFocus.isStop || (!vecPlayers.contains(objFocus) && objFocus != player))
 			{
-				objFocus.paintName(g, objFocus.colorName, 1);
+				objFocus = null;
 			}
-			if (objFocus.Action != 4 && (objFocus.typeObject == 0 || objFocus.typeObject == 1))
+			else
 			{
-				objFocus.paintHPFocus(g);
+				if (objFocus.typeObject == 0 || objFocus.typeObject == 2)
+				{
+					objFocus.paintName(g, objFocus.colorName, 1);
+				}
+				if (objFocus.Action != 4 && (objFocus.typeObject == 0 || objFocus.typeObject == 1))
+				{
+					objFocus.paintHPFocus(g);
+				}
 			}
 		}
 		if (!getIsOffAdmin(2))
@@ -2534,10 +2541,14 @@ public class GameScreen : MainScreen
 			MainScreen.cameraMain.moveCamera(objView.x - MotherCanvas.w / 2, objView.y - MotherCanvas.h / 3 * 2);
 		}
 		MainScreen.cameraMain.UpdateCameraGameScreen();
-		if (objFocus != null && objFocus.returnAction())
+		if (objFocus != null && (objFocus.returnAction() || (!vecPlayers.contains(objFocus) && objFocus != player)))
 		{
 			objFocus = null;
 			center = null;
+		}
+		if (objGiaotiep != null && (objGiaotiep.returnAction() || (!vecPlayers.contains(objGiaotiep) && objGiaotiep != player)))
+		{
+			objGiaotiep = null;
 		}
 		int num3 = vecEffTam.size();
 		for (int num4 = 0; num4 < num3; num4++)
@@ -3004,18 +3015,32 @@ public class GameScreen : MainScreen
 			MainObject mainObject = (MainObject)vecPlayers.elementAt(i);
 			if (mainObject != player && (mainObject.typeObject != 10 || mainObject.IDMainShiper != player.ID))
 			{
+				mainObject.isRemove = true;
+				mainObject.isStop = true;
 				vecPlayers.removeElementAt(i);
 				i--;
 			}
 		}
 		isVecPlayersDirty = true;
+		objFocus = null;
+		objGiaotiep = null;
+		objPvPNew = null;
 		vecBoat.removeAllElements();
+		vecObjMove.removeAllElements();
+		vecObjFire.removeAllElements();
+		VecEffect.removeAllElements();
+		vecEffTam.removeAllElements();
+		if (LoadMap.vecPointChange != null)
+		{
+			LoadMap.vecPointChange.removeAllElements();
+		}
 		try
 		{
 			AThMadaraFunc.resetGomData();
 			if (player != null)
 			{
 				player.oldMonsterPos = null;
+				player.posTransRoad = null;
 			}
 		}
 		catch (Exception)
@@ -3029,12 +3054,31 @@ public class GameScreen : MainScreen
 		for (int i = 0; i < vecPlayers.size(); i++)
 		{
 			MainObject mainObject = (MainObject)vecPlayers.elementAt(i);
-			if (mainObject.typeObject == 2)
+			if (mainObject != null && mainObject.typeObject == 2)
 			{
+				mainObject.isRemove = true;
+				mainObject.isStop = true;
+				if (objFocus == mainObject)
+				{
+					objFocus = null;
+				}
+				if (objGiaotiep == mainObject)
+				{
+					objGiaotiep = null;
+				}
 				vecPlayers.removeElement(mainObject);
 				i--;
 			}
 		}
+		if (objFocus != null && objFocus.typeObject == 2)
+		{
+			objFocus = null;
+		}
+		if (objGiaotiep != null && objGiaotiep.typeObject == 2)
+		{
+			objGiaotiep = null;
+		}
+		isVecPlayersDirty = true;
 	}
 
 	public static int find_Index_Stop(mVector vec)

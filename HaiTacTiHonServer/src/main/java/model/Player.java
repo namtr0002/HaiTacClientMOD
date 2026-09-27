@@ -4320,6 +4320,8 @@ public class Player {
 
     public void goto_map(Vgo vgo) throws IOException {
         this.resetMenuState();
+        this.targetFight = null;
+        this.pvp_target = null;
         if (this.isdie) {
             this.ischangemap = false;
             this.getService().send_box_ThongBao_OK("Bạn đang kiệt sức, hãy hồi sinh trước khi đi tiếp!");
@@ -4522,6 +4524,9 @@ public class Player {
                 this.ship_pet.map = null;
             }
             this.wait_change_map = true;
+            Message m = new Message(30);
+            this.addmsg(m);
+            m.cleanup();
             if (this.map != null) {
                 this.map.leave_map(this, 2);
             }
@@ -11021,14 +11026,24 @@ public class Player {
                             b.onDeath(pFind);
                         }
                     }
-                    if (Zone.is_map_boss(map.template.id) && p.map_boss_info != null
-                            && p.map_boss_info.mob.contains(mob_target)) {
+                    if (Zone.is_map_boss(map.template.id)) {
                         map.remove_obj(mob_target.index, 1);
+                        if (map.mobs != null) {
+                            map.mobs.remove(mob_target.index);
+                        }
+                        mob_target.isdie = true;
+                        mob_target.hp = 0;
+                        mob_target.time_refresh = Long.MAX_VALUE;
                         if (p != null && !p.isBot && p.conn != null) {
                             List<GiftBox> listGift = core.RewardService.getGiftMapBossByLevel(p);
                             core.RewardService.sendGiftOrMail(p, 0, "Phần thưởng Săn Quái", "Phần thưởng", listGift, true);
                         }
-                        p.map_boss_info.mob.clear();
+                        if (p.map_boss_info != null) {
+                            p.map_boss_info.mob.remove(mob_target);
+                            if (p.map_boss_info.mob.isEmpty()) {
+                                MapBossInfo.remove(p.map_boss_info);
+                            }
+                        }
                         p.updateArchiDaily(3);
                     }
                     

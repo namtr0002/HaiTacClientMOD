@@ -1301,6 +1301,7 @@ public class ReadMessenge : AvMain
 			{
 				ObjectData.setToRms(data, type, num);
 			}
+			Rms.lastLoadedZoom = 0;
 			mImage img = mImage.createImage(data, 0, data.Length);
 			SetImage(img, type, num);
 		}
@@ -1313,6 +1314,13 @@ public class ReadMessenge : AvMain
 	{
 		if (img != null)
 		{
+			if (img.image != null && img.image.texture != null)
+			{
+				if (type == IconType.EFF_CLIENT || (id >= 501 && id <= 529))
+				{
+					img.image.texture.filterMode = UnityEngine.FilterMode.Bilinear;
+				}
+			}
 			MyHashTable table = ObjectData.getTable(type);
 			if (table != null)
 			{
@@ -1604,6 +1612,14 @@ public class ReadMessenge : AvMain
 				return;
 			}
 			mainObject.isRemove = true;
+			if (GameScreen.objFocus == mainObject)
+			{
+				GameScreen.objFocus = null;
+			}
+			if (GameScreen.objGiaotiep == mainObject)
+			{
+				GameScreen.objGiaotiep = null;
+			}
 			if (GameCanvas.lowGraphic)
 			{
 				GameScreen.checkObjRemoveInVecMove(num, 0);
@@ -1693,10 +1709,26 @@ public class ReadMessenge : AvMain
 			case 4:
 			{
 				sbyte b8 = msg.reader().readByte();
-				LoadMap.mLockMap = new sbyte[b8];
+				sbyte[] lockData = new sbyte[b8];
+				bool allPositive = (b8 >= 40);
 				for (int num7 = 0; num7 < b8; num7++)
 				{
-					LoadMap.mLockMap[num7] = msg.reader().readByte();
+					lockData[num7] = msg.reader().readByte();
+					if (lockData[num7] <= 0)
+					{
+						allPositive = false;
+					}
+				}
+				if (allPositive)
+				{
+					LoadMap.mLockMap = lockData;
+					try
+					{
+						CRes.saveRMS("mLockMap", lockData);
+					}
+					catch (Exception)
+					{
+					}
 				}
 				break;
 			}
@@ -2507,7 +2539,7 @@ public class ReadMessenge : AvMain
 		LoadMap.specMap = 0;
 		GameScreen.indexHelp = -1;
 		GameScreen.vecHelp = null;
-		GameCanvas.chatTabScr.addNewChat(T.tabServer, "", T.thongbao, 1, isFocus: false);
+		GameCanvas.chatTabScr.addNewChat("Hệ Thống", "", T.thongbao, 1, false, -1, ChatDetail.CAT_SYSTEM);
 		GameCanvas.chatTabScr.getCurTab(0);
 		GameCanvas.chatTabScr.updateCamTab();
 		GameScreen.numMess = 0;
@@ -2575,6 +2607,16 @@ public class ReadMessenge : AvMain
 			switch (b)
 			{
 			case 0:
+				if (info != null && (info.IndexOf("đăng nhập ở") >= 0 || info.IndexOf("dang nhap o") >= 0 || info.IndexOf("đang đăng nhập") >= 0))
+				{
+					AThMadaraMOD.cancelAutoReconnect();
+					Session_ME.gI().close();
+					GameScreen.player = null;
+					if (GameCanvas.currentScreen != GameCanvas.loginScr && GameCanvas.currentScreen != GameCanvas.fristLoginScr)
+					{
+						GameCanvas.loginScr.Show();
+					}
+				}
 				GameCanvas.Start_Normal_DiaLog(info, mVector2, isCmdClose: true);
 				break;
 			case 1:
@@ -2814,6 +2856,14 @@ public class ReadMessenge : AvMain
 			{
 				mainObject.isRemove = true;
 				mainObject.timeEffRemoveChar = 2;
+				if (GameScreen.objFocus == mainObject)
+				{
+					GameScreen.objFocus = null;
+				}
+				if (GameScreen.objGiaotiep == mainObject)
+				{
+					GameScreen.objGiaotiep = null;
+				}
 			}
 		}
 		catch (Exception)
@@ -3477,7 +3527,7 @@ public class ReadMessenge : AvMain
 				}
 			}
 			mainObject.Hp = hp;
-			if (mainObject.Action == 4 && mainObject.Hp > 0)
+			if ((mainObject.Action == 4 || mainObject.isDie) && mainObject.Hp > 0)
 			{
 				mainObject.Reveive();
 			}
@@ -3531,7 +3581,7 @@ public class ReadMessenge : AvMain
 			sbyte typePirate = msg.reader().readByte();
 			sbyte isDonotShowHat = msg.reader().readByte();
 			MainObject mainObject = MainObject.get_Object(iD, 0);
-			if (mainObject == null || mainObject.returnAction())
+			if (mainObject == null || mainObject.isRemove)
 			{
 				return;
 			}
@@ -4249,7 +4299,7 @@ public class ReadMessenge : AvMain
 								if (k == itemBoat.typeBoat && itemBoat.idPart == GameScreen.player.myBoat[k])
 								{
 									itemBoat.addInfoFrist(T.daTrangBi, 4);
-									itemBoat.colorName = 1;
+									itemBoat.colorName = 4;
 									flag = true;
 								}
 							}
@@ -4410,6 +4460,11 @@ public class ReadMessenge : AvMain
 			}
 			else if (b2 != 107)
 			{
+				if (GameCanvas.tabInven == null)
+				{
+					GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, 0, MainTab.xTab);
+					GameCanvas.tabInven.initCmd();
+				}
 				mVector3.addElement(GameCanvas.tabInven);
 			}
 			else
@@ -4418,6 +4473,11 @@ public class ReadMessenge : AvMain
 			}
 			if (b == 99)
 			{
+				if (GameCanvas.tabInven == null)
+				{
+					GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, 0, MainTab.xTab);
+					GameCanvas.tabInven.initCmd();
+				}
 				GameCanvas.tabInven.setTypeInven(2);
 				TabChest tabChest = new TabChest(name, Player.vecChest, MainTab.xTab);
 				tabChest.initCmd();
@@ -4425,7 +4485,22 @@ public class ReadMessenge : AvMain
 			}
 			else
 			{
-				GameCanvas.tabInven.setTypeInven(1);
+				if (b == 110)
+				{
+					if (GameCanvas.tabInvenClan != null)
+					{
+						GameCanvas.tabInvenClan.setTypeInven(1);
+					}
+				}
+				else
+				{
+					if (GameCanvas.tabInven == null)
+					{
+						GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, 0, MainTab.xTab);
+						GameCanvas.tabInven.initCmd();
+					}
+					GameCanvas.tabInven.setTypeInven(1);
+				}
 				tabShop = new TabShop(name, mVector2, b, MainTab.xTab);
 				mVector3.addElement(tabShop);
 			}
@@ -4448,10 +4523,7 @@ public class ReadMessenge : AvMain
 				GameCanvas.tabShopScr.typeCurrent = 1;
 			}
 			GameCanvas.tabShopScr.setTabSelect();
-			if (b == 101)
-			{
-				tabShop?.beginFocus();
-			}
+			tabShop?.beginFocus();
 		}
 		catch (Exception)
 		{
@@ -4879,7 +4951,7 @@ public class ReadMessenge : AvMain
 				chat = (mainObject.strChatPopup = GameMidlet.fixString(chat));
 				if (mainObject.typeObject == 0)
 				{
-					GameCanvas.chatTabScr.addNewChat(T.tabServer, "", mainObject.name + ": " + chat, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Công Cộng", "", mainObject.name + ": " + chat, 0, false, -1, ChatDetail.CAT_PUBLIC);
 				}
 			}
 		}
@@ -4928,33 +5000,21 @@ public class ReadMessenge : AvMain
 					return;
 				}
 
-				if (text.CompareTo(T.tabServer) == 0)
+				if (ChatTabScreen.isWorldTab(text))
 				{
-					GameCanvas.chatTabScr.addNewChat(text, T.thongbao + ": ", chat, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Thế Giới", "", chat, 0, false, -1, ChatDetail.CAT_WORLD);
 				}
-				else if (text.CompareTo(T.cmdEvent) == 0)
+				else if (ChatTabScreen.isPublicTab(text))
 				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Công Cộng", "", chat, 0, false, -1, ChatDetail.CAT_PUBLIC);
 				}
-				else if (text.CompareTo(T.tabPhobang) == 0)
+				else if (ChatTabScreen.isClanTab(text))
 				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat(T.tabBangHoi, "", chat, 0, false, -1, ChatDetail.CAT_CLAN);
 				}
-				else if (text.CompareTo(T.tabThongBao) == 0)
+				else if (ChatTabScreen.isSystemTab(text))
 				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 1, isFocus: false);
-				}
-				else if (text.CompareTo(T.tabBangChu) == 0)
-				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 1, isFocus: false);
-				}
-				else if (text.CompareTo(T.tabBangHoi) == 0)
-				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 0, isFocus: false);
-				}
-				else if (text.CompareTo(T.party) == 0)
-				{
-					GameCanvas.chatTabScr.addNewChat(text, "", chat, 0, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat(T.hethong, "", chat, 1, false, -1, ChatDetail.CAT_SYSTEM);
 				}
 				else
 				{
@@ -5520,16 +5580,28 @@ public class ReadMessenge : AvMain
 			{
 				Potion.UpdateDataPotion(SaveRms.loadData("dataPotionClan"), isSave: false, 8);
 			}
+			if (LoadMap.mLockMap == null || LoadMap.mLockMap.Length < 40)
+			{
+				GlobalService.gI().get_DATA(4);
+			}
 			LoginScreen.isCheckData = true;
 			GameCanvas.end_Dialog();
 			mSystem.outz("Check_Data_Ver OK, proceeding to login!");
-			if (GameCanvas.currentScreen == GameCanvas.loginScr)
+			if (LoginScreen.pendingTypeLogin >= 0)
+			{
+				sbyte pType = LoginScreen.pendingTypeLogin;
+				string pUser = LoginScreen.pendingUserLogin;
+				string pPass = LoginScreen.pendingPassLogin;
+				LoginScreen.pendingTypeLogin = -1;
+				GameCanvas.loginScr.doLogin(isGetData: false, pType, pUser, pPass);
+			}
+			else if (GameCanvas.currentScreen == GameCanvas.loginScr)
 			{
 				GameCanvas.loginScr.doLogin(isGetData: false, 0, GameCanvas.loginScr.tfUser.getText(), GameCanvas.loginScr.tfPass.getText());
 			}
 			else if (GameCanvas.currentScreen == GameCanvas.fristLoginScr)
 			{
-				GameCanvas.fristLoginScr.setNewAcc(isCheckDataOK: true);
+				GameCanvas.fristLoginScr.Show();
 			}
 		}
 		catch (Exception e)
@@ -5537,9 +5609,21 @@ public class ReadMessenge : AvMain
 			Out.printError(e);
 			LoginScreen.isCheckData = true;
 			GameCanvas.end_Dialog();
-			if (GameCanvas.currentScreen == GameCanvas.loginScr)
+			if (LoginScreen.pendingTypeLogin >= 0)
+			{
+				sbyte pType = LoginScreen.pendingTypeLogin;
+				string pUser = LoginScreen.pendingUserLogin;
+				string pPass = LoginScreen.pendingPassLogin;
+				LoginScreen.pendingTypeLogin = -1;
+				GameCanvas.loginScr.doLogin(isGetData: false, pType, pUser, pPass);
+			}
+			else if (GameCanvas.currentScreen == GameCanvas.loginScr)
 			{
 				GameCanvas.loginScr.doLogin(isGetData: false, 0, GameCanvas.loginScr.tfUser.getText(), GameCanvas.loginScr.tfPass.getText());
+			}
+			else if (GameCanvas.currentScreen == GameCanvas.fristLoginScr)
+			{
+				GameCanvas.fristLoginScr.Show();
 			}
 		}
 	}
@@ -5640,9 +5724,25 @@ public class ReadMessenge : AvMain
 			if (num == 1)
 			{
 				MainObject mainObject = MainObject.get_Object(iD, tem);
-				if (mainObject != null && mainObject != GameScreen.player)
+				if (mainObject != null)
 				{
-					mainObject.addEffBuff(1, effBuff, 0);
+					if (effBuff == 4026 || effBuff == 4029)
+					{
+						int effType = (effBuff == 4029 || (mainObject == GameScreen.player && Effect_Skill.isLocalPlayerPhoenixLv5())) ? 4029 : 4026;
+						LoadMapScreen.restoreSingleBuffSkill(mainObject, effType, timeBuff);
+					}
+					else if (effBuff == 4019)
+					{
+						LoadMapScreen.restoreSingleBuffSkill(mainObject, 4019, timeBuff);
+					}
+					else if (effBuff == 4023)
+					{
+						mainObject.addDataEff((short)4023, timeBuff, (sbyte)0, (sbyte)0);
+					}
+					else if (mainObject != GameScreen.player)
+					{
+						mainObject.addEffBuff(1, effBuff, 0);
+					}
 				}
 			}
 			MainBuff mainBuff = new MainBuff(typeBuff);
@@ -6235,10 +6335,19 @@ public class ReadMessenge : AvMain
 				if (itemVec3 != null)
 				{
 					MainItem mainItem3 = new MainItem(3, itemVec3.ID, itemVec3.idIcon, 1, itemVec3.colorName, itemVec3.LvUpgrade);
-					ScreenUpgrade.mItemUpgrade[0] = mainItem3;
-					ScreenUpgrade.instance.setDataUpgrade();
+					if (ScreenUpgrade.mItemUpgrade != null && ScreenUpgrade.mItemUpgrade.Length > 0)
+					{
+						ScreenUpgrade.mItemUpgrade[0] = mainItem3;
+					}
+					if (ScreenUpgrade.instance != null)
+					{
+						ScreenUpgrade.instance.setDataUpgrade();
+					}
 				}
-				ScreenUpgrade.instance.getMenuActionItem();
+				if (ScreenUpgrade.instance != null)
+				{
+					ScreenUpgrade.instance.getMenuActionItem();
+				}
 				break;
 			}
 			case 5:
@@ -7305,11 +7414,8 @@ public class ReadMessenge : AvMain
 			dataOutputStream.writeByte((sbyte)GameCanvas.IndexServer);
 			CRes.saveRMS("MAIN_frist_login", byteArrayOutputStream.toByteArray());
 			dataOutputStream.close();
-			GameMidlet.delRMS("MAIN_user_pass");
-			GameCanvas.loginScr.tfUser.setText("");
-			GameCanvas.loginScr.tfPass.setText("");
-			GameMidlet.delRMS("MAIN_user_last");
-			SaveRms.userLast = "";
+			SaveRms.userLast = text;
+			FristLoginScreen.userNew = text;
 		}
 		catch (Exception)
 		{
@@ -8581,17 +8687,9 @@ public class ReadMessenge : AvMain
 					break;
 				}
 
-				GameCanvas.tabShopScr = new TabScreen(MainTab.xTab, 0);
-				mVector mVector3 = new mVector();
-				GameCanvas.tabShopScr.isShopClan = false;
-				GameCanvas.tabInvenClan = new TabInventory(T.khoPet, mVector2, 7, MainTab.xTab);
-				GameCanvas.tabInvenClan.initCmd();
-				mVector3.addElement(GameCanvas.tabInvenClan);
-				GameCanvas.tabShopScr.addVecTab(mVector3);
-				GameCanvas.tabShopScr.idSelect = 0;
-				GameCanvas.tabShopScr.Show(GameCanvas.gameScr);
-				GameCanvas.tabShopScr.typeCurrent = 1;
-				GameCanvas.tabShopScr.setTabSelect();
+				DualTabScreen.gI().curMainTab = 4;
+				DualTabScreen.gI().openPetSubView();
+				DualTabScreen.gI().Show(GameCanvas.gameScr);
 				break;
 			}
 			case 4:
@@ -9733,7 +9831,7 @@ public class ReadMessenge : AvMain
 				chat = (mainObject.strChatPopup = GameMidlet.fixString(chat));
 				if (mainObject.typeObject == 0)
 				{
-					GameCanvas.chatTabScr.addNewChat(T.tabServer, "", mainObject.name + ": " + chat, 1, isFocus: false);
+					GameCanvas.chatTabScr.addNewChat("Công Cộng", "", mainObject.name + ": " + chat, 0, false, -1, ChatDetail.CAT_PUBLIC);
 				}
 			}
 		}
@@ -9805,7 +9903,7 @@ public class ReadMessenge : AvMain
 					GameScreen.addEffectNum(content, mainObject.x - 12, mainObject.y - mainObject.hOne / 4 * 3 - lechYNum, 3);
 				}
 			}
-			if (mainObject.Action == 4 && mainObject.Hp > 0)
+			if ((mainObject.Action == 4 || mainObject.isDie) && mainObject.Hp > 0)
 			{
 				mainObject.Reveive();
 			}
@@ -9890,9 +9988,8 @@ public class ReadMessenge : AvMain
 				IDictionaryEnumerator enumerator = Player.delaySkill.GetEnumerator();
 				while (enumerator.MoveNext())
 				{
-					string k = (string)enumerator.Value;
-					DelaySkill delaySkill = (DelaySkill)Player.delaySkill.get(k);
-					if (delaySkill.typeSkill == 1)
+					DelaySkill delaySkill = (DelaySkill)enumerator.Value;
+					if (delaySkill != null && delaySkill.typeSkill == 1)
 					{
 						delaySkill.value = 0;
 					}
@@ -11347,7 +11444,7 @@ public class ReadMessenge : AvMain
 			{
 				sbyte[] data = new sbyte[msg.reader().available()];
 				msg.reader().read(ref data);
-				DataSkillEff.readData(data, isSave: true);
+				DataSkillEff.readData(data, isSave: true, forceZoom: mGraphics.zoomLevel);
 				break;
 			}
 			case 1:

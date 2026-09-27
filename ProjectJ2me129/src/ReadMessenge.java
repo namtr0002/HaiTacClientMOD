@@ -428,7 +428,8 @@ public final class ReadMessenge extends AvMain {
          // Fixed: Use correct J2ME field names
          dataMap.IDBack = LoadMapScreen.IDBack;
          dataMap.HBack = LoadMapScreen.HBack;
-         LoadMapScreen.isNextMap = true;
+          LoadMapScreen.isNextMap = true;
+          System.out.println("[readChangeMapNew] isNextMap=true idmap=" + idmap + " b=" + b + " isOnlineMap=" + LoadMap.isOnlineMap + " mapW=" + GameCanvas.loadmap.mapW + " mapH=" + GameCanvas.loadmap.mapH + " idTile=" + LoadMap.idTile + " player=" + (GameScreen.player != null ? GameScreen.player.name : "NULL"));
          if (b == 1) {
             GameCanvas.gameScr.setTypeViewPlayer(typeViewPlayer);
          }
@@ -726,7 +727,6 @@ public final class ReadMessenge extends AvMain {
          short id = m.reader().readShort();
          byte[] raws = new byte[m.reader().available()];
          m.reader().read(raws);
-         Ageticon.onReceive(id, raws);
          if (ObjectData.setIdOK()) {
             SaveImageRMS.vecSaveImage.addElement(new idSaveImage(id, raws));
          }
@@ -959,6 +959,12 @@ public final class ReadMessenge extends AvMain {
          MainObject var2;
          if ((var2 = MainObject.get_Object((int)var1, (byte)0)) != null && !var2.isRemove) {
             var2.isRemove = true;
+            if (GameScreen.objFocus == var2) {
+               GameScreen.objFocus = null;
+            }
+            if (GameScreen.AC == var2) {
+               GameScreen.AC = null;
+            }
             if (GameCanvas.lowGraphic) {
                GameScreen.AA((short)var1, (byte)0);
                return;
@@ -1096,12 +1102,22 @@ public final class ReadMessenge extends AvMain {
             }
          case 3://
             this.Get_Skill_Player(m);
-            //Agetskill.onServerMessage(m);
             return;
          case 4:
-            LoadMap.mLockMap = new byte[b = m.reader().readByte()];
+            b = m.reader().readByte();
+            byte[] lockData = new byte[b];
+            boolean allPositive = (b >= 40);
             for(var3 = 0; var3 < b; ++var3) {
-               LoadMap.mLockMap[var3] = m.reader().readByte();
+               lockData[var3] = m.reader().readByte();
+               if (lockData[var3] <= 0) {
+                  allPositive = false;
+               }
+            }
+            if (allPositive) {
+               LoadMap.mLockMap = lockData;
+               try {
+                  CRes.saveRMS("mLockMap", lockData);
+               } catch (Exception e) {}
             }
             return;
          case 5:
@@ -1613,7 +1629,7 @@ public final class ReadMessenge extends AvMain {
             LoadMap.specMap = 0;
             GameScreen.CV = -1;
             GameScreen.CU = null;
-            GameCanvas.chatTabScr.AB(T.CR, "", T.CT, (byte)1, false);
+            GameCanvas.chatTabScr.addNewChat("Hệ Thống", "", T.CT, (byte)1, false, -1, ChatDetail.CAT_SYSTEM);
             GameCanvas.chatTabScr.AD(0);
             GameCanvas.chatTabScr.AF();
             GameScreen.numMess = 0;
@@ -1813,6 +1829,15 @@ public final class ReadMessenge extends AvMain {
             }
 
             if (var2 == 0) {
+               String v4Lower = (var4 != null) ? var4.toLowerCase() : "";
+               if (v4Lower.indexOf("đăng nhập ở") >= 0 || v4Lower.indexOf("dang nhap o") >= 0 || v4Lower.indexOf("đang đăng nhập") >= 0) {
+                  AThMadaraMOD.cancelAutoReconnect();
+                  Session_ME.getInstance().close();
+                  GameScreen.player = null;
+                  if (GameCanvas.currentScreen != GameCanvas.loginScr && GameCanvas.currentScreen != GameCanvas.fristLoginScr) {
+                     GameCanvas.loginScr.Show();
+                  }
+               }
                GameCanvas.Start_Normal_DiaLog(var4, var5, true);
             } else if (var2 == 1) {
                MsgDialog var16;
@@ -2040,6 +2065,12 @@ public final class ReadMessenge extends AvMain {
          if (var4 != null && !var4.isRemove) {
             var4.isRemove = true;
             var4.LC = 2;
+            if (GameScreen.objFocus == var4) {
+               GameScreen.objFocus = null;
+            }
+            if (GameScreen.AC == var4) {
+               GameScreen.AC = null;
+            }
             return;
          }
       } catch (Exception var2) {
@@ -2610,7 +2641,7 @@ public final class ReadMessenge extends AvMain {
          }
 
          var4.Hp = var5;
-         if (var4.Action == 4 && var4.Hp > 0) {
+         if ((var4.Action == 4 || var4.isDie) && var4.Hp > 0) {
             var4.Reveive();
          }
 
@@ -2658,7 +2689,7 @@ public final class ReadMessenge extends AvMain {
          byte typePirate = var0.reader().readByte();
          byte isDonotShowHat = var0.reader().readByte();
          MainObject mainObject;
-         if ((mainObject = MainObject.get_Object((int)id, (byte)0)) != null && !mainObject.returnAction()) {
+         if ((mainObject = MainObject.get_Object((int)id, (byte)0)) != null && !mainObject.isRemove) {
             byte var5 = mainObject.typePK;
             mainObject.typePK = b;
             mainObject.typePirate = typePirate;
@@ -2731,13 +2762,17 @@ public final class ReadMessenge extends AvMain {
                   GameScreen.AB((int)19, (int)0);
                }
 
-               for(int var14 = 0; var14 < Player.vecInventory.size(); ++var14) {
-                  MainItem var20;
-                  if ((var20 = (MainItem)Player.vecInventory.elementAt(var14)).typeObject == 3 && var20.Lv_RQ == GameScreen.player.Lv) {
-                     for(int var18 = 0; var18 < var20.vecInfo.size(); ++var18) {
-                        infoShow var21;
-                        if ((var21 = (infoShow)var20.vecInfo.elementAt(var18)).AC == infoShow.AF) {
-                           var21.AB = 4;
+               if (Player.vecInventory != null) {
+                  for(int var14 = 0; var14 < Player.vecInventory.size(); ++var14) {
+                     MainItem var20;
+                     if ((var20 = (MainItem)Player.vecInventory.elementAt(var14)) != null && var20.typeObject == 3 && var20.Lv_RQ == GameScreen.player.Lv) {
+                        if (var20.vecInfo != null) {
+                           for(int var18 = 0; var18 < var20.vecInfo.size(); ++var18) {
+                              infoShow var21;
+                              if ((var21 = (infoShow)var20.vecInfo.elementAt(var18)) != null && var21.AC == infoShow.AF) {
+                                 var21.AB = 4;
+                              }
+                           }
                         }
                      }
                   }
@@ -2867,7 +2902,7 @@ public final class ReadMessenge extends AvMain {
             var8 = var1.reader().readShort();
 
             for(var11 = 0; var11 < GameScreen.vecPlayers.size(); ++var11) {
-               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)).typeObject == 0 && (var17.clan == null || var8 != var17.clan.ID)) {
+               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)) != null && var17.typeObject == 0 && (var17.clan == null || var8 != var17.clan.ID)) {
                   var17.addEffSpec((short)1, (short)var5);
                   GameScreen.AA((short)149, 0, var17.x, var17.y, var17.ID, var17.typeObject, (byte)0, var17, var5);
                }
@@ -2878,7 +2913,7 @@ public final class ReadMessenge extends AvMain {
             var8 = var1.reader().readShort();
 
             for(var11 = 0; var11 < GameScreen.vecPlayers.size(); ++var11) {
-               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)).typeObject == 0 && (var17.clan == null || var17.clan.ID != var8)) {
+               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)) != null && var17.typeObject == 0 && (var17.clan == null || var17.clan.ID != var8)) {
                   GameScreen.AA((short)151, 0, var17.x, var17.y, var17.ID, var17.typeObject, (byte)0, var17, var5);
                   GameScreen.AA((short)150, 0, var17.x, var17.y, var17.ID, var17.typeObject, (byte)0, var17, var5 / 10);
                }
@@ -2889,7 +2924,7 @@ public final class ReadMessenge extends AvMain {
             var8 = var1.reader().readShort();
 
             for(var11 = 0; var11 < GameScreen.vecPlayers.size(); ++var11) {
-               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)).typeObject == 0 && var17.clan != null && var17.clan.ID == var8) {
+               if ((var17 = (MainObject)GameScreen.vecPlayers.elementAt(var11)) != null && var17.typeObject == 0 && var17.clan != null && var17.clan.ID == var8) {
                   GameScreen.AA((short)151, 1, var17.x, var17.y, var17.ID, var17.typeObject, (byte)0, var17, var5);
                   var17.addEffSpec((short)11, (short)var5);
                }
@@ -3242,7 +3277,7 @@ public final class ReadMessenge extends AvMain {
                            for(var10 = 0; var10 < GameScreen.player.BO.length; ++var10) {
                               if (var10 == var21.AW && var21.AN == GameScreen.player.BO[var10]) {
                                  var21.addInfoFrist(T.daTrangBi, (byte)4);
-                                 var21.colorName = 1;
+                                 var21.colorName = 4;
                                  var19 = true;
                               }
                            }
@@ -3378,18 +3413,33 @@ public final class ReadMessenge extends AvMain {
             (GameCanvas.tabInvenClan = new TabInventory(T.tabInven, Player.AW, (byte)4, MainTab.xTab)).initCmd();
             var26.addElement(GameCanvas.tabInvenClan);
          } else if (var4 != 107) {
+            if (GameCanvas.tabInven == null) {
+               (GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, (byte)0, MainTab.xTab)).initCmd();
+            }
             var26.addElement(GameCanvas.tabInven);
          } else {
             GameCanvas.tabShopScr.isShopClan = true;
          }
 
          if (var2 == 99) {
+            if (GameCanvas.tabInven == null) {
+               (GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, (byte)0, MainTab.xTab)).initCmd();
+            }
             GameCanvas.tabInven.AA((byte)2);
             TabChest var24;
             (var24 = new TabChest(var3, Player.vecChest, MainTab.xTab)).AQ();
             var26.addElement(var24);
          } else {
-            GameCanvas.tabInven.AA((byte)1);
+            if (var2 == 110) {
+               if (GameCanvas.tabInvenClan != null) {
+                  GameCanvas.tabInvenClan.AA((byte)1);
+               }
+            } else {
+               if (GameCanvas.tabInven == null) {
+                  (GameCanvas.tabInven = new TabInventory(T.tabInven, Player.vecInventory, (byte)0, MainTab.xTab)).initCmd();
+               }
+               GameCanvas.tabInven.AA((byte)1);
+            }
             var27 = new TabShop(var3, var6, var2, MainTab.xTab);
             var26.addElement(var27);
          }
@@ -3409,7 +3459,7 @@ public final class ReadMessenge extends AvMain {
          }
 
          GameCanvas.tabShopScr.setTabSelect();
-         if (var2 == 101 && var27 != null) {
+         if (var27 != null) {
             var27.AB();
             return;
          }
@@ -3567,7 +3617,7 @@ public final class ReadMessenge extends AvMain {
 
          for(var8 = 0; var8 < GameScreen.vecPlayers.size(); ++var8) {
             MainObject var14;
-            if ((var14 = (MainObject)GameScreen.vecPlayers.elementAt(var8)).typeObject == 2) {
+            if ((var14 = (MainObject)GameScreen.vecPlayers.elementAt(var8)) != null && var14.typeObject == 2) {
                var14.BN();
             }
          }
@@ -3575,7 +3625,7 @@ public final class ReadMessenge extends AvMain {
          TabQuest.BO = false;
 
          for(var8 = 0; var8 < Player.QI.size(); ++var8) {
-            if ((var10 = (MainQuest)Player.QI.elementAt(var8)).AB == 0 || var10.AB == 2) {
+            if ((var10 = (MainQuest)Player.QI.elementAt(var8)) != null && (var10.AB == 0 || var10.AB == 2)) {
                TabQuest.BO = true;
                return;
             }
@@ -3762,7 +3812,7 @@ public final class ReadMessenge extends AvMain {
             String var4 = GameMidlet.AE(var0.reader().readUTF());
             var5.BC = var4;
             if (var5.typeObject == 0) {
-               GameCanvas.chatTabScr.AB(T.CR, "", var5.name + ": " + var4, (byte)1, false);
+               GameCanvas.chatTabScr.addNewChat("Công Cộng", "", var5.name + ": " + var4, (byte)0, false, -1, ChatDetail.CAT_PUBLIC);
                return;
             }
          }
@@ -3804,22 +3854,16 @@ public final class ReadMessenge extends AvMain {
                return;
             }
 
-            if (var1.compareTo(T.CR) == 0) {
-               GameCanvas.chatTabScr.AB(var1, T.CT + ": ", var3, (byte)1, false);
-            } else if (var1.compareTo(T.DV) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)1, false);
-            } else if (var1.compareTo(T.QC) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)1, false);
-            } else if (var1.compareTo(T.PD) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)1, false);
-            } else if (var1.compareTo(T.CS) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)1, false);
-            } else if (var1.compareTo(T.CQ) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)0, false);
-            } else if (var1.compareTo(T.CH) == 0) {
-               GameCanvas.chatTabScr.AB(var1, "", var3, (byte)0, false);
+            if (ChatTabScreen.isWorldTab(var1)) {
+               GameCanvas.chatTabScr.addNewChat("Thế Giới", "", var3, (byte)0, false, -1, ChatDetail.CAT_WORLD);
+            } else if (ChatTabScreen.isPublicTab(var1)) {
+               GameCanvas.chatTabScr.addNewChat("Công Cộng", "", var3, (byte)0, false, -1, ChatDetail.CAT_PUBLIC);
+            } else if (ChatTabScreen.isClanTab(var1)) {
+               GameCanvas.chatTabScr.addNewChat(T.CQ, "", var3, (byte)0, false, -1, ChatDetail.CAT_CLAN);
+            } else if (ChatTabScreen.isSystemTab(var1)) {
+               GameCanvas.chatTabScr.addNewChat(T.RH, "", var3, (byte)1, false, -1, ChatDetail.CAT_SYSTEM);
             } else {
-               GameCanvas.chatTabScr.AA(var1, var1 + ": ", var3, (byte)0, false);
+               GameCanvas.chatTabScr.addNewChat(var1, var1 + ": ", var3, (byte)0, false, -1, ChatDetail.CAT_PRIVATE);
             }
          }
       } catch (Exception var2) {
@@ -4253,7 +4297,18 @@ public final class ReadMessenge extends AvMain {
          short var2 = var0.reader().readShort();
          if (!GameCanvas.lowGraphic) {
             if (var1 != GlobalService.AD) {
-               GlobalService.getInstance().get_DATA((byte)15);
+               // Nếu sắp kết nối lại (pendingTypeLogin >= 0), không gửi get_DATA(15) async
+               // vì kết nối hiện tại sẽ bị huỷ → response mất → isLoadDataMon không được set.
+               // Thay vào đó thử load từ cache nếu có; login_Ok() trên kết nối mới sẽ gửi lại nếu cần.
+               if (LoginScreen.pendingTypeLogin >= 0) {
+                  java.io.DataInputStream cachedMon = SaveRms.AB("dataMon");
+                  if (cachedMon != null) {
+                     CatalogyMonster.AA(cachedMon, false);
+                  }
+                  // else: cache chưa có, login_Ok() sẽ gửi get_DATA(15) trên kết nối mới
+               } else {
+                  GlobalService.getInstance().get_DATA((byte)15);
+               }
             } else {
                CatalogyMonster.AA(SaveRms.AB("dataMon"), false);
             }
@@ -4265,6 +4320,7 @@ public final class ReadMessenge extends AvMain {
             }
          } else {
             LoadMapScreen.isLoadDataMon = true;
+            System.out.println("[Check_Data_Ver] isLoadDataMon=true (lowGraphic path)");
          }
 
          if (var0.reader().readShort() != GlobalService.AF) {
@@ -4310,14 +4366,22 @@ public final class ReadMessenge extends AvMain {
 
          LoginScreen.AB = true;
          GameCanvas.end_Dialog();
+         if (LoginScreen.pendingTypeLogin >= 0) {
+            byte pType = LoginScreen.pendingTypeLogin;
+            String pUser = LoginScreen.pendingUserLogin;
+            String pPass = LoginScreen.pendingPassLogin;
+            LoginScreen.pendingTypeLogin = -1;
+            GameCanvas.loginScr.AA(false, pType, pUser, pPass);
+            return;
+         }
+
          if (GameCanvas.currentScreen == GameCanvas.loginScr) {
             GameCanvas.loginScr.AA(false, (byte)0, GameCanvas.loginScr.AC.getText(), GameCanvas.loginScr.AD.getText());
             return;
          }
 
          if (GameCanvas.currentScreen == GameCanvas.fristLoginScr) {
-            FristLoginScreen var10000 = GameCanvas.fristLoginScr;
-            FristLoginScreen.AA(true);
+            GameCanvas.fristLoginScr.Show();
             return;
          }
       } catch (Exception var3) {
@@ -4401,8 +4465,17 @@ public final class ReadMessenge extends AvMain {
          byte var8 = var0.reader().readByte();
          byte var9 = var0.reader().readByte();
          MainObject var11;
-         if (var1 == 1 && (var11 = MainObject.get_Object((int)var3, (byte)var4)) != null && var11 != GameScreen.player) {
-            var11.addEffBuff((byte)1, (short)var6, (short)0);
+         if (var1 == 1 && (var11 = MainObject.get_Object((int)var3, (byte)var4)) != null) {
+            if (var6 == 4026 || var6 == 4029) {
+               int effType = (var6 == 4029 || (var11 == GameScreen.player && Effect_Skill.isLocalPlayerPhoenixLv5())) ? 4029 : 4026;
+               LoadMapScreen.restoreSingleBuffSkill(var11, effType, var7);
+            } else if (var6 == 4019) {
+               LoadMapScreen.restoreSingleBuffSkill(var11, 4019, var7);
+            } else if (var6 == 4023) {
+               var11.addDataEff((short)4023, var7, (byte)0, (byte)0);
+            } else if (var11 != GameScreen.player) {
+               var11.addEffBuff((byte)1, (short)var6, (short)0);
+            }
          }
 
          MainBuff var12;
@@ -4916,10 +4989,16 @@ public final class ReadMessenge extends AvMain {
                MainItem itemVec;
                if ((itemVec = MainItem.getItemVec((byte)3, id, Player.vecInventory)) != null) {
                   mainItem = new MainItem((byte)3, itemVec.ID, itemVec.idIcon, (short)1, itemVec.colorName, itemVec.LvUpgrade);
-                  ScreenUpgrade.mItemUpgrade[0] = mainItem;
-                  ScreenUpgrade.instance.setDataUpgrade();
+                  if (ScreenUpgrade.mItemUpgrade != null && ScreenUpgrade.mItemUpgrade.length > 0) {
+                     ScreenUpgrade.mItemUpgrade[0] = mainItem;
+                  }
+                  if (ScreenUpgrade.instance != null) {
+                     ScreenUpgrade.instance.setDataUpgrade();
+                  }
                }
-               ScreenUpgrade.instance.getMenuActionItem();
+               if (ScreenUpgrade.instance != null) {
+                  ScreenUpgrade.instance.getMenuActionItem();
+               }
                return;
             }
             MainItem itemVec2;
@@ -5860,11 +5939,7 @@ public final class ReadMessenge extends AvMain {
          var2.writeByte((byte)GameCanvas.IndexServer);
          CRes.saveRMS("MAIN_frist_login", var1.toByteArray());
          var2.close();
-         GameMidlet.AC("MAIN_user_pass");
-         GameCanvas.loginScr.AC.AB("");
-         GameCanvas.loginScr.AD.AB("");
-         GameMidlet.AC("MAIN_user_last");
-         SaveRms.userLast = "";
+         SaveRms.userLast = text;
       } catch (Exception var3) {
       }
    }
@@ -5974,6 +6049,12 @@ public final class ReadMessenge extends AvMain {
    public static void login_Ok() {
       if (ListChar_Screen.IndexCharSelected >= 0) {
          GlobalService.getInstance().get_DATA((byte)3);
+      }
+      // Fix: nếu dữ liệu quái chưa được tải (do kết nối đầu bị huỷ khi Check_Data_Ver),
+      // yêu cầu lại type 15 để isLoadDataMon = true khi vào LoadMapScreen
+      if (!LoadMapScreen.isLoadDataMon) {
+         System.out.println("[login_Ok] isLoadDataMon=false, requesting get_DATA(15)");
+         GlobalService.getInstance().get_DATA((byte)15);
       }
 
       GameMidlet.loginPlus();
@@ -7158,16 +7239,9 @@ public final class ReadMessenge extends AvMain {
                 return;
             }
             
-            GameCanvas.tabShopScr = new TabScreen(MainTab.xTab, (byte)0);
-            mVector mVector2 = new mVector();
-            GameCanvas.tabShopScr.isShopClan = false;
-            (GameCanvas.tabInvenClan = new TabInventory(T.khoPet, mVector, (byte)7, MainTab.xTab)).initCmd();
-            mVector2.addElement(GameCanvas.tabInvenClan);
-            GameCanvas.tabShopScr.addVecTab(mVector2);
-            GameCanvas.tabShopScr.idSelect = 0;
-            GameCanvas.tabShopScr.Show((MainScreen)GameCanvas.gameScr);
-            GameCanvas.tabShopScr.typeCurrent = 1;
-            GameCanvas.tabShopScr.setTabSelect();
+            DualTabScreen.gI().curMainTab = 4;
+            DualTabScreen.gI().openPetSubView();
+            DualTabScreen.gI().Show((MainScreen)GameCanvas.gameScr);
             return;
          }
 
@@ -7309,7 +7383,6 @@ public final class ReadMessenge extends AvMain {
             mPartp.pi[i].dy = m.reader().readByte();
          }
          CharPartInfo.hashMyPart.put("" + num, mPartp);
-         Agetpart.onPartReceived(num, mPartp);
       } catch (Exception var4) {
          var4.printStackTrace();
       }
@@ -8166,7 +8239,7 @@ public final class ReadMessenge extends AvMain {
             }
          }
 
-         if (var4.Action == 4 && var4.Hp > 0) {
+         if ((var4.Action == 4 || var4.isDie) && var4.Hp > 0) {
             var4.Reveive();
          }
 
@@ -9631,7 +9704,6 @@ public final class ReadMessenge extends AvMain {
          case 0:
             byte[] data = new byte[m.reader().available()];
             m.reader().read(data);
-            Ageteff.processEffectData(data);
             DataSkillEff.readData(data);
             return;
          case 1:
@@ -9640,8 +9712,12 @@ public final class ReadMessenge extends AvMain {
             int time = m.reader().readInt();
             byte typemove = m.reader().readByte();
             byte loop = m.reader().readByte();
+            short rotate = 0;
+            if (m.reader().available() >= 2) {
+               rotate = m.reader().readShort();
+            }
             if ((mainObject = GameScreen.AA(id)) != null) {
-               mainObject.addDataEff(id2, time, typemove, loop);
+               mainObject.addDataEff(id2, time, typemove, loop, rotate);
                return;
             }
             break;

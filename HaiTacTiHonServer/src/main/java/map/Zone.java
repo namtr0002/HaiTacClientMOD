@@ -574,7 +574,7 @@ public class Zone extends AbsMap {
                 if (mob != null) {
                     if (mob.isdie || mob.hp <= 0) {
                         boolean isNonRespawn = (mob.mtemplate != null && (mob.mtemplate.mob_id == 132 || mob.mtemplate.mob_id == 133))
-                                || (this.template != null && this.template.id == 179);
+                                || (this.template != null && (this.template.id == 179 || Zone.is_map_boss(this.template.id)));
                         if (!isNonRespawn) {
                             if (mob.time_refresh <= 0) {
                                 mob.time_refresh = System.currentTimeMillis() + Mob.TIME_RESPAWN * 1000L;
@@ -1084,7 +1084,7 @@ public class Zone extends AbsMap {
                 } else {
                     // 3. Xử lý quái chết & tự động hồi sinh theo chu kỳ
                     boolean isNonRespawn = (mob.mtemplate != null && (mob.mtemplate.mob_id == 132 || mob.mtemplate.mob_id == 133))
-                            || (this.template != null && this.template.id == 179);
+                            || (this.template != null && (this.template.id == 179 || Zone.is_map_boss(this.template.id)));
 
                     if (!isNonRespawn) {
                         if (mob.time_refresh <= 0) {
@@ -2523,7 +2523,7 @@ public class Zone extends AbsMap {
             if (p.map_boss_info != null && p.map_boss_info.mob != null && !p.map_boss_info.mob.isEmpty()) {
                 for (int i = 0; i < p.map_boss_info.mob.size(); i++) {
                     Mob mob = p.map_boss_info.mob.get(i);
-                    if (mob != null && !mob.isdie) {
+                    if (mob != null && !mob.isdie && mob.hp > 0) {
                         Zone.sendMobPos(p, mob);
                         if (p.getService() != null) {
                             p.getService().send_mob_info(mob);
@@ -2532,7 +2532,7 @@ public class Zone extends AbsMap {
                 }
             } else if (!this.mobs.isEmpty()) {
                 for (Mob mob : this.mobs.values()) {
-                    if (mob != null && !mob.isdie) {
+                    if (mob != null && !mob.isdie && mob.hp > 0) {
                         Zone.sendMobPos(p, mob);
                         if (p.getService() != null) {
                             p.getService().send_mob_info(mob);
