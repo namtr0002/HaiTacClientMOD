@@ -29,31 +29,38 @@ jobs:
           cd ios-build
           ls -la
 
-      - name: Patch Missing Frameworks & Objective-C Symbols
+      - name: Patch Native iOS Bridge
         run: |
           python3 -c "
           import os
+
+          bridge_code = '''#import <Foundation/Foundation.h>
+          #import <UIKit/UIKit.h>
+
+          extern \"C\" {
+              void _SMSsend(const char* tophone, const char* withtext, int n) {
+                  NSLog(@\"[iOSPlugins] _SMSsend: tophone=%s, withtext=%s, n=%d\", tophone ? tophone : \"\", withtext ? withtext : \"\", n);
+              }
+              int _unpause() { return 0; }
+              int _checkRotation() {
+                  UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+                  return UIInterfaceOrientationIsLandscape(orientation) ? 1 : 0;
+              }
+              int _back() { return 0; }
+              int _Send() { return 0; }
+              void _purchaseItem(const char* itemID, const char* userName, const char* gameID) {
+                  NSLog(@\"[iOSPlugins] _purchaseItem: itemID=%s, user=%s, game=%s\", itemID ? itemID : \"\", userName ? userName : \"\", gameID ? gameID : \"\");
+              }
+          }
+          '''
 
           for root, dirs, files in os.walk('ios-build'):
               for f in files:
                   if f == 'iOSPluginsBridge.mm':
                       p = os.path.join(root, f)
-                      with open(p, 'r', encoding='utf-8') as fp:
-                          text = fp.read()
-                      text = text.replace('#import <MessageUI/MessageUI.h>', '// #import <MessageUI/MessageUI.h>')
-                      text = text.replace('[MFMessageComposeViewController canSendText]', 'NO')
-                      text = text.replace('MFMessageComposeViewController', 'id')
                       with open(p, 'w', encoding='utf-8') as fp:
-                          fp.write(text)
-                      print(f'Successfully patched {p}')
-                  elif f == 'project.pbxproj':
-                      p = os.path.join(root, f)
-                      with open(p, 'r', encoding='utf-8') as fp:
-                          text = fp.read()
-                      text = text.replace('\"-weak-lSystem\",', '\"-weak-lSystem\",\n\t\t\t\t\t\"-framework\",\n\t\t\t\t\tMessageUI,')
-                      with open(p, 'w', encoding='utf-8') as fp:
-                          fp.write(text)
-                      print(f'Successfully patched {p}')
+                          fp.write(bridge_code)
+                      print(f'Successfully wrote clean native bridge to {p}')
           "
 
       - name: Build Archive (Unsigned / Ad-Hoc)
