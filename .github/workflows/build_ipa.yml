@@ -17,10 +17,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Xcode
-        uses: maxim-lobachev/setup-xcode@v1
-        with:
-          xcode-version: latest-stable
+      - name: Verify Xcode Version
+        run: |
+          xcodebuild -version
 
       - name: Combine and Extract Xcode Project
         run: |
@@ -37,6 +36,7 @@ jobs:
             -project Unity-iPhone.xcodeproj \
             -scheme Unity-iPhone \
             -configuration Release \
+            -destination "generic/platform=iOS" \
             -archivePath build/CauCaHaiTac.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
