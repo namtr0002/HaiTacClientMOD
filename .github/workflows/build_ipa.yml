@@ -29,6 +29,33 @@ jobs:
           cd ios-build
           ls -la
 
+      - name: Patch Missing Frameworks & Objective-C Symbols
+        run: |
+          python3 -c "
+          import os
+
+          for root, dirs, files in os.walk('ios-build'):
+              for f in files:
+                  if f == 'iOSPluginsBridge.mm':
+                      p = os.path.join(root, f)
+                      with open(p, 'r', encoding='utf-8') as fp:
+                          text = fp.read()
+                      text = text.replace('#import <MessageUI/MessageUI.h>', '// #import <MessageUI/MessageUI.h>')
+                      text = text.replace('[MFMessageComposeViewController canSendText]', 'NO')
+                      text = text.replace('MFMessageComposeViewController', 'id')
+                      with open(p, 'w', encoding='utf-8') as fp:
+                          fp.write(text)
+                      print(f'Successfully patched {p}')
+                  elif f == 'project.pbxproj':
+                      p = os.path.join(root, f)
+                      with open(p, 'r', encoding='utf-8') as fp:
+                          text = fp.read()
+                      text = text.replace('\"-weak-lSystem\",', '\"-weak-lSystem\",\n\t\t\t\t\t\"-framework\",\n\t\t\t\t\tMessageUI,')
+                      with open(p, 'w', encoding='utf-8') as fp:
+                          fp.write(text)
+                      print(f'Successfully patched {p}')
+          "
+
       - name: Build Archive (Unsigned / Ad-Hoc)
         run: |
           cd ios-build
