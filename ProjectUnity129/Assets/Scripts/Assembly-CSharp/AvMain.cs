@@ -198,6 +198,23 @@ public class AvMain
 
 	public static FrameImage fraEquip;
 
+	public static void paintEquipSilhouette(mGraphics g, int frameIdx, int x, int y)
+	{
+		UITheme cur = UIThemeManager.getCurrentTheme();
+		if (cur != null && cur.id == 1 && UITheme.fraSlotEquipBg != null)
+		{
+			if (frameIdx >= 0 && frameIdx < UITheme.fraSlotEquipBg.nFrame)
+			{
+				UITheme.fraSlotEquipBg.drawFrame(frameIdx, x, y, 0, 3, g);
+				return;
+			}
+		}
+		if (fraEquip != null && frameIdx >= 0 && frameIdx < fraEquip.nFrame)
+		{
+			fraEquip.drawFrame(frameIdx, x, y, 0, 3, g);
+		}
+	}
+
 	public static FrameImage fraIconNpc;
 
 	public static FrameImage fraShadowFocus;
@@ -447,7 +464,7 @@ public class AvMain
 
 	public virtual void updatekey()
 	{
-		if (GameCanvas.keyMyHold[5])
+		if (GameCanvas.keyMyHold[5] || GameCanvas.keyMyPressed[5])
 		{
 			if (center != null)
 			{
@@ -456,19 +473,23 @@ public class AvMain
 				center.perform();
 			}
 		}
-		else if (GameCanvas.keyMyHold[12])
+		else if (GameCanvas.keyMyHold[12] || GameCanvas.keyMyPressed[12] || GameCanvas.keyMyHold[40] || GameCanvas.keyMyPressed[40])
 		{
 			if (left != null)
 			{
 				GameCanvas.clearKeyPressed(12);
 				GameCanvas.clearKeyHold(12);
+				GameCanvas.clearKeyPressed(40);
+				GameCanvas.clearKeyHold(40);
 				left.perform();
 			}
 		}
-		else if (GameCanvas.keyMyHold[13] && right != null)
+		else if ((GameCanvas.keyMyHold[13] || GameCanvas.keyMyPressed[13] || GameCanvas.keyMyHold[41] || GameCanvas.keyMyPressed[41]) && right != null)
 		{
 			GameCanvas.clearKeyPressed(13);
 			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(41);
+			GameCanvas.clearKeyHold(41);
 			right.perform();
 		}
 	}
@@ -484,19 +505,23 @@ public class AvMain
 				okCMD.perform();
 			}
 		}
-		else if (GameCanvas.UseKey(40) || (GameCanvas.isTouch && GameCanvas.UseKey(12)))
+		else if (GameCanvas.UseKey(40) || GameCanvas.UseKey(12))
 		{
 			if (menuCMD != null)
 			{
 				GameCanvas.clearKeyPressed(40);
 				GameCanvas.clearKeyHold(40);
+				GameCanvas.clearKeyPressed(12);
+				GameCanvas.clearKeyHold(12);
 				menuCMD.perform();
 			}
 		}
-		else if ((GameCanvas.UseKey(41) || (GameCanvas.isTouch && GameCanvas.UseKey(13))) && backCMD != null)
+		else if ((GameCanvas.UseKey(41) || GameCanvas.UseKey(13)) && backCMD != null)
 		{
 			GameCanvas.clearKeyPressed(41);
 			GameCanvas.clearKeyHold(41);
+			GameCanvas.clearKeyPressed(13);
+			GameCanvas.clearKeyHold(13);
 			backCMD.perform();
 		}
 	}
@@ -512,19 +537,23 @@ public class AvMain
 				okCMD.perform();
 			}
 		}
-		else if (GameCanvas.isTouch && GameCanvas.UseKey(12))
+		else if (GameCanvas.UseKey(12) || GameCanvas.UseKey(40))
 		{
 			if (menuCMD != null)
 			{
 				GameCanvas.clearKeyPressed(12);
 				GameCanvas.clearKeyHold(12);
+				GameCanvas.clearKeyPressed(40);
+				GameCanvas.clearKeyHold(40);
 				menuCMD.perform();
 			}
 		}
-		else if (GameCanvas.isTouch && GameCanvas.UseKey(13) && backCMD != null)
+		else if ((GameCanvas.UseKey(13) || GameCanvas.UseKey(41)) && backCMD != null)
 		{
 			GameCanvas.clearKeyPressed(13);
 			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(41);
+			GameCanvas.clearKeyHold(41);
 			backCMD.perform();
 		}
 	}

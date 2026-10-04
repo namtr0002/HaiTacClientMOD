@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.unity3d.player"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+        android:icon="@mipmap/app_icon"
+        android:label="@string/app_name">
+        <activity android:name="com.unity3d.player.UnityPlayerActivity"
+                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|fontScale|layoutDirection|density"
+                  android:resizeableActivity="false"
+                  android:screenOrientation="sensorLandscape"
+                  android:launchMode="singleTask"
+                  android:hardwareAccelerated="true"
+                  android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+            <meta-data android:name="android.max_aspect" android:value="2.4" />
+            <meta-data android:name="notch.config" android:value="portrait|landscape"/>
+            <meta-data android:name="unity.launch-fullscreen" android:value="True" />
+            <meta-data android:name="unity.render-outside-safearea" android:value="True" />
+            <meta-data android:name="android.notch_support" android:value="true"/>
+        </activity>
+        <meta-data android:name="android.max_aspect" android:value="2.4" />
+    </application>
+</manifest>

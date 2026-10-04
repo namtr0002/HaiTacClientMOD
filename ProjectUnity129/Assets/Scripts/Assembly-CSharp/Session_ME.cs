@@ -339,7 +339,7 @@ public class Session_ME : ISession
 		{
 			AThMadaraMOD.cancelAutoReconnect();
 			close();
-			UpdateServer.showBlockedDialog();
+			UpdateServer.showBlockedServerDialog(host);
 			return;
 		}
 		if (connected || connecting)
@@ -398,13 +398,15 @@ public class Session_ME : ISession
 			{
 				AThMadaraMOD.cancelAutoReconnect();
 				close();
-				UpdateServer.showBlockedDialog();
+				UpdateServer.showBlockedServerDialog(host);
 				return;
 			}
 			isStart = true;
 			timeStart = GameCanvas.getTime();
 			sc = new TcpClient();
 			sc.NoDelay = true;
+			sc.SendBufferSize = 65536;
+			sc.ReceiveBufferSize = 65536;
 			IAsyncResult asyncResult = sc.BeginConnect(host, port, null, null);
 			bool success = asyncResult.AsyncWaitHandle.WaitOne(3000);
 			if ((!success || !sc.Connected) && (host == "127.0.0.1" || host.Equals("localhost", StringComparison.OrdinalIgnoreCase)))
@@ -415,6 +417,8 @@ public class Session_ME : ISession
 					try { sc.Close(); } catch (Exception) {}
 					sc = new TcpClient();
 					sc.NoDelay = true;
+					sc.SendBufferSize = 65536;
+					sc.ReceiveBufferSize = 65536;
 					asyncResult = sc.BeginConnect(host, altPort, null, null);
 					success = asyncResult.AsyncWaitHandle.WaitOne(3000);
 					if (success && sc.Connected)
@@ -518,18 +522,18 @@ public class Session_ME : ISession
 				test = 3 + " " + m.command;
 				if (getKeyComplete)
 				{
+					byte[] sendBuffer = new byte[data.Length];
 					for (int i = 0; i < data.Length; i++)
 					{
-						sbyte value2 = writeKey(data[i]);
-						dos.Write(value2);
+						sendBuffer[i] = (byte)writeKey(data[i]);
 					}
+					dos.Write(sendBuffer, 0, sendBuffer.Length);
 				}
 				else
 				{
-					for (int i = 0; i < data.Length; i++)
-					{
-						dos.Write((byte)data[i]);
-					}
+					byte[] sendBuffer = new byte[data.Length];
+					Buffer.BlockCopy(data, 0, sendBuffer, 0, data.Length);
+					dos.Write(sendBuffer, 0, sendBuffer.Length);
 				}
 				test = 4 + " " + m.command;
 				sendByteCount += 5 + data.Length;
@@ -607,7 +611,7 @@ public class Session_ME : ISession
 	public static void onRecieveMsg(Message msg)
 	{
 		if (msg == null) return;
-		if (Thread.CurrentThread.Name == Main.mainThreadName)
+		if (Main.mainThreadId != 0 && Thread.CurrentThread.ManagedThreadId == Main.mainThreadId)
 		{
 			if (messageHandler != null)
 			{
@@ -656,7 +660,7 @@ public class Session_ME : ISession
 				}
 			}
 			processed++;
-			if (System.DateTime.UtcNow.Ticks - startTicks > maxTicks)
+			if ((processed & 7) == 0 && System.DateTime.UtcNow.Ticks - startTicks > maxTicks)
 			{
 				break;
 			}
@@ -670,6 +674,7 @@ public class Session_ME : ISession
 			s_recvQueue.Clear();
 			recieveMsg.removeAllElements();
 		}
+		clearSendingMessage();
 		cleanNetwork();
 		isStart = false;
 	}

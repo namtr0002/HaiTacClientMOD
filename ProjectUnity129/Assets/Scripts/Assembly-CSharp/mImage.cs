@@ -48,30 +48,34 @@ public class mImage
 					mImage2 = createImage(array, 0, array.Length);
 					if (mImage2 != null && mImage2.image != null)
 					{
-						mImage2.image.assetZoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
+						mImage2.image.assetZoom = (Rms.lastLoadedZoom > 0) ? Rms.lastLoadedZoom : ((mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1);
 					}
 					return mImage2;
 				}
 			}
 			try
 			{
-				int resZoom = (mGraphics.zoomResource > 0) ? mGraphics.zoomResource : mGraphics.zoomLevel;
+				int resZoom = (mGraphics.zoomResource > 0) ? mGraphics.zoomResource : ((mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1);
+				if (resZoom > 4) resZoom = 4;
+				if (resZoom < 1) resZoom = 1;
+
 				mImage2.image = Image.createImage("/x" + resZoom + url);
-				if (mImage2.image == null && resZoom != mGraphics.zoomLevel)
+				if (mImage2.image == null)
 				{
-					mImage2.image = Image.createImage("/x" + mGraphics.zoomLevel + url);
+					for (int tryZ = resZoom - 1; tryZ >= 1; tryZ--)
+					{
+						mImage2.image = Image.createImage("/x" + tryZ + url);
+						if (mImage2.image != null) break;
+					}
 				}
 				if (mImage2.image == null && url.StartsWith("/w_interface/"))
 				{
-					mImage2.image = Image.createImage("/x" + resZoom + url.Replace("/w_interface/", "/interface/"));
-					if (mImage2.image == null && resZoom != mGraphics.zoomLevel)
+					string replacedUrl = url.Replace("/w_interface/", "/interface/");
+					for (int tryZ = resZoom; tryZ >= 1; tryZ--)
 					{
-						mImage2.image = Image.createImage("/x" + mGraphics.zoomLevel + url.Replace("/w_interface/", "/interface/"));
+						mImage2.image = Image.createImage("/x" + tryZ + replacedUrl);
+						if (mImage2.image != null) break;
 					}
-				}
-				if (mImage2.image == null && resZoom != 1)
-				{
-					mImage2.image = Image.createImage("/x1" + url);
 				}
 				if (url.Contains("noeff_mui_ten"))
 				{
@@ -111,10 +115,15 @@ public class mImage
 
 	public static mImage createImage(int w, int h)
 	{
-		return new mImage
+		mImage img = new mImage
 		{
 			image = Image.createImage(w * mGraphics.zoomLevel, h * mGraphics.zoomLevel)
 		};
+		if (img.image != null)
+		{
+			img.image.assetZoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
+		}
+		return img;
 	}
 
 	public static mImage createImage(sbyte[] data, int w, int h)

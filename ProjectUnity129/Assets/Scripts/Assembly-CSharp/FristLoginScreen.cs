@@ -10,6 +10,8 @@ public class FristLoginScreen : MainScreen
 
 	public iCommand cmdNewGame;
 
+	public iCommand cmdMenu;
+
 	private mVector vecCmd = new mVector();
 
 	public static string userNew = "";
@@ -36,9 +38,41 @@ public class FristLoginScreen : MainScreen
 		}
 		cmdBegin = new iCommand(T.loadGame, 0, 0, this);
 		SaveRms.userLast = "";
-		if (CRes.loadRMS("MAIN_user_last") != null)
+		if (CRes.loadRMS("MAIN_user_pass") != null)
+		{
+			GameCanvas.saveRms.loadUserPass();
+			if (GameCanvas.loginScr.tfUser != null)
+			{
+				string u = GameCanvas.loginScr.tfUser.getText().Trim();
+				if (!string.IsNullOrEmpty(u))
+				{
+					SaveRms.userLast = u;
+				}
+			}
+		}
+		else if (CRes.loadRMS("MAIN_user_last") != null)
 		{
 			GameCanvas.saveRms.loadUserLast();
+		}
+		else if (CRes.loadRMS("MAIN_frist_login") != null)
+		{
+			try
+			{
+				sbyte[] data = CRes.loadRMS("MAIN_frist_login");
+				DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+				string guestName = dis.readUTF();
+				if (!string.IsNullOrEmpty(guestName))
+				{
+					SaveRms.userLast = guestName.Trim();
+					userNew = guestName.Trim();
+				}
+				if (dis.available() > 0)
+				{
+					GameCanvas.IndexServer = dis.readByte();
+				}
+				dis.close();
+			}
+			catch (Exception) {}
 		}
 		else
 		{
@@ -67,7 +101,7 @@ public class FristLoginScreen : MainScreen
 		cmdServer = new iCommand(T.server + "\n" + UpdateServer.getCurrentServerName(), 4, this);
 		valueBegin = (GameCanvas.strListServer != null && GameCanvas.language < GameCanvas.strListServer.Length && GameCanvas.strListServer[GameCanvas.language] != null) ? (GameCanvas.strListServer[GameCanvas.language].Length - 1) * 38 : 0;
 		getVecBegin();
-		if (LoginScreen.yPaintLogo == 0)
+		if (LoginScreen.yPaintLogo == 0 || LoginScreen.yPaintLogo > LoginScreen.hLogo)
 		{
 			LoginScreen.yPaintLogo = LoginScreen.hLogo;
 		}
@@ -119,16 +153,39 @@ public class FristLoginScreen : MainScreen
 
 	public void setBeginGame()
 	{
-		if (KeyAuthManager.isAuthorized && CRes.loadRMS("MAIN_user_pass") != null)
+		if (CRes.loadRMS("MAIN_user_pass") != null)
 		{
-			GameCanvas.loginScr.Show();
-			GameCanvas.loginScr.doLogin(isGetData: true, 0, GameCanvas.loginScr.tfUser.getText(), GameCanvas.loginScr.tfPass.getText());
+			GameCanvas.saveRms.loadUserPass();
+			if (GameCanvas.loginScr.tfUser != null)
+			{
+				string u = GameCanvas.loginScr.tfUser.getText().Trim();
+				if (!string.IsNullOrEmpty(u))
+				{
+					SaveRms.userLast = u;
+				}
+			}
 		}
-		else
+		else if (CRes.loadRMS("MAIN_user_last") != null)
 		{
-			setNewAcc(isCheckDataOK: false);
-			getVecBegin();
+			GameCanvas.saveRms.loadUserLast();
 		}
+		else if (CRes.loadRMS("MAIN_frist_login") != null)
+		{
+			try
+			{
+				sbyte[] data = CRes.loadRMS("MAIN_frist_login");
+				DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+				string guestName = dis.readUTF();
+				if (!string.IsNullOrEmpty(guestName))
+				{
+					SaveRms.userLast = guestName.Trim();
+					userNew = guestName.Trim();
+				}
+				dis.close();
+			}
+			catch (Exception) {}
+		}
+		getVecBegin();
 	}
 
 	public void setNewAcc(bool isCheckDataOK)
@@ -168,7 +225,17 @@ public class FristLoginScreen : MainScreen
 		}
 		if (index == 99)
 		{
+			openMenuLeft();
+			return;
+		}
+		if (index == 97)
+		{
 			openSelectThemeMenu();
+			return;
+		}
+		if (index == 8)
+		{
+			GameMidlet.instance.exit();
 			return;
 		}
 		switch (index)
@@ -177,6 +244,21 @@ public class FristLoginScreen : MainScreen
 		{
 			if (!KeyAuthManager.checkAuthorizedOrNotice()) return;
 			ListChar_Screen.IndexCharSelected = -1;
+
+			// 1. Kiểm tra tài khoản thật đã lưu (MAIN_user_pass)
+			if (CRes.loadRMS("MAIN_user_pass") != null)
+			{
+				GameCanvas.saveRms.loadUserPass();
+				string savedUser = GameCanvas.loginScr.tfUser != null ? GameCanvas.loginScr.tfUser.getText().Trim() : "";
+				string savedPass = GameCanvas.loginScr.tfPass != null ? GameCanvas.loginScr.tfPass.getText().Trim() : "";
+				if (!string.IsNullOrEmpty(savedUser) && !string.IsNullOrEmpty(savedPass))
+				{
+					GameCanvas.loginScr.doLogin(isGetData: true, 0, savedUser, savedPass);
+					break;
+				}
+			}
+
+			// 2. Kiểm tra tài khoản khách / chơi nhanh đã lưu (MAIN_frist_login)
 			userNew = "";
 			sbyte[] array = CRes.loadRMS("MAIN_frist_login");
 			if (array != null)
@@ -195,7 +277,22 @@ public class FristLoginScreen : MainScreen
 					userNew = "";
 				}
 			}
-			GameCanvas.loginScr.doLogin(isGetData: true, 1, userNew, "");
+			if (!string.IsNullOrEmpty(userNew))
+			{
+				GameCanvas.loginScr.doLogin(isGetData: true, 1, userNew, "");
+				break;
+			}
+
+			// 3. Nếu chỉ có userLast mà không có pass, mở form đăng nhập để nhập pass
+			if (CRes.loadRMS("MAIN_user_last") != null)
+			{
+				GameCanvas.saveRms.loadUserLast();
+				GameCanvas.loginScr.Show();
+				break;
+			}
+
+			// 4. Nếu chưa từng lưu tài khoản nào, mở form đăng nhập
+			GameCanvas.loginScr.Show();
 			break;
 		}
 		case 1:
@@ -204,6 +301,17 @@ public class FristLoginScreen : MainScreen
 			break;
 		case 2:
 			if (!KeyAuthManager.checkAuthorizedOrNotice()) return;
+			if (CRes.loadRMS("MAIN_frist_login") != null)
+			{
+				GameCanvas.Start_Normal_DiaLog("Bạn đang có tài khoản chơi mới trên máy.\nNếu tạo mới sẽ thay thế tài khoản cũ. Bạn có muốn tiếp tục?", new iCommand("Đồng ý", 21, this), isCmdClose: true);
+			}
+			else
+			{
+				GameCanvas.loginScr.doLogin(isGetData: true, 1, "", "");
+			}
+			break;
+		case 21:
+			GameCanvas.end_Dialog();
 			GameCanvas.loginScr.doLogin(isGetData: true, 1, "", "");
 			break;
 		case 3:
@@ -332,9 +440,13 @@ public class FristLoginScreen : MainScreen
 		}
 	}
 
-	private void getVecBegin()
+	public override void init()
 	{
-		UpdateServer.loadServers();
+		getVecBegin();
+	}
+
+	public void getVecBegin()
+	{
 		vecCmd.removeAllElements();
 		if (GameCanvas.language > GameCanvas.strListServer.Length - 1)
 		{
@@ -342,40 +454,83 @@ public class FristLoginScreen : MainScreen
 		}
 		string sName = UpdateServer.getCurrentServerName();
 
-		if (SaveRms.userLast.Length > 0)
+		if (SaveRms.userLast != null && SaveRms.userLast.Length > 0)
 		{
 			cmdBegin.caption = T.loadGame + "\n " + SaveRms.userLast;
-			cmdBegin.setPos(MotherCanvas.hw - 38, MotherCanvas.h - 98, null, cmdBegin.caption);
-			cmdBegin.setTypeSpec();
-			vecCmd.addElement(cmdBegin);
-			cmdNewGame = new iCommand(T.newGame, 2, 0, this);
-			cmdNewGame.setPos(MotherCanvas.hw + 38, MotherCanvas.h - 98, null, cmdNewGame.caption);
-			cmdNewGame.setTypeSpec();
-			vecCmd.addElement(cmdNewGame);
-			cmdChangeAcc = new iCommand(T.changeAcc, 1, 0, this);
-			cmdChangeAcc.setPos(MotherCanvas.hw - 38, MotherCanvas.h - 46, null, cmdChangeAcc.caption);
-			cmdChangeAcc.setTypeSpec();
-			vecCmd.addElement(cmdChangeAcc);
-			cmdServer.caption = T.server + "\n" + sName;
-			cmdServer.setPos(MotherCanvas.hw + 38, MotherCanvas.h - 46, null, cmdServer.caption);
-			cmdServer.setTypeSpec();
-			vecCmd.addElement(cmdServer);
 		}
 		else
 		{
-			cmdNewGame = new iCommand(T.newGame, 2, 0, this);
-			cmdNewGame.setPos(MotherCanvas.hw - 76, MotherCanvas.h - 60, null, cmdNewGame.caption);
-			cmdNewGame.setTypeSpec();
-			vecCmd.addElement(cmdNewGame);
-			cmdChangeAcc = new iCommand(T.changeAcc, 1, 0, this);
-			cmdChangeAcc.setPos(MotherCanvas.hw, MotherCanvas.h - 60, null, cmdChangeAcc.caption);
-			cmdChangeAcc.setTypeSpec();
-			vecCmd.addElement(cmdChangeAcc);
-			cmdServer.caption = T.server + "\n" + sName;
-			cmdServer.setPos(MotherCanvas.hw + 76, MotherCanvas.h - 60, null, cmdServer.caption);
-			cmdServer.setTypeSpec();
-			vecCmd.addElement(cmdServer);
+			cmdBegin.caption = T.loadGame;
 		}
+		cmdBegin.setTypeSpec();
+
+		cmdNewGame = new iCommand(T.newGame, 2, 0, this);
+		cmdNewGame.setTypeSpec();
+
+		cmdChangeAcc = new iCommand(T.changeAcc, 1, 0, this);
+		cmdChangeAcc.setTypeSpec();
+
+		cmdServer.caption = T.server + "\n" + sName;
+		cmdServer.setTypeSpec();
+
+		// Bố cục Dynamic Ngang responsive:
+		int btnW = iCommand.wButtonCmd;
+		if (MotherCanvas.w >= 320)
+		{
+			int gap = 8;
+			int totalW = 4 * btnW + 3 * gap;
+			if (totalW > MotherCanvas.w - 16)
+			{
+				gap = System.Math.Max(2, (MotherCanvas.w - 16 - 4 * btnW) / 3);
+				totalW = 4 * btnW + 3 * gap;
+			}
+			int startX = MotherCanvas.hw - totalW / 2 + btnW / 2;
+			int posY = MotherCanvas.h - 52;
+
+			cmdBegin.setPos(startX + 0 * (btnW + gap), posY, null, cmdBegin.caption);
+			cmdNewGame.setPos(startX + 1 * (btnW + gap), posY, null, cmdNewGame.caption);
+			cmdChangeAcc.setPos(startX + 2 * (btnW + gap), posY, null, cmdChangeAcc.caption);
+			cmdServer.setPos(startX + 3 * (btnW + gap), posY, null, cmdServer.caption);
+		}
+		else
+		{
+			int gap = 6;
+			int totalW = 2 * btnW + gap;
+			int startX1 = MotherCanvas.hw - totalW / 2 + btnW / 2;
+			int startX2 = startX1 + btnW + gap;
+			int posY1 = MotherCanvas.h - 82;
+			int posY2 = MotherCanvas.h - 44;
+
+			cmdBegin.setPos(startX1, posY1, null, cmdBegin.caption);
+			cmdNewGame.setPos(startX2, posY1, null, cmdNewGame.caption);
+			cmdChangeAcc.setPos(startX1, posY2, null, cmdChangeAcc.caption);
+			cmdServer.setPos(startX2, posY2, null, cmdServer.caption);
+		}
+
+		vecCmd.addElement(cmdBegin);
+		vecCmd.addElement(cmdNewGame);
+		vecCmd.addElement(cmdChangeAcc);
+		vecCmd.addElement(cmdServer);
+
+		if (AvMain.fraIconMenu == null || AvMain.fraIconMenu.imgFrame == null)
+		{
+			AvMain.fraIconMenu = new FrameImage(mImage.createImage("/point/iconmenu.png"), 30, 30);
+		}
+		cmdMenu = new iCommand(T.menu ?? "Menu", 99, this);
+		if (GameCanvas.isTaiTho)
+		{
+			cmdMenu.setPos(30, MotherCanvas.h - 15, AvMain.fraIconMenu, "");
+		}
+		else
+		{
+			cmdMenu.setPos(15, MotherCanvas.h - 15, AvMain.fraIconMenu, "");
+		}
+		if (GameCanvas.isTouch)
+		{
+			vecCmd.addElement(cmdMenu);
+		}
+		left = cmdMenu;
+
 		idCommand = 0;
 		if (GameCanvas.isTouch && !GameCanvas.isTouchAndKey())
 		{
@@ -406,7 +561,7 @@ public class FristLoginScreen : MainScreen
 		LoginScreen.paintShowchar(g);
 		LoginScreen.paintLogo(g, MotherCanvas.hw);
 		mFont.tahoma_7_black.drawString(g, "Ver: " + ClientConfig.CLIENT_VERSION, MotherCanvas.w - 2, 2 + GameScreen.h12plus, 1);
-		mFont.tahoma_7_black.drawString(g, "ID: " + ClientConfig.CLIENT_ID, MotherCanvas.w - 2, 4 + GameScreen.h12plus + GameCanvas.hText / 2, 1);
+		mFont.tahoma_7_black.drawString(g, "No: 1", MotherCanvas.w - 2, 4 + GameScreen.h12plus + GameCanvas.hText / 2, 1);
 		GameCanvas.resetTrans(g);
 		for (int i = 0; i < vecCmd.size(); i++)
 		{
@@ -414,24 +569,22 @@ public class FristLoginScreen : MainScreen
 			iCommand2.paint(g, iCommand2.xCmd, iCommand2.yCmd);
 		}
 		base.paint(g);
-
-		// Theme selector button at bottom-left: [ Giao diện: Gốc ▼ ]
-		UITheme curTheme = UIThemeManager.getCurrentTheme();
-		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
-		int themeBtnX = 10;
-		int themeBtnY = MotherCanvas.h - 26;
-		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
-		if (themeBtnW < 110) themeBtnW = 110;
-		int themeBtnH = 20;
-
-		if (curTheme != null)
-		{
-			curTheme.paintButton(g, themeBtnX, themeBtnY, themeBtnW, themeBtnH, themeText, ModernUI.BTN_GOLD, false, false);
-		}
 	}
+
+	private int lastCanvasW;
+	private int lastCanvasH;
 
 	public override void update()
 	{
+		if (lastCanvasW != MotherCanvas.w || lastCanvasH != MotherCanvas.h)
+		{
+			lastCanvasW = MotherCanvas.w;
+			lastCanvasH = MotherCanvas.h;
+			if (MotherCanvas.w > 0 && MotherCanvas.h > 0)
+			{
+				getVecBegin();
+			}
+		}
 		LoginScreen.updateYPaintLogo(LoginScreen.hLogo);
 		LoginScreen.updateCharShow();
 	}
@@ -452,6 +605,16 @@ public class FristLoginScreen : MainScreen
 				idCommand++;
 				GameCanvas.clearKeyHold(6);
 				GameCanvas.ClearkeyMove(2);
+			}
+			else if (MotherCanvas.w < 320 && GameCanvas.keyMove(1))
+			{
+				idCommand = System.Math.Max(0, idCommand - 2);
+				GameCanvas.ClearkeyMove(1);
+			}
+			else if (MotherCanvas.w < 320 && GameCanvas.keyMove(3))
+			{
+				idCommand = System.Math.Min(num - 1, idCommand + 2);
+				GameCanvas.ClearkeyMove(3);
 			}
 			idCommand = AvMain.resetSelect(idCommand, num - 1, isreset: false);
 			if (num2 != idCommand && (!GameCanvas.isTouch || GameCanvas.isTouchAndKey()))
@@ -484,26 +647,28 @@ public class FristLoginScreen : MainScreen
 
 	public override void updatePointer()
 	{
-		int themeBtnX = 10;
-		int themeBtnY = MotherCanvas.h - 26;
-		UITheme curTheme = UIThemeManager.getCurrentTheme();
-		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
-		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
-		if (themeBtnW < 110) themeBtnW = 110;
-		int themeBtnH = 20;
-
-		if (GameCanvas.isPointSelect(themeBtnX, themeBtnY, themeBtnW, themeBtnH))
-		{
-			openSelectThemeMenu();
-			GameCanvas.isPointerSelect = false;
-			return;
-		}
-
 		for (int i = 0; i < vecCmd.size(); i++)
 		{
 			((iCommand)vecCmd.elementAt(i)).updatePointer();
 		}
 		base.updatePointer();
+	}
+
+	public void openMenuLeft()
+	{
+		mVector vec = new mVector();
+		UITheme curTheme = UIThemeManager.getCurrentTheme();
+		string themeName = (curTheme != null) ? curTheme.displayName : "Giao Di\u1ec7n";
+		vec.addElement(new iCommand("\uD83C\uDFA8 Giao di\u1ec7n: " + themeName, 97, this));
+		vec.addElement(new iCommand("\uD83C\uDF10 " + (T.server ?? "Ch\u1ecdn M\u00e1y Ch\u1ee7"), 4, this));
+		vec.addElement(new iCommand("\uD83D\uDD11 Nh\u1eadp Key B\u1ea3n Quy\u1ec1n", 23, this));
+		if (KeyAuthManager.isAuthorized)
+		{
+			vec.addElement(new iCommand("+ Th\u00eam IP Server", 25, this));
+		}
+		vec.addElement(new iCommand("\uD83D\uDD04 " + (T.changeAcc ?? "\u0110\u1ed5i T\u00e0i Kho\u1ea3n"), 1, 0, this));
+		vec.addElement(new iCommand("\u274C " + (T.exit ?? "Tho\u00e1t"), 8, this));
+		GameCanvas.menu.startAt(vec, 0, T.menu ?? "Menu");
 	}
 
 	public void openSelectThemeMenu()

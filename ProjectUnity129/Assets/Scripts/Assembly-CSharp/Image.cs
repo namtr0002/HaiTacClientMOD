@@ -106,41 +106,25 @@ public class Image
 
 	public static Image createImage(sbyte[] imageData, int offset, int lenght)
 	{
-		if (offset + lenght > imageData.Length)
+		if (imageData == null || offset + lenght > imageData.Length)
 		{
 			return null;
 		}
 		byte[] array = new byte[lenght];
-		for (int i = 0; i < lenght; i++)
-		{
-			array[i] = convertSbyteToByte(imageData[i + offset]);
-		}
+		Buffer.BlockCopy(imageData, offset, array, 0, lenght);
 		return createImage(array);
 	}
 
 	public static byte convertSbyteToByte(sbyte var)
 	{
-		if (var > 0)
-		{
-			return (byte)var;
-		}
-		return (byte)(var + 256);
+		return (byte)var;
 	}
 
 	public static byte[] convertArrSbyteToArrByte(sbyte[] var)
 	{
+		if (var == null) return null;
 		byte[] array = new byte[var.Length];
-		for (int i = 0; i < var.Length; i++)
-		{
-			if (var[i] > 0)
-			{
-				array[i] = (byte)var[i];
-			}
-			else
-			{
-				array[i] = (byte)(var[i] + 256);
-			}
-		}
+		Buffer.BlockCopy(var, 0, array, 0, var.Length);
 		return array;
 	}
 
@@ -421,14 +405,40 @@ public class Image
 		return null;
 	}
 
+	private static Texture2D loadTexture(string filename)
+	{
+		if (string.IsNullOrEmpty(filename)) return null;
+		string fn = filename.Trim();
+		while (fn.StartsWith("/"))
+		{
+			fn = fn.Substring(1);
+		}
+		// 1. Try file from disk first (Editor / loose files)
+		// Preserves exact raw pixel dimensions without POT resampling or mipmap blur
+		Texture2D tex = loadTextureFromFile(fn);
+		if (tex != null)
+		{
+			return tex;
+		}
+
+		// 2. Fallback to Resources.Load for packaged builds
+		string fnNoExt = fn;
+		if (fnNoExt.EndsWith(".png", StringComparison.OrdinalIgnoreCase) || fnNoExt.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase))
+		{
+			fnNoExt = fnNoExt.Substring(0, fnNoExt.Length - 4);
+		}
+		tex = Resources.Load(fnNoExt) as Texture2D;
+		if (tex == null && !fnNoExt.StartsWith("res/"))
+		{
+			tex = Resources.Load("res/" + fnNoExt) as Texture2D;
+		}
+		return tex;
+	}
+
 	private static Image __createImage(string filename)
 	{
 		Image image = new Image();
-		Texture2D texture2D = Resources.Load(filename) as Texture2D;
-		if (texture2D == null)
-		{
-			texture2D = loadTextureFromFile(filename);
-		}
+		Texture2D texture2D = loadTexture(filename);
 		if (texture2D == null)
 		{
 			throw new Exception("NULL POINTER EXCEPTION AT Image __createImage " + filename);
@@ -436,10 +446,10 @@ public class Image
 		image.texture = texture2D;
 		image.w = image.texture.width;
 		image.h = image.texture.height;
-		if (filename.Contains("/x4/") || filename.Contains("_x4_")) image.assetZoom = 4;
-		else if (filename.Contains("/x3/") || filename.Contains("_x3_")) image.assetZoom = 3;
-		else if (filename.Contains("/x2/") || filename.Contains("_x2_")) image.assetZoom = 2;
-		else if (filename.Contains("/x1/") || filename.Contains("_x1_")) image.assetZoom = 1;
+		if (filename.Contains("/x4/") || filename.StartsWith("x4/") || filename.Contains("_x4_")) image.assetZoom = 4;
+		else if (filename.Contains("/x3/") || filename.StartsWith("x3/") || filename.Contains("_x3_")) image.assetZoom = 3;
+		else if (filename.Contains("/x2/") || filename.StartsWith("x2/") || filename.Contains("_x2_")) image.assetZoom = 2;
+		else if (filename.Contains("/x1/") || filename.StartsWith("x1/") || filename.Contains("_x1_")) image.assetZoom = 1;
 		else image.assetZoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
 		setTextureQuality(image);
 		return image;
@@ -448,11 +458,7 @@ public class Image
 	private static Image __createImageX(string filename)
 	{
 		Image image = new Image();
-		Texture2D texture2D = Resources.Load(filename) as Texture2D;
-		if (texture2D == null)
-		{
-			texture2D = loadTextureFromFile(filename);
-		}
+		Texture2D texture2D = loadTexture(filename);
 		if (texture2D == null)
 		{
 			throw new Exception("NULL POINTER EXCEPTION AT Image __createImage " + filename);
@@ -504,26 +510,7 @@ public class Image
 			image.texture.LoadImage(imageData);
 			image.w = image.texture.width;
 			image.h = image.texture.height;
-			int[] array = new int[image.w * image.h];
-			Color[] pixels = image.texture.GetPixels(0, 0, image.w, image.h);
-			for (int i = 0; i < array.Length; i++)
-			{
-				array[i] = getIntByColor(pixels[i]);
-			}
-			int[] array2 = Hqx.HqxZoom(1, array, image.w, image.h);
-			int num = image.w;
-			int num2 = image.h;
-			image.texture = new Texture2D(num, num2);
-			Color[] array3 = new Color[num * num2];
-			for (int j = 0; j < array3.Length; j++)
-			{
-				array3[j] = getColor(array2[j]);
-			}
-			image.texture.SetPixels(array3);
-			image.texture.Apply(updateMipmaps: false, makeNoLongerReadable: false);
-			image.w = num;
-			image.h = num2;
-			image.assetZoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
+			image.assetZoom = (Rms.lastLoadedZoom > 0) ? Rms.lastLoadedZoom : ((mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1);
 			setTextureQuality(image);
 		}
 		catch (Exception)
@@ -594,6 +581,7 @@ public class Image
 		setTextureQuality(obj);
 		obj.w = w;
 		obj.h = h;
+		obj.assetZoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
 		obj.texture.Apply();
 		return obj;
 	}

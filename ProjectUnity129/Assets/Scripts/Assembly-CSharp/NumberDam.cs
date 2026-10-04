@@ -34,7 +34,7 @@ public class NumberDam
 			loadImg(type);
 			return;
 		}
-		int num = CRes.abs(value);
+		long num = (value < 0) ? (-(long)value) : ((long)value);
 		sbyte b = checkLenght(num);
 		int num2 = 8;
 		int num3 = 0;
@@ -49,7 +49,7 @@ public class NumberDam
 			num2 = 15;
 			break;
 		}
-		int num4 = 10;
+		long num4 = 10L;
 		num3 += (b - 1) * (num2 / 2);
 		if (value < 0)
 		{
@@ -57,8 +57,8 @@ public class NumberDam
 		}
 		for (int i = 0; i < b; i++)
 		{
-			int idx = (sbyte)(num % num4 / (num4 / 10));
-			num4 *= 10;
+			int idx = (int)(num % num4 / (num4 / 10L));
+			num4 *= 10L;
 			fraNum.drawFrameNew(idx, x + num3, y, 0, 3, g);
 			num3 -= num2;
 			if (type == 23 && i % 3 == 2)

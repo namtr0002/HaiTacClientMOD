@@ -233,9 +233,47 @@ public class ModernUI
 		mFont.tahoma_7b_white.drawString(g, displayText, x + w / 2, textY, 2);
 	}
 
+	public static void drawSlot(mGraphics g, int x, int y, int size, int rarity, bool isSelected)
+	{
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme == null || currentTheme.id == 0)
+		{
+			AvMain.paintRect(g, x, y, size, size, (sbyte)(isSelected ? 1 : 0), 3);
+			return;
+		}
+		if (rarity < 0) rarity = 0;
+		if (rarity >= COLOR_RARITY.Length) rarity = COLOR_RARITY.Length - 1;
+
+		int bgCol = COLOR_RARITY_BG[rarity];
+		fillGradientRect(g, x, y, size, size, bgCol + 0x0A0A0A, bgCol);
+
+		int borderCol = COLOR_RARITY[rarity];
+		g.setColor(borderCol);
+		g.drawRect(x, y, size - 1, size - 1);
+
+		if (isSelected)
+		{
+			int glowCol = (animTick % 20 < 10) ? COLOR_GOLD_BRIGHT : 0xFFFFFF;
+			g.setColor(glowCol);
+			g.drawRect(x - 1, y - 1, size + 1, size + 1);
+			g.drawRect(x, y, size - 1, size - 1);
+		}
+	}
+
 	public static void drawButton(mGraphics g, int x, int y, int w, int h, string text, int btnType, bool isPressed, bool isFocused)
 	{
 		if (w <= 0 || h <= 0) return;
+		UITheme currentTheme = UIThemeManager.getCurrentTheme();
+		if (currentTheme == null || currentTheme.id == 0)
+		{
+			AvMain.paintRect(g, x, y, w, h, (sbyte)(isPressed ? 1 : 0), 1);
+			if (!string.IsNullOrEmpty(text))
+			{
+				mFont f = isPressed ? mFont.tahoma_7b_yellow : mFont.tahoma_7b_white;
+				f.drawString(g, text, x + w / 2, y + (h - GameCanvas.hText) / 2, 2);
+			}
+			return;
+		}
 		int topCol = COLOR_GOLD_BRIGHT;
 		int botCol = COLOR_GOLD_BASE;
 		int borderCol = COLOR_GOLD_DARK;
@@ -309,31 +347,6 @@ public class ModernUI
 		}
 	}
 
-	public static void drawSlot(mGraphics g, int x, int y, int size, int rarity, bool isSelected)
-	{
-		if (rarity < 0) rarity = 0;
-		if (rarity >= COLOR_RARITY.Length) rarity = COLOR_RARITY.Length - 1;
-
-		int bgCol = COLOR_RARITY_BG[rarity];
-		fillGradientRect(g, x, y, size, size, bgCol + 0x0A0A0A, bgCol, 0.95f);
-
-		int borderCol = COLOR_RARITY[rarity];
-		g.setColor(borderCol, 0.8f);
-		g.drawRect(x, y, size - 1, size - 1);
-
-		if (isSelected)
-		{
-			int glowCol = (animTick % 20 < 10) ? COLOR_GOLD_BRIGHT : 0xFFFFFF;
-			g.setColor(glowCol, 1.0f);
-			g.drawRect(x - 1, y - 1, size + 1, size + 1);
-			g.drawRect(x, y, size - 1, size - 1);
-		}
-		else
-		{
-			g.setColor(0x000000, 0.5f);
-			g.drawRect(x + 1, y + 1, size - 3, size - 3);
-		}
-	}
 
 	// ==========================================
 	// WINDOW & CONTAINER COMPONENTS

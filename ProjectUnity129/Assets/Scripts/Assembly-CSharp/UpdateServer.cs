@@ -7,7 +7,7 @@ using System.Text;
 public class UpdateServer
 {
 	public static string DEFAULT_SERVER_LIST_URL => ClientConfig.SERVER_LIST_URL;
-	public static string SERVER_LIST_URL => ClientConfig.SERVER_LIST_URL;
+	public static string SERVER_LIST_URL => ClientConfig.FALLBACK_SERVER_LIST_URL;
 
 	public static List<string> serverHosts = new List<string>();
 	public static List<string> serverNames = new List<string>();
@@ -176,6 +176,12 @@ public class UpdateServer
 				}
 			}
 			catch (Exception) {}
+		}
+
+		if (!loaded)
+		{
+			parseRawServerContent("HaiTacZ:103.78.1.132:2239:0:0\nLocal:127.0.0.1:2239:0:0\n", tempHosts, tempNames, tempLang, tempFrameId);
+			if (tempHosts.Count > 0) loaded = true;
 		}
 
 		if (loaded)
@@ -622,6 +628,11 @@ public class UpdateServer
 	public static void showBlockedDialog()
 	{
 		GameCanvas.Start_Normal_Only_CmdClose_DiaLog("liên hệ t.me/@ThanhNamYe để thuê mod nhé");
+	}
+
+	public static void showBlockedServerDialog(string host)
+	{
+		showBlockedDialog();
 	}
 
 	private static bool isNumeric(string str)

@@ -480,20 +480,24 @@ public class MainItem
 
 	public virtual void paintNumPotion(mGraphics g, int x, int y, int w, short num)
 	{
+		int half = (w > 0) ? (w / 2) : (MainTab.wItem / 2);
+		int bgX = x + half - 11;
+		int bgY = y + half - 6;
+		int textY = bgY - 5;
 		if (numPotionNeed > 0)
 		{
-			g.drawImage(AvMain.imgBgnum, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 6, 3);
-			mFont mFont2 = mFont.tahoma_7_yellow;
-			if (numPotionNeed > numPotion)
-			{
-				mFont2 = mFont.tahoma_7_red;
-			}
-			mFont2.drawString(g, numPotion + "/" + numPotionNeed, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 9 - 2, 2);
+			if (AvMain.imgBgnum != null) g.drawImage(AvMain.imgBgnum, bgX, bgY, 3);
+			mFont mFont2 = (numPotionNeed > numPotion) ? mFont.tahoma_7_red : mFont.tahoma_7_yellow;
+			string str = numPotion + "/" + numPotionNeed;
+			if (mFont.tahoma_7_black != null) mFont.tahoma_7_black.drawString(g, str, bgX + 1, textY + 1, 2);
+			mFont2.drawString(g, str, bgX, textY, 2);
 		}
 		else if (num > 1)
 		{
-			g.drawImage(AvMain.imgBgnum, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 6, 3);
-			mFont.tahoma_7_yellow.drawString(g, num.ToString() ?? "", x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 9 - 2, 2);
+			if (AvMain.imgBgnum != null) g.drawImage(AvMain.imgBgnum, bgX, bgY, 3);
+			string str = num.ToString() ?? "";
+			if (mFont.tahoma_7_black != null) mFont.tahoma_7_black.drawString(g, str, bgX + 1, textY + 1, 2);
+			mFont.tahoma_7_yellow.drawString(g, str, bgX, textY, 2);
 		}
 	}
 
@@ -503,20 +507,24 @@ public class MainItem
 
 	public virtual void paintNumPotionQuay(mGraphics g, int x, int y, int w, short num)
 	{
+		int half = (w > 0) ? (w / 2) : (MainTab.wItem / 2);
+		int bgX = x + half - 11;
+		int bgY = y + half - 6;
+		int textY = bgY - 5;
 		if (numPotionNeed > 0)
 		{
-			g.drawImage(AvMain.imgBgnum, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 6, 3);
-			mFont mFont2 = mFont.tahoma_7_yellow;
-			if (numPotionNeed > numPotion)
-			{
-				mFont2 = mFont.tahoma_7_red;
-			}
-			mFont2.drawString(g, numPotion + "/" + numPotionNeed, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 9 - 2, 2);
+			if (AvMain.imgBgnum != null) g.drawImage(AvMain.imgBgnum, bgX, bgY, 3);
+			mFont mFont2 = (numPotionNeed > numPotion) ? mFont.tahoma_7_red : mFont.tahoma_7_yellow;
+			string str = numPotion + "/" + numPotionNeed;
+			if (mFont.tahoma_7_black != null) mFont.tahoma_7_black.drawString(g, str, bgX + 1, textY + 1, 2);
+			mFont2.drawString(g, str, bgX, textY, 2);
 		}
 		else
 		{
-			g.drawImage(AvMain.imgBgnum, x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 6, 3);
-			mFont.tahoma_7_yellow.drawString(g, num.ToString() ?? "", x + MainTab.wItem / 2 - 11, y + MainTab.wItem / 2 - 9 - 2, 2);
+			if (AvMain.imgBgnum != null) g.drawImage(AvMain.imgBgnum, bgX, bgY, 3);
+			string str = num.ToString() ?? "";
+			if (mFont.tahoma_7_black != null) mFont.tahoma_7_black.drawString(g, str, bgX + 1, textY + 1, 2);
+			mFont.tahoma_7_yellow.drawString(g, str, bgX, textY, 2);
 		}
 	}
 
@@ -734,10 +742,11 @@ public class MainItem
 
 	public static void removeUpdateItemVec(sbyte type, mVector vec)
 	{
+		if (vec == null) return;
 		for (int i = 0; i < vec.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vec.elementAt(i);
-			if (mainItem.typeObject == type)
+			if (mainItem != null && mainItem.typeObject == type)
 			{
 				vec.removeElement(mainItem);
 				i--;
@@ -747,10 +756,11 @@ public class MainItem
 
 	public static MainItem getItemVec(sbyte type, short id, mVector vec)
 	{
+		if (vec == null) return null;
 		for (int i = 0; i < vec.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vec.elementAt(i);
-			if (mainItem.typeObject == type && mainItem.ID == id)
+			if (mainItem != null && mainItem.typeObject == type && mainItem.ID == id)
 			{
 				return mainItem;
 			}
@@ -986,6 +996,7 @@ public class MainItem
 
 	public static mVector SortVecItem(mVector vec)
 	{
+		if (vec == null) return null;
 		int num = vec.size();
 		int num2;
 		for (int i = 0; i < num - 1; i++)
@@ -993,7 +1004,9 @@ public class MainItem
 			num2 = i;
 			for (int j = i + 1; j < num; j++)
 			{
-				if (((MainItem)vec.elementAt(j)).indexSort < ((MainItem)vec.elementAt(num2)).indexSort)
+				MainItem itJ = (MainItem)vec.elementAt(j);
+				MainItem itMin = (MainItem)vec.elementAt(num2);
+				if (itJ != null && itMin != null && itJ.indexSort < itMin.indexSort)
 				{
 					num2 = j;
 				}
@@ -1009,7 +1022,9 @@ public class MainItem
 			num2 = i;
 			for (int j = i + 1; j < num; j++)
 			{
-				if (((MainItem)vec.elementAt(j)).typeObject == 4 && ((MainItem)vec.elementAt(j)).ID < ((MainItem)vec.elementAt(num2)).ID)
+				MainItem itJ = (MainItem)vec.elementAt(j);
+				MainItem itMin = (MainItem)vec.elementAt(num2);
+				if (itJ != null && itMin != null && itJ.typeObject == 4 && itJ.ID < itMin.ID)
 				{
 					num2 = j;
 				}

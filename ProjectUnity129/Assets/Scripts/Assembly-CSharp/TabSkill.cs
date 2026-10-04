@@ -107,6 +107,8 @@ public class TabSkill : MainTab
 		mVector mVector6 = new mVector();
 		mVector mVector7 = new mVector();
 		vecListSkillPaint.removeAllElements();
+		mVector varActive = new mVector();
+		mVector varSea = new mVector();
 		for (int i = 0; i < Player.vecListSkill.size(); i++)
 		{
 			Skill_Info skill_Info = (Skill_Info)Player.vecListSkill.elementAt(i);
@@ -114,8 +116,14 @@ public class TabSkill : MainTab
 			{
 				if (skill_Info.typeDevil == 0 && (skill_Info.typeSkill == 1 || skill_Info.typeSkill == 4))
 				{
-					mVector2.addElement(skill_Info);
-					numActiveSkill++;
+					if (skill_Info.typeSkill == 4)
+					{
+						varSea.addElement(skill_Info);
+					}
+					else
+					{
+						varActive.addElement(skill_Info);
+					}
 				}
 				else if (skill_Info.typeDevil == 1)
 				{
@@ -144,6 +152,20 @@ public class TabSkill : MainTab
 				}
 			}
 		}
+		int nFirstActive = (varActive.size() < 3) ? varActive.size() : 3;
+		for (int k = 0; k < nFirstActive; k++)
+		{
+			mVector2.addElement(varActive.elementAt(k));
+		}
+		for (int k = 0; k < varSea.size(); k++)
+		{
+			mVector2.addElement(varSea.elementAt(k));
+		}
+		for (int k = nFirstActive; k < varActive.size(); k++)
+		{
+			mVector2.addElement(varActive.elementAt(k));
+		}
+		numActiveSkill = mVector2.size();
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
@@ -357,9 +379,10 @@ public class TabSkill : MainTab
 			{
 				break;
 			}
-			if (skillCur != null && ((LoadMap.specMap == 4 && skillCur.typeSkill == 1) || (LoadMap.specMap != 4 && skillCur.typeSkill == 4)))
+			bool isSea = (LoadMap.specMap == 4 || (GameScreen.player != null && GameScreen.player.boatSea != null));
+			if (skillCur != null && ((isSea && skillCur.typeSkill != 4 && skillCur.typeSkill != 2) || (!isSea && skillCur.typeSkill == 4)))
 			{
-				GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.khongdungduocmapnay);
+				GameCanvas.Start_Normal_Only_CmdClose_DiaLog(isSea ? "Kỹ năng này không thể sử dụng trên biển" : T.khongdungduocmapnay);
 				break;
 			}
 			mVector mVector2 = new mVector();

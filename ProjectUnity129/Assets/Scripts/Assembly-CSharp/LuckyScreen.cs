@@ -206,7 +206,7 @@ public class LuckyScreen : MainScreen
 		for (int i = 0; i < Player.vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
-			if (mainItem.typeObject == 4 && mainItem.ID == 0)
+			if (mainItem != null && mainItem.typeObject == 4 && mainItem.ID == 0)
 			{
 				poi = mainItem;
 				break;
@@ -566,7 +566,7 @@ public class LuckyScreen : MainScreen
 			for (int i = 0; i < Player.vecInventory.size(); i++)
 			{
 				MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
-				if (mainItem.typeObject == 4 && mainItem.ID == 232)
+				if (mainItem != null && mainItem.typeObject == 4 && mainItem.ID == 232)
 				{
 					vequay = mainItem;
 					isUpdateVe = false;

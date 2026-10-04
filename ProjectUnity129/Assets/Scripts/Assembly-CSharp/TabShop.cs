@@ -55,12 +55,167 @@ public class TabShop : MainTabShop
 		}
 		cmdShip = new iCommand(T.ship, 11, this);
 		cmdChangeShip = new iCommand(T.changeship, 12, this);
+		cmdUse = new iCommand(T.cmdUse, 13, this);
+		cmdDonotUse = new iCommand(T.thaora, 13, this);
+		cmdMenu = new iCommand(T.select, 10, this);
+		cmdBuyHair = new iCommand(T.select, 3, 1, this);
+		cmdBuyPotion = new iCommand(T.cmdBuy, 4, this);
+		cmdBuyItem = new iCommand(T.cmdBuy, 3, 0, this);
+		cmdBuyIconClan = new iCommand(T.select, 3, 2, this);
+		cmdOpenRebuildItem = new iCommand(T.Upgrade, 15, this);
+		cmdOpenMenuDaKham = new iCommand(T.menu, 16, this);
+		if (typeNPCShop == 113 || typeNPCShop == 114)
+		{
+			cmdBuyHair = new iCommand(T.select, 3, 3, this);
+		}
+		beginFocus();
+	}
+
+	public override void commandPointer(int index, int subIndex)
+	{
+		mVector mVector2;
+		switch (index)
+		{
+		case 3:
+			if (itemCur == null)
+			{
+				return;
+			}
+			if (typeNPCShop != 116 && typeNPCShop != 118)
+			{
+				if (subIndex == 1)
+				{
+					string text = T.price + " " + itemCur.price + " " + T.bery + ".";
+					if (itemCur.price == 0)
+					{
+						text = T.price + " " + itemCur.priceRuby + " " + T.ruby + ".";
+					}
+					if (itemCur.price <= 0 && itemCur.priceRuby <= 0)
+					{
+						text = string.Empty;
+					}
+					GameCanvas.Start_Normal_DiaLog(T.hoiMuaItem + itemCur.name + "?\n" + text, new iCommand(T.cmdBuy, 5, 1, this), isCmdClose: true);
+					return;
+				}
+				if (subIndex == 2)
+				{
+					if (itemCur.priceRuby == 0)
+					{
+						GameCanvas.Start_Normal_DiaLog(T.banmuonchon + itemCur.name + T.lamcohieu, new iCommand(T.select, 5, 1, this), isCmdClose: true);
+						return;
+					}
+					GameCanvas.Start_Normal_DiaLog(T.banmuonchon + itemCur.name + T.lamcohieu + " " + T.price + " " + itemCur.priceRuby + " " + T.ruby + ".", new iCommand(T.select, 5, 1, this), isCmdClose: true);
+					return;
+				}
+				if (subIndex == 3)
+				{
+					GameCanvas.Start_Normal_DiaLog(T.banmuonchon + itemCur.name + "?", new iCommand(T.select, 5, 1, this), isCmdClose: true);
+					return;
+				}
+				GameCanvas.Start_Normal_DiaLog(T.hoiMuaItem + "1 " + itemCur.name + "?", new iCommand(T.cmdBuy, 5, 1, this), isCmdClose: true);
+				return;
+			}
+			GameCanvas.Start_Normal_DiaLog(T.banmuonchon + itemCur.namepaint + ".", new iCommand(T.doiqua, 5, 1, this), isCmdClose: true);
+			return;
+		case 4:
+			if (itemCur == null)
+			{
+				return;
+			}
+			if (typeNPCShop != 116 && typeNPCShop != 118)
+			{
+				mVector2 = new mVector();
+				string text2 = (itemCur.price > 0) ? ("(" + itemCur.price + " " + T.bery + " / 1 " + T.mon + ")") : ("(" + itemCur.priceRuby + " " + T.ruby + " / 1 " + T.mon + ")");
+				for (int i = 0; i < mNumBuyRuby.Length; i++)
+				{
+					iCommand iCommand2 = new iCommand("x" + mNumBuyRuby[i], 14, mNumBuyRuby[i], this);
+					mVector2.addElement(iCommand2);
+				}
+				GameCanvas.Start_Normal_DiaLog_New(T.hoiMua + "\n" + text2, mVector2, isCmdClose: true, itemCur.name);
+				return;
+			}
+			GameCanvas.Start_Normal_DiaLog(T.banmuonchon + itemCur.namepaint + ".", new iCommand(T.doiqua, 5, 1, this), isCmdClose: true);
+			return;
+		case 5:
+			if (itemCur != null)
+			{
+				GlobalService.gI().Buy_Item_Potion(typeNPCShop, itemCur.ID, 1, itemCur.typeObject);
+				GameCanvas.Start_Waiting_DiaLog(T.pleaseWaiting, isCmdClose: true);
+			}
+			return;
+		case 6:
+			if (itemCur != null)
+			{
+				int num = 1;
+				try
+				{
+					num = int.Parse(input.tfInput.getText());
+					if (num < 0) num = 1;
+				}
+				catch (Exception)
+				{
+					num = 1;
+				}
+				GameCanvas.end_Dialog();
+				GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.pleaseWaiting);
+				GlobalService.gI().Buy_Item_Potion(typeNPCShop, itemCur.ID, (short)num, itemCur.typeObject);
+			}
+			return;
+		case 10:
+			mVector2 = getMenuActionItem();
+			if (mVector2 != null)
+			{
+				GameCanvas.menu.startAt(mVector2, 2, T.menu);
+			}
+			break;
+		case 11:
+			GlobalService.gI().Ship(1);
+			return;
+		case 12:
+			GlobalService.gI().Ship(0);
+			return;
+		case 13:
+			if (itemCur != null)
+			{
+				GlobalService.gI().Use_Item(itemCur.ID, itemCur.typeObject);
+				GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.pleaseWaiting);
+			}
+			return;
+		case 14:
+			if (tickbuy <= 0 && itemCur != null)
+			{
+				GlobalService.gI().Buy_Item_Potion(typeNPCShop, itemCur.ID, (short)subIndex, itemCur.typeObject);
+				tickbuy = 5;
+			}
+			return;
+		case 15:
+			GlobalService.gI().Upgrade_Item(7, 0, 0);
+			return;
+		case 16:
+			mVector mVector3 = new mVector();
+			mVector3.addElement(new iCommand(T.cuonghoa, 17, 9, this));
+			mVector3.addElement(new iCommand(T.cmdChuyenHoa, 17, 12, this));
+			mVector3.addElement(new iCommand(T.kham, 17, 10, this));
+			mVector3.addElement(new iCommand(T.duclo, 17, 13, this));
+			GameCanvas.menuCur.startAt(mVector3, 2, T.menu);
+			return;
+		case 17:
+			GlobalService.gI().Upgrade_Item((sbyte)subIndex, 0, 0);
+			break;
+		default:
+			base.commandPointer(index, subIndex);
+			break;
+		}
 	}
 
 	public override mVector getMenuActionItem()
 	{
 		mVector result = null;
-		MainItem mainItem = (MainItem)vecShop.elementAt(IdSelect);
+		MainItem mainItem = null;
+		if (vecShop != null && IdSelect >= 0 && IdSelect < vecShop.size())
+		{
+			mainItem = (MainItem)vecShop.elementAt(IdSelect);
+		}
 		if (mainItem != null)
 		{
 			itemCur = mainItem;
@@ -153,6 +308,8 @@ public class TabShop : MainTabShop
 				break;
 			}
 		}
+		updateTrangBi();
+		setPosCmd(getMenuActionItem());
 	}
 
 	public override void updateTrangBi()

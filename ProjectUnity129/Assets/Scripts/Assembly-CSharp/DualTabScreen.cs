@@ -100,6 +100,7 @@ public short lastPreviewTitleEffId = -1;
 public ListNew petList;
 public int selectedPetIndex = -1;
 public MainItem selectedPetInfo = null;
+public InputDialog inputDialogSkill = null;
 private static string[] SHORT_ATT_NAMES = new string[] { "S.Mạnh", "P.Thủ", "T.Lực", "T.Thần", "N.Nhẹn" };
 
 public static DualTabScreen gI() {
@@ -148,6 +149,10 @@ public void recalculateLayout() {
 public override void Show(MainScreen screen) {
     base.Show(screen);
     instance = this;
+    keyFireCoolDown = 6;
+    GameCanvas.clearAll();
+    GameCanvas.clearKeyHold();
+    GameCanvas.clearKeyPressed();
     lastCanvasW = MotherCanvas.w;
     lastCanvasH = MotherCanvas.h;
 
@@ -386,6 +391,8 @@ public void initTab2() {
 updateSkillList();
 int leftPaneW = isWide ? 160 : (w * 45 / 100);
 int skillCount = validSkills.size();
+if (selectedSkillIndex >= skillCount) selectedSkillIndex = skillCount - 1;
+if (selectedSkillIndex < 0) selectedSkillIndex = 0;
 int limSkillY = skillCount * 34 - (h - 56);
 if (limSkillY < 0) limSkillY = 0;
 if (skillList == null) {
@@ -676,7 +683,6 @@ GameCanvas.Start_Normal_Only_CmdClose_DiaLog("Bạn chưa có sư đồ!");
 break;
 case 7:
 if (GameCanvas.gameScr.cmdDauGia != null) GameCanvas.gameScr.cmdDauGia.perform();
-            break;
 break;
 case 8:
 if (GameCanvas.gameScr.cmdShowWC != null) GameCanvas.gameScr.cmdShowWC.perform();
@@ -855,6 +861,21 @@ focusPane = 1;
 if (!isTabInitialized[curMainTab] || isTabDirty[curMainTab] || curMainTab == 2) {
 initTab(curMainTab);
 }
+if (focusPane == 1) {
+    if (curMainTab == 0 && filteredItems != null && filteredItems.size() > 0) {
+        selectedInvenIndex = 0;
+        selectedItemInfo = (MainItem)filteredItems.elementAt(0);
+        selectItem(selectedItemInfo, 0, 0);
+    } else if (curMainTab == 1) {
+        selectedAttIndex = 0;
+    } else if (curMainTab == 2) {
+        selectedSkillIndex = 0;
+    } else if (curMainTab == 3) {
+        selectedQuestIndex = 0;
+    } else if (curMainTab == 4) {
+        selectedChucNangIndex = 0;
+    }
+}
 updateSoftKeys();
 }
 }
@@ -893,9 +914,69 @@ public void updateSkillList() {
     }
 
     if (source != null) {
+        // Nhóm 1: Chiêu chủ động nghề của clazz (tối đa 3 chiêu đầu) và chiêu trên biển ngay bên dưới
+        mVector classActive = new mVector();
+        mVector seaSkills = new mVector();
         for (int i = 0; i < source.size(); i++) {
             Skill_Info sk = (Skill_Info)source.elementAt(i);
-            if (sk != null && sk.Lv_RQ != -1) {
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeSkill == 1 && sk.typeDevil == 0) {
+                if (!classActive.contains(sk)) classActive.addElement(sk);
+            } else if (sk != null && sk.Lv_RQ != -1 && sk.typeSkill == 4) {
+                if (!seaSkills.contains(sk)) seaSkills.addElement(sk);
+            }
+        }
+        int nFirst = (classActive.size() < 3) ? classActive.size() : 3;
+        for (int i = 0; i < nFirst; i++) {
+            Skill_Info sk = (Skill_Info)classActive.elementAt(i);
+            if (!validSkills.contains(sk)) validSkills.addElement(sk);
+        }
+        for (int i = 0; i < seaSkills.size(); i++) {
+            Skill_Info sk = (Skill_Info)seaSkills.elementAt(i);
+            if (!validSkills.contains(sk)) validSkills.addElement(sk);
+        }
+        for (int i = nFirst; i < classActive.size(); i++) {
+            Skill_Info sk = (Skill_Info)classActive.elementAt(i);
+            if (!validSkills.contains(sk)) validSkills.addElement(sk);
+        }
+        // Nhóm 2: Kỹ năng Trái ác quỷ (typeDevil == 1)
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeDevil == 1) {
+                if (!validSkills.contains(sk)) validSkills.addElement(sk);
+            }
+        }
+        // Nhóm 3: Kỹ năng Haki (typeDevil == 2)
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeDevil == 2) {
+                if (!validSkills.contains(sk)) validSkills.addElement(sk);
+            }
+        }
+        // Nhóm 4: Chiêu hỗ trợ / Buff (typeSkill == 2)
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeSkill == 2 && sk.typeDevil == 0) {
+                if (!validSkills.contains(sk)) validSkills.addElement(sk);
+            }
+        }
+        // Nhóm 5: Chiêu nội tại / Bị động (typeSkill == 3)
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeSkill == 3 && sk.typeDevil == 0) {
+                if (!validSkills.contains(sk)) validSkills.addElement(sk);
+            }
+        }
+        // Nhóm 6: Kỹ năng nghề (typeSkill == 6)
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && sk.typeSkill == 6) {
+                if (!validSkills.contains(sk)) validSkills.addElement(sk);
+            }
+        }
+        // Nhóm 7: Các kỹ năng hợp lệ còn lại nếu chưa được thêm
+        for (int i = 0; i < source.size(); i++) {
+            Skill_Info sk = (Skill_Info)source.elementAt(i);
+            if (sk != null && sk.Lv_RQ != -1 && !validSkills.contains(sk)) {
                 validSkills.addElement(sk);
             }
         }
@@ -1046,12 +1127,13 @@ this.invenList.cmtoX = 0;
 private void updateSoftKeys() {
 
 backCMD = cmdClose;
+right = cmdClose;
 
 if (curMainTab == 0) {
 if (focusPane == 0 && selectedEquipIndex >= 0) {
 cmdAction.caption = "Đổi";
 cmdMenuAction.caption = "Đổi";
-center = cmdAction;
+left = cmdAction;
 center = cmdMenuAction;
 return;
 }
@@ -1073,7 +1155,7 @@ mVector mActions = cur.getActionInven((sbyte)0);
 if (mActions != null && mActions.size() > 0) {
 iCommand primaryCmd = (iCommand)mActions.elementAt(0);
 cmdAction.caption = primaryCmd.caption;
-center = cmdAction;
+left = cmdAction;
 
 if (mActions.size() > 1) {
 cmdMenuAction.caption = "Menu";
@@ -1084,45 +1166,62 @@ center = cmdAction;
 return;
 }
 }
-center = null;
+left = null;
 center = null;
 return;
 } else if (curMainTab == 1) {
 if (focusPane == 1) {
 cmdAction.caption = "+1 Điểm";
 cmdMenuAction.caption = "Cộng";
-center = cmdAction;
+left = cmdAction;
 center = cmdAction;
 } else {
-center = null;
+left = null;
 center = null;
 }
 return;
 } else if (curMainTab == 2) {
-if (focusPane == 1 && validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
-Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
-if (curSk != null && curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4)) {
-cmdAction.caption = "Gán Phím";
-cmdMenuAction.caption = "Gán Phím";
-center = cmdAction;
-center = cmdAction;
-return;
-}
-}
-center = null;
-center = null;
-return;
+    if (focusPane == 1 && validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+        Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+        if (curSk != null) {
+            bool canAdd = (curSk.typeDevil == 0 && curSk.typeSkill != 4 && curSk.typeSkill != 6 && Player.pointSkill > 0 && curSk.Lv_RQ > 0 && curSk.Lv_RQ < Skill_Info.maxLv);
+            bool canHotkey = (curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+
+            if (canAdd && canHotkey) {
+                cmdAction.caption = "Gán Ô";
+                cmdMenuAction.caption = "+ Điểm";
+                left = cmdMenuAction;
+                center = cmdAction;
+                return;
+            } else if (canHotkey) {
+                cmdAction.caption = "Gán Ô";
+                cmdMenuAction.caption = "Gán Ô";
+                left = cmdAction;
+                center = cmdAction;
+                return;
+            } else if (canAdd) {
+                cmdAction.caption = "+ Điểm";
+                cmdMenuAction.caption = "+ Điểm";
+                left = cmdAction;
+                center = cmdAction;
+                return;
+            }
+        }
+    }
+    left = null;
+    center = null;
+    return;
 } else if (curMainTab == 3) {
 cmdAction.caption = "Chi Tiết";
 cmdMenuAction.caption = "Chi Tiết";
-center = cmdAction;
+left = cmdAction;
 center = cmdAction;
 return;
 } else if (curMainTab == 4) {
 if (chucNangSubView == 0) {
 cmdAction.caption = "Mở";
 cmdMenuAction.caption = "Mở";
-center = cmdAction;
+left = cmdAction;
 center = cmdAction;
 return;
 } else if (chucNangSubView == 1) {
@@ -1130,11 +1229,11 @@ if (selectedDanhHieuInfo != null && selectedDanhHieuInfo.actionButtons != null &
 TitleActionBtn btn = (TitleActionBtn)selectedDanhHieuInfo.actionButtons.elementAt(0);
 cmdAction.caption = btn.name;
 cmdMenuAction.caption = btn.name;
-center = cmdAction;
+left = cmdAction;
 center = cmdAction;
 return;
 }
-center = null;
+left = null;
 center = null;
 return;
 } else if (chucNangSubView == 2) {
@@ -1143,11 +1242,11 @@ MainItem p = (MainItem)Player.vecPet.elementAt(selectedPetIndex);
 string petAct = (p != null && p.colorName == 1) ? "Tháo" : "Dùng";
 cmdAction.caption = petAct;
 cmdMenuAction.caption = petAct;
-center = cmdAction;
+left = cmdAction;
 center = cmdAction;
 return;
 }
-center = null;
+left = null;
 center = null;
 return;
 }
@@ -1184,6 +1283,32 @@ break;
 case 5:
 GlobalService.gI().Add_Point_Attribute((sbyte)selectedAttIndex, (short)subIndex);
 GameCanvas.end_Dialog();
+break;
+case 10:
+if (validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+if (curSk != null && inputDialogSkill != null) {
+int pts = 1;
+try {
+pts = int.Parse(inputDialogSkill.tfInput.getText());
+if (pts < 1) pts = 1;
+if (pts > Player.pointSkill) pts = Player.pointSkill;
+} catch (Exception) {
+pts = 1;
+}
+GlobalService.gI().Add_Point_Skill((short)curSk.indexHotKey, (short)pts);
+GameCanvas.end_Dialog();
+}
+}
+break;
+case 11:
+if (validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+if (curSk != null) {
+GlobalService.gI().Add_Point_Skill((short)curSk.indexHotKey, 1);
+GameCanvas.end_Dialog();
+}
+}
 break;
 }
 }
@@ -1252,8 +1377,17 @@ private void doPrimaryAction() {
         } else if (curMainTab == 1) {
             addPotentialPoint(selectedAttIndex);
         } else if (curMainTab == 2) {
-            if (focusPane == 1) {
-                openSkillHotkeyMenu();
+            if (focusPane == 1 && validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+                Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+                if (curSk != null) {
+                    bool canHotkey = (curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+                    bool canAdd = (curSk.typeDevil == 0 && curSk.typeSkill != 4 && curSk.typeSkill != 6 && Player.pointSkill > 0 && curSk.Lv_RQ > 0 && curSk.Lv_RQ < Skill_Info.maxLv);
+                    if (canHotkey) {
+                        openSkillHotkeyMenu();
+                    } else if (canAdd) {
+                        addPointSkill(curSk);
+                    }
+                }
             }
         } else if (curMainTab == 3) {
             openQuestDetails();
@@ -1355,6 +1489,37 @@ GameCanvas.clearKeyPressed();
 GameCanvas.menu.startAt(mActions, 2, cur.name);
 }
 }
+} else if (curMainTab == 2) {
+if (focusPane == 1 && validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+if (curSk != null) {
+bool canAdd = (curSk.typeDevil == 0 && curSk.typeSkill != 4 && curSk.typeSkill != 6 && Player.pointSkill > 0 && curSk.Lv_RQ > 0 && curSk.Lv_RQ < Skill_Info.maxLv);
+bool canHotkey = (curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+if (canAdd) {
+addPointSkill(curSk);
+} else if (canHotkey) {
+openSkillHotkeyMenu();
+}
+}
+}
+}
+}
+
+public void addPointSkill(Skill_Info sk) {
+if (sk == null) return;
+if (Player.mLvSkill != null && sk.indexHotKey >= 0 && sk.indexHotKey < Player.mLvSkill.Length) {
+if (Player.mLvSkill[sk.indexHotKey] >= Skill_Info.maxLv) {
+GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.maxLvSkill);
+return;
+}
+}
+if (Player.pointSkill > 1) {
+inputDialogSkill = GameCanvas.Start_Input_Dialog(T.nhappoint, new iCommand(T.cmdSetPoint, 10, 0, this), isNum: true, T.congDiem);
+GameCanvas.subDialog = inputDialogSkill;
+} else if (Player.pointSkill == 1) {
+GameCanvas.Start_Normal_DiaLog(T.add1Point, new iCommand(T.congDiem, 11, 0, this), isCmdClose: true);
+} else {
+GameCanvas.Start_Normal_Only_CmdClose_DiaLog("Bạn không còn điểm kỹ năng.");
 }
 }
 
@@ -1367,8 +1532,9 @@ return;
 if (curSk.typeSkill == 3 || curSk.typeSkill == 6) {
 return;
 }
-if ((LoadMap.specMap == 4 && curSk.typeSkill == 1) || (LoadMap.specMap != 4 && curSk.typeSkill == 4)) {
-GameCanvas.Start_Normal_Only_CmdClose_DiaLog("Kỹ năng này chỉ được sử dụng khi đánh trên biển");
+bool isSea = (LoadMap.specMap == 4 || (GameScreen.player != null && GameScreen.player.boatSea != null));
+if ((isSea && curSk.typeSkill != 4 && curSk.typeSkill != 2) || (!isSea && curSk.typeSkill == 4)) {
+GameCanvas.Start_Normal_Only_CmdClose_DiaLog(isSea ? "Kỹ năng này không thể sử dụng trên biển" : "Kỹ năng này chỉ được sử dụng khi đánh trên biển");
 return;
 }
 mVector mVector2 = new mVector();
@@ -1398,6 +1564,9 @@ GameCanvas.Start_Current_Dialog((MainDialog)msgDialog);
 }
 
 public void close() {
+    GameCanvas.clearAll();
+    GameCanvas.clearKeyHold();
+    GameCanvas.clearKeyPressed();
     if (curMainTab == 4 && chucNangSubView > 0) {
         chucNangSubView = 0;
         selectedDanhHieuInfo = null;
@@ -1550,29 +1719,66 @@ public void close() {
 
     public void handleKeyPress() {
         if (keyFireCoolDown > 0) return;
-        // Key 5 / OK / FIRE / Enter (5, 12, 40)
-        if (GameCanvas.isKeyPressed(5) || GameCanvas.keyMyPressed[5] || GameCanvas.isKeyPressed(12) || GameCanvas.keyMyPressed[12] || GameCanvas.isKeyPressed(40) || GameCanvas.keyMyPressed[40]) {
+
+        // Softkey Back/Close on Key 13 / 41 (Back/Right/Esc/F2)
+        if (GameCanvas.keyMyHold[13] || GameCanvas.isKeyPressed(13) || GameCanvas.keyMyHold[41] || GameCanvas.isKeyPressed(41)) {
+            GameCanvas.clearAll();
+            GameCanvas.clearKeyHold();
+            GameCanvas.clearKeyPressed();
+            if (curMainTab == 4 && chucNangSubView != 0) {
+                chucNangSubView = 0;
+                selectedPetInfo = null;
+                selectedDanhHieuInfo = null;
+                selectedChucNangIndex = 0;
+                focusPane = 1;
+                updateSoftKeys();
+                return;
+            }
+            close();
+            return;
+        }
+
+        // Key 5 / OK / FIRE / Enter
+        if (GameCanvas.isKeyPressed(5) || GameCanvas.keyMyPressed[5]) {
             keyFireCoolDown = 8;
             GameCanvas.clearAll();
             GameCanvas.clearKeyHold();
             GameCanvas.clearKeyPressed();
-            doPrimaryAction();
+            if (center != null) {
+                center.perform();
+            } else {
+                doPrimaryAction();
+            }
+            return;
+        }
+
+        // Key 12 / 40 (Left Softkey / F1)
+        if (GameCanvas.isKeyPressed(12) || GameCanvas.keyMyPressed[12] || GameCanvas.isKeyPressed(40) || GameCanvas.keyMyPressed[40]) {
+            keyFireCoolDown = 8;
+            GameCanvas.clearAll();
+            GameCanvas.clearKeyHold();
+            GameCanvas.clearKeyPressed();
+            if (left != null) {
+                left.perform();
+            } else {
+                doPrimaryAction();
+            }
             return;
         }
 
         // Focus 2: Top Nav Tabs
         if (focusPane == 2) {
-            if (GameCanvas.isKeyPressed(0)) {
+            if (GameCanvas.keyMove(0)) {
                 GameCanvas.ClearkeyMove(0);
                 switchTab(curMainTab - 1, true);
                 return;
             }
-            if (GameCanvas.isKeyPressed(2)) {
+            if (GameCanvas.keyMove(2)) {
                 GameCanvas.ClearkeyMove(2);
                 switchTab(curMainTab + 1, true);
                 return;
             }
-            if (GameCanvas.isKeyPressed(3)) {
+            if (GameCanvas.keyMove(3)) {
                 GameCanvas.ClearkeyMove(3);
                 if (curMainTab == 0) {
                     focusPane = 1;
@@ -1600,7 +1806,7 @@ public void close() {
 
         // Focus 3: Filter Bar (Tab 0)
         if (focusPane == 3) {
-            if (GameCanvas.isKeyPressed(0)) {
+            if (GameCanvas.keyMove(0)) {
                 GameCanvas.ClearkeyMove(0);
                 selectedItemInfo = null;
                 selectedInvenIndex = -1;
@@ -1610,7 +1816,7 @@ public void close() {
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(2)) {
+            if (GameCanvas.keyMove(2)) {
                 GameCanvas.ClearkeyMove(2);
                 selectedItemInfo = null;
                 selectedInvenIndex = -1;
@@ -1620,13 +1826,13 @@ public void close() {
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(1)) {
+            if (GameCanvas.keyMove(1)) {
                 GameCanvas.ClearkeyMove(1);
                 focusPane = 2; // Up to Top Nav Tabs
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(3)) {
+            if (GameCanvas.keyMove(3)) {
                 GameCanvas.ClearkeyMove(3);
                 focusPane = 1; // Down to Inven Grid
                 if (selectedInvenIndex < 0 && filteredItems.size() > 0) {
@@ -1649,14 +1855,6 @@ public void close() {
             handleKeypadTab3();
         } else if (curMainTab == 4) {
             handleKeypadTab4();
-        }
-
-        // Softkey Menu on Key 13 / 41 (Back/Right)
-        if (GameCanvas.keyMyHold[13] || GameCanvas.isKeyPressed(13) || GameCanvas.keyMyHold[41] || GameCanvas.isKeyPressed(41)) {
-            GameCanvas.clearAll();
-            GameCanvas.clearAll();
-            close();
-            return;
         }
     }
 
@@ -1682,7 +1880,7 @@ public void close() {
                 return;
             }
 
-            if (GameCanvas.isKeyPressed(0) && selectedInvenIndex >= 0 && selectedInvenIndex % cols == 0) {
+            if (GameCanvas.keyMove(0) && selectedInvenIndex >= 0 && selectedInvenIndex % cols == 0) {
                 GameCanvas.ClearkeyMove(0);
                 focusPane = 0;
                 int row = selectedInvenIndex / cols;
@@ -1694,7 +1892,7 @@ public void close() {
                 return;
             }
 
-            if (GameCanvas.isKeyPressed(1) && selectedInvenIndex >= 0 && selectedInvenIndex < cols) {
+            if (GameCanvas.keyMove(1) && selectedInvenIndex >= 0 && selectedInvenIndex < cols) {
                 GameCanvas.ClearkeyMove(1);
                 focusPane = 3; // Len Filter Bar
                 updateSoftKeys();
@@ -1702,10 +1900,10 @@ public void close() {
             }
 
             bool hasKeypadMove = false;
-            if (GameCanvas.isKeyPressed(0)) { selectedInvenIndex--; GameCanvas.ClearkeyMove(0); hasKeypadMove = true; }
-            if (GameCanvas.isKeyPressed(2)) { selectedInvenIndex++; GameCanvas.ClearkeyMove(2); hasKeypadMove = true; }
-            if (GameCanvas.isKeyPressed(1)) { selectedInvenIndex -= cols; GameCanvas.ClearkeyMove(1); hasKeypadMove = true; }
-            if (GameCanvas.isKeyPressed(3)) { selectedInvenIndex += cols; GameCanvas.ClearkeyMove(3); hasKeypadMove = true; }
+            if (GameCanvas.keyMove(0)) { selectedInvenIndex--; GameCanvas.ClearkeyMove(0); hasKeypadMove = true; }
+            if (GameCanvas.keyMove(2)) { selectedInvenIndex++; GameCanvas.ClearkeyMove(2); hasKeypadMove = true; }
+            if (GameCanvas.keyMove(1)) { selectedInvenIndex -= cols; GameCanvas.ClearkeyMove(1); hasKeypadMove = true; }
+            if (GameCanvas.keyMove(3)) { selectedInvenIndex += cols; GameCanvas.ClearkeyMove(3); hasKeypadMove = true; }
 
             if (hasKeypadMove) {
                 if (selectedInvenIndex < 0) selectedInvenIndex = 0;
@@ -1758,7 +1956,7 @@ public void close() {
             int baseSlot = (equipSubTab == 1) ? 8 : 0;
             if (selectedEquipIndex < baseSlot) selectedEquipIndex = baseSlot;
 
-            if (GameCanvas.isKeyPressed(2)) {
+            if (GameCanvas.keyMove(2)) {
                 GameCanvas.ClearkeyMove(2);
                 if ((selectedEquipIndex - baseSlot) % 2 == 0) {
                     selectedEquipIndex++;
@@ -1776,14 +1974,14 @@ public void close() {
                     updateSoftKeys();
                     return;
                 }
-            } else if (GameCanvas.isKeyPressed(0)) {
+            } else if (GameCanvas.keyMove(0)) {
                 GameCanvas.ClearkeyMove(0);
                 if ((selectedEquipIndex - baseSlot) % 2 == 1) {
                     selectedEquipIndex--;
                     MainItem eq = (MainItem)GameScreen.player.hashEquip.get("" + selectedEquipIndex);
                     selectItem(eq, 0, 0);
                 }
-            } else if (GameCanvas.isKeyPressed(1)) {
+            } else if (GameCanvas.keyMove(1)) {
                 GameCanvas.ClearkeyMove(1);
                 if (selectedEquipIndex - baseSlot >= 2) {
                     selectedEquipIndex -= 2;
@@ -1801,7 +1999,7 @@ public void close() {
                     updateSoftKeys();
                     return;
                 }
-            } else if (GameCanvas.isKeyPressed(3)) {
+            } else if (GameCanvas.keyMove(3)) {
                 GameCanvas.ClearkeyMove(3);
                 if (selectedEquipIndex - baseSlot <= 5) {
                     selectedEquipIndex += 2;
@@ -1832,32 +2030,32 @@ public void close() {
     private void handleKeypadTab1() {
         if (focusPane == 0) {
             // Left Table: Scroll full stats list
-            if (GameCanvas.isKeyPressed(1) && infoList != null && infoList.cmx <= 0) {
+            if (GameCanvas.keyMove(1) && infoList != null && infoList.cmx <= 0) {
                 GameCanvas.ClearkeyMove(1);
                 focusPane = 2; // Jump up to Top Nav Tabs
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(1) && infoList != null) {
+            if (GameCanvas.keyMove(1) && infoList != null) {
                 GameCanvas.ClearkeyMove(1);
                 infoList.cmtoX -= 18;
                 if (infoList.cmtoX < 0) infoList.cmtoX = 0;
             }
-            if (GameCanvas.isKeyPressed(3) && infoList != null) {
+            if (GameCanvas.keyMove(3) && infoList != null) {
                 GameCanvas.ClearkeyMove(3);
                 infoList.cmtoX += 18;
                 if (infoList.cmtoX > infoList.cmxLim) infoList.cmtoX = infoList.cmxLim;
             }
 
             // Key 6 / Right moves to Tiem Nang
-            if (GameCanvas.isKeyPressed(2)) {
+            if (GameCanvas.keyMove(2)) {
                 GameCanvas.ClearkeyMove(2);
                 focusPane = 1;
                 selectedAttIndex = 0;
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(0)) {
+            if (GameCanvas.keyMove(0)) {
                 GameCanvas.ClearkeyMove(0);
                 switchTab(curMainTab - 1);
                 return;
@@ -1867,14 +2065,14 @@ public void close() {
             int maxAtt = (Player.mAttribute != null && Player.mAttribute.Length > 0) ? Player.mAttribute.Length : 5;
             bool keyMoved = false;
 
-            if (GameCanvas.isKeyPressed(1) && selectedAttIndex == 0) {
+            if (GameCanvas.keyMove(1) && selectedAttIndex == 0) {
                 GameCanvas.ClearkeyMove(1);
                 focusPane = 2; // Jump up to Top Nav Tabs
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(1)) { selectedAttIndex--; GameCanvas.ClearkeyMove(1); keyMoved = true; }
-            if (GameCanvas.isKeyPressed(3)) { selectedAttIndex++; GameCanvas.ClearkeyMove(3); keyMoved = true; }
+            if (GameCanvas.keyMove(1)) { selectedAttIndex--; GameCanvas.ClearkeyMove(1); keyMoved = true; }
+            if (GameCanvas.keyMove(3)) { selectedAttIndex++; GameCanvas.ClearkeyMove(3); keyMoved = true; }
             if (selectedAttIndex < 0) selectedAttIndex = maxAtt - 1;
             if (selectedAttIndex >= maxAtt) selectedAttIndex = 0;
 
@@ -1892,13 +2090,13 @@ public void close() {
             }
 
             // Key 4 / Left moves to Chi So
-            if (GameCanvas.isKeyPressed(0)) {
+            if (GameCanvas.keyMove(0)) {
                 GameCanvas.ClearkeyMove(0);
                 focusPane = 0;
                 updateSoftKeys();
                 return;
             }
-            if (GameCanvas.isKeyPressed(2)) {
+            if (GameCanvas.keyMove(2)) {
                 GameCanvas.ClearkeyMove(2);
                 switchTab(curMainTab + 1);
                 return;
@@ -1907,25 +2105,52 @@ public void close() {
     }
 
     private void handleKeypadTab2() {
-        int total = validSkills.size();
+        int total = (validSkills != null) ? validSkills.size() : 0;
         if (total > 0 && focusPane == 1) {
-            bool hasKeyMove = false;
-            if (GameCanvas.isKeyPressed(1) && selectedSkillIndex == 0) {
-                GameCanvas.ClearkeyMove(1);
-                focusPane = 2;
+            // Scroll detail pane using * (10) and # (11)
+            if (GameCanvas.isKeyPressed(10) || GameCanvas.keyMyHold[10]) {
+                GameCanvas.ClearkeyMove(10);
+                GameCanvas.clearKeyHold(10);
+                if (skillDetailList != null) {
+                    skillDetailList.cmtoX -= 25;
+                    if (skillDetailList.cmtoX < 0) skillDetailList.cmtoX = 0;
+                }
                 return;
             }
-            if (GameCanvas.isKeyPressed(1)) { selectedSkillIndex--; GameCanvas.ClearkeyMove(1); hasKeyMove = true; }
-            if (GameCanvas.isKeyPressed(3)) { selectedSkillIndex++; GameCanvas.ClearkeyMove(3); hasKeyMove = true; }
-            if (GameCanvas.isKeyPressed(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
-            if (GameCanvas.isKeyPressed(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
+            if (GameCanvas.isKeyPressed(11) || GameCanvas.keyMyHold[11]) {
+                GameCanvas.ClearkeyMove(11);
+                GameCanvas.clearKeyHold(11);
+                if (skillDetailList != null) {
+                    skillDetailList.cmtoX += 25;
+                    if (skillDetailList.cmtoX > skillDetailList.cmxLim) skillDetailList.cmtoX = skillDetailList.cmxLim;
+                }
+                return;
+            }
+
+            bool hasKeyMove = false;
+            if (GameCanvas.keyMove(1) && selectedSkillIndex == 0) {
+                GameCanvas.ClearkeyMove(1);
+                focusPane = 2;
+                updateSoftKeys();
+                return;
+            }
+            if (GameCanvas.keyMove(1)) { selectedSkillIndex--; GameCanvas.ClearkeyMove(1); hasKeyMove = true; }
+            if (GameCanvas.keyMove(3)) { selectedSkillIndex++; GameCanvas.ClearkeyMove(3); hasKeyMove = true; }
+            if (GameCanvas.keyMove(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
+            if (GameCanvas.keyMove(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
             if (selectedSkillIndex < 0) selectedSkillIndex = 0;
             if (selectedSkillIndex >= total) selectedSkillIndex = total - 1;
 
-            if (hasKeyMove && skillList != null) {
-                int slotY = selectedSkillIndex * 34;
-                if (slotY < skillList.cmx) skillList.cmtoX = slotY;
-                if (slotY + 34 > skillList.cmx + (h - 56)) skillList.cmtoX = slotY + 34 - (h - 56);
+            if (hasKeyMove) {
+                if (skillDetailList != null) {
+                    skillDetailList.cmx = 0;
+                    skillDetailList.cmtoX = 0;
+                }
+                if (skillList != null) {
+                    int slotY = selectedSkillIndex * 34;
+                    if (slotY < skillList.cmx) skillList.cmtoX = slotY;
+                    if (slotY + 34 > skillList.cmx + (h - 56)) skillList.cmtoX = slotY + 34 - (h - 56);
+                }
             }
             updateSoftKeys();
         }
@@ -1935,15 +2160,15 @@ public void close() {
         int total = (Player.vecQuest != null) ? Player.vecQuest.size() : 0;
         if (total > 0 && focusPane == 1) {
             bool hasKeyMove = false;
-            if (GameCanvas.isKeyPressed(1) && selectedQuestIndex == 0) {
+            if (GameCanvas.keyMove(1) && selectedQuestIndex == 0) {
                 GameCanvas.ClearkeyMove(1);
                 focusPane = 2;
                 return;
             }
-            if (GameCanvas.isKeyPressed(1)) { selectedQuestIndex--; GameCanvas.ClearkeyMove(1); hasKeyMove = true; }
-            if (GameCanvas.isKeyPressed(3)) { selectedQuestIndex++; GameCanvas.ClearkeyMove(3); hasKeyMove = true; }
-            if (GameCanvas.isKeyPressed(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
-            if (GameCanvas.isKeyPressed(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
+            if (GameCanvas.keyMove(1)) { selectedQuestIndex--; GameCanvas.ClearkeyMove(1); hasKeyMove = true; }
+            if (GameCanvas.keyMove(3)) { selectedQuestIndex++; GameCanvas.ClearkeyMove(3); hasKeyMove = true; }
+            if (GameCanvas.keyMove(0)) { GameCanvas.ClearkeyMove(0); switchTab(curMainTab - 1); return; }
+            if (GameCanvas.keyMove(2)) { GameCanvas.ClearkeyMove(2); switchTab(curMainTab + 1); return; }
             if (selectedQuestIndex < 0) selectedQuestIndex = 0;
             if (selectedQuestIndex >= total) selectedQuestIndex = total - 1;
 
@@ -1965,7 +2190,7 @@ public void close() {
                 bool keyMoved = false;
 
                 if (cols == 2) {
-                    if (GameCanvas.isKeyPressed(1)) {
+                    if (GameCanvas.keyMove(1)) {
                         GameCanvas.ClearkeyMove(1);
                         if (selectedChucNangIndex < 2) {
                             focusPane = 2;
@@ -1974,13 +2199,13 @@ public void close() {
                         }
                         selectedChucNangIndex -= 2;
                         keyMoved = true;
-                    } else if (GameCanvas.isKeyPressed(3)) {
+                    } else if (GameCanvas.keyMove(3)) {
                         GameCanvas.ClearkeyMove(3);
                         if (selectedChucNangIndex + 2 < count) {
                             selectedChucNangIndex += 2;
                             keyMoved = true;
                         }
-                    } else if (GameCanvas.isKeyPressed(0)) {
+                    } else if (GameCanvas.keyMove(0)) {
                         GameCanvas.ClearkeyMove(0);
                         if (selectedChucNangIndex % 2 == 1) {
                             selectedChucNangIndex--;
@@ -1989,7 +2214,7 @@ public void close() {
                             switchTab(curMainTab - 1);
                             return;
                         }
-                    } else if (GameCanvas.isKeyPressed(2)) {
+                    } else if (GameCanvas.keyMove(2)) {
                         GameCanvas.ClearkeyMove(2);
                         if (selectedChucNangIndex % 2 == 0 && selectedChucNangIndex + 1 < count) {
                             selectedChucNangIndex++;
@@ -2000,25 +2225,25 @@ public void close() {
                         }
                     }
                 } else {
-                    if (GameCanvas.isKeyPressed(1) && selectedChucNangIndex == 0) {
+                    if (GameCanvas.keyMove(1) && selectedChucNangIndex == 0) {
                         GameCanvas.ClearkeyMove(1);
                         focusPane = 2;
                         updateSoftKeys();
                         return;
                     }
-                    if (GameCanvas.isKeyPressed(1)) {
+                    if (GameCanvas.keyMove(1)) {
                         selectedChucNangIndex--;
                         GameCanvas.ClearkeyMove(1);
                         keyMoved = true;
-                    } else if (GameCanvas.isKeyPressed(3)) {
+                    } else if (GameCanvas.keyMove(3)) {
                         selectedChucNangIndex++;
                         GameCanvas.ClearkeyMove(3);
                         keyMoved = true;
-                    } else if (GameCanvas.isKeyPressed(0)) {
+                    } else if (GameCanvas.keyMove(0)) {
                         GameCanvas.ClearkeyMove(0);
                         switchTab(curMainTab - 1);
                         return;
-                    } else if (GameCanvas.isKeyPressed(2)) {
+                    } else if (GameCanvas.keyMove(2)) {
                         GameCanvas.ClearkeyMove(2);
                         switchTab(curMainTab + 1);
                         return;
@@ -2028,7 +2253,7 @@ public void close() {
                 if (selectedChucNangIndex < 0) selectedChucNangIndex = 0;
                 if (selectedChucNangIndex >= count) selectedChucNangIndex = count - 1;
 
-                if (featureMenuList != null) {
+                if (keyMoved && featureMenuList != null) {
                     int row = selectedChucNangIndex / cols;
                     int itemY = row * (itemH + 4);
                     int listH = h - 34 - 29;
@@ -2041,21 +2266,21 @@ public void close() {
             int dhCount = (Player.vecDanhHieu != null) ? Player.vecDanhHieu.size() : 0;
             if (focusPane == 1 && dhCount > 0) {
                 bool keyMoved = false;
-                if (GameCanvas.isKeyPressed(1) && selectedDanhHieuIndex == 0) {
+                if (GameCanvas.keyMove(1) && selectedDanhHieuIndex == 0) {
                     GameCanvas.ClearkeyMove(1);
                     focusPane = 2;
                     updateSoftKeys();
                     return;
                 }
-                if (GameCanvas.isKeyPressed(1)) {
+                if (GameCanvas.keyMove(1)) {
                     selectedDanhHieuIndex--;
                     GameCanvas.ClearkeyMove(1);
                     keyMoved = true;
-                } else if (GameCanvas.isKeyPressed(3)) {
+                } else if (GameCanvas.keyMove(3)) {
                     selectedDanhHieuIndex++;
                     GameCanvas.ClearkeyMove(3);
                     keyMoved = true;
-                } else if (GameCanvas.isKeyPressed(0)) {
+                } else if (GameCanvas.keyMove(0)) {
                     GameCanvas.ClearkeyMove(0);
                     chucNangSubView = 0;
                     selectedDanhHieuInfo = null;
@@ -2083,13 +2308,13 @@ public void close() {
             if (cols < 1) cols = 1;
 
             if (focusPane == 1 && total > 0) {
-                if (GameCanvas.isKeyPressed(1) && selectedPetIndex < cols) {
+                if (GameCanvas.keyMove(1) && selectedPetIndex < cols) {
                     GameCanvas.ClearkeyMove(1);
                     focusPane = 2;
                     updateSoftKeys();
                     return;
                 }
-                if (GameCanvas.isKeyPressed(0) && selectedPetIndex % cols == 0) {
+                if (GameCanvas.keyMove(0) && selectedPetIndex % cols == 0) {
                     GameCanvas.ClearkeyMove(0);
                     chucNangSubView = 0;
                     selectedPetInfo = null;
@@ -2097,10 +2322,10 @@ public void close() {
                     return;
                 }
                 bool hasPetMove = false;
-                if (GameCanvas.isKeyPressed(0)) { selectedPetIndex--; GameCanvas.ClearkeyMove(0); hasPetMove = true; }
-                if (GameCanvas.isKeyPressed(2)) { selectedPetIndex++; GameCanvas.ClearkeyMove(2); hasPetMove = true; }
-                if (GameCanvas.isKeyPressed(1)) { selectedPetIndex -= cols; GameCanvas.ClearkeyMove(1); hasPetMove = true; }
-                if (GameCanvas.isKeyPressed(3)) { selectedPetIndex += cols; GameCanvas.ClearkeyMove(3); hasPetMove = true; }
+                if (GameCanvas.keyMove(0)) { selectedPetIndex--; GameCanvas.ClearkeyMove(0); hasPetMove = true; }
+                if (GameCanvas.keyMove(2)) { selectedPetIndex++; GameCanvas.ClearkeyMove(2); hasPetMove = true; }
+                if (GameCanvas.keyMove(1)) { selectedPetIndex -= cols; GameCanvas.ClearkeyMove(1); hasPetMove = true; }
+                if (GameCanvas.keyMove(3)) { selectedPetIndex += cols; GameCanvas.ClearkeyMove(3); hasPetMove = true; }
                 if (selectedPetIndex < 0) selectedPetIndex = 0;
                 if (selectedPetIndex >= total) selectedPetIndex = total - 1;
                 MainItem pet = (MainItem)Player.vecPet.elementAt(selectedPetIndex);
@@ -2152,7 +2377,7 @@ public void close() {
             } else if (curMainTab == 4) {
                 paintTabChucNang(g);
             }
-        } catch (Exception e) {}
+        } catch (Exception) {}
 
 // Side money box removed for clean parchment UI
 
@@ -2207,7 +2432,7 @@ public void close() {
                 if (showBadge && MainEvent.imgNew != null && GameCanvas.gameTick % 10 < 8) {
                     g.drawImage(MainEvent.imgNew, curX + tabW - 8, startY + 3, 3);
                 }
-            } catch (Exception e) {}
+            } catch (Exception) {}
         }
     }
 
@@ -2249,7 +2474,6 @@ public void close() {
         int equipAreaX = paneX + 4;
         int equipAreaY = paneY + 28;
         int equipAreaW = leftPaneW - 8;
-        int equipAreaH = 120;
 
         int tabBtnW = (equipAreaW - 6) / 2;
         int tabBtnH = 13;
@@ -2572,7 +2796,9 @@ public void close() {
             if (lastRow >= totalRows) lastRow = totalRows - 1;
 
             int startSlot = firstRow * cols;
-            int endSlot = System.Math.Min(totalSlots, (lastRow + 1) * cols);
+            int endSlot = Math.Min(totalSlots, (lastRow + 1) * cols);
+            int prevW = MainTab.wItem;
+            MainTab.wItem = invSlotSize;
 
             for (int i = startSlot; i < endSlot; i++) {
                 int col = i % cols;
@@ -2596,14 +2822,6 @@ public void close() {
                             g.drawRect(slotX, slotY, invSlotSize - 1, invSlotSize - 1);
                         }
 
-                        if (item.typeObject == 4) {
-                            if (item.numPotion > 1) {
-                                mFont.tahoma_7_white.drawString(g, "" + item.numPotion, slotX + invSlotSize - 2, slotY + invSlotSize - 9, 1);
-                            }
-                        } else if (item.numPotion > 1) {
-                            mFont.tahoma_7_white.drawString(g, "" + item.numPotion, slotX + invSlotSize - 2, slotY + invSlotSize - 9, 1);
-                        }
-
                         if (item.LvUpgrade > 0) {
                             mFont.tahoma_7b_green.drawString(g, "+" + item.LvUpgrade, slotX + 2, slotY + 1, 0);
                         }
@@ -2619,6 +2837,7 @@ public void close() {
                     }
                 }
             }
+            MainTab.wItem = prevW;
 
             GameCanvas.resetTrans(g);
             g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
@@ -2727,11 +2946,9 @@ item.paint(g, sx + size / 2, sy + size / 2, size);
 if (item.LvUpgrade > 0) {
     mFont.tahoma_7b_green.drawString(g, "+" + item.LvUpgrade, sx + 2, sy + 1, 0);
 }
-} else if (AvMain.fraEquip != null) {
+} else {
 int frameIdx = equipType % 8;
-if (frameIdx < AvMain.fraEquip.nFrame) {
-AvMain.fraEquip.drawFrame(frameIdx, sx + size / 2, sy + size / 2, 0, 3, g);
-}
+AvMain.paintEquipSilhouette(g, frameIdx, sx + size / 2, sy + size / 2);
 }
 
 if (isDivine) {
@@ -2865,7 +3082,7 @@ curY += 15;
 mFont.tahoma_7_yellow.drawString(g, "Kháng: " + Player.InfoShortEquip[3], listX + 4, curY, 0);
 curY += 15;
 }
-} catch (Exception var20) {
+} catch (Exception) {
 } finally {
 GameCanvas.resetTrans(g);
 g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
@@ -3118,10 +3335,13 @@ g.translate(0, -attriList.cmx);
                 }
                 mFont.tahoma_7_green.drawString(g, tagType, rightPaneX + 42, rightPaneY + 22, 0);
 
-                bool canAssignKey = (curSk.Lv_RQ >= 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+                bool canAddPoint = (curSk.typeDevil == 0 && curSk.typeSkill != 4 && curSk.typeSkill != 6 && Player.pointSkill > 0 && curSk.Lv_RQ > 0 && curSk.Lv_RQ < Skill_Info.maxLv);
+                bool canAssignKey = (curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+                bool hasBottomAction = canAddPoint || canAssignKey;
+
                 int detailViewY = rightPaneY + 38;
                 int detailViewW = rightPaneW - 8;
-                int detailViewH = rightPaneH - 38 - (canAssignKey ? 26 : 4);
+                int detailViewH = rightPaneH - 38 - (hasBottomAction ? 28 : 6);
 
                 if (skillDetailList != null) {
                     g.setClip(rightPaneX + 4, detailViewY, detailViewW, detailViewH);
@@ -3162,44 +3382,169 @@ g.translate(0, -attriList.cmx);
                         }
                     }
 
+                    // Sát thương chiêu
+                    if (curSk.damage > 0 && curSk.typeSkill != 2 && curSk.typeSkill != 3 && curSk.typeSkill != 6) {
+                        mFont.tahoma_7_white.drawString(g, "Sát thương: " + curSk.damage, rightPaneX + 14, curDetailY, 0);
+                        curDetailY += 14;
+                    }
+
+                    // MP tiêu hao
                     if (curSk.manaLost > 0) {
                         mFont.tahoma_7_blue.drawString(g, "Tiêu hao: " + curSk.manaLost + " MP", rightPaneX + 14, curDetailY, 0);
                         curDetailY += 14;
                     }
 
+                    // Thời gian hồi chiêu
                     if (curSk.timeDelay > 0) {
-                        mFont.tahoma_7_yellow.drawString(g, "Thời gian hồi: " + (curSk.timeDelay / 1000) + "." + ((curSk.timeDelay % 1000) / 100) + " giây", rightPaneX + 14, curDetailY, 0);
+                        mFont.tahoma_7_yellow.drawString(g, "Thời gian hồi: " + MainItem.getTimeDelay(curSk.timeDelay), rightPaneX + 14, curDetailY, 0);
                         curDetailY += 14;
                     }
 
+                    // Phạm vi sử dụng
                     if (curSk.range > 0) {
                         mFont.tahoma_7_white.drawString(g, "Phạm vi: " + curSk.range + " px", rightPaneX + 14, curDetailY, 0);
                         curDetailY += 14;
                     }
 
+                    // Số mục tiêu
                     if (curSk.nTarget > 0) {
                         mFont.tahoma_7_white.drawString(g, "Số mục tiêu: " + curSk.nTarget, rightPaneX + 14, curDetailY, 0);
                         curDetailY += 14;
                     }
 
-                    g.setColor(0x886633);
-                    g.drawLine(rightPaneX + 14, curDetailY + 2, rightPaneX + rightPaneW - 14, curDetailY + 2);
-                    curDetailY += 8;
+                    // Phạm vi lan
+                    if (curSk.rangeLan > 0) {
+                        mFont.tahoma_7_white.drawString(g, "Phạm vi lan: " + curSk.rangeLan + " px", rightPaneX + 14, curDetailY, 0);
+                        curDetailY += 14;
+                    }
 
-                    if (curSk.strInfo != null && curSk.strInfo.Length > 0) {
-                        for (int lineIdx = 0; lineIdx < curSk.strInfo.Length; lineIdx++) {
-                            string infoLine = curSk.strInfo[lineIdx];
-                            if (infoLine != null && infoLine.Length > 0) {
-                                string[] wrappedLines = mFont.tahoma_7_white.splitFontArray(infoLine, rightPaneW - 28);
-                                if (wrappedLines != null) {
-                                    for (int wl = 0; wl < wrappedLines.Length; wl++) {
-                                        mFont.tahoma_7_white.drawString(g, wrappedLines[wl], rightPaneX + 14, curDetailY, 0);
+                    // Thuộc tính cộng thêm & Hiệu ứng đặc biệt từ vecAtt
+                    if (curSk.vecAtt != null && curSk.vecAtt.size() > 0) {
+                        int specTime = 0, specRate = 0, specId = 0, bocPhaRate = 0, bocPhaDmg = 0;
+                        bool hasAttHeader = false;
+
+                        for (int j = 0; j < curSk.vecAtt.size(); j++) {
+                            MainInfoItem attItem = (MainInfoItem)curSk.vecAtt.elementAt(j);
+                            if (attItem == null) continue;
+
+                            if (attItem.id >= 28 && attItem.id < 32) {
+                                if (attItem.id == 28) specId = attItem.value;
+                                else if (attItem.id == 29) specRate = attItem.value;
+                                else if (attItem.id == 30) specTime = attItem.value;
+                            } else if (attItem.id >= 64 && attItem.id <= 65) {
+                                if (attItem.id == 64) bocPhaDmg = attItem.value;
+                                else if (attItem.id == 65) bocPhaRate = attItem.value;
+                            } else {
+                                if (!hasAttHeader) {
+                                    g.setColor(0x886633);
+                                    g.drawLine(rightPaneX + 14, curDetailY + 2, rightPaneX + rightPaneW - 14, curDetailY + 2);
+                                    curDetailY += 6;
+                                    hasAttHeader = true;
+                                }
+
+                                string attName = MainItem.getAttributeNameSafe(attItem.id);
+                                sbyte isPer = MainItem.getAttributePercentSafe(attItem.id);
+                                sbyte colorVal = (attItem.colorMain != 0) ? attItem.colorMain : MainItem.getAttributeColorSafe(attItem.id);
+                                string valFormatted = (attItem.value > 0 ? "+" : "") + MainItem.strGetPercent(attItem.value, isPer);
+                                string fullLine = attName + ": " + valFormatted;
+
+                                mFont f = AvMain.setTextColor(colorVal);
+                                if (f == null) f = mFont.tahoma_7_white;
+                                string[] wrapped = f.splitFontArray(fullLine, rightPaneW - 28);
+                                if (wrapped != null) {
+                                    for (int wl = 0; wl < wrapped.Length; wl++) {
+                                        f.drawString(g, wrapped[wl], rightPaneX + 14, curDetailY, 0);
                                         curDetailY += 13;
                                     }
                                 }
                             }
                         }
+
+                        if (specTime > 0) {
+                            if (!hasAttHeader) {
+                                g.setColor(0x886633);
+                                g.drawLine(rightPaneX + 14, curDetailY + 2, rightPaneX + rightPaneW - 14, curDetailY + 2);
+                                curDetailY += 6;
+                                hasAttHeader = true;
+                            }
+                            string effName = "null";
+                            if (specId >= 0 && specId < T.mEffSpec.Length) {
+                                effName = T.mEffSpec[specId];
+                            }
+                            string specStr = MainItem.strGetPercent(specRate, 1) + " " + T.gay + " " + effName + " " + T.trong + " " + MainItem.strGetPercent(specTime, 10);
+                            string[] wrappedSpec = mFont.tahoma_7_yellow.splitFontArray(specStr, rightPaneW - 28);
+                            if (wrappedSpec != null) {
+                                for (int wl = 0; wl < wrappedSpec.Length; wl++) {
+                                    mFont.tahoma_7_yellow.drawString(g, wrappedSpec[wl], rightPaneX + 14, curDetailY, 0);
+                                    curDetailY += 13;
+                                }
+                            }
+                        }
+
+                        if (bocPhaDmg > 0) {
+                            if (!hasAttHeader) {
+                                g.setColor(0x886633);
+                                g.drawLine(rightPaneX + 14, curDetailY + 2, rightPaneX + rightPaneW - 14, curDetailY + 2);
+                                curDetailY += 6;
+                                hasAttHeader = true;
+                            }
+                            string bpStr = MainItem.strGetPercent(bocPhaRate, 1) + " " + T.bocPhaAtt + " " + MainItem.strGetPercent(bocPhaDmg, 1);
+                            string[] wrappedBp = mFont.tahoma_7_yellow.splitFontArray(bpStr, rightPaneW - 28);
+                            if (wrappedBp != null) {
+                                for (int wl = 0; wl < wrappedBp.Length; wl++) {
+                                    mFont.tahoma_7_yellow.drawString(g, wrappedBp[wl], rightPaneX + 14, curDetailY, 0);
+                                    curDetailY += 13;
+                                }
+                            }
+                        }
                     }
+
+                    // idEffSpec hiệu ứng đặc biệt
+                    if (curSk.idEffSpec > 0) {
+                        string effSpecDesc = "Hiệu ứng: " + curSk.perEffSpec + "% " + ((curSk.idEffSpec >= 0 && curSk.idEffSpec < T.mEffSpec.Length) ? T.mEffSpec[curSk.idEffSpec] : ("" + curSk.idEffSpec)) + " (" + (curSk.timeEffSpec / 1000) + "s)";
+                        string[] wrappedEff = mFont.tahoma_7_yellow.splitFontArray(effSpecDesc, rightPaneW - 28);
+                        if (wrappedEff != null) {
+                            for (int wl = 0; wl < wrappedEff.Length; wl++) {
+                                mFont.tahoma_7_yellow.drawString(g, wrappedEff[wl], rightPaneX + 14, curDetailY, 0);
+                                curDetailY += 13;
+                            }
+                        }
+                    }
+
+                    // Mô tả chi tiết kỹ năng (curSk.info hoặc fallback curSk.strInfo)
+                    string rawDesc = curSk.info;
+                    if ((rawDesc == null || rawDesc.Length == 0) && curSk.strInfo != null && curSk.strInfo.Length > 0) {
+                        for (int sIdx = 0; sIdx < curSk.strInfo.Length; sIdx++) {
+                            if (curSk.strInfo[sIdx] != null && curSk.strInfo[sIdx].Length > 0) {
+                                if (rawDesc == null || rawDesc.Length == 0) rawDesc = curSk.strInfo[sIdx];
+                                else rawDesc = rawDesc + "\n" + curSk.strInfo[sIdx];
+                            }
+                        }
+                    }
+
+                    if (rawDesc != null && rawDesc.Trim().Length > 0) {
+                        g.setColor(0x886633);
+                        g.drawLine(rightPaneX + 14, curDetailY + 2, rightPaneX + rightPaneW - 14, curDetailY + 2);
+                        curDetailY += 6;
+
+                        string[] descLines = mFont.tahoma_7_white.splitFontArray(rawDesc, rightPaneW - 28);
+                        if (descLines != null) {
+                            for (int wl = 0; wl < descLines.Length; wl++) {
+                                mFont.tahoma_7_white.drawString(g, descLines[wl], rightPaneX + 14, curDetailY, 0);
+                                curDetailY += 13;
+                            }
+                        }
+                    }
+
+                    // Tính toán chiều cao nội dung chi tiết & giới hạn cuộn
+                    int totalContentH = curDetailY - (detailViewY + 2);
+                    int limDetail = totalContentH - detailViewH;
+                    if (limDetail < 0) limDetail = 0;
+                    skillDetailList.cmxLim = limDetail;
+                    if (skillDetailList.cmtoX > limDetail) skillDetailList.cmtoX = limDetail;
+                    if (skillDetailList.cmtoX < 0) skillDetailList.cmtoX = 0;
+                    if (skillDetailList.cmx > limDetail) skillDetailList.cmx = limDetail;
+                    if (skillDetailList.cmx < 0) skillDetailList.cmx = 0;
 
                     GameCanvas.resetTrans(g);
                     g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
@@ -3211,10 +3556,28 @@ g.translate(0, -attriList.cmx);
                     }
                 }
 
-                if (canAssignKey) {
-                    int btnY = rightPaneY + rightPaneH - 24;
-                    AvMain.paintRect(g, rightPaneX + 14, btnY, 80, 18, (sbyte)1, 1);
-                    mFont.tahoma_7b_black.drawString(g, "Gán Phím Tắt", rightPaneX + 54, btnY + 3, 2);
+                // Các nút hành động phía dưới
+                int btnY = rightPaneY + rightPaneH - 24;
+                if (canAddPoint && canAssignKey) {
+                    int btnCongX = rightPaneX + 10;
+                    int btnCongW = (rightPaneW - 26) / 2;
+                    AvMain.paintRect(g, btnCongX, btnY, btnCongW, 20, (sbyte)1, 1);
+                    mFont.tahoma_7b_black.drawStringAutoCenter(g, "+ Điểm (" + Player.pointSkill + ")", btnCongX + btnCongW / 2, btnY + 4, btnCongW - 4);
+
+                    int btnGanX = btnCongX + btnCongW + 6;
+                    int btnGanW = btnCongW;
+                    AvMain.paintRect(g, btnGanX, btnY, btnGanW, 20, (sbyte)1, 1);
+                    mFont.tahoma_7b_black.drawStringAutoCenter(g, "Gán Ô", btnGanX + btnGanW / 2, btnY + 4, btnGanW - 4);
+                } else if (canAddPoint) {
+                    int btnCongW = 76;
+                    int btnCongX = rightPaneX + (rightPaneW - btnCongW) / 2;
+                    AvMain.paintRect(g, btnCongX, btnY, btnCongW, 20, (sbyte)1, 1);
+                    mFont.tahoma_7b_black.drawStringAutoCenter(g, "Cộng Điểm", btnCongX + btnCongW / 2, btnY + 4, btnCongW - 4);
+                } else if (canAssignKey) {
+                    int btnGanW = System.Math.Min(100, rightPaneW - 20);
+                    int btnGanX = rightPaneX + (rightPaneW - btnGanW) / 2;
+                    AvMain.paintRect(g, btnGanX, btnY, btnGanW, 20, (sbyte)1, 1);
+                    mFont.tahoma_7b_black.drawStringAutoCenter(g, "Gán Ô", btnGanX + btnGanW / 2, btnY + 4, btnGanW - 4);
                 }
             }
         }
@@ -3332,6 +3695,16 @@ g.translate(0, -attriList.cmx);
     }
 private void paintFeatureIcon(mGraphics g, int index, int x, int y) {
 try {
+if (index == 0) { // Danh Hiệu: dùng trực tiếp quick_16, không dùng icon
+FrameImage fra0 = QuickMenu.getFraQuickMenu(16);
+if (fra0 != null && fra0.imgFrame != null && fra0.imgFrame.image != null) {
+fra0.drawFrame(0, x, y, 0, 3, g);
+} else {
+mFont.tahoma_7b_yellow.drawString(g, "DH", x, y - 5, 2);
+}
+return;
+}
+
 short iconId = getFeatureIconId(index);
 if (iconId >= 0) {
 MainImage img = ObjectData.getImageAll(iconId, ObjectData.hashImageItemOther, (short)9000);
@@ -3344,18 +3717,7 @@ return;
 }
 }
 
-if (index == 0) { // Danh Hiệu
-FrameImage fra0 = (QuickMenu.fraQuickMenu != null && 16 >= 0 && 16 < QuickMenu.fraQuickMenu.Length ? QuickMenu.fraQuickMenu[16] : null);
-if (fra0 != null && fra0.imgFrame != null && fra0.imgFrame.image != null) {
-fra0.drawFrame(0, x, y, 0, 3, g);
-} else if (AvMain.fraBanhLai != null) {
-AvMain.fraBanhLai.drawFrame(0, x, y, 0, 3, g);
-} else if (AvMain.fraPirate != null) {
-AvMain.fraPirate.drawFrame(0, x, y, 0, 3, g);
-} else {
-mFont.tahoma_7b_yellow.drawString(g, "DH", x, y - 5, 2);
-}
-} else if (index == 1) { // Thú Cưng
+if (index == 1) { // Thú Cưng
 FrameImage fra1 = (QuickMenu.fraQuickMenu != null && 15 >= 0 && 15 < QuickMenu.fraQuickMenu.Length ? QuickMenu.fraQuickMenu[15] : null);
 if (fra1 != null && fra1.imgFrame != null && fra1.imgFrame.image != null) {
 fra1.drawFrame(0, x, y, 0, 3, g);
@@ -3461,7 +3823,7 @@ mFont.tahoma_7b_yellow.drawString(g, "MOD", x, y - 5, 2);
 } else {
 mFont.tahoma_7b_yellow.drawString(g, "*", x, y - 5, 2);
 }
-} catch (Exception e) {
+} catch (Exception) {
 }
 }
 
@@ -3554,7 +3916,7 @@ int featureCount = getFeatureItemCount();
                     }
 
                     (isSel ? mFont.tahoma_7b_yellow : mFont.tahoma_7_white).drawString(g, ">", itemX + itemW - 8, itemY + itemH / 2 - 4, 2);
-                } catch (Exception e) {}
+                } catch (Exception) {}
             }
 
             GameCanvas.resetTrans(g);
@@ -3825,6 +4187,8 @@ int featureCount = getFeatureItemCount();
             g.translate(0, -petList.cmx);
 
             int totalSlots = System.Math.Max(Player.maxInventory, System.Math.Max(petCount, cols * 4));
+            int prevW = MainTab.wItem;
+            MainTab.wItem = slotSize;
 
             for (int i = 0; i < totalSlots; i++) {
                 int col = i % cols;
@@ -3858,6 +4222,7 @@ int featureCount = getFeatureItemCount();
                     }
                 }
             }
+            MainTab.wItem = prevW;
 
             GameCanvas.resetTrans(g);
             g.setClip(0, 0, MotherCanvas.w, MotherCanvas.h);
@@ -4316,13 +4681,50 @@ int featureCount = getFeatureItemCount();
 
         int rightPaneX = leftPaneW + 6 + x + 10;
         int rightPaneY = y + 28;
+        int rightPaneW = w - leftPaneW - (isWide ? 20 : 16);
         int rightPaneH = h - 34;
         int btnY = rightPaneY + rightPaneH - 24;
 
-        if (GameCanvas.isPoint(rightPaneX + 14, btnY, 80, 18)) {
-            GameCanvas.isPointerSelect = false;
-            openSkillHotkeyMenu();
-            return;
+        if (validSkills != null && selectedSkillIndex >= 0 && selectedSkillIndex < validSkills.size()) {
+            Skill_Info curSk = (Skill_Info)validSkills.elementAt(selectedSkillIndex);
+            if (curSk != null) {
+                bool canAddPoint = (curSk.typeDevil == 0 && curSk.typeSkill != 4 && curSk.typeSkill != 6 && Player.pointSkill > 0 && curSk.Lv_RQ > 0 && curSk.Lv_RQ < Skill_Info.maxLv);
+                bool canAssignHotkey = (curSk.Lv_RQ > 0 && (curSk.typeSkill == 1 || curSk.typeSkill == 2 || curSk.typeSkill == 4));
+
+                if (canAddPoint && canAssignHotkey) {
+                    int btnCongX = rightPaneX + 10;
+                    int btnCongW = (rightPaneW - 26) / 2;
+                    if (GameCanvas.isPoint(btnCongX, btnY - 2, btnCongW, 22)) {
+                        GameCanvas.isPointerSelect = false;
+                        addPointSkill(curSk);
+                        return;
+                    }
+
+                    int btnGanX = btnCongX + btnCongW + 6;
+                    int btnGanW = btnCongW;
+                    if (GameCanvas.isPoint(btnGanX, btnY - 2, btnGanW, 22)) {
+                        GameCanvas.isPointerSelect = false;
+                        openSkillHotkeyMenu();
+                        return;
+                    }
+                } else if (canAddPoint) {
+                    int btnCongW = 76;
+                    int btnCongX = rightPaneX + (rightPaneW - btnCongW) / 2;
+                    if (GameCanvas.isPoint(btnCongX, btnY - 2, btnCongW, 22)) {
+                        GameCanvas.isPointerSelect = false;
+                        addPointSkill(curSk);
+                        return;
+                    }
+                } else if (canAssignHotkey) {
+                    int btnGanW = System.Math.Min(100, rightPaneW - 20);
+                    int btnGanX = rightPaneX + (rightPaneW - btnGanW) / 2;
+                    if (GameCanvas.isPoint(btnGanX, btnY - 2, btnGanW, 22)) {
+                        GameCanvas.isPointerSelect = false;
+                        openSkillHotkeyMenu();
+                        return;
+                    }
+                }
+            }
         }
     }
 

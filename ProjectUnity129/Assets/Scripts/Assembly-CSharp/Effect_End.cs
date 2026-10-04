@@ -1500,7 +1500,7 @@ public class Effect_End : MainEffect
 			fRemove = 12;
 			if (typeSub == 1)
 			{
-				fraImgSubEff = new FrameImage(468, 6);
+				fraImgSubEff = null; // Old skill effs only 0-466. 468 is Thần Trang Venom
 				fRemove = 18;
 			}
 			break;
@@ -1957,7 +1957,10 @@ public class Effect_End : MainEffect
 				-1, -1, 0, 0, 0, 0, 1, 1, 1, 1,
 				1, 1, 1, 1
 			};
-			y = objTo.y + 4;
+			if (objTo != null)
+			{
+				y = objTo.y + 4;
+			}
 			break;
 		case 153:
 		{
@@ -7845,7 +7848,7 @@ public class Effect_End : MainEffect
 		for (int i = 0; i < num; i++)
 		{
 			mainItem = (MainItem)Player.vecInventory.elementAt(i);
-			if (mainItem.ID == idPotion)
+			if (mainItem != null && mainItem.ID == idPotion)
 			{
 				break;
 			}
@@ -7905,10 +7908,14 @@ public class Effect_End : MainEffect
 		for (int i = 0; i < num; i++)
 		{
 			mainItem = (MainItem)Player.vecInventory.elementAt(i);
-			if (mainItem.ID == idPotion)
+			if (mainItem != null && mainItem.ID == idPotion)
 			{
 				break;
 			}
+		}
+		if (mainItem == null)
+		{
+			return;
 		}
 		fraImgEff = new FrameImage(mainItem.getImage(), idPotion, 1);
 		fRemove = CRes.random(10, 16);

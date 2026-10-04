@@ -66,23 +66,19 @@ public class MainPlayer : MainObject
 		}
 		if (GameCanvas.loadmap.getTile(x + vx, y + vy) == 1)
 		{
-			if (isAutomove)
-			{
-				setAutoMoveNear();
-			}
-			else
-			{
-				if (Action != 4)
-				{
-					Action = 0;
-				}
-				vx = 0;
-				vy = 0;
-			}
+			// BUG FIX: Java gốc luôn chạy slide logic khi hit wall, bất kể auto hay manual.
+			// C# cũ khi isAutomove=false chỉ set vx=vy=0 cứng, bỏ mất logic trượt tường.
+			setAutoMoveNear();
 		}
 		else if (LoadMap.specMap == 4)
 		{
 			setMoveSea(this);
+		}
+		// BUG FIX: Java chỉ vào escape loop khi vx==0 && vy==0 (nhân vật đứng yên nhưng bị kẹt tile).
+		// C# cũ thiếu điều kiện này → escape loop chạy cả khi đang di chuyển gây teleport bất ngờ.
+		if (vx != 0 || vy != 0)
+		{
+			return;
 		}
 		if (!LoadMap.Tile_Stand(GameCanvas.loadmap.getTile(x, y)))
 		{
@@ -701,6 +697,8 @@ public class MainPlayer : MainObject
 
 	public override iCommand getCenterCmd()
 	{
-		return null;
+		// BUG FIX: Java gốc trả về GameScreen.BY (= cmdGiaoTiep) khi mapLang() == true.
+		// C# cũ luôn return null → mất nút "Giao Tiếp" khi focus vào MainPlayer khác.
+		return GameCanvas.loadmap.mapLang() ? GameScreen.cmdGiaoTiep : null;
 	}
 }

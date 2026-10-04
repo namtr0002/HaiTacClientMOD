@@ -97,12 +97,33 @@ public class MainSkill
 
 	public void paint(mGraphics g, int x, int y, sbyte lvDevil)
 	{
-		Skill_Info.paintIcon(g, x, y, idIcon, lvDevil);
+		short drawIcon = idIcon;
+		if ((ID == 4005 || typeEffSkill == 4005) && (drawIcon == 201 || drawIcon == 205 || drawIcon <= 0))
+		{
+			drawIcon = 4005;
+		}
+		Skill_Info.paintIcon(g, x, y, drawIcon, lvDevil);
 	}
 
 	public void getData()
 	{
-		if (typeEffSkill > mRangeSkill.Length - 1)
+		if (typeEffSkill >= 4001 && typeEffSkill <= 4016)
+		{
+			range = 220;
+		}
+		else if (typeEffSkill == 4017 || typeEffSkill == 4021 || typeEffSkill == 4024 || typeEffSkill == 4025 || typeEffSkill == 4027 || typeEffSkill == 4028 || typeEffSkill == 4030 || typeEffSkill == 4031 || typeEffSkill == 4035 || typeEffSkill == 4036)
+		{
+			range = 240;
+		}
+		else if (typeEffSkill == 4018)
+		{
+			range = 360;
+		}
+		else if (typeEffSkill == 4019 || typeEffSkill == 4022 || typeEffSkill == 4023 || typeEffSkill == 4026 || typeEffSkill == 4029 || typeEffSkill == 4032 || typeEffSkill == 4033 || typeEffSkill == 4037 || typeEffSkill == 4038)
+		{
+			range = 120;
+		}
+		else if (typeEffSkill > mRangeSkill.Length - 1)
 		{
 			range = 48;
 		}

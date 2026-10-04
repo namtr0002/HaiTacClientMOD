@@ -1,6 +1,7 @@
 public class Other_Player : MainPlayer
 {
 	private mVector vecEffShip = new mVector("Other_Player.vecEffShip");
+	private sbyte cachedColorName = -128;
 
 	public Other_Player(short ID, sbyte type, string name, int x, int y)
 	{
@@ -85,27 +86,33 @@ public class Other_Player : MainPlayer
 			return;
 		}
 		sbyte color = colorName;
-		if (Player.vecParty.size() > 0)
+		if (cachedColorName == -128 || (GameCanvas.gameTick + (ID & 15)) % 30 == 0)
 		{
-			for (int i = 0; i < Player.vecParty.size(); i++)
+			cachedColorName = colorName;
+			if (Player.vecParty.size() > 0)
 			{
-				if (((InfoMemList)Player.vecParty.elementAt(i)).name.CompareTo(name) == 0)
+				for (int i = 0; i < Player.vecParty.size(); i++)
 				{
-					color = 4;
-					break;
+					if (((InfoMemList)Player.vecParty.elementAt(i)).name.CompareTo(name) == 0)
+					{
+						cachedColorName = 4;
+						break;
+					}
+				}
+			}
+			if (cachedColorName != 4 && Player.mSatnhan.Length != 0)
+			{
+				for (int j = 0; j < Player.mSatnhan.Length; j++)
+				{
+					if (ID == Player.mSatnhan[j])
+					{
+						cachedColorName = 6;
+						break;
+					}
 				}
 			}
 		}
-		if (Player.mSatnhan.Length != 0)
-		{
-			for (int j = 0; j < Player.mSatnhan.Length; j++)
-			{
-				if (ID == Player.mSatnhan[j])
-				{
-					color = 6;
-				}
-			}
-		}
+		color = (cachedColorName != -128) ? cachedColorName : colorName;
 		if (isHuman())
 		{
 			if (Action == 4)
@@ -385,7 +392,7 @@ public class Other_Player : MainPlayer
 			{
 				Move_to_Focus_Person();
 				int tile = GameCanvas.loadmap.getTile(x + vx, y + vy);
-				setMove(1, tile);
+				setMove(downSpeedWater, tile); // BUG FIX: Java dùng downSpeedWater, không hardcode 1
 			}
 		}
 		base.update();

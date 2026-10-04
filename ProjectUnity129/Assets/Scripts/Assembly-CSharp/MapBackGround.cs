@@ -1702,6 +1702,20 @@ public class MapBackGround
 			mImgCloud = null;
 		}
 		valueMyRandom = hBack - hLimit + yplusCloud;
+		if (mImg != null && mWImg != null)
+		{
+			for (int i = 0; i < mImg.Length && i < mWImg.Length; i++)
+			{
+				if (mImg[i] != null && mImg[i].image != null)
+				{
+					int actualW = mImage.getImageWidth(mImg[i]);
+					if (actualW > 0)
+					{
+						mWImg[i] = actualW;
+					}
+				}
+			}
+		}
 		int num27 = 0;
 		mHBegin = new int[mHImg.Length];
 		for (int num28 = 0; num28 < mHImg.Length; num28++)
@@ -2603,7 +2617,9 @@ public class MapBackGround
 		{
 			return;
 		}
-		for (int i = 0; i < MotherCanvas.w; i += 20)
+		int skyW = mImage.getImageWidth(imgSky);
+		if (skyW <= 0) skyW = 20;
+		for (int i = 0; i < MotherCanvas.w; i += skyW)
 		{
 			g.drawImage(imgSky, MainScreen.cameraMain.xCam + i, mHBegin[0] - hSky, 0);
 		}
@@ -3032,23 +3048,25 @@ public class MapBackGround
 		PosCloud = null;
 		if (GameCanvas.Day_Night == GameCanvas.DAY)
 		{
-			if (MotherCanvas.h > 230)
+			if (MotherCanvas.h > 80) // Fix: hạ ngưỡng từ 230 → 80, luôn tạo cloud khi h đủ lớn
+		{
+			PosCloud = new Point[3][];
+			for (int i = 0; i < PosCloud.Length; i++)
 			{
-				PosCloud = new Point[3][];
-				for (int i = 0; i < PosCloud.Length; i++)
+				int num = CRes.random(1, 3);
+				PosCloud[i] = new Point[num];
+				for (int j = 0; j < num; j++)
 				{
-					int num = CRes.random(1, 3);
-					PosCloud[i] = new Point[num];
-					for (int j = 0; j < num; j++)
-					{
-						PosCloud[i][j] = new Point();
-						PosCloud[i][j].x = CRes.random(MotherCanvas.w) * 100;
-						PosCloud[i][j].y = MotherCanvas.h - 290 + i * 30 + CRes.random_Am_0(10) + ((i == 1) ? 5 : 0);
-						PosCloud[i][j].vx = -CRes.random(100, 200) / (i * 4 + 1);
-						PosCloud[i][j].frame = i % 3;
-					}
+					PosCloud[i][j] = new Point();
+					PosCloud[i][j].x = CRes.random(MotherCanvas.w) * 100;
+					// Fix: Y cloud dựa trên h thực tế thay vì hardcode h-290 (gây âm khi h<290)
+					int cloudBaseY = MotherCanvas.h - System.Math.Max(MotherCanvas.h * 3 / 4, 60) + i * 20;
+					PosCloud[i][j].y = cloudBaseY + CRes.random_Am_0(10) + ((i == 1) ? 5 : 0);
+					PosCloud[i][j].vx = -CRes.random(100, 200) / (i * 4 + 1);
+					PosCloud[i][j].frame = i % 3;
 				}
 			}
+		}
 		}
 		else
 		{
@@ -3275,7 +3293,9 @@ public class MapBackGround
 		}
 		if (imgSky != null)
 		{
-			for (int i = 0; i < MotherCanvas.w; i += 20)
+			int skyW = mImage.getImageWidth(imgSky);
+			if (skyW <= 0) skyW = 20;
+			for (int i = 0; i < MotherCanvas.w; i += skyW)
 			{
 				g.drawImage(imgSky, i, MotherCanvas.h - 160 - 115, 0);
 			}
@@ -3308,7 +3328,9 @@ public class MapBackGround
 		g.fillRect(0, 0, MotherCanvas.w, MotherCanvas.h);
 		if (imgSky != null)
 		{
-			for (int i = 0; i < MotherCanvas.w; i += 20)
+			int skyW2 = mImage.getImageWidth(imgSky);
+			if (skyW2 <= 0) skyW2 = 20;
+			for (int i = 0; i < MotherCanvas.w; i += skyW2)
 			{
 				g.drawImage(imgSky, i, MotherCanvas.h - 100 - 115, 0);
 			}

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class Interface_Game
 {
 	public const sbyte KEYPAD = 0;
@@ -147,7 +149,7 @@ public class Interface_Game
 
 	public static bool isPaintInfoFocus;
 
-	public static sbyte typeTouch = 0;
+	public static sbyte typeTouch = 1;
 
 	public static sbyte typeShowPvP = -1;
 
@@ -236,10 +238,6 @@ public class Interface_Game
 	public static int yEffShowMoney;
 
 	public static int typeShowMoney;
-
-	private static int frameIconfocus = 0;
-
-	private static bool isNextFrame = true;
 
 	public static int[][] colorHPHeart = new int[10][]
 	{
@@ -437,8 +435,9 @@ public class Interface_Game
 		if (GameCanvas.isTouch)
 		{
 			wSkill = 32;
-			xPointMove = 55;
-			yPointMove = MotherCanvas.h - 55;
+			xPointMove = GameCanvas.isTaiTho ? 75 : 62;
+			yPointMove = MotherCanvas.h - (GameCanvas.isTaiTho ? 65 : 60);
+			UITheme.loadTheme01Assets();
 			imgMove = new mImage[2];
 			for (int i = 0; i < imgMove.Length; i++)
 			{
@@ -483,7 +482,7 @@ public class Interface_Game
 					mSizeImgOther[l][1] = mImage.getImageHeight(imgOther[l].image) / 2;
 				}
 			}
-			QuickMenu.fraQuickMenu = new FrameImage[16];
+			QuickMenu.fraQuickMenu = new FrameImage[17];
 			for (int m = 0; m < QuickMenu.fraQuickMenu.Length; m++)
 			{
 				QuickMenu.fraQuickMenu[m] = new FrameImage(mImage.createImage("/point/quick_" + m + ".png"), 30, 30);
@@ -629,26 +628,48 @@ public class Interface_Game
 								num3 = 1;
 							}
 							paintHotKey(g, hotkey, num, num2, 20, flag);
-							if (hotkey.skill == null || hotkey.skill.lvDevil == 0 || flag)
+							if (typeTouch == 1)
 							{
-								UITheme curTheme = UIThemeManager.getCurrentTheme();
-								if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && j == 2 && typeTouch == 0)
+								if (hotkey.skill == null && hotkey.itemcur == null)
 								{
-									UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
-								}
-								else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
-								{
-									UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
-								}
-								else
-								{
-									if (j == 2 && typeTouch == 0)
+									UITheme curTheme = UIThemeManager.getCurrentTheme();
+									if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
 									{
-										g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+										UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
+									}
+									else if (AvMain.imgHotKey != null)
+									{
+										g.drawImage(AvMain.imgHotKey, num, num2, 3);
+									}
+								}
+								else if (flag)
+								{
+									AvMain.fraQuest.drawFrame(2, num, num2 - 2 + GameCanvas.gameTick / 5 % 3, 0, 3, g);
+								}
+							}
+							else
+							{
+								if (hotkey.skill == null || hotkey.skill.lvDevil == 0 || flag)
+								{
+									UITheme curTheme = UIThemeManager.getCurrentTheme();
+									if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && j == 2)
+									{
+										UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
+									}
+									else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+									{
+										UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
 									}
 									else
 									{
-										g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+										if (j == 2)
+										{
+											g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+										}
+										else
+										{
+											g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+										}
 									}
 								}
 							}
@@ -676,14 +697,32 @@ public class Interface_Game
 								if (hotkey2 != null)
 								{
 									paintHotKey(g, hotkey2, num4, num5, 20, isPaintGiaotiep: false);
-									UITheme curTheme = UIThemeManager.getCurrentTheme();
-									if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+									if (typeTouch == 1)
 									{
-										UITheme.fraSkillSlot.drawFrame(num6, num4, num5, 0, 3, g);
+										if (hotkey2.skill == null && hotkey2.itemcur == null)
+										{
+											UITheme curTheme = UIThemeManager.getCurrentTheme();
+											if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+											{
+												UITheme.fraSkillSlot.drawFrame(num6, num4, num5, 0, 3, g);
+											}
+											else if (AvMain.imgHotKey != null)
+											{
+												g.drawImage(AvMain.imgHotKey, num4, num5, 3);
+											}
+										}
 									}
 									else
 									{
-										g.drawRegion(imgFire[2], 0, num6 * 50, 50, 50, 0, num4, num5, 3);
+										UITheme curTheme = UIThemeManager.getCurrentTheme();
+										if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+										{
+											UITheme.fraSkillSlot.drawFrame(num6, num4, num5, 0, 3, g);
+										}
+										else
+										{
+											g.drawRegion(imgFire[2], 0, num6 * 50, 50, 50, 0, num4, num5, 3);
+										}
 									}
 								}
 							}
@@ -990,26 +1029,44 @@ public class Interface_Game
 					num3 = 1;
 				}
 				paintHotKey(g, hotkey, num, num2, 20, isPaintGiaotiep: false);
-				if (hotkey.skill == null || hotkey.skill.lvDevil == 0)
+				if (typeTouch == 1)
 				{
-					UITheme curTheme = UIThemeManager.getCurrentTheme();
-					if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && i == 2 && typeTouch == 0)
+					if (hotkey.skill == null && hotkey.itemcur == null)
 					{
-						UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
-					}
-					else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
-					{
-						UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
-					}
-					else
-					{
-						if (i == 2 && typeTouch == 0)
+						UITheme curTheme = UIThemeManager.getCurrentTheme();
+						if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
 						{
-							g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+							UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
+						}
+						else if (AvMain.imgHotKey != null)
+						{
+							g.drawImage(AvMain.imgHotKey, num, num2, 3);
+						}
+					}
+				}
+				else
+				{
+					if (hotkey.skill == null || hotkey.skill.lvDevil == 0)
+					{
+						UITheme curTheme = UIThemeManager.getCurrentTheme();
+						if (curTheme != null && curTheme.id > 0 && UITheme.fraAttack != null && i == 2)
+						{
+							UITheme.fraAttack.drawFrame(num3, num, num2, 0, 3, g);
+						}
+						else if (curTheme != null && curTheme.id > 0 && UITheme.fraSkillSlot != null)
+						{
+							UITheme.fraSkillSlot.drawFrame(num3, num, num2, 0, 3, g);
 						}
 						else
 						{
-							g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+							if (i == 2)
+							{
+								g.drawRegion(imgFire[1], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+							}
+							else
+							{
+								g.drawRegion(imgFire[0], 0, num3 * 50, 50, 50, 0, num, num2, 3);
+							}
 						}
 					}
 				}
@@ -1074,16 +1131,17 @@ public class Interface_Game
 		{
 			x -= 19;
 		}
-		PaintHPMP(g, 1, GameScreen.player.Hp, GameScreen.player.maxHp, x + 18, y, 0, 9, 66, 0, isflip: false, GameScreen.player.HpEff, isEffHP, GameScreen.player.lvHeart);
-		y += 11;
-		PaintHPMP(g, 2, GameScreen.player.Mp, GameScreen.player.maxMp, x + 18, y, 0, 9, 66, 0, isflip: false, 0, isEffMP, 0);
-		y += 8;
+		int wBar = 62;
+		PaintHPMP(g, 1, GameScreen.player.Hp, GameScreen.player.maxHp, x + 18, y, 0, 9, wBar, 0, isflip: false, GameScreen.player.HpEff, isEffHP, GameScreen.player.lvHeart);
+		y += 10;
+		PaintHPMP(g, 2, GameScreen.player.Mp, GameScreen.player.maxMp, x + 18, y, 0, 9, wBar, 0, isflip: false, 0, isEffMP, 0);
+		y += 9;
 		int num = 0;
 		if (GameScreen.player.Lv >= 100)
 		{
 			fontLv.drawString(g, GameScreen.player.LvThongThao + " + " + GameScreen.player.percentThongThao / 10 + "," + GameScreen.player.percentThongThao % 10 + "%", x + 20, y, 0);
-			y += 10;
-			num = GameScreen.player.percentThongThao * 65 / 1000;
+			y += 9;
+			num = GameScreen.player.percentThongThao * wBar / 1000;
 			if (GameScreen.player.percentThongThao > 0 && num == 0)
 			{
 				num = 1;
@@ -1092,19 +1150,19 @@ public class Interface_Game
 		else
 		{
 			fontLv.drawString(g, GameScreen.player.Lv + " + " + GameScreen.player.percentLv / 10 + "," + GameScreen.player.percentLv % 10 + "%", x + 20, y, 0);
-			y += 10;
-			num = GameScreen.player.percentLv * 65 / 1000;
+			y += 9;
+			num = GameScreen.player.percentLv * wBar / 1000;
 			if (GameScreen.player.percentLv > 0 && num == 0)
 			{
 				num = 1;
 			}
 		}
-		if (num > 65)
+		if (num > wBar)
 		{
-			num = 65;
+			num = wBar;
 		}
 		g.setColor(1258003);
-		g.fillRect(x + 18, y, 65, 2);
+		g.fillRect(x + 18, y, wBar, 2);
 		if (num > 0)
 		{
 			g.setColor(3514158);
@@ -1113,7 +1171,7 @@ public class Interface_Game
 		for (int i = 1; i < 5; i++)
 		{
 			g.setColor(16777215);
-			g.fillRect(x + 18 + i * 13, y, 1, 2);
+			g.fillRect(x + 18 + i * (wBar / 5), y, 1, 2);
 		}
 	}
 
@@ -1342,35 +1400,34 @@ public class Interface_Game
 		{
 			return;
 		}
-		MainObject objFocus = GameScreen.objFocus;
-		if (AvMain.fraIconfocus.nFrame == 1)
+		if (AvMain.fraIconfocus == null)
 		{
-			g.drawImage(AvMain.fraIconfocus.imgFrame, objFocus.x, objFocus.y - objFocus.hOne - objFocus.dy - objFocus.hIconFocus - GameCanvas.gameTick % 5, 3);
 			return;
 		}
-		if (isNextFrame)
+		MainObject objFocus = GameScreen.objFocus;
+
+		int yOffset = objFocus.hIconFocus;
+		if (objFocus.typeObject == 2)
 		{
-			if (GameCanvas.gameTick % 3 == 0)
-			{
-				frameIconfocus++;
-			}
-			if (frameIconfocus >= AvMain.fraIconfocus.nFrame - 1)
-			{
-				isNextFrame = false;
-			}
+			yOffset = (objFocus.typeQuest > 0 || objFocus.typeIconNPC > -1) ? 42 : 28;
 		}
-		else
+		else if (yOffset == 0)
 		{
-			if (GameCanvas.gameTick % 3 == 0)
-			{
-				frameIconfocus--;
-			}
-			if (frameIconfocus <= 0)
-			{
-				isNextFrame = true;
-			}
+			yOffset = 18;
 		}
-		AvMain.fraIconfocus.drawFrame(frameIconfocus, objFocus.x, objFocus.y - objFocus.hOne - objFocus.dy - objFocus.hIconFocus - 3, 0, 3, g);
+
+		int dyBounce = (GameCanvas.gameTick % 8 < 4) ? (GameCanvas.gameTick % 8) : (8 - (GameCanvas.gameTick % 8));
+		int yArrow = objFocus.y - objFocus.hOne - objFocus.dy - yOffset - dyBounce;
+
+		if (AvMain.fraIconfocus.nFrame > 1)
+		{
+			int frame = (GameCanvas.gameTick / 2) % AvMain.fraIconfocus.nFrame;
+			AvMain.fraIconfocus.drawFrame(frame, objFocus.x, yArrow, 0, 3, g);
+		}
+		else if (AvMain.fraIconfocus.imgFrame != null)
+		{
+			g.drawImage(AvMain.fraIconfocus.imgFrame, objFocus.x, yArrow, 3);
+		}
 	}
 
 	public void paintInfoFocus(mGraphics g)
@@ -1641,10 +1698,12 @@ public class Interface_Game
 		{
 			text2 = cur / 1000 + "k";
 		}
+		string strSep = (text2.EndsWith("k") || text2.EndsWith("M") || text2.EndsWith("B") || text.StartsWith("k") || text.StartsWith("M") || text.StartsWith("B")) ? " / " : "/";
+		string hpDisplayStr = text2 + strSep + text;
 		switch (isNum)
 		{
 		case 0:
-			mFont.tahoma_7_white.drawString(g, text2 + "/" + text, x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2);
+			mFont.tahoma_7_white.drawString(g, hpDisplayStr, x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2);
 			break;
 		case 1:
 			mFont.tahoma_7_white.drawString(g, MainItem.strGetPercent(cur, 1), x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2);
@@ -1652,14 +1711,14 @@ public class Interface_Game
 		case 2:
 			if (type == 104)
 			{
-				int num6 = mFont.tahoma_7_black.getWidth(text2 + "/" + text) + 4;
+				int num6 = mFont.tahoma_7_black.getWidth(hpDisplayStr) + 4;
 				g.setColor(0);
 				g.fillRect(x + wRect / 2 - 10 - num6 / 2, y - 1 + plusHFont + (hrect - 9) / 2, num6, 11);
 			}
-			AvMain.Font3dSmall(g, text2 + "/" + text, x + wRect / 2 - 10, y - 1 + plusHFont + (hrect - 9) / 2, 2, 0);
+			AvMain.Font3dSmall(g, hpDisplayStr, x + wRect / 2 - 10, y - 1 + plusHFont + (hrect - 9) / 2, 2, 0);
 			break;
 		case 3:
-			AvMain.Font3dSmall(g, text2 + "/" + text, x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2, 0);
+			AvMain.Font3dSmall(g, hpDisplayStr, x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2, 0);
 			break;
 		case 4:
 			mFont.tahoma_7_white.drawString(g, text2 ?? "", x + wRect / 2, y - 1 + plusHFont + (hrect - 9) / 2, 2);
@@ -1967,6 +2026,10 @@ public class Interface_Game
 			tickCheckPoint--;
 			return;
 		}
+		if (GameScreen.player != null && (GameScreen.player.isAutoFireNew108 || isAutoFireInterface || Player.AutoFireCur > 0 || AThMadaraMOD.isSlaughterActive))
+		{
+			return; // Đang bật tàn sát/tự đánh: chặn đổi map khi ở gần VGO
+		}
 		int x = GameCanvas.px + MainScreen.cameraMain.xCam;
 		int y = GameCanvas.py + MainScreen.cameraMain.yCam;
 		for (int i = 0; i < LoadMap.vecPointChange.size(); i++)
@@ -2131,22 +2194,53 @@ public class Interface_Game
 	public void moveTypeKeypad()
 	{
 		int dpadRadius = 55; // Calibrated radius matching visual D-Pad bounds (imgMove[0])
-		// Dùng isPoint (vị trí HIỆN TẠI px/py) thay vì isPointLast (điểm bắt đầu bấm)
-		// Để detect ngón tay đang ở trên D-pad, không phải điểm bấm ban đầu
-		if ((GameCanvas.isPointerDown || GameCanvas.isPointerMove) && GameCanvas.isPoint(xPointMove - dpadRadius, yPointMove - dpadRadius, dpadRadius * 2, dpadRadius * 2))
+		bool isTouchingDpad = false;
+		int touchDx = 0;
+		int touchDy = 0;
+
+		// 1. Check all active touches for D-pad interaction (supports multi-touch)
+		if (Input.touchCount > 0)
 		{
-			int dx = GameCanvas.px - xPointMove;
-			int dy = GameCanvas.py - yPointMove;
-			// Chỉ xử lý hướng khi ngón tay đủ xa tâm (tránh trường hợp bấm đúng tâm dx=dy=0)
-			if (dx != 0 || dy != 0)
+			int zoom = (mGraphics.zoomLevel > 0) ? mGraphics.zoomLevel : 1;
+			for (int tIdx = 0; tIdx < Input.touchCount; tIdx++)
 			{
-				int num = CRes.angle(dx, dy);
-				int num2 = 0;
-				num2 = ((num > 45 && num <= 135) ? 3 : ((num <= 135 || num > 225) ? ((num <= 225 || num > 315) ? 1 : 2) : 0));
-				GameCanvas.clearKeyHold();
-				GameCanvas.isPointerDown = true;
-				GameCanvas.isPointerSelect = false;
-				keyPoint = mKeyMove[num2];
+				Touch t = Input.GetTouch(tIdx);
+				if (t.phase == TouchPhase.Began || t.phase == TouchPhase.Moved || t.phase == TouchPhase.Stationary)
+				{
+					int tX = (int)(t.position.x / (float)zoom);
+					int tY = (int)(((float)Screen.height - t.position.y) / (float)zoom);
+					if (CRes.abs(tX - xPointMove) <= dpadRadius && CRes.abs(tY - yPointMove) <= dpadRadius)
+					{
+						isTouchingDpad = true;
+						touchDx = tX - xPointMove;
+						touchDy = tY - yPointMove;
+						break;
+					}
+				}
+			}
+		}
+
+		// 2. Fallback to GameCanvas pointer (mouse or single touch)
+		if (!isTouchingDpad && (GameCanvas.isPointerDown || GameCanvas.isPointerMove) && GameCanvas.isPoint(xPointMove - dpadRadius, yPointMove - dpadRadius, dpadRadius * 2, dpadRadius * 2))
+		{
+			isTouchingDpad = true;
+			touchDx = GameCanvas.px - xPointMove;
+			touchDy = GameCanvas.py - yPointMove;
+		}
+
+		if (isTouchingDpad)
+		{
+			if (touchDx != 0 || touchDy != 0)
+			{
+				int num = CRes.angle(touchDx, touchDy);
+				int num2 = ((num > 45 && num <= 135) ? 3 : ((num <= 135 || num > 225) ? ((num <= 225 || num > 315) ? 1 : 2) : 0));
+				int newKey = mKeyMove[num2];
+				if (keyPoint != newKey && (keyPoint == 4 || keyPoint == 6 || keyPoint == 2 || keyPoint == 8))
+				{
+					GameCanvas.keyMyHold[keyPoint] = false;
+					GameCanvas.keyMyPressed[keyPoint] = false;
+				}
+				keyPoint = newKey;
 				GameCanvas.keyMyHold[keyPoint] = true;
 				timePointer = 3;
 				Player.setStart_EndAutoFire(isAu: false);
@@ -2155,11 +2249,14 @@ public class Interface_Game
 					GameScreen.player.skillCurrent = null;
 				}
 			}
-			else
+		}
+		else
+		{
+			if (keyPoint == 4 || keyPoint == 6 || keyPoint == 2 || keyPoint == 8)
 			{
-				// Bấm đúng tâm D-pad: giữ hướng hiện tại (không đổi hướng)
-				GameCanvas.isPointerDown = true;
-				GameCanvas.isPointerSelect = false;
+				GameCanvas.keyMyHold[keyPoint] = false;
+				GameCanvas.keyMyPressed[keyPoint] = false;
+				keyPoint = -1;
 			}
 		}
 		if (GameCanvas.isPointerSelect && !GameCanvas.isPointer(xPointMove - dpadRadius, yPointMove - dpadRadius, dpadRadius * 2, dpadRadius * 2))
@@ -2242,6 +2339,8 @@ public class Interface_Game
 					if (GameScreen.player != null)
 					{
 						GameScreen.player.isAutoFireNew108 = true;
+						Player.xBeginAuto = GameScreen.player.x;
+						Player.yBeginAuto = GameScreen.player.y;
 					}
 					addInfoPlayerNormal("Tự đánh: BẬT", mFont.tahoma_7_yellow);
 				}
@@ -2251,8 +2350,9 @@ public class Interface_Game
 					if (GameScreen.player != null)
 					{
 						GameScreen.player.isAutoFireNew108 = false;
-						GameScreen.player.posTransRoad = null;
 					}
+					AThMadaraMOD.isSlaughterActive = false;
+					AThMadaraMOD.slaughterTargetName = null;
 					addInfoPlayerNormal("Tự đánh: TẠM DỪNG", mFont.tahoma_7_yellow);
 				}
 			}
@@ -2341,10 +2441,9 @@ public class Interface_Game
 		{
 			if (typeTouch == 0)
 			{
-				xBeginKill = MotherCanvas.w - 35;
-				yBeginKill = MotherCanvas.h - 50;
+				xBeginKill = MotherCanvas.w - (GameCanvas.isTaiTho ? 45 : 35);
+				yBeginKill = MotherCanvas.h - (GameCanvas.isTaiTho ? 60 : 50);
 				int num = gocBegin;
-				int num2 = gocBegin - 30;
 				for (int i = 0; i < mPosKillCur.Length; i++)
 				{
 					if (i == 2)
@@ -2358,11 +2457,14 @@ public class Interface_Game
 						mPosKillCur[i][1] = yBeginKill + CRes.getsin(CRes.fixangle(num)) * lSkill / 1000;
 						num -= 35;
 					}
-					mPosKillBuff[i][0] = xBeginKill + CRes.getcos(CRes.fixangle(num2)) * (lSkill + 40) / 1000;
-					mPosKillBuff[i][1] = yBeginKill + CRes.getsin(CRes.fixangle(num2)) * (lSkill + 40) / 1000;
-					num2 -= 20;
 					mPosKillSub[i][0] = MotherCanvas.w * 2 - mPosKillCur[i][0];
 					mPosKillSub[i][1] = mPosKillCur[i][1];
+				}
+				int buffStartX = (GameCanvas.isTaiTho ? 75 : 62) + 55;
+				for (int l = 0; l < mPosKillBuff.Length; l++)
+				{
+					mPosKillBuff[l][0] = buffStartX + (l % 3) * wSkill;
+					mPosKillBuff[l][1] = MotherCanvas.h - 24 - (l / 3) * wSkill;
 				}
 				xBeginKill = wSkill / 2;
 				yBeginKill = 80;
@@ -2376,7 +2478,8 @@ public class Interface_Game
 			}
 			else if (typeTouch == 1)
 			{
-				xBeginKill = MotherCanvas.w - wSkill * 6 - wSkill / 2;
+				int rightMargin = GameCanvas.isTaiTho ? 38 : (wSkill / 2 + 5);
+				xBeginKill = MotherCanvas.w - wSkill * 6 - rightMargin;
 				yBeginKill = MotherCanvas.h - 24;
 				for (int k = 0; k < mPosKillCur.Length; k++)
 				{
@@ -2389,15 +2492,11 @@ public class Interface_Game
 					mPosEffCurrent[k + 6][0] = xBeginKill + k * wSkill;
 					mPosEffCurrent[k + 6][1] = yBeginKill - wSkill * 2 + 4;
 				}
-				xBeginKill = wSkill / 2;
+				xBeginKill = GameCanvas.isTaiTho ? (wSkill / 2 + 15) : (wSkill / 2);
 				int num3 = wSkill;
-				if (GameCanvas.isTaiTho)
-				{
-					xBeginKill += 10;
-				}
 				for (int l = 0; l < mPosKillBuff.Length; l++)
 				{
-					mPosKillBuff[l][0] = xBeginKill + l % 3 * num3;
+					mPosKillBuff[l][0] = xBeginKill + (l % 3) * num3;
 					mPosKillBuff[l][1] = yBeginKill - num3 * (l / 3);
 				}
 			}
@@ -2422,11 +2521,12 @@ public class Interface_Game
 
 	public static void setPosTouch()
 	{
-		xAutoFire = MotherCanvas.w - 29;
+		int safeRight = GameCanvas.isTaiTho ? 36 : 29;
+		xAutoFire = MotherCanvas.w - safeRight;
 		if (mPosOther != null && mPosOther.Length > 3 && mPosOther[2] != null && mPosOther[3] != null)
 		{
-			mPosOther[2][0] = MotherCanvas.w - 29;
-			mPosOther[3][0] = MotherCanvas.w - 29;
+			mPosOther[2][0] = MotherCanvas.w - safeRight;
+			mPosOther[3][0] = MotherCanvas.w - safeRight;
 		}
 		if (mPosOther != null && mPosOther.Length > 4 && mPosOther[4] != null)
 		{

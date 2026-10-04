@@ -183,10 +183,10 @@ public class UITheme
 
 		if (imgWinBgPattern != null)
 		{
-			int inX = x + 16;
-			int inY = y + 16;
-			int inW = w - 32;
-			int inH = h - 32;
+			int inX = x + 12;
+			int inY = y + 12;
+			int inW = w - 24;
+			int inH = h - 24;
 			if (inW > 0 && inH > 0)
 			{
 				for (int py = 0; py < inH; py += 32)
@@ -209,11 +209,19 @@ public class UITheme
 		{
 			for (int ex = 0; ex < edgeX; ex += 20)
 			{
-				int sw = (edgeX - ex < 20) ? (edgeX - ex) : 20;
-				g.drawRegion(imgWinEdgeT, 0, 0, sw, 20, 0, x + 20 + ex, y, 0);
+				if (ex + 20 >= edgeX)
+				{
+					g.drawRegion(imgWinEdgeT, 0, 0, 20, 20, 0, x + w - 40, y, 0);
+					if (imgWinEdgeB != null)
+					{
+						g.drawRegion(imgWinEdgeB, 0, 0, 20, 20, 0, x + w - 40, y + h - 20, 0);
+					}
+					break;
+				}
+				g.drawRegion(imgWinEdgeT, 0, 0, 20, 20, 0, x + 20 + ex, y, 0);
 				if (imgWinEdgeB != null)
 				{
-					g.drawRegion(imgWinEdgeB, 0, 0, sw, 20, 0, x + 20 + ex, y + h - 20, 0);
+					g.drawRegion(imgWinEdgeB, 0, 0, 20, 20, 0, x + 20 + ex, y + h - 20, 0);
 				}
 			}
 		}
@@ -222,11 +230,19 @@ public class UITheme
 		{
 			for (int ey = 0; ey < edgeY; ey += 20)
 			{
-				int sh = (edgeY - ey < 20) ? (edgeY - ey) : 20;
-				g.drawRegion(imgWinEdgeL, 0, 0, 20, sh, 0, x, y + 20 + ey, 0);
+				if (ey + 20 >= edgeY)
+				{
+					g.drawRegion(imgWinEdgeL, 0, 0, 20, 20, 0, x, y + h - 40, 0);
+					if (imgWinEdgeR != null)
+					{
+						g.drawRegion(imgWinEdgeR, 0, 0, 20, 20, 0, x + w - 20, y + h - 40, 0);
+					}
+					break;
+				}
+				g.drawRegion(imgWinEdgeL, 0, 0, 20, 20, 0, x, y + 20 + ey, 0);
 				if (imgWinEdgeR != null)
 				{
-					g.drawRegion(imgWinEdgeR, 0, 0, 20, sh, 0, x + w - 20, y + 20 + ey, 0);
+					g.drawRegion(imgWinEdgeR, 0, 0, 20, 20, 0, x + w - 20, y + 20 + ey, 0);
 				}
 			}
 		}

@@ -50,6 +50,7 @@ public class LoadMapScreen : MainScreen
 		}
 		GameCanvas.saveImage.start();
 		GameScreen.VecEffect.removeAllElements();
+		GameScreen.vecEffTam.removeAllElements();
 		GameScreen.VecNum.removeAllElements();
 		GameScreen.vecObjMove.removeAllElements();
 		GameScreen.isPvPNew = false;
@@ -281,6 +282,7 @@ public class LoadMapScreen : MainScreen
 			}
 			LoadMap.Area = area;
 			GameCanvas.gameScr.Show();
+			restoreBuffVisuals();
 			Interface_Game.timeShowNameMap = 0;
 			GameCanvas.hLoad = MotherCanvas.h / 4 * 3;
 			Interface_Game.wtable = mFont.tahoma_7b_white.getWidth(LoadMap.getNameMap(GameCanvas.loadmap.idMap)) + 20;
@@ -586,6 +588,127 @@ public class LoadMapScreen : MainScreen
 		catch (Exception)
 		{
 			mSystem.outloi("load bat am thanh");
+		}
+	}
+
+	// Khôi phục visual aura Effect_Skill / DataSkillEff của các buff còn active sau đổi map.
+	// VecEffect bị xóa trong Show() nên cần tái tạo visual cho caster.
+	public static void restoreSingleBuffSkill(MainObject obj, int effType, int remaining)
+	{
+		try
+		{
+			if (obj == null || remaining <= 500) return;
+
+			// Tránh tạo Effect_Skill trùng lặp trong VecEffect
+			for (int j = 0; j < GameScreen.VecEffect.size(); j++)
+			{
+				MainEffect me = (MainEffect)GameScreen.VecEffect.elementAt(j);
+				if (me is Effect_Skill es2 && !es2.isRemove && es2.objFireMain == obj)
+				{
+					if (effType == 4019 && es2.typeEffect == 4019) return;
+					if ((effType == 4026 || effType == 4029) && (es2.typeEffect == 4026 || es2.typeEffect == 4029)) return;
+					if (es2.typeEffect == effType) return;
+				}
+			}
+			// Tránh tạo Effect_Skill trùng lặp trong vecEffTam
+			for (int j = 0; j < GameScreen.vecEffTam.size(); j++)
+			{
+				MainEffect me = (MainEffect)GameScreen.vecEffTam.elementAt(j);
+				if (me is Effect_Skill es2 && !es2.isRemove && es2.objFireMain == obj)
+				{
+					if (effType == 4019 && es2.typeEffect == 4019) return;
+					if ((effType == 4026 || effType == 4029) && (es2.typeEffect == 4026 || es2.typeEffect == 4029)) return;
+					if (es2.typeEffect == effType) return;
+				}
+			}
+
+			Effect_Skill es = new Effect_Skill();
+			es.typeEffect = (short)effType;
+			es.objFireMain = obj;
+			es.f = -1;
+			es.isStop = false;
+			es.isRemove = false;
+			es.isEff = true;
+			es.numNextFrame = 1;
+			es.x = obj.x;
+			es.y = obj.y;
+			es.levelPaint = -1; // vẽ sau lưng nhân vật
+			es.timeBegin = GameCanvas.timeNow;
+			es.timeEnd = (short)Math.Min(32000, remaining);
+			es.Dir = (sbyte)obj.type_left_right;
+			GameScreen.vecEffTam.addElement(es);
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	private void restoreBuffVisuals()
+	{
+		try
+		{
+			if (GameScreen.player == null) return;
+			Player player = GameScreen.player;
+			long now = mSystem.currentTimeMillis();
+
+			// 1. Quét player.vecBuffCur (các buff đang hiển thị trên thanh buff HUD)
+			if (player.vecBuffCur != null)
+			{
+				for (int i = 0; i < player.vecBuffCur.size(); i++)
+				{
+					MainBuff mb = (MainBuff)player.vecBuffCur.elementAt(i);
+					if (mb == null || mb.isRemove) continue;
+					int remaining = mb.getRemainingTime();
+					if (remaining <= 500) continue;
+
+					// Phượng Hoàng (Marco): IdBuff 5034 / 4027 / 4026 hoặc icon 452
+					if (mb.IdBuff == 5034 || mb.IdBuff == 4027 || mb.IdBuff == 4026 || mb.idIcon == 452)
+					{
+						int effType = Effect_Skill.isLocalPlayerPhoenixLv5() ? 4029 : 4026;
+						restoreSingleBuffSkill(player, effType, remaining);
+					}
+					// Venom (Magellan): IdBuff 5026 / 4019 / 4020 hoặc icon 914
+					else if (mb.IdBuff == 5026 || mb.IdBuff == 4019 || mb.IdBuff == 4020 || mb.idIcon == 914)
+					{
+						restoreSingleBuffSkill(player, 4019, remaining);
+					}
+					// Kaido (Thanh Long): IdBuff 5030 / 4023 hoặc icon 448
+					else if (mb.IdBuff == 5030 || mb.IdBuff == 4023 || mb.idIcon == 448)
+					{
+						player.addDataEff((short)4023, remaining, (sbyte)0, (sbyte)0);
+					}
+				}
+			}
+
+			// 2. Quét player.vecDataEff (các marker effect đã lưu)
+			if (player.vecDataEff != null)
+			{
+				for (int i = 0; i < player.vecDataEff.size(); i++)
+				{
+					DataSkillEff de = (DataSkillEff)player.vecDataEff.elementAt(i);
+					if (de == null || de.wantDestroy) continue;
+					if (de.typeupdate != 2) continue;
+					long remaining = de.timelive - now;
+					if (remaining <= 500) continue;
+
+					if (de.idEff == 108) // Venom marker
+					{
+						restoreSingleBuffSkill(player, 4019, (int)remaining);
+					}
+					else if (de.idEff == 526) // Phoenix marker
+					{
+						int effType = Effect_Skill.isLocalPlayerPhoenixLv5() ? 4029 : 4026;
+						restoreSingleBuffSkill(player, effType, (int)remaining);
+					}
+					else if (de.idEff == 4023) // Kaido marker
+					{
+						// Đã có trong vecDataEff, paintDataEff tự vẽ
+					}
+				}
+			}
+		}
+		catch (Exception)
+		{
 		}
 	}
 }

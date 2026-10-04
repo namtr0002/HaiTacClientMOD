@@ -46,10 +46,11 @@ public class Key
 	{
 		if (GameMidlet.isPC)
 		{
-			UP = 15;
-			DOWN = 16;
-			LEFT = 17;
-			RIGHT = 18;
+			UP = 2;
+			DOWN = 8;
+			LEFT = 4;
+			RIGHT = 6;
+			FIRE = 5;
 		}
 	}
 }

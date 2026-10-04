@@ -20,11 +20,11 @@ public class GameCanvas : MotherCanvas, IActionListener
 
 	public new static GameCanvas instance;
 
-	public static bool[] keyMyPressed = new bool[55];
+	public static bool[] keyMyPressed = new bool[64];
 
-	public static bool[] keyMyReleased = new bool[55];
+	public static bool[] keyMyReleased = new bool[64];
 
-	public static bool[] keyMyHold = new bool[55];
+	public static bool[] keyMyHold = new bool[64];
 
 	public static bool isMoto;
 
@@ -310,33 +310,10 @@ public class GameCanvas : MotherCanvas, IActionListener
 		{
 			wCommand = 30;
 		}
-		if (GameMidlet.DEVICE != 0 && (mGraphics.zoomLevel > 1 || GameMidlet.DEVICE == 2))
-		{
-			mFont.loadmFont();
-			isLoadFont = true;
-		}
-		sbyte[] array2 = CRes.loadRMS("Main_Load_Image_Android_OK");
-		string text = "";
-		if (array2 != null)
-		{
-			DataInputStream dataInputStream2 = new DataInputStream(new ByteArrayInputStream(array2));
-			try
-			{
-				text = dataInputStream2.readUTF();
-				dataInputStream2.close();
-			}
-			catch (Exception)
-			{
-				text = "";
-			}
-		}
-		if (text.CompareTo("1.2.9") == 0 || GameMidlet.DEVICE == 0 || GameMidlet.DEVICE == 4)
-		{
-			beginGame();
-			return;
-		}
-		updateImageAndroidScr = new UpdateImageScreen();
-		updateImageAndroidScr.Show();
+		mFont.loadmFont();
+		isLoadFont = true;
+		beginGame();
+		return;
 	}
 
 	public void beginGame()
@@ -420,6 +397,11 @@ public class GameCanvas : MotherCanvas, IActionListener
 	{
 		try
 		{
+			if (gx != null)
+			{
+				g = gx;
+			}
+			g.reset();
 			if (isTaiTho)
 			{
 				g.setColor(0);
@@ -851,29 +833,51 @@ public class GameCanvas : MotherCanvas, IActionListener
 		case 56:
 		case 57:
 			keyMyHold[keyCode - 28] = false;
+			keyMyPressed[keyCode - 28] = false;
 			break;
 		case 42:
 			keyMyHold[10] = false;
+			keyMyPressed[10] = false;
 			break;
 		case 35:
 			keyMyHold[11] = false;
+			keyMyPressed[11] = false;
 			break;
 		case -6:
 			keyMyHold[12] = false;
+			keyMyPressed[12] = false;
 			break;
 		case -7:
 			keyMyHold[13] = false;
+			keyMyPressed[13] = false;
 			break;
 		}
 	}
 
 	public static bool isKeyPressed(int index)
 	{
-		if (keyMyPressed[index])
+		if (index >= 0 && index < keyMyPressed.Length)
 		{
-			return true;
+			return keyMyPressed[index];
 		}
 		return false;
+	}
+
+	public static bool keyMovePressed(int Dir)
+	{
+		switch (Dir)
+		{
+		case 0:
+			return keyMyPressed[4] || keyMyPressed[24] || keyMyPressed[34];
+		case 1:
+			return keyMyPressed[2] || keyMyPressed[22] || keyMyPressed[32];
+		case 2:
+			return keyMyPressed[6] || keyMyPressed[26] || keyMyPressed[36];
+		case 3:
+			return keyMyPressed[8] || keyMyPressed[28] || keyMyPressed[38];
+		default:
+			return false;
+		}
 	}
 
 	public void onPointerDragged(int x, int y)
@@ -917,8 +921,6 @@ public class GameCanvas : MotherCanvas, IActionListener
 		{
 			isPointerSelect = true;
 		}
-		clearKeyHold();
-		clearKeyPressed();
 		isPointerDown = false;
 		isPointerRelease = true;
 		isPointerMove = false;
@@ -930,8 +932,6 @@ public class GameCanvas : MotherCanvas, IActionListener
 
 	public static void clearKeyPressed()
 	{
-		isPointerRelease = false;
-		isPointerDown = false;
 		for (int i = 0; i < keyMyPressed.Length; i++)
 		{
 			keyMyPressed[i] = false;
@@ -940,15 +940,51 @@ public class GameCanvas : MotherCanvas, IActionListener
 
 	public static void clearKeyPressed(int keycode)
 	{
-		isPointerRelease = false;
-		isPointerDown = false;
-		keyMyPressed[keycode] = false;
+		if (keycode == 0 || keycode == 4 || keycode == 24 || keycode == 34)
+		{
+			keyMyPressed[0] = false;
+			keyMyPressed[4] = false;
+			keyMyPressed[24] = false;
+			keyMyPressed[34] = false;
+		}
+		else if (keycode == 1 || keycode == 2 || keycode == 22 || keycode == 32)
+		{
+			keyMyPressed[1] = false;
+			keyMyPressed[2] = false;
+			keyMyPressed[22] = false;
+			keyMyPressed[32] = false;
+		}
+		else if (keycode == 6 || keycode == 26 || keycode == 36)
+		{
+			keyMyPressed[6] = false;
+			keyMyPressed[26] = false;
+			keyMyPressed[36] = false;
+		}
+		else if (keycode == 3 || keycode == 8 || keycode == 28 || keycode == 38)
+		{
+			keyMyPressed[3] = false;
+			keyMyPressed[8] = false;
+			keyMyPressed[28] = false;
+			keyMyPressed[38] = false;
+		}
+		else if (keycode == 12 || keycode == 40)
+		{
+			keyMyPressed[12] = false;
+			keyMyPressed[40] = false;
+		}
+		else if (keycode == 13 || keycode == 41)
+		{
+			keyMyPressed[13] = false;
+			keyMyPressed[41] = false;
+		}
+		else if (keycode >= 0 && keycode < keyMyPressed.Length)
+		{
+			keyMyPressed[keycode] = false;
+		}
 	}
 
 	public static void clearKeyHold()
 	{
-		isPointerRelease = false;
-		isPointerDown = false;
 		for (int i = 0; i < keyMyHold.Length; i++)
 		{
 			keyMyHold[i] = false;
@@ -957,9 +993,47 @@ public class GameCanvas : MotherCanvas, IActionListener
 
 	public static void clearKeyHold(int keycode)
 	{
-		isPointerRelease = false;
-		isPointerDown = false;
-		keyMyHold[keycode] = false;
+		if (keycode == 0 || keycode == 4 || keycode == 24 || keycode == 34)
+		{
+			keyMyHold[0] = false;
+			keyMyHold[4] = false;
+			keyMyHold[24] = false;
+			keyMyHold[34] = false;
+		}
+		else if (keycode == 1 || keycode == 2 || keycode == 22 || keycode == 32)
+		{
+			keyMyHold[1] = false;
+			keyMyHold[2] = false;
+			keyMyHold[22] = false;
+			keyMyHold[32] = false;
+		}
+		else if (keycode == 6 || keycode == 26 || keycode == 36)
+		{
+			keyMyHold[6] = false;
+			keyMyHold[26] = false;
+			keyMyHold[36] = false;
+		}
+		else if (keycode == 3 || keycode == 8 || keycode == 28 || keycode == 38)
+		{
+			keyMyHold[3] = false;
+			keyMyHold[8] = false;
+			keyMyHold[28] = false;
+			keyMyHold[38] = false;
+		}
+		else if (keycode == 12 || keycode == 40)
+		{
+			keyMyHold[12] = false;
+			keyMyHold[40] = false;
+		}
+		else if (keycode == 13 || keycode == 41)
+		{
+			keyMyHold[13] = false;
+			keyMyHold[41] = false;
+		}
+		else if (keycode >= 0 && keycode < keyMyHold.Length)
+		{
+			keyMyHold[keycode] = false;
+		}
 	}
 
 	public static void clearKeyReleased()
@@ -1210,25 +1284,47 @@ public class GameCanvas : MotherCanvas, IActionListener
 	{
 		switch (Dir)
 		{
-		case 1:
-			keyMyHold[2] = false;
-			keyMyHold[22] = false;
-			keyMyHold[32] = false;
-			break;
-		case 3:
-			keyMyHold[8] = false;
-			keyMyHold[28] = false;
-			keyMyHold[38] = false;
-			break;
 		case 0:
+			keyMyPressed[0] = false;
+			keyMyPressed[4] = false;
+			keyMyPressed[24] = false;
+			keyMyPressed[34] = false;
+			keyMyHold[0] = false;
 			keyMyHold[4] = false;
 			keyMyHold[24] = false;
 			keyMyHold[34] = false;
 			break;
+		case 1:
+			keyMyPressed[1] = false;
+			keyMyPressed[2] = false;
+			keyMyPressed[22] = false;
+			keyMyPressed[32] = false;
+			keyMyHold[1] = false;
+			keyMyHold[2] = false;
+			keyMyHold[22] = false;
+			keyMyHold[32] = false;
+			break;
 		case 2:
+			keyMyPressed[6] = false;
+			keyMyPressed[26] = false;
+			keyMyPressed[36] = false;
 			keyMyHold[6] = false;
 			keyMyHold[26] = false;
 			keyMyHold[36] = false;
+			break;
+		case 3:
+			keyMyPressed[3] = false;
+			keyMyPressed[8] = false;
+			keyMyPressed[28] = false;
+			keyMyPressed[38] = false;
+			keyMyHold[3] = false;
+			keyMyHold[8] = false;
+			keyMyHold[28] = false;
+			keyMyHold[38] = false;
+			break;
+		default:
+			clearKeyPressed(Dir);
+			clearKeyHold(Dir);
 			break;
 		}
 	}
@@ -1350,23 +1446,34 @@ public class GameCanvas : MotherCanvas, IActionListener
 		case 1:
 			clearKeyHold(21);
 			clearKeyHold(31);
+			clearKeyPressed(21);
+			clearKeyPressed(31);
 			break;
 		case 3:
 			clearKeyHold(23);
 			clearKeyHold(33);
+			clearKeyPressed(23);
+			clearKeyPressed(33);
 			break;
 		case 5:
 			clearKeyHold(5);
 			clearKeyHold(25);
 			clearKeyHold(35);
+			clearKeyPressed(5);
+			clearKeyPressed(25);
+			clearKeyPressed(35);
 			break;
 		case 7:
 			clearKeyHold(27);
 			clearKeyHold(37);
+			clearKeyPressed(27);
+			clearKeyPressed(37);
 			break;
 		case 9:
 			clearKeyHold(29);
 			clearKeyHold(39);
+			clearKeyPressed(29);
+			clearKeyPressed(39);
 			break;
 		case 0:
 			clearKeyHold(12);

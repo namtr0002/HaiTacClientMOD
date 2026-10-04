@@ -74,6 +74,16 @@ public class AThMadaraFunc
 		return Player.isSkillEnabledForAuto(skillId);
 	}
 
+	public static bool isSeaMap()
+	{
+		return LoadMap.specMap == 4 || (GameScreen.player != null && GameScreen.player.boatSea != null);
+	}
+
+	public static bool isSeaMap(Player p)
+	{
+		return LoadMap.specMap == 4 || (p != null && p.boatSea != null) || (GameScreen.player != null && GameScreen.player.boatSea != null);
+	}
+
 	public static bool isSkillUsable(Player p, Skill_Info sk, bool isAttackSkill)
 	{
 		if (sk == null) return false;
@@ -81,29 +91,25 @@ public class AThMadaraFunc
 		if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang()) return false;
 		if (sk.typeSkill == 3 || sk.typeSkill == 6) return false;
 
-		bool isSeaMap = (LoadMap.specMap == 4);
-		if (isSeaMap)
-		{
-			if (sk.typeSkill == 1) return false;
-		}
-		else
-		{
-			if (sk.typeSkill == 4) return false;
-		}
+		bool isSea = isSeaMap(p);
 
 		if (isAttackSkill)
 		{
-			if (isSeaMap)
+			if (isSea)
 			{
-				if (sk.typeSkill != 4 && sk.typeSkill != 0) return false;
+				// Trên biển: CHỈ dùng chiêu trên biển (typeSkill == 4). Chặn tuyệt đối chiêu thường (typeSkill == 1, 0...)
+				if (sk.typeSkill != 4) return false;
 			}
 			else
 			{
+				// Map thường: CHẶN TUYỆT ĐỐI chiêu trên biển (typeSkill == 4). Chỉ dùng chiêu thường (typeSkill == 1 hoặc 0)
+				if (sk.typeSkill == 4) return false;
 				if (sk.typeSkill != 1 && sk.typeSkill != 0) return false;
 			}
 		}
 		else
 		{
+			// Chiêu hỗ trợ (buff): typeSkill == 2
 			if (sk.typeSkill != 2) return false;
 			if (sk.typeBuff == 3)
 			{
@@ -112,9 +118,8 @@ public class AThMadaraFunc
 					return false;
 				}
 			}
+			if (!isSkillEnabledInAuto(sk.ID)) return false;
 		}
-
-		if (!isSkillEnabledInAuto(sk.ID)) return false;
 
 		DelaySkill d = DelaySkill.getDelay(sk.indexHotKey);
 		if (d != null && !d.isCoolDown()) return false;

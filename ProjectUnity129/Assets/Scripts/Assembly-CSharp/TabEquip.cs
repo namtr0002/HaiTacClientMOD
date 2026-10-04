@@ -222,7 +222,7 @@ public class TabEquip : MainTab
 		for (int i = 0; i < Player.vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
-			if (mainItem.typeObject == 3 && mainItem.typeEquip == num && (mainItem.charClass == 0 || mainItem.charClass == GameScreen.player.clazz))
+			if (mainItem != null && mainItem.typeObject == 3 && mainItem.typeEquip == num && (mainItem.charClass == 0 || mainItem.charClass == GameScreen.player.clazz))
 			{
 				mVector2.addElement(mainItem);
 			}
@@ -291,9 +291,9 @@ public class TabEquip : MainTab
 				mainItem.paintColor(g, mposEquip[i][0] + wItemCur / 2 - 1, mposEquip[i][1] + wItemCur / 2 - 1, wItemCur - 3);
 				mainItem.paint(g, mposEquip[i][0] + wItemCur / 2 - 1, mposEquip[i][1] + wItemCur / 2 - 1, wItemCur, 1);
 			}
-			else if (AvMain.fraEquip != null)
+			else
 			{
-				AvMain.fraEquip.drawFrame(i, mposEquip[i][0] + wItemCur / 2 - 1, mposEquip[i][1] + wItemCur / 2 - 1, 0, 3, g);
+				AvMain.paintEquipSilhouette(g, i, mposEquip[i][0] + wItemCur / 2 - 1, mposEquip[i][1] + wItemCur / 2 - 1);
 			}
 			if (IdSelect == i && GameCanvas.currentScreen.setCurTypetab(1))
 			{

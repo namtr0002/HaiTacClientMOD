@@ -648,6 +648,16 @@ public class Menu : AvMain
 		{
 			timeShowSelect--;
 		}
+		// Đóng menu nhanh bằng phím F2 (13), Esc (41), hoặc Back
+		if (GameCanvas.isKeyPressed(13) || GameCanvas.keyMyHold[13] || GameCanvas.isKeyPressed(41) || GameCanvas.keyMyHold[41] || GameCanvas.UseKey(13) || GameCanvas.UseKey(41))
+		{
+			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(13);
+			GameCanvas.clearKeyHold(41);
+			GameCanvas.clearKeyPressed(41);
+			doCloseMenu();
+			return;
+		}
 		bool flag = false;
 		if (isNPCMenu == 1)
 		{
@@ -680,9 +690,14 @@ public class Menu : AvMain
 					}
 				}
 			}
-			if (GameCanvas.keyMyHold[5])
+			if (GameCanvas.keyMyHold[5] || GameCanvas.keyMyPressed[5] || GameCanvas.isKeyPressed(5) || GameCanvas.isKeyPressed(12) || GameCanvas.isKeyPressed(40) || GameCanvas.keyMyHold[12] || GameCanvas.keyMyHold[40])
 			{
 				GameCanvas.clearKeyHold(5);
+				GameCanvas.clearKeyPressed(5);
+				GameCanvas.clearKeyHold(12);
+				GameCanvas.clearKeyPressed(12);
+				GameCanvas.clearKeyHold(40);
+				GameCanvas.clearKeyPressed(40);
 				if (menuSelectedItem < menuItems.size() && menuSelectedItem >= 0)
 				{
 					((iCommand)menuItems.elementAt(menuSelectedItem)).perform();
@@ -714,7 +729,7 @@ public class Menu : AvMain
 					GameCanvas.ClearkeyMove(2);
 				}
 			}
-			else if (GameCanvas.keyMove(1))
+			else if (GameCanvas.keyMove(1) || GameCanvas.keyMove(0))
 			{
 				flag = true;
 				menuSelectedItem--;
@@ -723,8 +738,9 @@ public class Menu : AvMain
 					menuSelectedItem = menuItems.size() - 1;
 				}
 				GameCanvas.ClearkeyMove(1);
+				GameCanvas.ClearkeyMove(0);
 			}
-			else if (GameCanvas.keyMove(3))
+			else if (GameCanvas.keyMove(3) || GameCanvas.keyMove(2))
 			{
 				flag = true;
 				menuSelectedItem++;
@@ -733,6 +749,7 @@ public class Menu : AvMain
 					menuSelectedItem = 0;
 				}
 				GameCanvas.ClearkeyMove(3);
+				GameCanvas.ClearkeyMove(2);
 			}
 		}
 		if (flag)
@@ -768,9 +785,12 @@ public class Menu : AvMain
 			{
 				update_Pos_UP_DOWN();
 			}
-			if (GameCanvas.isPointerSelect && GameCanvas.menuCur == this && !GameCanvas.isPoint(menuX - 5, menuTemY - 5 - hPlus, wUni + 10, menuH + 10 + hPlus))
+			if ((GameCanvas.isPointerSelect || GameCanvas.isPointerClick || GameCanvas.isPointerRelease) && GameCanvas.menuCur == this)
 			{
-				doCloseMenu();
+				if (!GameCanvas.isPoint(menuX - 5, menuTemY - 5 - hPlus, wUni + 10, menuH + 10 + hPlus) && !GameCanvas.isPointLast(menuX - 5, menuTemY - 5 - hPlus, wUni + 10, menuH + 10 + hPlus))
+				{
+					doCloseMenu();
+				}
 			}
 		}
 		else if (isNPCMenu == 2)
@@ -787,6 +807,34 @@ public class Menu : AvMain
 
 	public void updatePos_LEFT_RIGHT()
 	{
+		if (GameCanvas.keyMyPressed[13] || GameCanvas.keyMyPressed[41] || GameCanvas.isKeyPressed(13) || GameCanvas.isKeyPressed(41))
+		{
+			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(13);
+			GameCanvas.clearKeyHold(41);
+			GameCanvas.clearKeyPressed(41);
+			doCloseMenu();
+			return;
+		}
+		if (timeShowSelect <= 0 && (GameCanvas.keyMyPressed[5] || GameCanvas.keyMyPressed[12] || GameCanvas.keyMyPressed[40] || GameCanvas.isKeyPressed(5) || GameCanvas.isKeyPressed(12) || GameCanvas.isKeyPressed(40)))
+		{
+			GameCanvas.clearKeyHold(5);
+			GameCanvas.clearKeyPressed(5);
+			GameCanvas.clearKeyHold(12);
+			GameCanvas.clearKeyPressed(12);
+			GameCanvas.clearKeyHold(40);
+			GameCanvas.clearKeyPressed(40);
+			if (menuSelectedItem >= 0 && menuSelectedItem < menuItems.size())
+			{
+				iCommand iCommand = (iCommand)menuItems.elementAt(menuSelectedItem);
+				if (!iCommand.isDonotCloseMenu)
+				{
+					doCloseMenu();
+				}
+				perform(iCommand);
+				return;
+			}
+		}
 		if (GameCanvas.isPointerDown)
 		{
 			if (!pointerIsDowning && GameCanvas.isPointer(menuX, menuY, wUni, menuH))
@@ -881,27 +929,33 @@ public class Menu : AvMain
 
 	public void update_Pos_UP_DOWN()
 	{
-		if (timeShowSelect <= 0 && GameCanvas.keyMyPressed[5])
+		if (GameCanvas.keyMyPressed[13] || GameCanvas.keyMyPressed[41] || GameCanvas.isKeyPressed(13) || GameCanvas.isKeyPressed(41) || GameCanvas.UseKey(13) || GameCanvas.UseKey(41) || GameCanvas.keyMyHold[13] || GameCanvas.keyMyHold[41])
 		{
-			GameCanvas.clearKeyHold();
-			GameCanvas.clearKeyPressed();
-			iCommand iCommand2 = (iCommand)menuItems.elementAt(menuSelectedItem);
-			if (!iCommand2.isDonotCloseMenu)
-			{
-				doCloseMenu();
-			}
-			perform(iCommand2);
+			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(13);
+			GameCanvas.clearKeyHold(41);
+			GameCanvas.clearKeyPressed(41);
+			doCloseMenu();
+			return;
 		}
-		else if (timeShowSelect <= 0 && GameCanvas.keyMyPressed[12])
+		if (timeShowSelect <= 0 && (GameCanvas.keyMyPressed[5] || GameCanvas.keyMyPressed[12] || GameCanvas.keyMyPressed[40] || GameCanvas.isKeyPressed(5) || GameCanvas.isKeyPressed(12) || GameCanvas.isKeyPressed(40)))
 		{
-			GameCanvas.clearKeyHold();
-			GameCanvas.clearKeyPressed();
-			iCommand iCommand3 = (iCommand)menuItems.elementAt(menuSelectedItem);
-			if (!iCommand3.isDonotCloseMenu)
+			GameCanvas.clearKeyHold(5);
+			GameCanvas.clearKeyPressed(5);
+			GameCanvas.clearKeyHold(12);
+			GameCanvas.clearKeyPressed(12);
+			GameCanvas.clearKeyHold(40);
+			GameCanvas.clearKeyPressed(40);
+			if (menuSelectedItem >= 0 && menuSelectedItem < menuItems.size())
 			{
-				doCloseMenu();
+				iCommand iCommand2 = (iCommand)menuItems.elementAt(menuSelectedItem);
+				if (!iCommand2.isDonotCloseMenu)
+				{
+					doCloseMenu();
+				}
+				perform(iCommand2);
+				return;
 			}
-			perform(iCommand3);
 		}
 		if (GameCanvas.isPointerDown)
 		{
@@ -996,6 +1050,14 @@ public class Menu : AvMain
 		if (GameCanvas.isPointerRelease && pointerIsDowning)
 		{
 			pointerIsDowning = false;
+		}
+		if ((GameCanvas.isPointerClick || GameCanvas.isPointerSelect || GameCanvas.isPointerRelease) && !pointerIsDowning)
+		{
+			if (!GameCanvas.isPoint(menuX - 5, menuTemY - 5 - hPlus, wUni + 10, menuH + 10 + hPlus) && !GameCanvas.isPointLast(menuX - 5, menuTemY - 5 - hPlus, wUni + 10, menuH + 10 + hPlus))
+			{
+				doCloseMenu();
+				return;
+			}
 		}
 	}
 

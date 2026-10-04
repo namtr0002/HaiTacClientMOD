@@ -60,6 +60,12 @@ public class Point
 
 	public MainObject obj;
 
+	public int AK;
+
+	public int AL;
+
+	public MainObject AZ;
+
 	public Point()
 	{
 	}
@@ -93,6 +99,8 @@ public class Point
 		isSmall = false;
 		fraImgEff = null;
 		obj = null;
+		AK = AL = 0;
+		AZ = null;
 		if (vecEffPoint != null) vecEffPoint.removeAllElements();
 	}
 
@@ -149,16 +157,13 @@ public class PointPool
 
 	public static Point obtain(int x = 0, int y = 0)
 	{
-		lock (pool)
+		if (pool.Count > 0)
 		{
-			if (pool.Count > 0)
-			{
-				Point p = pool.Pop();
-				p.reset();
-				p.x = x;
-				p.y = y;
-				return p;
-			}
+			Point p = pool.Pop();
+			p.reset();
+			p.x = x;
+			p.y = y;
+			return p;
 		}
 		return new Point(x, y);
 	}
@@ -166,13 +171,10 @@ public class PointPool
 	public static void recycle(Point p)
 	{
 		if (p == null) return;
-		lock (pool)
+		if (pool.Count < 256)
 		{
-			if (pool.Count < 256)
-			{
-				p.reset();
-				pool.Push(p);
-			}
+			p.reset();
+			pool.Push(p);
 		}
 	}
 

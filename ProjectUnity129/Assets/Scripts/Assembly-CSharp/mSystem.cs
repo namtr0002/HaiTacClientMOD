@@ -88,11 +88,9 @@ public class mSystem
 
 	public static sbyte[] convertToSbyte(byte[] scr)
 	{
+		if (scr == null) return null;
 		sbyte[] array = new sbyte[scr.Length];
-		for (int i = 0; i < scr.Length; i++)
-		{
-			array[i] = (sbyte)scr[i];
-		}
+		Buffer.BlockCopy(scr, 0, array, 0, scr.Length);
 		return array;
 	}
 
@@ -103,18 +101,9 @@ public class mSystem
 
 	public static byte[] convetToByte(sbyte[] scr)
 	{
+		if (scr == null) return null;
 		byte[] array = new byte[scr.Length];
-		for (int i = 0; i < scr.Length; i++)
-		{
-			if (scr[i] > 0)
-			{
-				array[i] = (byte)scr[i];
-			}
-			else
-			{
-				array[i] = (byte)(scr[i] + 256);
-			}
-		}
+		Buffer.BlockCopy(scr, 0, array, 0, scr.Length);
 		return array;
 	}
 
@@ -144,8 +133,11 @@ public class mSystem
 
 	public static void gc()
 	{
-		Resources.UnloadUnusedAssets();
-		GC.Collect();
+		if (GameCanvas.currentScreen == GameCanvas.loadMapScr || GameCanvas.currentScreen == null)
+		{
+			Resources.UnloadUnusedAssets();
+			GC.Collect();
+		}
 	}
 
 	public static int[][] new_M_Int(int value1, int value2)
@@ -164,8 +156,11 @@ public class mSystem
 
 	public static void gcc()
 	{
-		Resources.UnloadUnusedAssets();
-		GC.Collect();
+		if (GameCanvas.currentScreen == GameCanvas.loadMapScr || GameCanvas.currentScreen == null)
+		{
+			Resources.UnloadUnusedAssets();
+			GC.Collect();
+		}
 	}
 
 	public static void onConnectOK()

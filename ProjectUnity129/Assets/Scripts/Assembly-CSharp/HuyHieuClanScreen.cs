@@ -408,7 +408,7 @@ public class HuyHieuClanScreen : LuckyScreen
 			isContinue = false;
 			isRunningOpenXu = false;
 			numXuInput = 0;
-			GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.notEnoughXuHanhTrinh);
+			Main.runOnMainThread(() => GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.notEnoughXuHanhTrinh));
 			return;
 		}
 		if (numXuInput == 0)

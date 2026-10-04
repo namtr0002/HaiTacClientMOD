@@ -11,7 +11,6 @@ public class ScaleGUI
 
 	private static List<Matrix4x4> stack = new List<Matrix4x4>();
 
-	private static bool isInitPCResolution = false;
 
 	public static void initScaleGUI()
 	{

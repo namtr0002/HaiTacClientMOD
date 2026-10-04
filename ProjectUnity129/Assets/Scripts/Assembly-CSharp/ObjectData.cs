@@ -286,11 +286,7 @@ public class ObjectData
 
 	public static bool setIdOK(short id)
 	{
-		if (GameMidlet.DEVICE != 0 && GameMidlet.DEVICE != 4)
-		{
-			return true;
-		}
-		return false;
+		return GameMidlet.DEVICE != 0;
 	}
 
 	public static void setToRms(sbyte[] mimg, sbyte type, int id)

@@ -362,6 +362,12 @@ public class MainObject : AvMain
 
 	public bool isTanHinh;
 
+	public bool isGom = false;
+
+	public int gomX;
+
+	public int gomY;
+
 	public bool isPaintWeapon = true;
 
 	public bool isPaintSpec;
@@ -2670,9 +2676,33 @@ public class MainObject : AvMain
 
 	public static MainObject get_Object(int ID, sbyte tem)
 	{
+		if (GameScreen.player != null && GameScreen.player.typeObject == tem)
+		{
+			short numP = (tem == 10) ? GameScreen.player.IDMainShiper : GameScreen.player.ID;
+			if (numP == ID)
+			{
+				if (GameScreen.player.isRemove || GameScreen.player.isStop)
+				{
+					return null;
+				}
+				return GameScreen.player;
+			}
+		}
+		if (GameScreen.objFocus != null && GameScreen.objFocus.typeObject == tem)
+		{
+			short numF = (tem == 10) ? GameScreen.objFocus.IDMainShiper : GameScreen.objFocus.ID;
+			if (numF == ID)
+			{
+				if (GameScreen.objFocus.isRemove || GameScreen.objFocus.isStop)
+				{
+					return null;
+				}
+				return GameScreen.objFocus;
+			}
+		}
 		for (int num = GameScreen.vecPlayers.size() - 1; num >= 0; num--)
 		{
-			if (num != GameScreen.vecPlayers.size())
+			if (num < GameScreen.vecPlayers.size())
 			{
 				MainObject mainObject = (MainObject)GameScreen.vecPlayers.elementAt(num);
 				if (mainObject != null && mainObject.typeObject == tem)
@@ -2686,6 +2716,8 @@ public class MainObject : AvMain
 					{
 						if (mainObject.isRemove || mainObject.isStop)
 						{
+							GameScreen.vecPlayers.removeElement(mainObject);
+							GameScreen.isVecPlayersDirty = true;
 							return null;
 						}
 						return mainObject;
@@ -3019,6 +3051,7 @@ public class MainObject : AvMain
 	public virtual void Reveive()
 	{
 		isFlyDie = false;
+		isDie = false;
 		vecSkillFires.removeAllElements();
 		vecBuffCur.removeAllElements();
 		vecBuffCurNew.removeAllElements();

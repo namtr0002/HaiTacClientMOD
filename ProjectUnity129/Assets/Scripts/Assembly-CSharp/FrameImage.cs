@@ -50,6 +50,10 @@ public class FrameImage
 
 	private bool isFormFrame;
 
+	private bool isLoaded;
+
+	private int lastLoadAttemptFrame = -1;
+
 	private int normalizeId(int id)
 	{
 		if (id >= 25000)
@@ -73,10 +77,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageHeight(img.image) / height;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageHeight(img.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 		maxNumFrame = nFrame;
 	}
@@ -91,10 +97,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageWidth(img.image) / width * this.maxNumFrame;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageWidth(img.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 	}
 
@@ -109,10 +117,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageWidth(img.image) / width * this.maxNumFrame;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageWidth(img.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 	}
 
@@ -126,10 +136,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageHeight(imgFrame.image) / height;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageHeight(imgFrame.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 		maxNumFrame = nFrame;
 	}
@@ -144,6 +156,11 @@ public class FrameImage
 		{
 			frameWidth = mImage.getImageWidth(imgFrame.image);
 			frameHeight = mImage.getImageHeight(imgFrame.image) / numframe;
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
+		}
+		else
+		{
+			isLoaded = false;
 		}
 	}
 
@@ -158,6 +175,11 @@ public class FrameImage
 		{
 			frameWidth = mImage.getImageWidth(imgFrame.image);
 			frameHeight = mImage.getImageHeight(imgFrame.image) / numframe;
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
+		}
+		else
+		{
+			isLoaded = false;
 		}
 	}
 
@@ -174,10 +196,16 @@ public class FrameImage
 			{
 				frameWidth = mImage.getImageWidth(imgFrame.image);
 				frameHeight = mImage.getImageHeight(imgFrame.image) / numframe;
+				isLoaded = (frameWidth > 0 && frameHeight > 0);
+			}
+			else
+			{
+				isLoaded = false;
 			}
 		}
 		catch (Exception)
 		{
+			isLoaded = false;
 		}
 	}
 
@@ -200,10 +228,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageHeight(imgFrame.image) / frameHeight;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageHeight(imgFrame.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 		maxNumFrame = nFrame;
 	}
@@ -224,10 +254,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageWidth(imgFrame.image) / width * this.maxNumFrame;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageWidth(imgFrame.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 	}
 
@@ -248,10 +280,12 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageWidth(imgFrame.image) / width * this.maxNumFrame;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageWidth(imgFrame.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
 		}
 	}
 
@@ -275,10 +309,68 @@ public class FrameImage
 		{
 			nFrame = mImage.getImageWidth(imgFrame.image) / frameWidth * this.maxNumFrame;
 			if (nFrame < 1) nFrame = 1;
+			isLoaded = (mImage.getImageWidth(imgFrame.image) > 0);
 		}
 		else
 		{
 			nFrame = 1;
+			isLoaded = false;
+		}
+	}
+
+	public void updateDimensions()
+	{
+		if (imgFrame == null || imgFrame.image == null) return;
+		int imgW = mImage.getImageWidth(imgFrame.image);
+		int imgH = mImage.getImageHeight(imgFrame.image);
+		if (imgW <= 0 && imgFrame.image != null) imgW = imgFrame.image.getWidth();
+		if (imgH <= 0 && imgFrame.image != null) imgH = imgFrame.image.getHeight();
+		if (imgW <= 0 || imgH <= 0) return;
+
+		if (isFormFrame)
+		{
+			if (imgW > 0) frameWidth = imgW;
+			if (nFrame > 0 && imgH > 0)
+			{
+				frameHeight = imgH / nFrame;
+			}
+			else if (imgH > 0)
+			{
+				frameHeight = imgH;
+			}
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
+		}
+		else if (maxNumFrame > 1 && frameWidth > 0)
+		{
+			nFrame = (imgW / frameWidth) * maxNumFrame;
+			if (nFrame < 1) nFrame = 1;
+			if (frameHeight <= 0 && imgH > 0)
+			{
+				frameHeight = imgH / maxNumFrame;
+			}
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
+		}
+		else if (frameHeight > 0)
+		{
+			nFrame = imgH / frameHeight;
+			if (nFrame < 1) nFrame = 1;
+			maxNumFrame = nFrame;
+			if (frameWidth <= 0 && imgW > 0)
+			{
+				frameWidth = imgW;
+			}
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
+		}
+		else if (frameWidth > 0)
+		{
+			nFrame = imgW / frameWidth;
+			if (nFrame < 1) nFrame = 1;
+			maxNumFrame = 1;
+			if (frameHeight <= 0 && imgH > 0)
+			{
+				frameHeight = imgH;
+			}
+			isLoaded = (frameWidth > 0 && frameHeight > 0);
 		}
 	}
 
@@ -287,37 +379,23 @@ public class FrameImage
 	public void drawFrame(int idx, int x, int y, int trans, int orthor, mGraphics g)
 	{
 		if (g == null) return;
-		// Retry load nếu image chưa sẵn sàng (null hoặc texture chưa load), chỉ khi có Id hợp lệ
-		if (Id >= 0 && (imgFrame == null || imgFrame.image == null))
+		if (imgFrame == null || imgFrame.image == null)
 		{
-			mImage loaded = getImage();
-			if (loaded != null && loaded.image != null)
+			int curTick = GameCanvas.gameTick;
+			if (curTick - lastLoadAttemptFrame < 30 && lastLoadAttemptFrame >= 0) return;
+			lastLoadAttemptFrame = curTick;
+			imgFrame = getImage();
+			if (imgFrame == null || imgFrame.image == null) return;
+			isLoaded = false;
+		}
+		if (!isLoaded || frameWidth <= 0 || frameHeight <= 0)
+		{
+			updateDimensions();
+			if (imgFrame != null && imgFrame.image != null && imgFrame.image.texture != null && imgFrame.image.texture.filterMode != UnityEngine.FilterMode.Bilinear)
 			{
-				imgFrame = loaded;
+				imgFrame.image.texture.filterMode = UnityEngine.FilterMode.Bilinear;
 			}
 		}
-		if (imgFrame == null || imgFrame.image == null) return;
-
-		// Lazy-init dims lần đầu tiên sau khi image load xong
-		if (isFormFrame)
-		{
-			if (frameWidth <= 0 || frameHeight <= 0)
-			{
-				frameWidth = mImage.getImageWidth(imgFrame.image);
-				frameHeight = (nFrame > 0) ? (mImage.getImageHeight(imgFrame.image) / nFrame) : mImage.getImageHeight(imgFrame.image);
-			}
-		}
-		else if (frameHeight > 0 && nFrame <= 1)
-		{
-			int h = mImage.getImageHeight(imgFrame.image);
-			if (h > 0 && frameHeight > 0)
-			{
-				nFrame = h / frameHeight;
-				if (nFrame < 1) nFrame = 1;
-				maxNumFrame = nFrame;
-			}
-		}
-
 		if (idx >= 0 && idx < nFrame && frameHeight > 0 && frameWidth > 0)
 		{
 			g.drawRegion(imgFrame, 0, idx * frameHeight, frameWidth, frameHeight, trans, x, y, orthor);
@@ -336,6 +414,7 @@ public class FrameImage
 			if (loaded != null && loaded.image != null)
 			{
 				imgFrame = loaded;
+				isLoaded = false;
 			}
 		}
 		return imgFrame;
@@ -350,6 +429,15 @@ public class FrameImage
 		try
 		{
 			MainImage mainImg = ObjectData.getImage(lowG ? IconType.EFF_CLIENT_LOW : IconType.EFF_CLIENT, Id);
+			if (mainImg != null && mainImg.img != null && mainImg.img.image != null)
+			{
+				if (imgFrame != mainImg.img)
+				{
+					imgFrame = mainImg.img;
+					isLoaded = false;
+				}
+				return imgFrame;
+			}
 			return (mainImg != null) ? mainImg.img : null;
 		}
 		catch (Exception)
@@ -363,36 +451,19 @@ public class FrameImage
 		if (g == null) return;
 		int maxN = (maxNumFrame > 0) ? maxNumFrame : 1;
 		int num = idx + indexSuper * maxN;
-		// Retry load nếu image chưa sẵn sàng
-		if (Id >= 0 && (imgFrame == null || imgFrame.image == null))
+		if (imgFrame == null || imgFrame.image == null)
 		{
-			mImage loaded = getImage();
-			if (loaded != null && loaded.image != null)
-			{
-				imgFrame = loaded;
-			}
+			int curTick = GameCanvas.gameTick;
+			if (curTick - lastLoadAttemptFrame < 30 && lastLoadAttemptFrame >= 0) return;
+			lastLoadAttemptFrame = curTick;
+			imgFrame = getImage();
+			if (imgFrame == null || imgFrame.image == null) return;
+			isLoaded = false;
 		}
-		if (imgFrame == null || imgFrame.image == null) return;
-
-		// Lazy-init dims
-		if (isFormFrame)
+		if (!isLoaded || frameWidth <= 0 || frameHeight <= 0)
 		{
-			if (frameWidth <= 0 || frameHeight <= 0)
-			{
-				frameWidth = mImage.getImageWidth(imgFrame.image);
-				frameHeight = (nFrame > 0) ? (mImage.getImageHeight(imgFrame.image) / nFrame) : mImage.getImageHeight(imgFrame.image);
-			}
+			updateDimensions();
 		}
-		else if (frameWidth > 0 && nFrame <= 1)
-		{
-			int w = mImage.getImageWidth(imgFrame.image);
-			if (w > 0 && frameWidth > 0)
-			{
-				nFrame = w / frameWidth * maxN;
-				if (nFrame < 1) nFrame = 1;
-			}
-		}
-
 		if (num >= 0 && num < nFrame && maxN > 0 && frameWidth > 0 && frameHeight > 0)
 		{
 			g.drawRegion(imgFrame, num / maxN * frameWidth, num % maxN * frameHeight, frameWidth, frameHeight, trans, x, y, orthor);
@@ -403,36 +474,19 @@ public class FrameImage
 	{
 		if (g == null) return;
 		int maxN = (maxNumFrame > 0) ? maxNumFrame : 1;
-		// Retry load nếu image chưa sẵn sàng
-		if (Id >= 0 && (imgFrame == null || imgFrame.image == null))
+		if (imgFrame == null || imgFrame.image == null)
 		{
-			mImage loaded = getImage();
-			if (loaded != null && loaded.image != null)
-			{
-				imgFrame = loaded;
-			}
+			int curTick = GameCanvas.gameTick;
+			if (curTick - lastLoadAttemptFrame < 30 && lastLoadAttemptFrame >= 0) return;
+			lastLoadAttemptFrame = curTick;
+			imgFrame = getImage();
+			if (imgFrame == null || imgFrame.image == null) return;
+			isLoaded = false;
 		}
-		if (imgFrame == null || imgFrame.image == null) return;
-
-		// Lazy-init dims
-		if (isFormFrame)
+		if (!isLoaded || frameWidth <= 0 || frameHeight <= 0)
 		{
-			if (frameWidth <= 0 || frameHeight <= 0)
-			{
-				frameWidth = mImage.getImageWidth(imgFrame.image);
-				frameHeight = (nFrame > 0) ? (mImage.getImageHeight(imgFrame.image) / nFrame) : mImage.getImageHeight(imgFrame.image);
-			}
+			updateDimensions();
 		}
-		else if (frameWidth > 0 && nFrame <= 1)
-		{
-			int w = mImage.getImageWidth(imgFrame.image);
-			if (w > 0 && frameWidth > 0)
-			{
-				nFrame = w / frameWidth * maxN;
-				if (nFrame < 1) nFrame = 1;
-			}
-		}
-
 		if (idx >= 0 && idx < nFrame && maxN > 0 && frameWidth > 0 && frameHeight > 0)
 		{
 			g.drawRegion(imgFrame, idx / maxN * frameWidth, idx % maxN * frameHeight, frameWidth, frameHeight, trans, x, y, orthor);

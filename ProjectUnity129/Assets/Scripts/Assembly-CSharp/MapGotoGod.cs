@@ -85,14 +85,26 @@ public class MapGotoGod
 		mapH = 18;
 		imgTile = null;
 		imgTileWater = null;
-		mLockMap = new sbyte[30]
+		mLockMap = new sbyte[40]
 		{
 			8, 11, 8, 8, 5, 5, 20, 20, 13, 13,
 			8, 8, 4, 4, 4, 7, 4, 4, 7, 7,
-			25, 42, 9, 12, 5, 5, 8, 8, 9, 12
+			25, 42, 9, 12, 5, 5, 8, 8, 9, 12,
+			2, 2, 3, 5, 6, 8, 4, 4, 13, 13
 		};
-		fWater = mLockMap[idTile * 2];
-		fStand = mLockMap[idTile * 2 + 1];
+		if (idTile >= 0 && idTile * 2 + 1 < mLockMap.Length)
+		{
+			fWater = mLockMap[idTile * 2];
+			fStand = mLockMap[idTile * 2 + 1];
+		}
+		if (fWater <= 0)
+		{
+			fWater = 8;
+		}
+		if (fStand <= 0)
+		{
+			fStand = 11;
+		}
 		mapPaint = new int[810]
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

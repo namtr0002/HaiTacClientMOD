@@ -1,8 +1,5 @@
 public class MainMonster : MainObject
 {
-	public bool isGom = false;
-	public int gomX, gomY;
-
 	public const sbyte MONSTER_MOVE_12 = 0;
 
 	public const sbyte MONSTER_MOVE_234 = 1;

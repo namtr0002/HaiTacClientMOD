@@ -46,7 +46,7 @@ public class Uniform
 					break;
 				}
 				MainItem mainItem = (MainItem)Player.vecInventory.elementAt(j);
-				if (mainItem.typeObject == 3 && mainItem.ID == mIdUniform[i])
+				if (mainItem != null && mainItem.typeObject == 3 && mainItem.ID == mIdUniform[i])
 				{
 					GlobalService.gI().Use_Item(mIdUniform[i], 3);
 					flag = true;
@@ -66,6 +66,10 @@ public class Uniform
 		for (int i = 0; i < Player.vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
+			if (mainItem == null)
+			{
+				continue;
+			}
 			mainItem.indexUniform = -1;
 			if (isRemove || mainItem.typeObject != 3)
 			{
@@ -74,6 +78,10 @@ public class Uniform
 			for (int j = 0; j < Player.vecUniform.size(); j++)
 			{
 				Uniform uniform = (Uniform)Player.vecUniform.elementAt(j);
+				if (uniform == null || uniform.mIdUniform == null)
+				{
+					continue;
+				}
 				for (int k = 0; k < uniform.mIdUniform.Length; k++)
 				{
 					if (mainItem.ID == uniform.mIdUniform[k])

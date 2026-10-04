@@ -68,7 +68,15 @@ public class LoadMap
 
 	public static mVector mItemMapNonData = new mVector();
 
-	public static sbyte[] mLockMap;
+	public static readonly sbyte[] DEFAULT_LOCK_MAP = new sbyte[40]
+	{
+		8, 11, 8, 8, 5, 5, 20, 20, 13, 13,
+		8, 8, 4, 4, 4, 7, 4, 4, 7, 7,
+		25, 42, 9, 12, 5, 5, 8, 8, 9, 12,
+		2, 2, 3, 5, 6, 8, 4, 4, 13, 13
+	};
+
+	public static sbyte[] mLockMap = (sbyte[])DEFAULT_LOCK_MAP.Clone();
 
 	public static short[] mMapLang;
 
@@ -142,9 +150,9 @@ public class LoadMap
 
 	public static bool isOnlineMap = true;
 
-	private int fStand;
+	private int fStand = 11;
 
-	private int fWater;
+	private int fWater = 8;
 
 	public static int demSendTem = 0;
 
@@ -158,6 +166,9 @@ public class LoadMap
 
 	public LoadMap()
 	{
+		idTile = -1;
+		fStand = 11;
+		fWater = 8;
 		maxX = MotherCanvas.w / wTile + 1;
 		maxY = MotherCanvas.h / wTile + 1;
 		for (int i = 0; i < mItemMap.Length; i++)
@@ -174,13 +185,74 @@ public class LoadMap
 			mapW = dataInputStream.readByte();
 			mapH = dataInputStream.readByte();
 			int num = dataInputStream.readByte();
+			bool validLock = (mLockMap != null && mLockMap.Length >= 40);
+			if (validLock)
+			{
+				for (int i = 0; i < mLockMap.Length; ++i)
+				{
+					if (mLockMap[i] <= 0)
+					{
+						validLock = false;
+						break;
+					}
+				}
+			}
+			if (!validLock)
+			{
+				try
+				{
+					sbyte[] array = CRes.loadRMS("mLockMap");
+					if (array != null && array.Length >= 40)
+					{
+						bool rmsValid = true;
+						for (int i = 0; i < array.Length; ++i)
+						{
+							if (array[i] <= 0)
+							{
+								rmsValid = false;
+								break;
+							}
+						}
+						if (rmsValid)
+						{
+							mLockMap = array;
+							validLock = true;
+						}
+					}
+				}
+				catch (Exception)
+				{
+				}
+			}
+			if (!validLock || mLockMap == null || mLockMap.Length < 40)
+			{
+				mLockMap = (sbyte[])DEFAULT_LOCK_MAP.Clone();
+				try
+				{
+					CRes.saveRMS("mLockMap", mLockMap);
+				}
+				catch (Exception)
+				{
+				}
+			}
+			if (num >= 0 && num * 2 + 1 < mLockMap.Length)
+			{
+				fWater = mLockMap[num * 2];
+				fStand = mLockMap[num * 2 + 1];
+			}
+			if (fWater <= 0)
+			{
+				fWater = 8;
+			}
+			if (fStand <= 0)
+			{
+				fStand = 11;
+			}
 			if (idTile != num)
 			{
 				idTile = num;
 				imgTile = null;
 				imgTileWater = null;
-				fWater = mLockMap[idTile * 2];
-				fStand = mLockMap[idTile * 2 + 1];
 				ObjectData.getImageOther((short)idTile, 20);
 				if (idTile == 11 || idTile == 14)
 				{
@@ -344,7 +416,7 @@ public class LoadMap
 		{
 			num4 = maxRow;
 		}
-		if ((imgTileWater == null || imgTileWater.img == null) && !GameCanvas.lowGraphic)
+		if ((imgTileWater == null || imgTileWater.img == null) && !GameCanvas.lowGraphic && (idTile == 3 || fWater < fStand))
 		{
 			imgTileWater = ObjectData.getImageOther((short)idTile, 70);
 		}
@@ -355,47 +427,37 @@ public class LoadMap
 			g.fillRect(MainScreen.cameraMain.xCam, MainScreen.cameraMain.yCam, MotherCanvas.w, MotherCanvas.h);
 			return;
 		}
+		if (num3 > mapW) num3 = mapW;
+		if (num4 > mapH) num4 = mapH;
+		mImage tileImg = (imgTile != null) ? imgTile.img : null;
+		mImage waterImg = (imgTileWater != null) ? imgTileWater.img : null;
+		bool hasWater = !GameCanvas.lowGraphic && waterImg != null && (idTile == 3 || fWater < fStand);
+		int tickMod14 = GameCanvas.gameTick % 14;
+		int tickDiv14 = GameCanvas.gameTick / 14;
+
 		for (int i = num; i < num3; i++)
 		{
 			for (int j = num2; j < num4; j++)
 			{
-				int safeI = (i < mapW) ? i : (mapW - 1);
-				int safeJ = (j < mapH) ? j : (mapH - 1);
-				if (safeI < 0) safeI = 0;
-				if (safeJ < 0) safeJ = 0;
-				int num5 = safeJ * mapW + safeI;
+				int num5 = j * mapW + i;
 				if (num5 >= mapPaint.Length)
 				{
 					continue;
 				}
 				int num6 = mapPaint[num5] - 1;
-				if (!GameCanvas.lowGraphic && idTile == 3 && num6 >= 35 && num6 <= 37 && GameCanvas.gameTick % 14 < 7)
+				if (hasWater && idTile == 3 && num6 >= 35 && num6 <= 37 && tickMod14 < 7)
 				{
-					int num7 = 0;
-					if (GameCanvas.gameTick / 14 % 2 == 0)
-					{
-						num7 = 3;
-					}
-					if (imgTileWater != null && imgTileWater.img != null)
-					{
-						g.drawRegion(imgTileWater.img, (num7 + num6 - 35) / 10 * wTile, (num7 + num6 - 35) % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
-					}
+					int num7 = (tickDiv14 % 2 == 0) ? 3 : 0;
+					g.drawRegion(waterImg, (num7 + num6 - 35) / 10 * wTile, (num7 + num6 - 35) % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
 				}
-				else if (!GameCanvas.lowGraphic && num6 >= fWater - 1 && num6 < fStand - 1 && GameCanvas.gameTick % 14 < 7 && idTile != 3)
+				else if (hasWater && num6 >= fWater - 1 && num6 < fStand - 1 && tickMod14 < 7 && idTile != 3)
 				{
-					int num8 = 0;
-					if (GameCanvas.gameTick / 14 % 2 == 0)
-					{
-						num8 = fStand - fWater;
-					}
-					if (imgTileWater != null && imgTileWater.img != null)
-					{
-						g.drawRegion(imgTileWater.img, (num8 + num6 - (fWater - 1)) / 10 * wTile, (num8 + num6 - (fWater - 1)) % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
-					}
+					int num8 = (tickDiv14 % 2 == 0) ? (fStand - fWater) : 0;
+					g.drawRegion(waterImg, (num8 + num6 - (fWater - 1)) / 10 * wTile, (num8 + num6 - (fWater - 1)) % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
 				}
-				else if (num6 > -1 && imgTile != null && imgTile.img != null)
+				else if (num6 > -1 && tileImg != null)
 				{
-					g.drawRegion(imgTile.img, num6 / 10 * wTile, num6 % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
+					g.drawRegion(tileImg, num6 / 10 * wTile, num6 % 10 * wTile, wTile, wTile, 0, i * wTile, j * wTile, 0);
 				}
 			}
 		}
@@ -407,8 +469,22 @@ public class LoadMap
 
 	public int getTile(int xset, int yset)
 	{
-		int num = yset / wTile * mapW + xset / wTile;
-		if (num > limitMap || xset < 0 || xset >= limitW + MotherCanvas.w || yset < 0 || yset >= limitH + MotherCanvas.h)
+		if (mapType == null || mapW <= 0 || mapH <= 0 || wTile <= 0)
+		{
+			return 1;
+		}
+		if (xset < 0 || yset < 0)
+		{
+			return 1;
+		}
+		int tileX = xset / wTile;
+		int tileY = yset / wTile;
+		if (tileX < 0 || tileX >= mapW || tileY < 0 || tileY >= mapH)
+		{
+			return 1;
+		}
+		int num = tileY * mapW + tileX;
+		if (num < 0 || num >= mapType.Length)
 		{
 			return 1;
 		}

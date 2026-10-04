@@ -2,7 +2,7 @@ public class Clan_Screen : ChatTabScreen
 {
 	private int xbegintab;
 
-	public static iCommand cmdClose;
+	public static new iCommand cmdClose;
 
 	public MainClan clan;
 

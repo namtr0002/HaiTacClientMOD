@@ -11,6 +11,8 @@ public class Player : MainPlayer
 
 	public static bool isBlock = false;
 
+	public static int blockTimeout = 0;
+
 	public static bool isAutoFilterItems = false;
 
 	public bool isAutoFireNew108 = false;
@@ -21,7 +23,7 @@ public class Player : MainPlayer
 
 	public static sbyte AutoFireCur = 0;
 
-	public System.Collections.Generic.Dictionary<MainMonster, int[]> oldMonsterPos = null;
+	public System.Collections.Generic.Dictionary<MainObject, int[]> oldMonsterPos = null;
 
 	public static sbyte currentTab = 0;
 
@@ -398,6 +400,19 @@ public class Player : MainPlayer
 
 	public override void update()
 	{
+		if (isBlock)
+		{
+			blockTimeout++;
+			if (blockTimeout > 60 || (Action == 0 && skillCurrent == null && blockTimeout > 15))
+			{
+				isBlock = false;
+				blockTimeout = 0;
+			}
+		}
+		else
+		{
+			blockTimeout = 0;
+		}
 		if (GameCanvas.loadmap != null && GameCanvas.loadmap.maxWMap > 0 && GameCanvas.loadmap.maxHMap > 0)
 		{
 			if (lastMapId != GameCanvas.loadmap.idMap)
@@ -405,6 +420,8 @@ public class Player : MainPlayer
 				lastMapId = (short)GameCanvas.loadmap.idMap;
 				lastX = (short)x;
 				lastY = (short)y;
+				isBlock = false;
+				blockTimeout = 0;
 			}
 			if (x < 0 || x > GameCanvas.loadmap.maxWMap || y < 0 || y > GameCanvas.loadmap.maxHMap)
 			{
@@ -997,12 +1014,15 @@ public class Player : MainPlayer
 				}
 			}
 		}
-		if (AutoFireCur >= 1 && Action != 2 && Interface_Game.isAutoFireInterface && !isAutoFireNew108)
+		if (AutoFireCur >= 1 && Action != 2 && Interface_Game.isAutoFireInterface && !isAutoFireNew108 && !AThMadaraMOD.isSlaughterActive)
 		{
-			setAutoFire(AutoFireCur == 2);
-			if (typeAutoBuff == 1 && MsgAutoFire.value != null && !AThMadaraFunc.isUserInteracting(this) && GameCanvas.gameTick % 5 == 1)
+			if (Action == 0 && !AThMadaraFunc.isUserInteracting(this))
 			{
-				updateAutoBuff();
+				setAutoFire(AutoFireCur == 2);
+				if (typeAutoBuff == 1 && MsgAutoFire.value != null && GameCanvas.gameTick % 5 == 1)
+				{
+					updateAutoBuff();
+				}
 			}
 		}
 		if (isGetItem)
@@ -1060,7 +1080,7 @@ public class Player : MainPlayer
 		for (int i = 0; i < vecInventory.size(); i++)
 		{
 			MainItem mainItem2 = (MainItem)vecInventory.elementAt(i);
-			if (mainItem2.typeObject == 4 && mphp == mainItem2.Hp_Mp_Other && mainItem2.numPotion > 0 && (mainItem == null || (MsgAutoMPHP.typeUu == 0 && mainItem2.value < mainItem.value) || (MsgAutoMPHP.typeUu == 1 && mainItem2.value > mainItem.value)))
+			if (mainItem2 != null && mainItem2.typeObject == 4 && mphp == mainItem2.Hp_Mp_Other && mainItem2.numPotion > 0 && (mainItem == null || (MsgAutoMPHP.typeUu == 0 && mainItem2.value < mainItem.value) || (MsgAutoMPHP.typeUu == 1 && mainItem2.value > mainItem.value)))
 			{
 				mainItem = mainItem2;
 			}
@@ -1160,11 +1180,11 @@ public class Player : MainPlayer
 
 	private void updateDelay()
 	{
-		IDictionaryEnumerator enumerator = Player.delaySkill.GetEnumerator();
-		while (enumerator.MoveNext())
+		if (Player.delaySkill == null || Player.delaySkill.h == null || Player.delaySkill.h.Count == 0) return;
+		foreach (object obj in Player.delaySkill.h.Values)
 		{
-			DelaySkill delaySkill = (DelaySkill)enumerator.Value;
-			if (delaySkill.value > -150)
+			DelaySkill delaySkill = (DelaySkill)obj;
+			if (delaySkill != null && delaySkill.value > -150)
 			{
 				delaySkill.value -= (int)(GameCanvas.timeNow - delaySkill.timebegin);
 				delaySkill.timebegin = GameCanvas.timeNow;
@@ -1384,6 +1404,11 @@ public class Player : MainPlayer
 		}
 		if (!isGhost)
 		{
+			if (posTransRoad != null && (GameCanvas.keyMove(0) || GameCanvas.keyMove(1) || GameCanvas.keyMove(2) || GameCanvas.keyMove(3)))
+			{
+				posTransRoad = null;
+				countAutoMove = 0;
+			}
 			bool flag = false;
 			if (Action != 4 && Action != 2 && Action != 3 && isSendMove && posTransRoad == null && Hp > 0)
 			{
@@ -1424,22 +1449,27 @@ public class Player : MainPlayer
 		}
 		if (GameCanvas.keyActionUni(1))
 		{
+			GameCanvas.ClearActionUni(1);
 			setActionHotKey(0);
 		}
 		else if (GameCanvas.keyActionUni(3))
 		{
+			GameCanvas.ClearActionUni(3);
 			setActionHotKey(1);
 		}
 		else if (GameCanvas.keyActionUni(5))
 		{
+			GameCanvas.ClearActionUni(5);
 			setActionHotKey(2);
 		}
 		else if (GameCanvas.keyActionUni(7))
 		{
+			GameCanvas.ClearActionUni(7);
 			setActionHotKey(3);
 		}
 		else if (GameCanvas.keyActionUni(9))
 		{
+			GameCanvas.ClearActionUni(9);
 			setActionHotKey(999);
 		}
 		if (GameCanvas.keyActionUni(10))
@@ -1447,17 +1477,27 @@ public class Player : MainPlayer
 			GameCanvas.ClearActionUni(10);
 			GameCanvas.gameScr.cmdChatPopup.perform();
 		}
-		if (GameCanvas.keyMyHold[40] || (GameCanvas.isTouch && GameCanvas.keyMyHold[12]))
+		if (GameCanvas.keyMyHold[40] || GameCanvas.keyMyHold[12] || GameCanvas.keyMyPressed[40] || GameCanvas.keyMyPressed[12])
 		{
 			GameCanvas.clearKeyHold(40);
 			GameCanvas.clearKeyHold(12);
-			GameCanvas.gameScr.cmdInfoMe.perform();
+			GameCanvas.clearKeyPressed(40);
+			GameCanvas.clearKeyPressed(12);
+			if (GameCanvas.gameScr != null && GameCanvas.gameScr.cmdInfoMe != null)
+			{
+				GameCanvas.gameScr.cmdInfoMe.perform();
+			}
 		}
-		if (GameCanvas.keyMyHold[41] || (GameCanvas.isTouch && GameCanvas.keyMyHold[13]))
+		if (GameCanvas.keyMyHold[41] || GameCanvas.keyMyHold[13] || GameCanvas.keyMyPressed[41] || GameCanvas.keyMyPressed[13])
 		{
 			GameCanvas.clearKeyHold(41);
 			GameCanvas.clearKeyHold(13);
-			GameCanvas.gameScr.cmdNextFocus.perform();
+			GameCanvas.clearKeyPressed(41);
+			GameCanvas.clearKeyPressed(13);
+			if (GameCanvas.gameScr != null && GameCanvas.gameScr.cmdNextFocus != null)
+			{
+				GameCanvas.gameScr.cmdNextFocus.perform();
+			}
 		}
 		if (GameCanvas.keyActionUni(4))
 		{
@@ -1684,7 +1724,7 @@ public class Player : MainPlayer
 			{
 				return;
 			}
-			if (GameScreen.objFocus != null && ((GameScreen.objFocus.typeObject == 1 && (GameScreen.objFocus.Action == 4 || GameScreen.objFocus.isDie)) || MainObject.getDistance(GameScreen.objFocus.x, GameScreen.objFocus.y, x, y) > wFocus + 60))
+			if (GameScreen.objFocus != null && (((GameScreen.objFocus.Action == 4 || GameScreen.objFocus.isDie) && (GameScreen.objFocus.typeObject != 0 || GameScreen.objFocus.Hp <= 0)) || MainObject.getDistance(GameScreen.objFocus.x, GameScreen.objFocus.y, x, y) > wFocus + 60))
 			{
 				GameScreen.objFocus = null;
 				GameCanvas.gameScr.center = null;
@@ -1708,6 +1748,7 @@ public class Player : MainPlayer
 			for (int i = 0; i < num; i++)
 			{
 				MainObject mainObject2 = (MainObject)GameScreen.vecPlayers.elementAt((i + indexFocus) % num);
+				if (mainObject2 == null) continue;
 				int distance = MainObject.getDistance(mainObject2.x, mainObject2.y, x, y);
 				if (distance <= wFocus)
 				{
@@ -1756,7 +1797,11 @@ public class Player : MainPlayer
 
 	private bool CheckSkipFocus(MainObject obj)
 	{
-		if (obj == GameScreen.player || ((obj.Action == 4 || obj.isDie) && obj.typeObject != 0) || obj.isRemove || (GameScreen.objFocus != null && obj == GameScreen.objFocus) || obj.typeObject == 10)
+		if (obj == null)
+		{
+			return true;
+		}
+		if (obj == GameScreen.player || ((obj.Action == 4 || obj.isDie) && (obj.typeObject != 0 || obj.Hp <= 0)) || obj.isRemove || (GameScreen.objFocus != null && obj == GameScreen.objFocus) || obj.typeObject == 10)
 		{
 			return true;
 		}
@@ -1789,7 +1834,7 @@ public class Player : MainPlayer
 				for (int j = num; j < GameScreen.vecPlayers.size(); j++)
 				{
 					MainObject mainObject = (MainObject)GameScreen.vecPlayers.elementAt(j);
-					if (mainObject.typeObject == 0 && !CheckSkipFocus(mainObject) && MainObject.getDistance(mainObject.x, mainObject.y, x, y) < wFocus)
+					if (mainObject != null && mainObject.typeObject == 0 && !CheckSkipFocus(mainObject) && MainObject.getDistance(mainObject.x, mainObject.y, x, y) < wFocus)
 					{
 						GameScreen.objFocus = mainObject;
 						if (!GameCanvas.isTouch)
@@ -1810,7 +1855,7 @@ public class Player : MainPlayer
 			for (int k = num; k < GameScreen.vecPlayers.size(); k++)
 			{
 				MainObject mainObject2 = (MainObject)GameScreen.vecPlayers.elementAt(k);
-				if (!CheckSkipFocus(mainObject2) && (typePK != 0 || mainObject2.typeObject != 0) && MainObject.getDistance(mainObject2.x, mainObject2.y, x, y) < wFocus)
+				if (mainObject2 != null && !CheckSkipFocus(mainObject2) && (typePK != 0 || mainObject2.typeObject != 0) && MainObject.getDistance(mainObject2.x, mainObject2.y, x, y) < wFocus)
 				{
 					GameScreen.objFocus = mainObject2;
 					if (!GameCanvas.isTouch)
@@ -1828,7 +1873,7 @@ public class Player : MainPlayer
 		for (int l = 0; l < num; l++)
 		{
 			MainObject mainObject3 = (MainObject)GameScreen.vecPlayers.elementAt(l);
-			if (!CheckSkipFocus(mainObject3) && (typePK != 0 || mainObject3.typeObject != 0) && MainObject.getDistance(mainObject3.x, mainObject3.y, x, y) < wFocus)
+			if (mainObject3 != null && !CheckSkipFocus(mainObject3) && (typePK != 0 || mainObject3.typeObject != 0) && MainObject.getDistance(mainObject3.x, mainObject3.y, x, y) < wFocus)
 			{
 				GameScreen.objFocus = mainObject3;
 				if (!GameCanvas.isTouch)
@@ -1897,18 +1942,31 @@ public class Player : MainPlayer
 		}
 		else if (Action != 2 && Action != 4 && Hp > 0)
 		{
-			Hotkey hotkey = hotkeyPlayer[currentTab][index];
-			if (hotkey.itemcur != null)
+			if (hotkeyPlayer != null && currentTab >= 0 && currentTab < hotkeyPlayer.Length && hotkeyPlayer[currentTab] != null && index >= 0 && index < hotkeyPlayer[currentTab].Length)
 			{
-				hotkey.itemcur.Use_Item();
-			}
-			else if (hotkey.skill != null && hotkey.skill.isBuff && !GameCanvas.loadmap.mapLang() && setSkillBuff(index, hotkey))
-			{
-				beginPlayerFire(index, hotkey);
-			}
-			else if (GameScreen.objFocus != null)
-			{
-				GameScreen.objFocus.setFireObject(index);
+				Hotkey hotkey = hotkeyPlayer[currentTab][index];
+				if (hotkey != null)
+				{
+					if (hotkey.itemcur != null)
+					{
+						hotkey.itemcur.Use_Item();
+					}
+					else if (hotkey.skill != null && hotkey.skill.isBuff && !GameCanvas.loadmap.mapLang() && setSkillBuff(index, hotkey))
+					{
+						beginPlayerFire(index, hotkey);
+					}
+					else
+					{
+						if (GameScreen.objFocus == null || GameScreen.objFocus.isDie || GameScreen.objFocus.Hp <= 0 || GameScreen.objFocus.isRemove)
+						{
+							nextMonster();
+						}
+						if (GameScreen.objFocus != null)
+						{
+							GameScreen.objFocus.setFireObject(index);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -1918,17 +1976,28 @@ public class Player : MainPlayer
 		GameCanvas.clearAll();
 		if (Action != 2 && Action != 4 && Hp > 0)
 		{
-			Hotkey hotkey = hotkeyBuffPlayer[index];
-			if (hotkey != null && hotkey.skill != null && !GameCanvas.loadmap.mapLang() && setSkillBuff(index, hotkey))
+			if (hotkeyBuffPlayer != null && index >= 0 && index < hotkeyBuffPlayer.Length)
 			{
-				beginPlayerFire(index, hotkey);
+				Hotkey hotkey = hotkeyBuffPlayer[index];
+				if (hotkey != null && hotkey.skill != null && !GameCanvas.loadmap.mapLang() && setSkillBuff(index, hotkey))
+				{
+					beginPlayerFire(index, hotkey);
+				}
 			}
 		}
 	}
 
 	private bool setSkillBuff(int index, Hotkey hot)
 	{
+		if (hot == null || hot.skill == null)
+		{
+			return false;
+		}
 		Skill_Info skillFromID = Skill_Info.getSkillFromID(hot.skill.ID);
+		if (skillFromID == null)
+		{
+			return false;
+		}
 		if (skillFromID.typeSkill == 2)
 		{
 			if (skillFromID.typeBuff == 1 || skillFromID.typeBuff == 2)
@@ -1961,10 +2030,10 @@ public class Player : MainPlayer
 				num = i - 1;
 			}
 			Hotkey hotkey = hotkeyPlayer[currentTab][num];
-			if (hotkey.skill != null)
+			if (hotkey != null && hotkey.skill != null)
 			{
 				Skill_Info skillFromID = Skill_Info.getSkillFromID(hotkey.skill.ID);
-				if (DelaySkill.getDelay(skillFromID.indexHotKey).isCoolDown() && Mp >= getManaNeedUse(skillFromID.manaLost))
+				if (skillFromID != null && AThMadaraFunc.isSkillUsable(this, skillFromID, true))
 				{
 					beginPlayerFire(num, hotkey);
 					break;
@@ -1988,15 +2057,21 @@ public class Player : MainPlayer
 		{
 			return false;
 		}
-		if ((LoadMap.specMap == 4 && skill_info.typeSkill == 1) || (LoadMap.specMap != 4 && skill_info.typeSkill == 4))
+		bool isSea = (LoadMap.specMap == 4 || boatSea != null);
+		if ((isSea && skill_info.typeSkill != 4 && skill_info.typeSkill != 2) || (!isSea && skill_info.typeSkill == 4))
 		{
-			Interface_Game.addInfoPlayerNormal(T.khongdungduocmapnay, mFont.tahoma_7_white);
+			Interface_Game.addInfoPlayerNormal(isSea ? "Kỹ năng này không thể sử dụng trên biển" : T.khongdungduocmapnay, mFont.tahoma_7_white);
 			return false;
 		}
-		if (Mp < getManaNeedUse(skill_info.manaLost))
+		int manaNeed = Math.Max((int)skill_info.manaLost, getManaNeedUse(skill_info.manaLost));
+		if (Mp < manaNeed)
 		{
-			Interface_Game.addInfoPlayerNormal(T.manaLost, mFont.tahoma_7_white);
-			return false;
+			AThMadaraFunc.updateAutoPotion(this);
+			if (Mp < manaNeed)
+			{
+				Interface_Game.addInfoPlayerNormal(T.manaLost, mFont.tahoma_7_white);
+				return false;
+			}
 		}
 		if (check_Fire_EffSpec())
 		{
@@ -2009,10 +2084,13 @@ public class Player : MainPlayer
 			for (int i = 0; i < mVector2.size(); i++)
 			{
 				Object_Effect_Skill object_Effect_Skill = (Object_Effect_Skill)mVector2.elementAt(i);
-				MainObject mainObject = MainObject.get_Object(object_Effect_Skill.ID, object_Effect_Skill.tem);
-				if (mainObject != null)
+				if (object_Effect_Skill != null)
 				{
-					object_Effect_Skill.setHP(mainObject.maxHp / 10, mainObject.Hp - mainObject.maxHp / 10, 0);
+					MainObject mainObject = MainObject.get_Object(object_Effect_Skill.ID, object_Effect_Skill.tem);
+					if (mainObject != null)
+					{
+						object_Effect_Skill.setHP(mainObject.maxHp / 10, mainObject.Hp - mainObject.maxHp / 10, 0);
+					}
 				}
 			}
 		}
@@ -2041,16 +2119,25 @@ public class Player : MainPlayer
 
 	public void beginPlayerFire(int index)
 	{
-		Hotkey hot = hotkeyPlayer[currentTab][index];
-		beginPlayerFire(index, hot);
+		if (hotkeyPlayer != null && currentTab >= 0 && currentTab < hotkeyPlayer.Length && hotkeyPlayer[currentTab] != null && index >= 0 && index < hotkeyPlayer[currentTab].Length)
+		{
+			Hotkey hot = hotkeyPlayer[currentTab][index];
+			if (hot != null)
+			{
+				beginPlayerFire(index, hot);
+			}
+		}
 	}
 
 	public void beginPlayerFire(int index, Hotkey hot)
 	{
-		if (hot.skill != null)
+		if (hot != null && hot.skill != null)
 		{
 			Skill_Info skillFromID = Skill_Info.getSkillFromID(hot.skill.ID);
-			beginPlayerFire(skillFromID);
+			if (skillFromID != null)
+			{
+				beginPlayerFire(skillFromID);
+			}
 		}
 	}
 
@@ -2134,11 +2221,11 @@ public class Player : MainPlayer
 
 	public bool setFightPk(MainObject objset)
 	{
-		if (objset == null || objset.returnAction() || objset.Action == 4)
+		if (objset == null || objset.isRemove || objset.Action == 4)
 		{
 			return false;
 		}
-		if (GameCanvas.loadmap.mapLang())
+		if (GameCanvas.loadmap != null && GameCanvas.loadmap.mapLang())
 		{
 			return false;
 		}
@@ -2151,6 +2238,14 @@ public class Player : MainPlayer
 			return false;
 		}
 		if (objset.typeObject == 2)
+		{
+			return false;
+		}
+		if (objset.typeObject == 5 || objset.typeObject == 7)
+		{
+			return true;
+		}
+		if (objset.typeObject == 0 && (objset.timeSafe > 0 || timeSafe > 0))
 		{
 			return false;
 		}
@@ -2256,20 +2351,18 @@ public class Player : MainPlayer
 				}
 			}
 		}
-		bool isAdd = true;
 		for (int j = 0; j < GameScreen.VecEffect.size(); j++)
 		{
 			MainEffect mainEffect = (MainEffect)GameScreen.VecEffect.elementAt(j);
-			if (mainEffect.valueEffect == 0 && !mainEffect.isAddHP && !mainEffect.isStop && mainEffect.typeEffect == skill.typeEffSkill && mainEffect.timeAddNum == -1 && mainEffect.objFireMain != null && mainEffect.objFireMain == GameScreen.player)
+			if (mainEffect != null && mainEffect.valueEffect == 0 && !mainEffect.isAddHP && !mainEffect.isStop && (mainEffect.typeEffect == skill.typeEffSkill || mainEffect.typeEffect >= 4000) && mainEffect.objFireMain != null && mainEffect.objFireMain == GameScreen.player)
 			{
 				mainEffect.replaceHP(vec);
 				mainEffect.isEff = false;
 				mainEffect.isAddHP = true;
-				isAdd = false;
 				break;
 			}
 		}
-		Effect_Skill.setHP_New(vec, this, isAdd);
+		Effect_Skill.setHP_New(vec, this, isAdd: true);
 	}
 
 	public static void setHotKey(int index, MainSkill skill, MainItem item)
@@ -2382,6 +2475,10 @@ public class Player : MainPlayer
 	public mVector setSkillLan(Skill_Info skill)
 	{
 		mVector mVector2 = new mVector();
+		if (skill == null)
+		{
+			return mVector2;
+		}
 		if (skill.typeSkill == 2)
 		{
 			if (skill.typeBuff == 1 || skill.typeBuff == 2 || skill.typeBuff == 2)
@@ -2474,22 +2571,26 @@ public class Player : MainPlayer
 		MainObject objFocus = GameScreen.objFocus;
 		if (!GameScreen.isOnAutoPB)
 		{
-			if (objFocus != null && objFocus.typeObject == 0 && (objAutoFrist == null || objAutoFrist.typeObject == 0))
+			bool isPvp = AThMadaraFunc.isPvpMap() || GameScreen.isPvPNew || typePK >= 4;
+			if (objFocus != null && objFocus.typeObject == 0 && (objAutoFrist == null || objAutoFrist.typeObject == 0 || isPvp))
 			{
 				if (!setFightPk(objFocus))
 				{
-					AutoFireCur = 0;
+					if (!isPvp)
+					{
+						AutoFireCur = 0;
+					}
 					return;
 				}
 			}
 			else
 			{
-				if (objFocus == null || objFocus.returnAction() || objFocus.typeObject != 1 || objFocus.isDie || objFocus.Hp <= 0)
+				if (objFocus == null || objFocus.returnAction() || (objFocus.typeObject != 1 && (!isPvp || objFocus.typeObject != 0)) || objFocus.isDie || objFocus.Hp <= 0)
 				{
 					nextMonster();
 					if (GameScreen.objFocus != null)
 					{
-						if (GameScreen.objFocus.typeObject != 1)
+						if (GameScreen.objFocus.typeObject != 1 && (!isPvp || GameScreen.objFocus.typeObject != 0))
 						{
 							return;
 						}
@@ -2498,7 +2599,7 @@ public class Player : MainPlayer
 					}
 				}
 				objFocus = GameScreen.objFocus;
-				if (objFocus == null || objFocus.typeObject != 1)
+				if (objFocus == null || (objFocus.typeObject != 1 && (!isPvp || objFocus.typeObject != 0)))
 				{
 					return;
 				}
@@ -2535,6 +2636,19 @@ public class Player : MainPlayer
 					{
 						IndexFire = (num2 + 1) % num;
 					}
+					break;
+				}
+			}
+		}
+		if (activeSkillCount == 0 && vecListSkill != null && vecListSkill.size() > 0)
+		{
+			for (int k = 0; k < vecListSkill.size(); k++)
+			{
+				Skill_Info skFb = (Skill_Info)vecListSkill.elementAt(k);
+				if (skFb != null && AThMadaraFunc.isSkillUsable(this, skFb, true))
+				{
+					beginPlayerFire(skFb);
+					timeFristSkill = GameCanvas.timeNow;
 					break;
 				}
 			}
@@ -2584,14 +2698,21 @@ public class Player : MainPlayer
 		{
 			if (Interface_Game.isAutoFireInterface && AutoFireCur != typeAutoFireMain)
 			{
-				AutoFireCur = typeAutoFireMain;
-				xBeginAuto = GameScreen.player.x;
-				yBeginAuto = GameScreen.player.y;
+				AutoFireCur = (sbyte)((typeAutoFireMain > 0) ? typeAutoFireMain : 1);
+				if (GameScreen.player != null)
+				{
+					xBeginAuto = GameScreen.player.x;
+					yBeginAuto = GameScreen.player.y;
+				}
 			}
 		}
-		else if (AutoFireCur >= 1)
+		else
 		{
 			AutoFireCur = 0;
+			if (!AThMadaraMOD.isSlaughterActive && (GameScreen.player == null || !GameScreen.player.isAutoFireNew108))
+			{
+				Interface_Game.isAutoFireInterface = false;
+			}
 		}
 	}
 
@@ -2766,7 +2887,7 @@ public class Player : MainPlayer
 		for (int i = 0; i < vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vecInventory.elementAt(i);
-			if (mainItem.typeObject == type)
+			if (mainItem != null && mainItem.typeObject == type)
 			{
 				GlobalService.gI().Chest(1, mainItem.ID, mainItem.typeObject, mainItem.numPotion);
 			}
@@ -2778,7 +2899,7 @@ public class Player : MainPlayer
 		for (int i = 0; i < vecChest.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vecChest.elementAt(i);
-			if (mainItem.typeObject == type)
+			if (mainItem != null && mainItem.typeObject == type)
 			{
 				GlobalService.gI().Chest(2, mainItem.ID, mainItem.typeObject, mainItem.numPotion);
 			}
@@ -2790,7 +2911,7 @@ public class Player : MainPlayer
 		for (int i = 0; i < vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vecInventory.elementAt(i);
-			if (mainItem.typeObject == 4 && ((mainItem.ID >= 44 && mainItem.ID <= 79) || (mainItem.ID >= 362 && mainItem.ID <= 367)))
+			if (mainItem != null && mainItem.typeObject == 4 && ((mainItem.ID >= 44 && mainItem.ID <= 79) || (mainItem.ID >= 362 && mainItem.ID <= 367)))
 			{
 				GlobalService.gI().Chest(1, mainItem.ID, mainItem.typeObject, mainItem.numPotion);
 			}
@@ -2802,7 +2923,7 @@ public class Player : MainPlayer
 		for (int i = 0; i < vecChest.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vecChest.elementAt(i);
-			if (mainItem.typeObject == 4 && ((mainItem.ID >= 44 && mainItem.ID <= 79) || (mainItem.ID >= 362 && mainItem.ID <= 367)))
+			if (mainItem != null && mainItem.typeObject == 4 && ((mainItem.ID >= 44 && mainItem.ID <= 79) || (mainItem.ID >= 362 && mainItem.ID <= 367)))
 			{
 				GlobalService.gI().Chest(2, mainItem.ID, mainItem.typeObject, mainItem.numPotion);
 			}
@@ -2840,11 +2961,11 @@ public class Player : MainPlayer
 			else
 			{
 				AThMadaraFunc.updateGomPositions(this);
-				if (isAutoFireNew108)
+				if (isAutoFireNew108 && !AThMadaraFunc.isUserInteracting(this))
 				{
 					try
 					{
-						if (AThMadaraFunc.gomUseMapCenter)
+						if (AThMadaraFunc.gomUseMapCenter && AThMadaraFunc.gomFixedX > 0 && AThMadaraFunc.gomFixedY > 0)
 						{
 							x = AThMadaraFunc.gomFixedX;
 							y = AThMadaraFunc.gomFixedY;

@@ -20,9 +20,31 @@ public class Rms
 		__saveRMS("x" + mGraphics.zoomLevel + filename, data);
 	}
 
+	public static int lastLoadedZoom = 0;
+
 	public static sbyte[] loadRMS(string filename)
 	{
-		return __loadRMS("x" + mGraphics.zoomLevel + filename);
+		lastLoadedZoom = mGraphics.zoomLevel;
+		sbyte[] array = __loadRMS("x" + mGraphics.zoomLevel + filename);
+		if (array != null && array.Length > 0)
+		{
+			return array;
+		}
+		int[] fallbackZooms = new int[] { 3, 4, 2, 1 };
+		for (int i = 0; i < fallbackZooms.Length; i++)
+		{
+			if (fallbackZooms[i] != mGraphics.zoomLevel)
+			{
+				array = __loadRMS("x" + fallbackZooms[i] + filename);
+				if (array != null && array.Length > 0)
+				{
+					lastLoadedZoom = fallbackZooms[i];
+					return array;
+				}
+			}
+		}
+		lastLoadedZoom = 0;
+		return null;
 	}
 
 	public static string loadRMSString(string fileName)
@@ -48,18 +70,9 @@ public class Rms
 
 	public static byte[] convertSbyteToByte(sbyte[] var)
 	{
+		if (var == null) return null;
 		byte[] array = new byte[var.Length];
-		for (int i = 0; i < var.Length; i++)
-		{
-			if (var[i] > 0)
-			{
-				array[i] = (byte)var[i];
-			}
-			else
-			{
-				array[i] = (byte)(var[i] + 256);
-			}
-		}
+		Buffer.BlockCopy(var, 0, array, 0, var.Length);
 		return array;
 	}
 

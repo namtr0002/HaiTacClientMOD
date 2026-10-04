@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 public class DataSkillEff
 {
@@ -32,6 +33,8 @@ public class DataSkillEff
 
 	public bool isLoadData;
 
+	public bool isChangeFlip;
+
 	public short idEff;
 
 	public bool canremove;
@@ -54,6 +57,10 @@ public class DataSkillEff
 
 	public int y;
 
+	public int rotate;
+
+	public sbyte subTick = 0;
+
 	public sbyte typeMove;
 
 	public const sbyte CHOANG = 1;
@@ -68,7 +75,7 @@ public class DataSkillEff
 
 	private long lasttime;
 
-	private long timelive;
+	public long timelive;
 
 	public DataSkillEff(short idEff, sbyte[] data)
 	{
@@ -97,6 +104,7 @@ public class DataSkillEff
 	public DataSkillEff(short idEff, int time, bool changeFlip)
 	{
 		this.idEff = idEff;
+		this.isChangeFlip = changeFlip;
 		f = 0;
 		switch (time)
 		{
@@ -138,6 +146,7 @@ public class DataSkillEff
 	public DataSkillEff(short idEff, int time, sbyte typemove, sbyte loop, bool changeFlip)
 	{
 		this.idEff = idEff;
+		this.isChangeFlip = changeFlip;
 		typeMove = typemove;
 		waitLoop = loop;
 		switch (time)
@@ -170,28 +179,83 @@ public class DataSkillEff
 		idEff = ideff;
 		this.x = x;
 		this.y = y;
+		this.isChangeFlip = changeFlip;
 		typeupdate = 1;
 		load(changeFlip);
 	}
 
-	public void loadData(sbyte[] array)
+	public DataSkillEff(short idEff, int time, bool changeFlip, int rotate)
+	{
+		this.idEff = idEff;
+		this.isChangeFlip = changeFlip;
+		this.rotate = rotate;
+		f = 0;
+		switch (time)
+		{
+		case -1:
+			typeupdate = 3;
+			break;
+		case 0:
+			typeupdate = 1;
+			break;
+		default:
+			typeupdate = 2;
+			timelive = mSystem.currentTimeMillis() + time;
+			break;
+		}
+		load(changeFlip);
+	}
+
+	public DataSkillEff(short ideff, int x, int y, bool changeFlip, int rotate)
+	{
+		idEff = ideff;
+		this.x = x;
+		this.y = y;
+		this.isChangeFlip = changeFlip;
+		this.rotate = rotate;
+		typeupdate = 1;
+		load(changeFlip);
+	}
+
+	public void applyTemplate(SkillEffTemplate t)
+	{
+		if (t == null) return;
+		listFrame = t.listFrame;
+		smallImage = t.smallImage;
+		frameChar = t.frameChar;
+		sequence = t.sequence;
+		fw = t.fw;
+		fh = t.fh;
+		min = t.min;
+		isLoadData = true;
+	}
+
+	public static SkillEffTemplate parseTemplate(sbyte[] array, bool changeFlip)
 	{
 		if (array == null)
 		{
-			return;
+			return null;
 		}
+		SkillEffTemplate t = new SkillEffTemplate();
 		DataInputStream dataInputStream = null;
 		try
 		{
 			bool flag = true;
-			listFrame.removeAllElements();
-			smallImage = null;
+			t.listFrame.removeAllElements();
 			dataInputStream = new DataInputStream(new ByteArrayInputStream(array));
 			int num = dataInputStream.readByte();
-			smallImage = new SmallImage[num];
+			t.smallImage = new SmallImage[num];
 			for (int i = 0; i < num; i++)
 			{
-				smallImage[i] = new SmallImage(dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte());
+				int imageId = dataInputStream.readUnsignedByte();
+				if (imageId == 255)
+				{
+					t.smallImage[i] = new SmallImage(dataInputStream.readUnsignedByte(), dataInputStream.readShort(), dataInputStream.readShort(), dataInputStream.readShort(), dataInputStream.readShort());
+				}
+				else
+				{
+					t.smallImage[i] = new SmallImage(imageId, dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte());
+				}
 			}
 			int num2 = 0;
 			int num3 = 10000;
@@ -204,11 +268,30 @@ public class DataSkillEff
 				for (int k = 0; k < b; k++)
 				{
 					PartFrame partFrame = new PartFrame(dataInputStream.readShort(), dataInputStream.readShort(), dataInputStream.readByte());
-					if (flag)
+					int flipOrExtendedMarker = dataInputStream.readUnsignedByte();
+					if (flipOrExtendedMarker == 128)
 					{
-						partFrame.flip = dataInputStream.readByte();
-						partFrame.onTop = dataInputStream.readByte();
+						partFrame.flip = (sbyte)dataInputStream.readByte();
+						partFrame.rotate = dataInputStream.readShort();
 					}
+					else
+					{
+						partFrame.flip = (sbyte)flipOrExtendedMarker;
+					}
+					if (changeFlip)
+					{
+						partFrame.flip = ((partFrame.flip == 0) ? ((sbyte)1) : ((sbyte)0));
+						partFrame.rotate = (short)(-partFrame.rotate);
+						if (t.smallImage != null && partFrame.idSmallImg >= 0 && partFrame.idSmallImg < t.smallImage.Length && t.smallImage[partFrame.idSmallImg] != null)
+						{
+							partFrame.dx = (short)(-partFrame.dx - t.smallImage[partFrame.idSmallImg].w);
+						}
+						else
+						{
+							partFrame.dx = (short)(-partFrame.dx);
+						}
+					}
+					partFrame.onTop = dataInputStream.readByte();
 					if (partFrame.onTop == 0)
 					{
 						mVector2.addElement(partFrame);
@@ -226,234 +309,155 @@ public class DataSkillEff
 						num3 = CRes.abs(partFrame.dy);
 					}
 				}
-				listFrame.addElement(new FrameEff(mVector2, mVector3));
+				t.listFrame.addElement(new FrameEff(mVector3, mVector2));
 			}
-			fw = smallImage[0].w;
-			min = num3;
-			fh = (short)num2;
+			if (t.smallImage != null && t.smallImage.Length > 0 && t.smallImage[0] != null)
+			{
+				t.fw = t.smallImage[0].w;
+			}
+			t.min = num3;
+			t.fh = (short)num2;
 			short num5 = 0;
 			num5 = ((!flag) ? dataInputStream.readShort() : ((short)dataInputStream.readUnsignedByte()));
-			sequence = new sbyte[num5];
+			t.sequence = new sbyte[num5];
 			for (int l = 0; l < num5; l++)
 			{
-				sequence[l] = (sbyte)dataInputStream.readShort();
+				t.sequence[l] = (sbyte)dataInputStream.readShort();
 			}
 			if (flag)
 			{
 				dataInputStream.readByte();
-				num5 = dataInputStream.readByte();
-				frameChar[0] = new sbyte[num5];
+				num5 = (short)dataInputStream.readByte();
+				t.frameChar[0] = new sbyte[num5];
 				for (int m = 0; m < num5; m++)
 				{
-					frameChar[0][m] = dataInputStream.readByte();
+					t.frameChar[0][m] = dataInputStream.readByte();
 				}
-				num5 = dataInputStream.readByte();
-				frameChar[1] = new sbyte[num5];
+				num5 = (short)dataInputStream.readByte();
+				t.frameChar[1] = new sbyte[num5];
 				for (int n = 0; n < num5; n++)
 				{
-					frameChar[1][n] = dataInputStream.readByte();
+					t.frameChar[1][n] = dataInputStream.readByte();
 				}
-				num5 = dataInputStream.readByte();
-				frameChar[3] = new sbyte[num5];
+				num5 = (short)dataInputStream.readByte();
+				t.frameChar[3] = new sbyte[num5];
 				for (int num6 = 0; num6 < num5; num6++)
 				{
-					frameChar[3][num6] = dataInputStream.readByte();
+					t.frameChar[3][num6] = dataInputStream.readByte();
 				}
+				t.frameChar[2] = t.frameChar[3];
 			}
-			isLoadData = true;
-			try
-			{
-				indexSplash[0] = (sbyte)(frameChar[0].Length - 7);
-				indexSplash[1] = (sbyte)(frameChar[1].Length - 7);
-				indexSplash[2] = (sbyte)(frameChar[2].Length - 7);
-				indexSplash[3] = (sbyte)(frameChar[3].Length - 7);
-			}
-			catch (Exception)
-			{
-			}
-			indexSplash[0] = dataInputStream.readByte();
-			indexSplash[1] = dataInputStream.readByte();
-			indexSplash[2] = dataInputStream.readByte();
-			indexSplash[3] = indexSplash[2];
+			return t;
 		}
 		catch (Exception)
 		{
+			return null;
 		}
 		finally
 		{
 			try
 			{
-				dataInputStream.close();
+				if (dataInputStream != null) dataInputStream.close();
 			}
 			catch (Exception)
 			{
 			}
 		}
+	}
+
+	public void loadData(sbyte[] array)
+	{
+		loadData(array, false);
 	}
 
 	public void loadData(sbyte[] array, bool changeFlip)
 	{
-		if (array == null)
-		{
-			return;
-		}
-		DataInputStream dataInputStream = null;
-		try
-		{
-			bool flag = true;
-			listFrame.removeAllElements();
-			smallImage = null;
-			dataInputStream = new DataInputStream(new ByteArrayInputStream(array));
-			int num = dataInputStream.readByte();
-			smallImage = new SmallImage[num];
-			for (int i = 0; i < num; i++)
-			{
-				smallImage[i] = new SmallImage(dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte(), dataInputStream.readUnsignedByte());
-			}
-			int num2 = 0;
-			int num3 = 10000;
-			int num4 = dataInputStream.readShort();
-			for (int j = 0; j < num4; j++)
-			{
-				sbyte b = dataInputStream.readByte();
-				mVector mVector2 = new mVector();
-				mVector mVector3 = new mVector();
-				for (int k = 0; k < b; k++)
-				{
-					PartFrame partFrame = new PartFrame(dataInputStream.readShort(), dataInputStream.readShort(), dataInputStream.readByte());
-					if (flag)
-					{
-						partFrame.flip = dataInputStream.readByte();
-						partFrame.onTop = dataInputStream.readByte();
-						if (changeFlip)
-						{
-							partFrame.flip = ((partFrame.flip == 0) ? ((sbyte)1) : ((sbyte)0));
-						}
-					}
-					if (partFrame.onTop == 0)
-					{
-						mVector2.addElement(partFrame);
-					}
-					else
-					{
-						mVector3.addElement(partFrame);
-					}
-					if (num2 < CRes.abs(partFrame.dy))
-					{
-						num2 = CRes.abs(partFrame.dy);
-					}
-					if (CRes.abs(partFrame.dy) < num3)
-					{
-						num3 = CRes.abs(partFrame.dy);
-					}
-				}
-				listFrame.addElement(new FrameEff(mVector2, mVector3));
-			}
-			fw = smallImage[0].w;
-			min = num3;
-			fh = (short)num2;
-			short num5 = 0;
-			num5 = ((!flag) ? dataInputStream.readShort() : ((short)dataInputStream.readUnsignedByte()));
-			sequence = new sbyte[num5];
-			for (int l = 0; l < num5; l++)
-			{
-				sequence[l] = (sbyte)dataInputStream.readShort();
-			}
-			if (flag)
-			{
-				dataInputStream.readByte();
-				num5 = dataInputStream.readByte();
-				frameChar[0] = new sbyte[num5];
-				for (int m = 0; m < num5; m++)
-				{
-					frameChar[0][m] = dataInputStream.readByte();
-				}
-				num5 = dataInputStream.readByte();
-				frameChar[1] = new sbyte[num5];
-				for (int n = 0; n < num5; n++)
-				{
-					frameChar[1][n] = dataInputStream.readByte();
-				}
-				num5 = dataInputStream.readByte();
-				frameChar[3] = new sbyte[num5];
-				for (int num6 = 0; num6 < num5; num6++)
-				{
-					frameChar[3][num6] = dataInputStream.readByte();
-				}
-			}
-			isLoadData = true;
-			try
-			{
-				indexSplash[0] = (sbyte)(frameChar[0].Length - 7);
-				indexSplash[1] = (sbyte)(frameChar[1].Length - 7);
-				indexSplash[2] = (sbyte)(frameChar[2].Length - 7);
-				indexSplash[3] = (sbyte)(frameChar[3].Length - 7);
-			}
-			catch (Exception)
-			{
-			}
-			indexSplash[0] = dataInputStream.readByte();
-			indexSplash[1] = dataInputStream.readByte();
-			indexSplash[2] = dataInputStream.readByte();
-			indexSplash[3] = indexSplash[2];
-		}
-		catch (Exception)
-		{
-		}
-		finally
-		{
-			try
-			{
-				dataInputStream.close();
-			}
-			catch (Exception)
-			{
-			}
-		}
+		SkillEffTemplate t = parseTemplate(array, changeFlip);
+		applyTemplate(t);
 	}
 
-	public DataSkillEff(sbyte[] array)
+	private static readonly string[] KEY_CACHE = new string[8192];
+
+	public static string getKey(short id)
 	{
-		loadData(array);
+		if (id >= 0 && id < 8192)
+		{
+			string s = KEY_CACHE[id];
+			if (s == null)
+			{
+				s = id.ToString();
+				KEY_CACHE[id] = s;
+			}
+			return s;
+		}
+		return id.ToString();
 	}
 
-	public DataSkillEff(sbyte[] array, bool changeFlip)
+	private static MyHashTable TIME_REQUEST = new MyHashTable();
+
+	public static void preload(short idEff)
 	{
-		loadData(array, changeFlip);
+		string key = getKey(idEff);
+		EffectData effectData = (EffectData)ALL_EFF_DATA.get(key);
+		if (effectData == null || effectData.data == null)
+		{
+			sbyte[] rmsData = CRes.loadRMS("DataSkillEff" + idEff);
+			if (rmsData != null && rmsData.Length > 0)
+			{
+				readData(rmsData, false, Rms.lastLoadedZoom);
+			}
+		}
 	}
 
 	public void load(bool changeFlip)
 	{
-		EffectData effectData = (EffectData)ALL_EFF_DATA.get(idEff.ToString() ?? "");
-		if (effectData == null)
+		this.isChangeFlip = changeFlip;
+		string key = getKey(idEff);
+		EffectData effectData = (EffectData)ALL_EFF_DATA.get(key);
+		if (effectData == null || effectData.data == null)
 		{
-			effectData = new EffectData();
-			ALL_EFF_DATA.put(idEff.ToString() ?? "", effectData);
-			GlobalService.gI().getDataSkillEFf(0, idEff);
+			long now = mSystem.currentTimeMillis();
+			object lastReqObj = TIME_REQUEST.get(key);
+			long lastReq = (lastReqObj != null) ? (long)lastReqObj : 0L;
+			if (now - lastReq < 3000L)
+			{
+				return;
+			}
+			TIME_REQUEST.put(key, now);
+
+			sbyte[] rmsData = CRes.loadRMS("DataSkillEff" + idEff);
+			if (rmsData != null && rmsData.Length > 0)
+			{
+				effectData = readData(rmsData, false, Rms.lastLoadedZoom);
+			}
+			if (effectData == null || effectData.data == null)
+			{
+				GlobalService.gI().getDataSkillEFf(0, idEff);
+			}
 		}
 		if (effectData != null && effectData.data != null)
 		{
 			effectData.count = GameCanvas.timeNow / 1000;
-			loadData(effectData.data, changeFlip);
-			isLoadData = true;
+			SkillEffTemplate t = changeFlip ? effectData.templateFlip : effectData.templateNormal;
+			if (t == null)
+			{
+				t = parseTemplate(effectData.data, changeFlip);
+				if (changeFlip)
+				{
+					effectData.templateFlip = t;
+				}
+				else
+				{
+					effectData.templateNormal = t;
+				}
+			}
+			applyTemplate(t);
 		}
 	}
 
 	public void load()
 	{
-		EffectData effectData = (EffectData)ALL_EFF_DATA.get(idEff.ToString() ?? "");
-		if (effectData == null)
-		{
-			effectData = new EffectData();
-			ALL_EFF_DATA.put(idEff.ToString() ?? "", effectData);
-			GlobalService.gI().getDataSkillEFf(0, idEff);
-		}
-		if (effectData != null && effectData.data != null)
-		{
-			effectData.count = GameCanvas.timeNow / 1000;
-			loadData(effectData.data);
-			isLoadData = true;
-		}
+		load(this.isChangeFlip);
 	}
 
 	public bool isHavedata()
@@ -462,9 +466,10 @@ public class DataSkillEff
 		{
 			return true;
 		}
-		load();
-		return false;
+		load(this.isChangeFlip);
+		return isLoadData;
 	}
+
 
 	public void paintTopEff(mGraphics g, int x, int y, int hOne)
 	{
@@ -473,44 +478,60 @@ public class DataSkillEff
 			return;
 		}
 		FrameEff frameEff = (FrameEff)listFrame.elementAt(Frame);
+		if (frameEff == null) return;
 		try
 		{
 			mVector listPartTop = frameEff.listPartTop;
-			for (int i = 0; i < listPartTop.size(); i++)
+			if (listPartTop == null || listPartTop.size() == 0) return;
+			mImage image = getImage();
+			if (image == null || image.image == null) return;
+			int imgW = (image.w > 0) ? image.w : mImage.getImageWidth(image.image);
+			int imgH = (image.h > 0) ? image.h : mImage.getImageHeight(image.image);
+			int count = listPartTop.size();
+			for (int i = 0; i < count; i++)
 			{
 				PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
 				SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
-				mImage image = getImage();
-				if (image != null && image.image != null)
+				int dx = partFrame.dx;
+				int dy = partFrame.dy;
+				int totalRotate = partFrame.rotate;
+				if (rotate != 0)
 				{
-					int dx = partFrame.dx;
-					int num = smallImage.w;
-					int num2 = smallImage.h;
-					int num3 = smallImage.x;
-					int num4 = smallImage.y;
-					if (num3 > mImage.getImageWidth(image.image))
-					{
-						num3 = 0;
-					}
-					if (num4 > mImage.getImageHeight(image.image))
-					{
-						num4 = 0;
-					}
-					if (num3 + num > mImage.getImageWidth(image.image))
-					{
-						num = mImage.getImageWidth(image.image) - num3;
-					}
-					if (num4 + num2 > mImage.getImageHeight(image.image))
-					{
-						num2 = mImage.getImageHeight(image.image) - num4;
-					}
-					int num5 = 0;
-					if (hOne == 62 && min >= 50)
-					{
-						num5 = -8;
-					}
-					g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + partFrame.dy + num5, 0);
+					totalRotate += rotate;
+					double rad = (double)rotate * (System.Math.PI / 180.0);
+					double cos = System.Math.Cos(rad);
+					double sin = System.Math.Sin(rad);
+					int rdx = (int)System.Math.Round((double)dx * cos - (double)dy * sin);
+					int rdy = (int)System.Math.Round((double)dx * sin + (double)dy * cos);
+					dx = rdx;
+					dy = rdy;
 				}
+				int num = smallImage.w;
+				int num2 = smallImage.h;
+				int num3 = smallImage.x;
+				int num4 = smallImage.y;
+				if (num3 > imgW)
+				{
+					num3 = 0;
+				}
+				if (num4 > imgH)
+				{
+					num4 = 0;
+				}
+				if (num3 + num > imgW)
+				{
+					num = imgW - num3;
+				}
+				if (num4 + num2 > imgH)
+				{
+					num2 = imgH - num4;
+				}
+				int num5 = 0;
+				if (hOne == 62 && min >= 50)
+				{
+					num5 = -8;
+				}
+				g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + dy + num5, 0, totalRotate);
 			}
 		}
 		catch (Exception)
@@ -521,44 +542,62 @@ public class DataSkillEff
 
 	public void paintTopEff(mGraphics g)
 	{
-		if (!isHavedata() || (typeupdate == 3 && Frame == -1) || Frame >= listFrame.size())
+		if (!isHavedata() || (typeupdate == 3 && Frame == -1) || Frame < 0 || Frame >= listFrame.size())
 		{
 			return;
 		}
 		FrameEff frameEff = (FrameEff)listFrame.elementAt(Frame);
+		if (frameEff == null) return;
 		try
 		{
 			mVector listPartTop = frameEff.listPartTop;
-			for (int i = 0; i < listPartTop.size(); i++)
+			if (listPartTop == null || listPartTop.size() == 0) return;
+			mImage image = getImage();
+			if (image == null || image.image == null) return;
+			int imgW = (image.w > 0) ? image.w : mImage.getImageWidth(image.image);
+			int imgH = (image.h > 0) ? image.h : mImage.getImageHeight(image.image);
+			int count = listPartTop.size();
+			for (int i = 0; i < count; i++)
 			{
 				PartFrame partFrame = (PartFrame)listPartTop.elementAt(i);
-				SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
-				mImage image = getImage();
-				if (image != null && image.image != null)
+				if (partFrame == null || smallImage == null || partFrame.idSmallImg < 0 || partFrame.idSmallImg >= smallImage.Length) continue;
+				SmallImage smallImg = smallImage[partFrame.idSmallImg];
+				if (smallImg == null) continue;
+				int dx = partFrame.dx;
+				int dy = partFrame.dy;
+				int totalRotate = partFrame.rotate;
+				if (rotate != 0)
 				{
-					int dx = partFrame.dx;
-					int num = smallImage.w;
-					int num2 = smallImage.h;
-					int num3 = smallImage.x;
-					int num4 = smallImage.y;
-					if (num3 > mImage.getImageWidth(image.image))
-					{
-						num3 = 0;
-					}
-					if (num4 > mImage.getImageHeight(image.image))
-					{
-						num4 = 0;
-					}
-					if (num3 + num > mImage.getImageWidth(image.image))
-					{
-						num = mImage.getImageWidth(image.image) - num3;
-					}
-					if (num4 + num2 > mImage.getImageHeight(image.image))
-					{
-						num2 = mImage.getImageHeight(image.image) - num4;
-					}
-					g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + partFrame.dy, 0);
+					totalRotate += rotate;
+					double rad = (double)rotate * (System.Math.PI / 180.0);
+					double cos = System.Math.Cos(rad);
+					double sin = System.Math.Sin(rad);
+					int rdx = (int)System.Math.Round((double)dx * cos - (double)dy * sin);
+					int rdy = (int)System.Math.Round((double)dx * sin + (double)dy * cos);
+					dx = rdx;
+					dy = rdy;
 				}
+				int num = smallImg.w;
+				int num2 = smallImg.h;
+				int num3 = smallImg.x;
+				int num4 = smallImg.y;
+				if (num3 > imgW)
+				{
+					num3 = 0;
+				}
+				if (num4 > imgH)
+				{
+					num4 = 0;
+				}
+				if (num3 + num > imgW)
+				{
+					num = imgW - num3;
+				}
+				if (num4 + num2 > imgH)
+				{
+					num2 = imgH - num4;
+				}
+				g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + dy, 0, totalRotate);
 			}
 		}
 		catch (Exception)
@@ -569,44 +608,55 @@ public class DataSkillEff
 
 	public void paint(mGraphics g)
 	{
-		if (!isHavedata() || Frame >= listFrame.size())
+		paint(g, this.x, this.y);
+	}
+
+	public void paint(mGraphics g, int px, int py)
+	{
+		if (!isHavedata() || Frame < 0 || Frame >= listFrame.size())
 		{
 			return;
 		}
 		FrameEff frameEff = (FrameEff)listFrame.elementAt(Frame);
+		if (frameEff == null) return;
+		mImage image = getImage();
+		if (image == null || image.image == null) return;
+		int imgW = (image.w > 0) ? image.w : mImage.getImageWidth(image.image);
+		int imgH = (image.h > 0) ? image.h : mImage.getImageHeight(image.image);
 		try
 		{
 			mVector listPartPaint = frameEff.getListPartPaint();
-			for (int i = 0; i < listPartPaint.size(); i++)
+			if (listPartPaint == null || listPartPaint.size() == 0) return;
+			int count = listPartPaint.size();
+			for (int i = 0; i < count; i++)
 			{
 				PartFrame partFrame = (PartFrame)listPartPaint.elementAt(i);
-				SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
-				mImage image = getImage();
-				if (image != null && image.image != null)
+				if (partFrame == null || smallImage == null || partFrame.idSmallImg < 0 || partFrame.idSmallImg >= smallImage.Length) continue;
+				SmallImage smallImg = smallImage[partFrame.idSmallImg];
+				if (smallImg == null) continue;
+				int dx = partFrame.dx;
+				int dy = partFrame.dy;
+				int totalRotate = partFrame.rotate;
+				if (rotate != 0)
 				{
-					int dx = partFrame.dx;
-					int num = smallImage.w;
-					int num2 = smallImage.h;
-					int num3 = smallImage.x;
-					int num4 = smallImage.y;
-					if (num3 > mImage.getImageWidth(image.image))
-					{
-						num3 = 0;
-					}
-					if (num4 > mImage.getImageHeight(image.image))
-					{
-						num4 = 0;
-					}
-					if (num3 + num > mImage.getImageWidth(image.image))
-					{
-						num = mImage.getImageWidth(image.image) - num3;
-					}
-					if (num4 + num2 > mImage.getImageHeight(image.image))
-					{
-						num2 = mImage.getImageHeight(image.image) - num4;
-					}
-					g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + partFrame.dy, 0);
+					totalRotate += rotate;
+					double rad = (double)rotate * (System.Math.PI / 180.0);
+					double cos = System.Math.Cos(rad);
+					double sin = System.Math.Sin(rad);
+					int rdx = (int)System.Math.Round((double)dx * cos - (double)dy * sin);
+					int rdy = (int)System.Math.Round((double)dx * sin + (double)dy * cos);
+					dx = rdx;
+					dy = rdy;
 				}
+				int num = smallImg.w;
+				int num2 = smallImg.h;
+				int num3 = smallImg.x;
+				int num4 = smallImg.y;
+				if (num3 > imgW) num3 = 0;
+				if (num4 > imgH) num4 = 0;
+				if (num3 + num > imgW) num = imgW - num3;
+				if (num4 + num2 > imgH) num2 = imgH - num4;
+				g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, px + dx, py + dy, 0, totalRotate);
 			}
 		}
 		catch (Exception)
@@ -621,44 +671,60 @@ public class DataSkillEff
 			return;
 		}
 		FrameEff frameEff = (FrameEff)listFrame.elementAt(Frame);
+		if (frameEff == null) return;
 		try
 		{
 			mVector listPartBottom = frameEff.listPartBottom;
-			for (int i = 0; i < listPartBottom.size(); i++)
+			if (listPartBottom == null || listPartBottom.size() == 0) return;
+			mImage image = getImage();
+			if (image == null || image.image == null) return;
+			int imgW = (image.w > 0) ? image.w : mImage.getImageWidth(image.image);
+			int imgH = (image.h > 0) ? image.h : mImage.getImageHeight(image.image);
+			int count = listPartBottom.size();
+			for (int i = 0; i < count; i++)
 			{
 				PartFrame partFrame = (PartFrame)listPartBottom.elementAt(i);
 				SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
-				mImage image = getImage();
-				if (image != null && image.image != null)
+				int dx = partFrame.dx;
+				int dy = partFrame.dy;
+				int totalRotate = partFrame.rotate;
+				if (rotate != 0)
 				{
-					int dx = partFrame.dx;
-					int num = smallImage.w;
-					int num2 = smallImage.h;
-					int num3 = smallImage.x;
-					int num4 = smallImage.y;
-					if (num3 > mImage.getImageWidth(image.image))
-					{
-						num3 = 0;
-					}
-					if (num4 > mImage.getImageHeight(image.image))
-					{
-						num4 = 0;
-					}
-					if (num3 + num > mImage.getImageWidth(image.image))
-					{
-						num = mImage.getImageWidth(image.image) - num3;
-					}
-					if (num4 + num2 > mImage.getImageHeight(image.image))
-					{
-						num2 = mImage.getImageHeight(image.image) - num4;
-					}
-					int num5 = 0;
-					if (hOne == 62 && min >= 50)
-					{
-						num5 = -8;
-					}
-					g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + partFrame.dy + num5, 0);
+					totalRotate += rotate;
+					double rad = (double)rotate * (System.Math.PI / 180.0);
+					double cos = System.Math.Cos(rad);
+					double sin = System.Math.Sin(rad);
+					int rdx = (int)System.Math.Round((double)dx * cos - (double)dy * sin);
+					int rdy = (int)System.Math.Round((double)dx * sin + (double)dy * cos);
+					dx = rdx;
+					dy = rdy;
 				}
+				int num = smallImage.w;
+				int num2 = smallImage.h;
+				int num3 = smallImage.x;
+				int num4 = smallImage.y;
+				if (num3 > imgW)
+				{
+					num3 = 0;
+				}
+				if (num4 > imgH)
+				{
+					num4 = 0;
+				}
+				if (num3 + num > imgW)
+				{
+					num = imgW - num3;
+				}
+				if (num4 + num2 > imgH)
+				{
+					num2 = imgH - num4;
+				}
+				int num5 = 0;
+				if (hOne == 62 && min >= 50)
+				{
+					num5 = -8;
+				}
+				g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + dy + num5, 0, totalRotate);
 			}
 		}
 		catch (Exception)
@@ -668,44 +734,62 @@ public class DataSkillEff
 
 	public void paintBottomEff(mGraphics g)
 	{
-		if (!isHavedata() || (typeupdate == 3 && Frame == -1) || Frame >= listFrame.size())
+		if (!isHavedata() || (typeupdate == 3 && Frame == -1) || Frame < 0 || Frame >= listFrame.size())
 		{
 			return;
 		}
 		FrameEff frameEff = (FrameEff)listFrame.elementAt(Frame);
+		if (frameEff == null) return;
 		try
 		{
 			mVector listPartBottom = frameEff.listPartBottom;
-			for (int i = 0; i < listPartBottom.size(); i++)
+			if (listPartBottom == null || listPartBottom.size() == 0) return;
+			mImage image = getImage();
+			if (image == null || image.image == null) return;
+			int imgW = (image.w > 0) ? image.w : mImage.getImageWidth(image.image);
+			int imgH = (image.h > 0) ? image.h : mImage.getImageHeight(image.image);
+			int count = listPartBottom.size();
+			for (int i = 0; i < count; i++)
 			{
 				PartFrame partFrame = (PartFrame)listPartBottom.elementAt(i);
-				SmallImage smallImage = this.smallImage[partFrame.idSmallImg];
-				mImage image = getImage();
-				if (image != null && image.image != null)
+				if (partFrame == null || smallImage == null || partFrame.idSmallImg < 0 || partFrame.idSmallImg >= smallImage.Length) continue;
+				SmallImage smallImg = smallImage[partFrame.idSmallImg];
+				if (smallImg == null) continue;
+				int dx = partFrame.dx;
+				int dy = partFrame.dy;
+				int totalRotate = partFrame.rotate;
+				if (rotate != 0)
 				{
-					int dx = partFrame.dx;
-					int num = smallImage.w;
-					int num2 = smallImage.h;
-					int num3 = smallImage.x;
-					int num4 = smallImage.y;
-					if (num3 > mImage.getImageWidth(image.image))
-					{
-						num3 = 0;
-					}
-					if (num4 > mImage.getImageHeight(image.image))
-					{
-						num4 = 0;
-					}
-					if (num3 + num > mImage.getImageWidth(image.image))
-					{
-						num = mImage.getImageWidth(image.image) - num3;
-					}
-					if (num4 + num2 > mImage.getImageHeight(image.image))
-					{
-						num2 = mImage.getImageHeight(image.image) - num4;
-					}
-					g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + partFrame.dy, 0);
+					totalRotate += rotate;
+					double rad = (double)rotate * (System.Math.PI / 180.0);
+					double cos = System.Math.Cos(rad);
+					double sin = System.Math.Sin(rad);
+					int rdx = (int)System.Math.Round((double)dx * cos - (double)dy * sin);
+					int rdy = (int)System.Math.Round((double)dx * sin + (double)dy * cos);
+					dx = rdx;
+					dy = rdy;
 				}
+				int num = smallImg.w;
+				int num2 = smallImg.h;
+				int num3 = smallImg.x;
+				int num4 = smallImg.y;
+				if (num3 > imgW)
+				{
+					num3 = 0;
+				}
+				if (num4 > imgH)
+				{
+					num4 = 0;
+				}
+				if (num3 + num > imgW)
+				{
+					num = imgW - num3;
+				}
+				if (num4 + num2 > imgH)
+				{
+					num2 = imgH - num4;
+				}
+				g.drawRegion(image, num3, num4, num, num2, (partFrame.flip == 1) ? 2 : 0, x + dx, y + dy, 0, totalRotate);
 			}
 		}
 		catch (Exception)
@@ -720,13 +804,39 @@ public class DataSkillEff
 
 	public mImage getImage()
 	{
-		EffectData obj = (EffectData)ALL_EFF_DATA.get(idEff.ToString() ?? "");
-		if (obj == null) return null;
-		obj.count = GameCanvas.timeNow / 1000;
-		return obj.img;
+		string key = getKey(idEff);
+		EffectData obj = (EffectData)ALL_EFF_DATA.get(key);
+		if (obj != null && obj.img != null && obj.img.image != null)
+		{
+			obj.count = GameCanvas.timeNow / 1000;
+			return obj.img;
+		}
+
+		long now = mSystem.currentTimeMillis();
+		object lastReqObj = TIME_REQUEST.get(key);
+		long lastReq = (lastReqObj != null) ? (long)lastReqObj : 0L;
+		if (now - lastReq < 3000L)
+		{
+			return (obj != null) ? obj.img : null;
+		}
+		TIME_REQUEST.put(key, now);
+
+		sbyte[] rmsData = CRes.loadRMS("DataSkillEff" + idEff);
+		if (rmsData != null && rmsData.Length > 0)
+		{
+			obj = readData(rmsData, false, Rms.lastLoadedZoom);
+			if (obj != null && obj.img != null && obj.img.image != null)
+			{
+				obj.count = GameCanvas.timeNow / 1000;
+				return obj.img;
+			}
+		}
+
+		GlobalService.gI().getDataSkillEFf(0, idEff);
+		return (obj != null) ? obj.img : null;
 	}
 
-	public static EffectData readData(sbyte[] dataeff, bool isSave)
+	public static EffectData readData(sbyte[] dataeff, bool isSave, int forceZoom = 0)
 	{
 		EffectData effectData = null;
 		try
@@ -737,16 +847,21 @@ public class DataSkillEff
 			dataInputStream.read(ref data);
 			sbyte[] data2 = new sbyte[dataInputStream.available()];
 			dataInputStream.read(ref data2);
-			effectData = (EffectData)ALL_EFF_DATA.get(id.ToString() ?? "");
+			string key = getKey(id);
+			effectData = (EffectData)ALL_EFF_DATA.get(key);
 			if (effectData == null)
 			{
 				// Key chưa tồn tại: tạo EffectData mới để không bỏ qua data từ server
 				effectData = new EffectData();
-				ALL_EFF_DATA.put(id.ToString() ?? "", effectData);
+				ALL_EFF_DATA.put(key, effectData);
 			}
-			effectData.setData(data, data2);
+			int z = (forceZoom > 0) ? forceZoom : Rms.lastLoadedZoom;
+			effectData.setData(data, data2, z);
 			effectData.count = GameCanvas.timeNow / 1000;
-			saveDataSkillEff(dataeff, id);
+			if (isSave)
+			{
+				saveDataSkillEff(dataeff, id);
+			}
 		}
 		catch (Exception)
 		{
@@ -772,35 +887,37 @@ public class DataSkillEff
 
 	public void update()
 	{
-		if (!isHavedata() || (listFrame.size() <= 0 && sequence.Length == 0))
+		if (!isHavedata() || sequence == null || (listFrame.size() <= 0 && sequence.Length == 0))
 		{
 			return;
 		}
+		int seqLen = sequence.Length;
+		if (seqLen == 0) return;
 		try
 		{
 			switch (typeupdate)
 			{
 			case 0:
 				f++;
-				if (f >= sequence.Length)
+				if (f >= seqLen)
 				{
 					wantDestroy = true;
 					f = 0;
 				}
-				Frame = sequence[f];
+				Frame = (f < seqLen) ? sequence[f] : (sbyte)0;
 				break;
 			case 1:
 				f++;
-				if (f >= sequence.Length)
+				if (f >= seqLen)
 				{
 					f = 0;
 					wantDestroy = true;
 				}
-				Frame = sequence[f];
+				Frame = (f < seqLen) ? sequence[f] : (sbyte)0;
 				break;
 			case 2:
 				f++;
-				if (f >= sequence.Length)
+				if (f >= seqLen)
 				{
 					f = 0;
 				}
@@ -808,11 +925,11 @@ public class DataSkillEff
 				{
 					wantDestroy = true;
 				}
-				Frame = sequence[f];
+				Frame = (f < seqLen) ? sequence[f] : (sbyte)0;
 				break;
 			case 3:
 				f++;
-				if (f >= sequence.Length)
+				if (f >= seqLen)
 				{
 					if (waitLoop > 0)
 					{
@@ -827,7 +944,7 @@ public class DataSkillEff
 						f = 0;
 					}
 				}
-				if (f < sequence.Length)
+				if (f < seqLen)
 				{
 					Frame = sequence[f];
 				}

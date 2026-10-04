@@ -273,7 +273,8 @@ public class MainHelp : AvMain
 				int num4 = MainTab.yTab + 32;
 				for (int i = 0; i < Player.vecInventory.size(); i++)
 				{
-					if (((MainItem)Player.vecInventory.elementAt(i)).typeObject == 4)
+					MainItem mi = (MainItem)Player.vecInventory.elementAt(i);
+					if (mi != null && mi.typeObject == 4)
 					{
 						createPoint(num3 + i % MainTabShop.maxNumItemW * MainTab.wItem + MainTab.wItem / 2 + 14, num4 + i / MainTabShop.maxNumItemW * MainTab.wItem + MainTab.wItem / 2, 10);
 						break;

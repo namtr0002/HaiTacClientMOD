@@ -57,6 +57,34 @@ public class QuickMenu : Menu
 		return instance = new QuickMenu();
 	}
 
+	public static FrameImage getFraQuickMenu(int index)
+	{
+		if (fraQuickMenu != null && index >= 0 && index < fraQuickMenu.Length && fraQuickMenu[index] != null)
+		{
+			return fraQuickMenu[index];
+		}
+		if (index == 16)
+		{
+			try
+			{
+				mImage img = mImage.createImage("/point/quick_16.png");
+				if (img != null && img.image != null)
+				{
+					FrameImage fra16 = new FrameImage(img, 30, 30);
+					if (fraQuickMenu != null && index < fraQuickMenu.Length)
+					{
+						fraQuickMenu[index] = fra16;
+					}
+					return fra16;
+				}
+			}
+			catch (Exception)
+			{
+			}
+		}
+		return null;
+	}
+
 	public void startAt()
 	{
 		beginMenu();
@@ -236,7 +264,9 @@ public class QuickMenu : Menu
 				GameCanvas.gameScr.cmdSudo.perform();
 				break;
 			case 15:
-				GameCanvas.gameScr.cmdPet.perform();
+				DualTabScreen.gI().curMainTab = 4;
+				DualTabScreen.gI().openPetSubView();
+				DualTabScreen.gI().Show(GameCanvas.gameScr);
 				break;
 		}
 	}

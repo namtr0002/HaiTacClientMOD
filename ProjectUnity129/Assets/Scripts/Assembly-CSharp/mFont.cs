@@ -252,8 +252,30 @@ public class mFont
 		}
 		this.id = id;
 		idPhong = colorP;
-		text = "FontSys/" + text;
-		myFont = (Font)Resources.Load(text);
+		string fontName = text;
+		myFont = (Font)Resources.Load("fontsys/" + fontName);
+		if (myFont == null)
+		{
+			myFont = (Font)Resources.Load("FontSys/" + fontName);
+		}
+		if (myFont == null)
+		{
+			myFont = (Font)Resources.Load("fontsys/fontnho");
+			if (myFont == null)
+			{
+				myFont = (Font)Resources.Load("FontSys/fontnho");
+			}
+		}
+		if (myFont == null)
+		{
+			try
+			{
+				myFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+			}
+			catch
+			{
+			}
+		}
 		if (id < 25)
 		{
 			color1 = setColorFontPhong(colorP);
@@ -559,6 +581,8 @@ public class mFont
 		return false;
 	}
 
+	private GUIStyle cachedCalcStyle;
+
 	public int getWidth(string s)
 	{
 		return getWidthExactOf(s);
@@ -566,13 +590,20 @@ public class mFont
 
 	public int getWidthExactOf(string s)
 	{
+		if (string.IsNullOrEmpty(s)) return 0;
+		if (!Main.isMainThread)
+		{
+			return getWidthNotExactOf(s);
+		}
 		try
 		{
-			return (int)new GUIStyle
+			if (cachedCalcStyle == null)
 			{
-				font = myFont,
-				fontSize = sizef * mGraphics.zoomLevel
-			}.CalcSize(new GUIContent(s)).x / mGraphics.zoomLevel;
+				cachedCalcStyle = new GUIStyle();
+			}
+			cachedCalcStyle.font = myFont;
+			cachedCalcStyle.fontSize = sizef * mGraphics.zoomLevel;
+			return (int)cachedCalcStyle.CalcSize(new GUIContent(s)).x / mGraphics.zoomLevel;
 		}
 		catch (Exception ex)
 		{
@@ -583,7 +614,10 @@ public class mFont
 
 	public int getWidthNotExactOf(string s)
 	{
-		return s.Length * wO / mGraphics.zoomLevel;
+		if (string.IsNullOrEmpty(s)) return 0;
+		int charW = (sizef > 0) ? (sizef * 5 / 8) : 7;
+		if (charW < 4) charW = 4;
+		return s.Length * charW;
 	}
 
 	public int getHeight()
@@ -592,12 +626,19 @@ public class mFont
 		{
 			return height / mGraphics.zoomLevel;
 		}
-		GUIStyle gUIStyle = new GUIStyle();
-		gUIStyle.font = myFont;
-		gUIStyle.fontSize = sizef * mGraphics.zoomLevel;
+		if (!Main.isMainThread)
+		{
+			return (sizef > 0) ? sizef : 20;
+		}
 		try
 		{
-			height = (int)gUIStyle.CalcSize(new GUIContent("Adg")).y + 2;
+			if (cachedCalcStyle == null)
+			{
+				cachedCalcStyle = new GUIStyle();
+			}
+			cachedCalcStyle.font = myFont;
+			cachedCalcStyle.fontSize = sizef * mGraphics.zoomLevel;
+			height = (int)cachedCalcStyle.CalcSize(new GUIContent("Adg")).y + 2;
 		}
 		catch (Exception ex)
 		{
@@ -607,56 +648,55 @@ public class mFont
 		return height / mGraphics.zoomLevel;
 	}
 
+	private GUIStyle[] cachedStyles;
+
+	public GUIStyle getCachedStyle(int align = 0)
+	{
+		if (cachedStyles == null)
+		{
+			cachedStyles = new GUIStyle[3];
+		}
+		int styleIndex = (align == 1) ? 1 : ((align == 2 || align == 3) ? 2 : 0);
+		GUIStyle gUIStyle = cachedStyles[styleIndex];
+		if (gUIStyle == null)
+		{
+			try
+			{
+				gUIStyle = (GUI.skin != null && GUI.skin.label != null) ? new GUIStyle(GUI.skin.label) : new GUIStyle();
+			}
+			catch
+			{
+				gUIStyle = new GUIStyle();
+			}
+			gUIStyle.font = myFont;
+			gUIStyle.alignment = (styleIndex == 1) ? TextAnchor.UpperRight : ((styleIndex == 2) ? TextAnchor.UpperCenter : TextAnchor.UpperLeft);
+			cachedStyles[styleIndex] = gUIStyle;
+		}
+		gUIStyle.fontSize = sizef * mGraphics.zoomLevel;
+		gUIStyle.normal.textColor = color1;
+		return gUIStyle;
+	}
+
 	public void _drawString(mGraphics g, string st, int x0, int y0, int align)
 	{
 		y0 += yAddFont;
-		GUIStyle gUIStyle = new GUIStyle(GUI.skin.label);
-		gUIStyle.font = myFont;
-		gUIStyle.fontSize = sizef * mGraphics.zoomLevel;
+		GUIStyle gUIStyle = getCachedStyle(align);
 		float num = 0f;
-		float num2 = 0f;
+		float num2 = y0;
 		switch (align)
 		{
 		case 0:
 			num = x0;
-			num2 = y0;
-			gUIStyle.alignment = TextAnchor.UpperLeft;
 			break;
 		case 1:
 			num = x0 - MotherCanvas.w;
-			num2 = y0;
-			gUIStyle.alignment = TextAnchor.UpperRight;
 			break;
 		case 2:
 		case 3:
 			num = x0 - MotherCanvas.w / 2;
-			num2 = y0;
-			gUIStyle.alignment = TextAnchor.UpperCenter;
 			break;
 		}
-		gUIStyle.normal.textColor = color1;
 		g.drawString(st, (int)num, (int)num2, gUIStyle);
-	}
-
-	public GUIStyle getCachedStyle(int align = 0)
-	{
-		GUIStyle gUIStyle = new GUIStyle(GUI.skin.label);
-		gUIStyle.font = myFont;
-		gUIStyle.fontSize = sizef * mGraphics.zoomLevel;
-		if (align == 1)
-		{
-			gUIStyle.alignment = TextAnchor.UpperRight;
-		}
-		else if (align == 2)
-		{
-			gUIStyle.alignment = TextAnchor.UpperCenter;
-		}
-		else
-		{
-			gUIStyle.alignment = TextAnchor.UpperLeft;
-		}
-		gUIStyle.normal.textColor = color1;
-		return gUIStyle;
 	}
 
 	public static string[] splitStringSv(string _text, string _searchStr)

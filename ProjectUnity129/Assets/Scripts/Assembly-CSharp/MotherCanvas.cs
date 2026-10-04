@@ -39,7 +39,7 @@ public class MotherCanvas
 	public const int GRAPHIC_IOS = 3;
 	public const int GRAPHIC_PC = 4;
 	public const int GRAPHIC_PIXEL = GRAPHIC_JAVA;
-	public const int GRAPHIC_FULL_HD = GRAPHIC_ANDROID;
+	public const int GRAPHIC_FULL_HD = GRAPHIC_PC;
 	public const int GRAPHIC_MINI = 10;
 
 	public static int userZoomSetting = 0;
@@ -48,11 +48,82 @@ public class MotherCanvas
 	public static int resourceZoom => mGraphics.zoomLevel;
 	public static float renderScale => 1f;
 
-	public static void saveZoomSetting(int zoom) {}
-	public static void loadZoomSetting() {}
-	public static void applyZoom(int zoom) {}
-	public static void applyZoomAndReloadData(int zoom) {}
-	public static void requestChangeZoom(int zoom, string modeName) {}
+	public static void saveZoomSetting(int zoom)
+	{
+		userZoomSetting = zoom;
+		try
+		{
+			PlayerPrefs.SetInt("MAIN_zoom_setting", zoom);
+			PlayerPrefs.Save();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(baos);
+			dos.writeInt(zoom);
+			CRes.saveRMS("MAIN_zoom_setting", baos.toByteArray());
+			dos.close();
+		}
+		catch (Exception)
+		{
+		}
+	}
+
+	public static void loadZoomSetting()
+	{
+		try
+		{
+			if (PlayerPrefs.HasKey("MAIN_zoom_setting"))
+			{
+				int savedPref = PlayerPrefs.GetInt("MAIN_zoom_setting");
+				if (savedPref >= 1 && savedPref <= 4)
+				{
+					userZoomSetting = savedPref;
+					return;
+				}
+			}
+			sbyte[] data = CRes.loadRMS("MAIN_zoom_setting");
+			if (data != null && data.Length > 0)
+			{
+				DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+				int saved = dis.readInt();
+				dis.close();
+				if (saved >= 1 && saved <= 4)
+				{
+					userZoomSetting = saved;
+					PlayerPrefs.SetInt("MAIN_zoom_setting", saved);
+					PlayerPrefs.Save();
+					return;
+				}
+			}
+		}
+		catch (Exception)
+		{
+		}
+		userZoomSetting = 0;
+	}
+
+	public static void applyZoom(int zoom)
+	{
+		if (zoom < 1 || zoom > 4) zoom = 2;
+		saveZoomSetting(zoom);
+		mGraphics.zoomLevel = zoom;
+		mGraphics.zoomResource = (zoom >= 2) ? 2 : 1;
+		if (instance != null)
+		{
+			instance.zoomLevel = zoom;
+			instance.checkZoomLevel();
+		}
+		refreshDisplay();
+	}
+
+	public static void applyZoomAndReloadData(int zoom)
+	{
+		applyZoom(zoom);
+	}
+
+	public static void requestChangeZoom(int zoom, string modeName)
+	{
+		applyZoom(zoom);
+	}
+
 	public static bool isZoomDataDownloaded(int zoom) => true;
 
 	// Orientation settings
@@ -274,6 +345,7 @@ public class MotherCanvas
 				instance.checkZoomLevel();
 			}
 			mFont.loadmFont();
+			LoadImageStatic.loadImageLanguage();
 			if (GameCanvas.loadmap != null && MainScreen.cameraMain != null)
 			{
 				GameCanvas.loadmap.limitW = GameCanvas.loadmap.maxWMap - w;
@@ -382,28 +454,49 @@ public class MotherCanvas
 		int longDim = (width > height) ? width : height;
 		int shortDim = (width > height) ? height : width;
 
-		if (GameMidlet.DEVICE == 0) // Thiết bị cũ / J2ME
+		bool isPCPlatform = GameMidlet.isPC 
+			|| GameMidlet.DEVICE == GameMidlet.PC 
+			|| Application.platform == RuntimePlatform.WindowsPlayer 
+			|| Application.platform == RuntimePlatform.WindowsEditor 
+			|| Application.platform == RuntimePlatform.OSXPlayer 
+			|| Application.platform == RuntimePlatform.OSXEditor 
+			|| Application.platform == RuntimePlatform.LinuxPlayer;
+
+		if (isPCPlatform)
+		{
+			GameMidlet.isPC = true;
+			if (GameMidlet.DEVICE != GameMidlet.PC)
+			{
+				GameMidlet.DEVICE = GameMidlet.PC;
+			}
+		}
+
+		if (userZoomSetting >= 1 && userZoomSetting <= 4)
+		{
+			mGraphics.zoomLevel = userZoomSetting;
+		}
+		else if (GameMidlet.DEVICE == 0) // Thiết bị cũ / J2ME
 		{
 			mGraphics.zoomLevel = 1;
 		}
-		else if (GameMidlet.isPC)
+		else if (isPCPlatform)
 		{
 			// PC / Unity Editor (Hỗ trợ cả Ngang & Dọc chuẩn xác)
 			if (longDim >= 3600 && shortDim >= 1800)
 			{
 				mGraphics.zoomLevel = 4; // Màn hình 4K UHD
 			}
-			else if (longDim >= 2400 && shortDim >= 1300)
+			else if (longDim >= 2200 && shortDim >= 1200)
 			{
 				mGraphics.zoomLevel = 3; // Màn hình 1440p / 2K QHD
 			}
-			else if (longDim >= 600 && shortDim >= 360)
+			else if (longDim >= 700 && shortDim >= 400)
 			{
-				mGraphics.zoomLevel = 2; // 1080p, 720p, Docked Editor (1317x518, 518x1317, 1920x864, 1920x1080)
+				mGraphics.zoomLevel = 2; // Cửa sổ PC lớn (1024x550, 1280x720, 1920x1080)
 			}
 			else
 			{
-				mGraphics.zoomLevel = 1; // Cửa sổ rất nhỏ (< 600x360)
+				mGraphics.zoomLevel = 1; // Cửa sổ PC nhỏ (600x355 chuẩn) hoặc nhỏ hơn 700x400
 			}
 		}
 		else
@@ -428,6 +521,7 @@ public class MotherCanvas
 		}
 		
 		this.zoomLevel = mGraphics.zoomLevel;
+		mGraphics.zoomResource = (mGraphics.zoomLevel >= 2) ? 2 : 1;
 		w = (width + mGraphics.zoomLevel - 1) / mGraphics.zoomLevel;
 		h = (height + mGraphics.zoomLevel - 1) / mGraphics.zoomLevel;
 		
@@ -529,17 +623,21 @@ public class MotherCanvas
 			GameCanvas.keyMyHold[34] = true;
 			GameCanvas.keyMyPressed[34] = true;
 			return true;
-		case 119:
-			GameCanvas.keyMyHold[32] = true;
-			GameCanvas.keyMyPressed[32] = true;
+		case 98:
+			GameCanvas.keyMyHold[51] = true;
+			GameCanvas.keyMyPressed[51] = true;
+			return true;
+		case 99:
+			GameCanvas.keyMyHold[48] = true;
+			GameCanvas.keyMyPressed[48] = true;
 			return true;
 		case 100:
 			GameCanvas.keyMyHold[36] = true;
 			GameCanvas.keyMyPressed[36] = true;
 			return true;
-		case 115:
-			GameCanvas.keyMyHold[38] = true;
-			GameCanvas.keyMyPressed[38] = true;
+		case 101:
+			GameCanvas.keyMyHold[43] = true;
+			GameCanvas.keyMyPressed[43] = true;
 			return true;
 		case 49:
 		case 103:
@@ -550,6 +648,10 @@ public class MotherCanvas
 		case 104:
 			GameCanvas.keyMyHold[33] = true;
 			GameCanvas.keyMyPressed[33] = true;
+			return true;
+		case 105:
+			GameCanvas.keyMyHold[46] = true;
+			GameCanvas.keyMyPressed[46] = true;
 			return true;
 		case 51:
 		case 106:
@@ -565,6 +667,38 @@ public class MotherCanvas
 		case 108:
 			GameCanvas.keyMyHold[39] = true;
 			GameCanvas.keyMyPressed[39] = true;
+			return true;
+		case 109:
+			GameCanvas.keyMyHold[42] = true;
+			GameCanvas.keyMyPressed[42] = true;
+			return true;
+		case 111:
+			GameCanvas.keyMyHold[44] = true;
+			GameCanvas.keyMyPressed[44] = true;
+			return true;
+		case 112:
+			GameCanvas.keyMyHold[50] = true;
+			GameCanvas.keyMyPressed[50] = true;
+			return true;
+		case 113:
+			GameCanvas.keyMyHold[47] = true;
+			GameCanvas.keyMyPressed[47] = true;
+			return true;
+		case 115:
+			GameCanvas.keyMyHold[38] = true;
+			GameCanvas.keyMyPressed[38] = true;
+			return true;
+		case 119:
+			GameCanvas.keyMyHold[32] = true;
+			GameCanvas.keyMyPressed[32] = true;
+			return true;
+		case 120:
+			GameCanvas.keyMyHold[49] = true;
+			GameCanvas.keyMyPressed[49] = true;
+			return true;
+		case 121:
+			GameCanvas.keyMyHold[45] = true;
+			GameCanvas.keyMyPressed[45] = true;
 			return true;
 		case 32:
 			GameCanvas.keyMyHold[5] = true;
@@ -587,58 +721,6 @@ public class MotherCanvas
 			GameCanvas.keyMyHold[13] = true;
 			GameCanvas.keyMyPressed[13] = true;
 			return true;
-		case 109:
-			GameCanvas.keyMyHold[42] = true;
-			GameCanvas.keyMyPressed[42] = true;
-			return true;
-		case 112:
-			GameCanvas.keyMyHold[43] = true;
-			GameCanvas.keyMyPressed[43] = true;
-			return true;
-		case 111:
-			GameCanvas.keyMyHold[44] = true;
-			GameCanvas.keyMyPressed[44] = true;
-			return true;
-		case 113:
-			GameCanvas.keyMyHold[45] = true;
-			GameCanvas.keyMyPressed[45] = true;
-			return true;
-		case 101:
-			GameCanvas.keyMyHold[46] = true;
-			GameCanvas.keyMyPressed[46] = true;
-			return true;
-		case 114:
-			GameCanvas.keyMyHold[47] = true;
-			GameCanvas.keyMyPressed[47] = true;
-			return true;
-		case 116:
-			GameCanvas.keyMyHold[48] = true;
-			GameCanvas.keyMyPressed[48] = true;
-			return true;
-		case 121:
-			GameCanvas.keyMyHold[49] = true;
-			GameCanvas.keyMyPressed[49] = true;
-			return true;
-		case 117:
-			GameCanvas.keyMyHold[50] = true;
-			GameCanvas.keyMyPressed[50] = true;
-			return true;
-		case 105:
-			GameCanvas.keyMyHold[51] = true;
-			GameCanvas.keyMyPressed[51] = true;
-			return true;
-		case 110:
-			GameCanvas.keyMyHold[52] = true;
-			GameCanvas.keyMyPressed[52] = true;
-			return true;
-		case 120:
-			GameCanvas.keyMyHold[53] = true;
-			GameCanvas.keyMyPressed[53] = true;
-			return true;
-		case 99:
-			GameCanvas.keyMyHold[54] = true;
-			GameCanvas.keyMyPressed[54] = true;
-			return true;
 		}
 		return false;
 	}
@@ -651,17 +733,21 @@ public class MotherCanvas
 			GameCanvas.keyMyHold[34] = false;
 			GameCanvas.keyMyPressed[34] = false;
 			return true;
-		case 119:
-			GameCanvas.keyMyHold[32] = false;
-			GameCanvas.keyMyPressed[32] = false;
+		case 98:
+			GameCanvas.keyMyHold[51] = false;
+			GameCanvas.keyMyPressed[51] = false;
+			return true;
+		case 99:
+			GameCanvas.keyMyHold[48] = false;
+			GameCanvas.keyMyPressed[48] = false;
 			return true;
 		case 100:
 			GameCanvas.keyMyHold[36] = false;
 			GameCanvas.keyMyPressed[36] = false;
 			return true;
-		case 115:
-			GameCanvas.keyMyHold[38] = false;
-			GameCanvas.keyMyPressed[38] = false;
+		case 101:
+			GameCanvas.keyMyHold[43] = false;
+			GameCanvas.keyMyPressed[43] = false;
 			return true;
 		case 49:
 		case 103:
@@ -672,6 +758,10 @@ public class MotherCanvas
 		case 104:
 			GameCanvas.keyMyHold[33] = false;
 			GameCanvas.keyMyPressed[33] = false;
+			return true;
+		case 105:
+			GameCanvas.keyMyHold[46] = false;
+			GameCanvas.keyMyPressed[46] = false;
 			return true;
 		case 51:
 		case 106:
@@ -687,6 +777,38 @@ public class MotherCanvas
 		case 108:
 			GameCanvas.keyMyHold[39] = false;
 			GameCanvas.keyMyPressed[39] = false;
+			return true;
+		case 109:
+			GameCanvas.keyMyHold[42] = false;
+			GameCanvas.keyMyPressed[42] = false;
+			return true;
+		case 111:
+			GameCanvas.keyMyHold[44] = false;
+			GameCanvas.keyMyPressed[44] = false;
+			return true;
+		case 112:
+			GameCanvas.keyMyHold[50] = false;
+			GameCanvas.keyMyPressed[50] = false;
+			return true;
+		case 113:
+			GameCanvas.keyMyHold[47] = false;
+			GameCanvas.keyMyPressed[47] = false;
+			return true;
+		case 115:
+			GameCanvas.keyMyHold[38] = false;
+			GameCanvas.keyMyPressed[38] = false;
+			return true;
+		case 119:
+			GameCanvas.keyMyHold[32] = false;
+			GameCanvas.keyMyPressed[32] = false;
+			return true;
+		case 120:
+			GameCanvas.keyMyHold[49] = false;
+			GameCanvas.keyMyPressed[49] = false;
+			return true;
+		case 121:
+			GameCanvas.keyMyHold[45] = false;
+			GameCanvas.keyMyPressed[45] = false;
 			return true;
 		case 32:
 			GameCanvas.keyMyHold[5] = false;
@@ -708,46 +830,6 @@ public class MotherCanvas
 			GameCanvas.keyMyPressed[41] = false;
 			GameCanvas.keyMyHold[13] = false;
 			GameCanvas.keyMyPressed[13] = false;
-			return true;
-		case 109:
-			GameCanvas.keyMyHold[42] = false;
-			GameCanvas.keyMyPressed[42] = false;
-			return true;
-		case 112:
-			GameCanvas.keyMyHold[50] = false;
-			GameCanvas.keyMyPressed[50] = false;
-			return true;
-		case 111:
-			GameCanvas.keyMyHold[44] = false;
-			GameCanvas.keyMyPressed[44] = false;
-			return true;
-		case 99:
-			GameCanvas.keyMyHold[48] = false;
-			GameCanvas.keyMyPressed[48] = false;
-			return true;
-		case 105:
-			GameCanvas.keyMyHold[46] = false;
-			GameCanvas.keyMyPressed[46] = false;
-			return true;
-		case 113:
-			GameCanvas.keyMyHold[47] = false;
-			GameCanvas.keyMyPressed[47] = false;
-			return true;
-		case 121:
-			GameCanvas.keyMyHold[45] = false;
-			GameCanvas.keyMyPressed[45] = false;
-			return true;
-		case 120:
-			GameCanvas.keyMyHold[49] = false;
-			GameCanvas.keyMyPressed[49] = false;
-			return true;
-		case 101:
-			GameCanvas.keyMyHold[43] = false;
-			GameCanvas.keyMyPressed[43] = false;
-			return true;
-		case 98:
-			GameCanvas.keyMyHold[51] = false;
-			GameCanvas.keyMyPressed[51] = false;
 			return true;
 		}
 		return false;

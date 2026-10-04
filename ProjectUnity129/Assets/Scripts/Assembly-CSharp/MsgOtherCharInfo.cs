@@ -18,8 +18,6 @@ public class MsgOtherCharInfo : MsgDialog
 
 	private bool isShowInfo;
 
-	private bool isCheckTop;
-
 	public static InfoMemList infoFight;
 
 	private iCommand cmdfight;
@@ -119,7 +117,6 @@ public class MsgOtherCharInfo : MsgDialog
 		{
 			ylechthanhtich += 14;
 		}
-		isCheckTop = true;
 
 		yLechChar = ylechthanhtich;
 		if (obj.hOne > 52)
@@ -247,13 +244,10 @@ public class MsgOtherCharInfo : MsgDialog
 			item.paintColor(g, sx + size / 2, sy + size / 2, size - 2);
 			item.paint(g, sx + size / 2, sy + size / 2, size, 1);
 		}
-		else if (equipType < 8 && AvMain.fraEquip != null)
+		else if (equipType < 8)
 		{
 			int frameIdx = equipType % 8;
-			if (frameIdx < AvMain.fraEquip.nFrame)
-			{
-				AvMain.fraEquip.drawFrame(frameIdx, sx + size / 2, sy + size / 2, 0, 3, g);
-			}
+			AvMain.paintEquipSilhouette(g, frameIdx, sx + size / 2, sy + size / 2);
 		}
 
 		if (isSel)

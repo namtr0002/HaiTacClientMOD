@@ -180,10 +180,15 @@ public class LoginScreen : MainScreen
 			{
 			}
 		}
-		if (yPaintLogo == 0)
+		if (yPaintLogo == 0 || yPaintLogo > hLogo)
 		{
 			yPaintLogo = hLogo;
 		}
+	}
+
+	public override void init()
+	{
+		updatePosCmd();
 	}
 
 	public void updatePosCmd()
@@ -225,9 +230,11 @@ public class LoginScreen : MainScreen
 				cmdHelp.setPos(MotherCanvas.w - 15, MotherCanvas.h - 15, AvMain.fraIconHome, "");
 			}
 			right = cmdHelp;
-			cmdLogin.setPos(MotherCanvas.hw, yBeginPaint + hShowPaper, AvMain.fraBtLogin, "");
+			// Đặt nút Login ở vị trí cố định cuối màn để không bị cắt
+			int loginY = System.Math.Min(yBeginPaint + hShowPaper, MotherCanvas.h - 28);
+			cmdLogin.setPos(MotherCanvas.hw, loginY, AvMain.fraBtLogin, "");
 			cmdLogin.isPlayframe = true;
-			cmdRegister.setPosXY(MotherCanvas.hw, yBeginPaint + hShowPaper - iCommand.hButtonCmdNor + 8);
+			cmdRegister.setPosXY(MotherCanvas.hw, loginY - iCommand.hButtonCmdNor + 8);
 		}
 		else
 		{
@@ -265,6 +272,7 @@ public class LoginScreen : MainScreen
 		GameScreen.player = null;
 		Session_ME.gI().close();
 		type = 0;
+		idSelect = 0;  // Reset để nút đăng nhập luôn hiện
 		setCmd();
 		wShowPaper = 5;
 		if (GameCanvas.currentScreen != null && GameCanvas.currentScreen != GameCanvas.loginScr && GameCanvas.currentScreen != GameCanvas.fristLoginScr)
@@ -350,14 +358,14 @@ public class LoginScreen : MainScreen
 				cmdLastLogin.caption = T.loadGame + " " + SaveRms.userLast;
 				mVector2.addElement(cmdLastLogin);
 			}
+			mVector2.addElement(new iCommand("🌐 " + (T.server ?? "Chọn Máy Chủ"), 27, this));
 			mVector2.addElement(cmdFristLogin);
-			mVector2.addElement(new iCommand(T.server ?? "Chọn máy chủ", 27, this));
+			mVector2.addElement(cmdSound);
+			mVector2.addElement(cmdHelp);
 			if (!GameCanvas.isSuperLowGraphic)
 			{
 				mVector2.addElement(cmdLowGraphic);
 			}
-			mVector2.addElement(cmdHelp);
-			mVector2.addElement(cmdSound);
 			cmdOffBg.caption = T.on + T.offBg;
 			if (!GameCanvas.isOffBg)
 			{
@@ -380,7 +388,6 @@ public class LoginScreen : MainScreen
 				mVector2.addElement(new iCommand("+ Thêm IP Server", 25, this));
 			}
 			mVector2.addElement(new iCommand("\uD83C\uDFA8 " + (UIThemeManager.getCurrentTheme() != null ? UIThemeManager.getCurrentTheme().displayName : "Đổi Giao Diện"), 99, this));
-			mVector2.addElement(new iCommand("\uD83D\uDDA5 UI Showcase", 98, this));
 			mVector2.addElement(cmdExitGame);
 			GameCanvas.menu.startAt(mVector2, 0, T.menu);
 			break;
@@ -499,15 +506,7 @@ public class LoginScreen : MainScreen
 			isCheckData = false;
 			GameMidlet.delAllRms();
 			GameCanvas.end_Dialog();
-			if (GameMidlet.DEVICE == 2)
-			{
-				GameCanvas.updateImageAndroidScr = new UpdateImageScreen();
-				GameCanvas.updateImageAndroidScr.Show();
-			}
-			else
-			{
-				setData();
-			}
+			setData();
 			break;
 		case 18:
 			GameCanvas.isOffBg = !GameCanvas.isOffBg;
@@ -641,7 +640,7 @@ public class LoginScreen : MainScreen
 		GameCanvas.resetTrans(g);
 		paintLogo(g, MotherCanvas.hw);
 		mFont.tahoma_7_black.drawString(g, "Ver: " + ClientConfig.CLIENT_VERSION, MotherCanvas.w - 2, 2 + GameScreen.h12plus, 1);
-		mFont.tahoma_7_black.drawString(g, "ID: " + ClientConfig.CLIENT_ID, MotherCanvas.w - 2, 4 + GameScreen.h12plus + GameCanvas.hText / 2, 1);
+		mFont.tahoma_7_black.drawString(g, "No: 1", MotherCanvas.w - 2, 4 + GameScreen.h12plus + GameCanvas.hText / 2, 1);
 		GameCanvas.resetTrans(g);
 		g.setClip(MotherCanvas.hw - wShowPaper / 2, 0, wShowPaper, MotherCanvas.h);
 		g.saveCanvas();
@@ -657,25 +656,11 @@ public class LoginScreen : MainScreen
 		paintListServer(g);
 		if (idSelect != 2 && idSelect != -2)
 		{
-			if (GameCanvas.isTouch && !GameCanvas.lowGraphic)
+			if (GameCanvas.isTouch && !GameCanvas.lowGraphic && AvMain.fraBtBanhlai != null)
 			{
 				AvMain.fraBtBanhlai.drawFrame(frameBanhlai, cmdLogin.xCmd, cmdLogin.yCmd, 0, 3, g);
 			}
 			base.paint(g);
-		}
-
-		// Theme selector button at bottom-left: [ Giao diện: Gốc ▼ ]
-		UITheme curTheme = UIThemeManager.getCurrentTheme();
-		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
-		int themeBtnX = 10;
-		int themeBtnY = MotherCanvas.h - 26;
-		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
-		if (themeBtnW < 110) themeBtnW = 110;
-		int themeBtnH = 20;
-
-		if (curTheme != null)
-		{
-			curTheme.paintButton(g, themeBtnX, themeBtnY, themeBtnW, themeBtnH, themeText, ModernUI.BTN_GOLD, false, false);
 		}
 	}
 
@@ -685,16 +670,25 @@ public class LoginScreen : MainScreen
 		{
 			LoadImageStatic.loadImageLanguage();
 		}
-		g.drawImage(AvMain.imgLg, x, yPaintLogo, 3);
-		if (GameCanvas.language == 0 && !GameCanvas.lowGraphic && !GameCanvas.isDeviceStore() && GameCanvas.IndexServer < AvMain.fraIconServer.nFrame)
+		if (AvMain.imgLg != null)
+		{
+			g.drawImage(AvMain.imgLg, x, yPaintLogo, 3);
+		}
+		if (GameCanvas.language == 0 && !GameCanvas.lowGraphic && !GameCanvas.isDeviceStore())
 		{
 			if (MotherCanvas.h >= 240)
 			{
-				AvMain.fraIconServer.drawFrame(GameCanvas.IndexServer, x + 35, yPaintLogo + 20, 0, 3, g);
+				if (AvMain.fraIconServer != null && GameCanvas.IndexServer < AvMain.fraIconServer.nFrame)
+				{
+					AvMain.fraIconServer.drawFrame(GameCanvas.IndexServer, x + 35, yPaintLogo + 20, 0, 3, g);
+				}
 			}
 			else
 			{
-				Interface_Game.fraBorderNoti.drawFrame(GameCanvas.IndexServer + 1, x + 34, yPaintLogo + 17, 0, 3, g);
+				if (Interface_Game.fraBorderNoti != null && GameCanvas.IndexServer + 1 < Interface_Game.fraBorderNoti.nFrame)
+				{
+					Interface_Game.fraBorderNoti.drawFrame(GameCanvas.IndexServer + 1, x + 34, yPaintLogo + 17, 0, 3, g);
+				}
 			}
 		}
 	}
@@ -1009,21 +1003,6 @@ public class LoginScreen : MainScreen
 
 	public override void updatePointer()
 	{
-		int themeBtnX = 10;
-		int themeBtnY = MotherCanvas.h - 26;
-		UITheme curTheme = UIThemeManager.getCurrentTheme();
-		string themeText = (curTheme != null) ? curTheme.displayName + " \u25bc" : "Giao di\u1ec7n \u25bc";
-		int themeBtnW = mFont.tahoma_7b_white.getWidth(themeText) + 16;
-		if (themeBtnW < 110) themeBtnW = 110;
-		int themeBtnH = 20;
-
-		if (GameCanvas.isPointSelect(themeBtnX, themeBtnY, themeBtnW, themeBtnH))
-		{
-			openSelectThemeMenu();
-			GameCanvas.isPointerSelect = false;
-			return;
-		}
-
 		if (GameCanvas.isPointSelect(tfPass.x, tfPass.y + hItem, tfPass.width, tfPass.height))
 		{
 			openSelectServerMenu();
@@ -1064,8 +1043,22 @@ public class LoginScreen : MainScreen
 		}
 	}
 
+	public static sbyte pendingTypeLogin = -1;
+	public static string pendingUserLogin = "";
+	public static string pendingPassLogin = "";
+
 	public void doLogin(bool isGetData, sbyte typeLogin, string user, string pass)
 	{
+		pendingTypeLogin = typeLogin;
+		pendingUserLogin = user != null ? user : "";
+		pendingPassLogin = pass != null ? pass : "";
+
+		if (typeLogin == 0)
+		{
+			if (tfUser != null) tfUser.setText(pendingUserLogin);
+			if (tfPass != null) tfPass.setText(pendingPassLogin);
+		}
+
 		GameCanvas.connect();
 		if (isGetData)
 		{

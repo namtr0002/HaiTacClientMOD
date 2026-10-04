@@ -485,7 +485,7 @@ public class MainTab : AvMain
 
 	private static void paintInfo_Money_Player(mGraphics g, bool isClan)
 	{
-		if (GameCanvas.isShortH && MainTabShop.instance.typeNPCShop != 118)
+		if (GameCanvas.isShortH && MainTabShop.instance != null && MainTabShop.instance.typeNPCShop != 118)
 		{
 			Interface_Game.paintInfoPlayer_Short(g, MotherCanvas.hw - 160, 3 + GameScreen.h12plus, isborder: true, mFont.tahoma_7_black);
 			return;

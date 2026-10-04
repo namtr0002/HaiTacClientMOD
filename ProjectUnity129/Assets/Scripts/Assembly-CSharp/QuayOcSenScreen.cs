@@ -514,10 +514,10 @@ public class QuayOcSenScreen : LuckyScreen
 			for (int i = 0; i < Player.vecInventory.size(); i++)
 			{
 				MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
-				if (mainItem.typeObject == 4 && mainItem.ID == 441)
+				if (mainItem != null && mainItem.typeObject == 4 && mainItem.ID == 441)
 				{
 					vequay = mainItem;
-					LuckyScreen.isUpdateVe = false;
+					isUpdateVe = false;
 					break;
 				}
 			}

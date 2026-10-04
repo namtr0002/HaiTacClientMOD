@@ -257,41 +257,12 @@ public class mSound
 
 	public static void load(string filename, int pos)
 	{
-		if (Thread.CurrentThread.Name == Main.mainThreadName)
-		{
-			__load(filename, pos);
-		}
-		else
-		{
-			_load(filename, pos);
-		}
+		__load(filename, pos);
 	}
 
 	private static void _load(string filename, int pos)
 	{
-		if (status != 0)
-		{
-			Cout.LogError("CANNOT LOAD AUDIO " + filename + " WHEN LOADING " + filenametemp);
-			return;
-		}
-		filenametemp = filename;
-		postem = pos;
-		status = 2;
-		int i;
-		for (i = 0; i < 100; i++)
-		{
-			Thread.Sleep(5);
-			if (status == 0)
-			{
-				break;
-			}
-		}
-		if (i == 100)
-		{
-			Cout.LogError("TOO LONG FOR LOAD AUDIO " + filename);
-			return;
-		}
-		Cout.Log("Load Audio " + filename + " done in " + i * 5 + "ms");
+		__load(filename, pos);
 	}
 
 	private static AudioSource[] s_audioSources;
@@ -315,43 +286,12 @@ public class mSound
 
 	public static void start(float volume, int pos)
 	{
-		if (Thread.CurrentThread.Name == Main.mainThreadName)
-		{
-			__start(volume, pos);
-		}
-		else
-		{
-			_start(volume, pos);
-		}
+		__start(volume, pos);
 	}
 
 	public static void _start(float volume, int pos)
 	{
-		if (status != 0)
-		{
-			Debug.LogError("CANNOT START AUDIO WHEN STARTING");
-			return;
-		}
-		volumetem = volume;
-		postem = pos;
-		status = 3;
-		int i;
-		for (i = 0; i < 100; i++)
-		{
-			Thread.Sleep(5);
-			if (status == 0)
-			{
-				break;
-			}
-		}
-		if (i == 100)
-		{
-			Debug.LogError("TOO LONG FOR START AUDIO");
-		}
-		else
-		{
-			Debug.Log("Start Audio done in " + i * 5 + "ms");
-		}
+		__start(volume, pos);
 	}
 
 	public static void __start(float volume, int pos)
@@ -375,42 +315,12 @@ public class mSound
 
 	public static void stop(int pos)
 	{
-		if (Thread.CurrentThread.Name == Main.mainThreadName)
-		{
-			__stop(pos);
-		}
-		else
-		{
-			_stop(pos);
-		}
+		__stop(pos);
 	}
 
 	public static void _stop(int pos)
 	{
-		if (status != 0)
-		{
-			Debug.LogError("CANNOT STOP AUDIO WHEN STOPPING");
-			return;
-		}
-		postem = pos;
-		status = 4;
-		int i;
-		for (i = 0; i < 100; i++)
-		{
-			Thread.Sleep(5);
-			if (status == 0)
-			{
-				break;
-			}
-		}
-		if (i == 100)
-		{
-			Debug.LogError("TOO LONG FOR STOP AUDIO");
-		}
-		else
-		{
-			Debug.Log("Stop Audio done in " + i * 5 + "ms");
-		}
+		__stop(pos);
 	}
 
 	public static void __stop(int pos)

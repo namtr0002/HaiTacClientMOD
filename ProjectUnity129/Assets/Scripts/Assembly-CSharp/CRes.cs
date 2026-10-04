@@ -355,7 +355,51 @@ public class CRes
 
 	public static void quickSort(mVector actors)
 	{
-		recQuickSort(actors, 0, actors.size() - 1);
+		if (actors == null) return;
+		int size = actors.size();
+		if (size <= 1) return;
+
+		try
+		{
+			bool isSorted = true;
+			for (int i = 0; i < size - 1; i++)
+			{
+				MainObject a = (MainObject)actors.elementAt(i);
+				MainObject b = (MainObject)actors.elementAt(i + 1);
+				if (a != null && b != null && a.ySort > b.ySort)
+				{
+					isSorted = false;
+					break;
+				}
+			}
+			if (isSorted) return;
+
+			for (int i = 1; i < size; i++)
+			{
+				MainObject cur = (MainObject)actors.elementAt(i);
+				if (cur == null) continue;
+				int curY = cur.ySort;
+				int j = i - 1;
+				while (j >= 0)
+				{
+					MainObject prev = (MainObject)actors.elementAt(j);
+					if (prev != null && prev.ySort > curY)
+					{
+						actors.setElementAt(prev, j + 1);
+						j--;
+					}
+					else
+					{
+						break;
+					}
+				}
+				actors.setElementAt(cur, j + 1);
+			}
+		}
+		catch (Exception)
+		{
+			recQuickSort(actors, 0, size - 1);
+		}
 	}
 
 	private static void recQuickSort(mVector actors, int left, int right)

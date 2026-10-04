@@ -1413,11 +1413,24 @@ public class ScreenUpgrade : MainScreen
 
 	public virtual void setDataUpgrade()
 	{
-		if (mItemUpgrade[0] == null)
+		if (mItemUpgrade == null || mItemUpgrade.Length == 0 || mItemUpgrade[0] == null)
+		{
+			return;
+		}
+		if (mTemMaterialUpgrade == null)
+		{
+			GlobalService.gI().get_DATA(12);
+			return;
+		}
+		if (mItemUpgrade[0].LvUpgrade < 0 || mItemUpgrade[0].LvUpgrade >= mTemMaterialUpgrade.Length || mTemMaterialUpgrade[mItemUpgrade[0].LvUpgrade] == null)
 		{
 			return;
 		}
 		MainDataUpgrade mainDataUpgrade = mTemMaterialUpgrade[mItemUpgrade[0].LvUpgrade];
+		if (mainDataUpgrade.mMaterial == null)
+		{
+			return;
+		}
 		for (int i = 3; i < mItemUpgrade.Length; i++)
 		{
 			mItemUpgrade[i] = null;
@@ -1425,7 +1438,9 @@ public class ScreenUpgrade : MainScreen
 		int num = 3;
 		for (int j = 0; j < mainDataUpgrade.mMaterial.Length; j++)
 		{
+			if (mainDataUpgrade.mMaterial[j] == null || mainDataUpgrade.mMaterial[j].Length < 3) continue;
 			MainMaterial mainMaterial = (MainMaterial)MainItem.hashMaterialTem.get(mainDataUpgrade.mMaterial[j][0].ToString() ?? "");
+			if (mainMaterial == null) continue;
 			if (mItemUpgrade[0].colorName == mainDataUpgrade.mMaterial[j][2] || mainDataUpgrade.mMaterial[j][2] == -1)
 			{
 				sbyte color = 5;
@@ -1435,8 +1450,11 @@ public class ScreenUpgrade : MainScreen
 					color = 6;
 				}
 				MainItem mainItem = new MainItem(7, mainMaterial.ID, mainMaterial.idIcon, mainDataUpgrade.mMaterial[j][1], color, 0);
-				mItemUpgrade[num] = mainItem;
-				num++;
+				if (num < mItemUpgrade.Length)
+				{
+					mItemUpgrade[num] = mainItem;
+					num++;
+				}
 			}
 		}
 	}

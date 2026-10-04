@@ -298,8 +298,7 @@ public class MainTabShop : MainTab
 			else if (GameCanvas.isPointerSelect)
 			{
 				isShowInfo = false;
-				GameCanvas.isPointerSelect = false;
-				return;
+				timeShowInfo = 0;
 			}
 		}
 		if (GameCanvas.isPointSelect(xCurBegin, yCurBegin, wCur, hCur))
@@ -446,6 +445,10 @@ public class MainTabShop : MainTab
 
 	public override void updateInfo()
 	{
+		if (vecShop == null || IdSelect < 0 || IdSelect >= vecShop.size())
+		{
+			return;
+		}
 		MainItem mainItem = (MainItem)vecShop.elementAt(IdSelect);
 		if (mainItem != null && itemCur != null && mainItem != itemCur)
 		{

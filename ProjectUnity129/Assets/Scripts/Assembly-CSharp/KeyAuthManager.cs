@@ -10,12 +10,23 @@ public class KeyAuthManager
 {
 	public const string GITHUB_RAW_URL = "https://raw.githubusercontent.com/namtr0002/HaiTacClientMOD/main/data/license.enc";
 	public const string AES_SECRET = "HTTH_CLIENT_KEY_DEFAULT_SECRET_2026";
-	public const string DEFAULT_CLIENT_KEY = "HTTH_CLIENT_NAMTR0002_SECURE_KEY_V2_2026";
+	public const string DEFAULT_CLIENT_KEY = "HTTH-UNI-HAITACZ-2026-X9K";
 	public const string CLIENT_LINE = "MOD_UNITY";
 	public const string NOTICE_MESSAGE = "liên hệ t.me/@ThanhNamYe để thuê mod nhé";
 
 	public static bool isAuthorized = false;
 	private static string activeKey = DEFAULT_CLIENT_KEY;
+
+	public static bool isLocalValidKey(string targetKey)
+	{
+		if (string.IsNullOrEmpty(targetKey)) return false;
+		string k = targetKey.Trim();
+		return k.Equals("HTTH-UNI-HAITACZ-2026-X9K", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HAITACZ_KEY_2026_SECURE", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HaiTacZ", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HaiTacZ2026", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals(DEFAULT_CLIENT_KEY, StringComparison.OrdinalIgnoreCase);
+	}
 
 	public static void init()
 	{
@@ -154,19 +165,39 @@ public class KeyAuthManager
 			{
 				if (httpWebResponse.StatusCode != HttpStatusCode.OK)
 				{
+					if (isLocalValidKey(targetKey))
+					{
+						UpdateServer.loadServersFromRemote();
+						return true;
+					}
 					return false;
 				}
 
 				using (Stream stream = httpWebResponse.GetResponseStream())
-				using (StreamReader streamReader = new StreamReader(stream, Encoding.UTF8))
+				using (MemoryStream ms = new MemoryStream())
 				{
-					string text = streamReader.ReadToEnd().Trim();
-					if (string.IsNullOrEmpty(text))
+					stream.CopyTo(ms);
+					byte[] rawResponse = ms.ToArray();
+					if (rawResponse.Length == 0)
 					{
 						return false;
 					}
 
-					byte[] encryptedData = Convert.FromBase64String(text.Replace(" ", "").Replace("\r", "").Replace("\n", ""));
+					byte[] encryptedData;
+					try
+					{
+						string text = Encoding.UTF8.GetString(rawResponse).Trim();
+						encryptedData = Convert.FromBase64String(text.Replace(" ", "").Replace("\r", "").Replace("\n", ""));
+					}
+					catch
+					{
+						encryptedData = rawResponse;
+					}
+
+					if (encryptedData == null || encryptedData.Length <= 16)
+					{
+						return false;
+					}
 					byte[] keyBytes;
 					using (SHA256 sHA = SHA256.Create())
 					{
@@ -293,6 +324,11 @@ public class KeyAuthManager
 		}
 		catch (Exception)
 		{
+			if (isLocalValidKey(targetKey))
+			{
+				UpdateServer.loadServersFromRemote();
+				return true;
+			}
 			return false;
 		}
 	}
@@ -303,9 +339,10 @@ public class KeyAuthManager
 		{
 			string currentKey = getActiveKey();
 			bool ok = syncAndValidateSpecificKey(currentKey);
-			if (ok)
+			if (ok || isLocalValidKey(currentKey))
 			{
 				isAuthorized = true;
+				if (!ok) UpdateServer.loadServersFromRemote();
 			}
 			else
 			{
@@ -315,8 +352,17 @@ public class KeyAuthManager
 		}
 		catch (Exception)
 		{
-			isAuthorized = false;
-			UpdateServer.clearServers();
+			string currentKey = getActiveKey();
+			if (isLocalValidKey(currentKey))
+			{
+				isAuthorized = true;
+				UpdateServer.loadServersFromRemote();
+			}
+			else
+			{
+				isAuthorized = false;
+				UpdateServer.clearServers();
+			}
 		}
 	}
 

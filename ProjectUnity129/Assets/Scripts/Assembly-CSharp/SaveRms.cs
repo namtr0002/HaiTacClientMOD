@@ -66,7 +66,12 @@ public class SaveRms
 		sbyte[] array = CRes.loadRMS("MAIN_user_pass");
 		if (array == null)
 		{
-			if (GameCanvas.IndexServer > GameCanvas.strListServer[GameCanvas.language].Length)
+			// Guard: kiểm tra strListServer trước khi access
+			if (GameCanvas.strListServer != null
+				&& GameCanvas.language >= 0
+				&& GameCanvas.language < GameCanvas.strListServer.Length
+				&& GameCanvas.strListServer[GameCanvas.language] != null
+				&& GameCanvas.IndexServer > GameCanvas.strListServer[GameCanvas.language].Length)
 			{
 				GameCanvas.IndexServer = 0;
 			}
@@ -81,14 +86,29 @@ public class SaveRms
 			if (dataInputStream.available() > 0)
 			{
 				GameCanvas.IndexServer = dataInputStream.readByte();
-				if (GameCanvas.IndexServer > GameCanvas.strListServer[GameCanvas.language].Length)
+				// Guard: kiểm tra strListServer trước khi access
+				if (GameCanvas.strListServer != null
+					&& GameCanvas.language >= 0
+					&& GameCanvas.language < GameCanvas.strListServer.Length
+					&& GameCanvas.strListServer[GameCanvas.language] != null
+					&& GameCanvas.IndexServer > GameCanvas.strListServer[GameCanvas.language].Length)
 				{
 					GameCanvas.IndexServer = 0;
 				}
 			}
 			else
 			{
-				GameCanvas.IndexServer = GameCanvas.strListServer[GameCanvas.language].Length - 1;
+				if (GameCanvas.strListServer != null
+					&& GameCanvas.language >= 0
+					&& GameCanvas.language < GameCanvas.strListServer.Length
+					&& GameCanvas.strListServer[GameCanvas.language] != null)
+				{
+					GameCanvas.IndexServer = GameCanvas.strListServer[GameCanvas.language].Length - 1;
+				}
+				else
+				{
+					GameCanvas.IndexServer = 0;
+				}
 			}
 			dataInputStream.close();
 		}
@@ -785,9 +805,17 @@ public class SaveRms
 					}
 				}
 			}
-			dataInputStream.readByte();
-			Player.AutoRevice = 0;
-			Player.isAutoRevice = false;
+			try
+			{
+				sbyte rev = dataInputStream.readByte();
+				Player.AutoRevice = rev;
+				Player.isAutoRevice = (rev == 1);
+			}
+			catch (Exception)
+			{
+				Player.AutoRevice = 0;
+				Player.isAutoRevice = false;
+			}
 			dataInputStream.close();
 		}
 		catch (Exception)

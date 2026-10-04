@@ -103,6 +103,32 @@ public class ChatTextField : AvMain
 	{
 		if (tfChat.getText().Length > 0)
 		{
+			string chatStr = tfChat.getText().Trim();
+			if (chatStr.Equals("/lv5", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("/cap5", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("lv5", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("cap 5", System.StringComparison.OrdinalIgnoreCase))
+			{
+				Effect_Skill.s_phoenixLevelOverride = 5;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: CẤP = 5 (Hoàng Kim Thần Thoại)", mFont.tahoma_7_yellow);
+				tfChat.setText("");
+				if (GameCanvas.isTouch) isShow = false;
+				return;
+			}
+			if (chatStr.Equals("/lv1", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("/cap1", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("lv1", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("cap 1", System.StringComparison.OrdinalIgnoreCase))
+			{
+				Effect_Skill.s_phoenixLevelOverride = 1;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: CẤP < 5 (Lam Hỏa Tiêu Chuẩn)", mFont.tahoma_7_yellow);
+				tfChat.setText("");
+				if (GameCanvas.isTouch) isShow = false;
+				return;
+			}
+			if (chatStr.Equals("/auto", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("/lv0", System.StringComparison.OrdinalIgnoreCase) || chatStr.Equals("auto", System.StringComparison.OrdinalIgnoreCase))
+			{
+				Effect_Skill.s_phoenixLevelOverride = 0;
+				Interface_Game.addInfoPlayerNormal("Trái Phượng Hoàng: TỰ ĐỘNG THEO SKILL", mFont.tahoma_7_yellow);
+				tfChat.setText("");
+				if (GameCanvas.isTouch) isShow = false;
+				return;
+			}
+
 			GameScreen.player.strChatPopup = tfChat.getText();
 			GlobalService.gI().chatPopup(tfChat.getText());
 			tfChat.setText("");

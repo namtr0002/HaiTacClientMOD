@@ -549,7 +549,10 @@ public class TabInventory : MainTabShop
 		for (int i = 0; i < vecsell.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vecsell.elementAt(i);
-			GlobalService.gI().Sell_Item(0, mainItem.ID, mainItem.typeObject, 1);
+			if (mainItem != null)
+			{
+				GlobalService.gI().Sell_Item(0, mainItem.ID, mainItem.typeObject, 1);
+			}
 		}
 		GameCanvas.end_Dialog();
 	}
@@ -557,10 +560,11 @@ public class TabInventory : MainTabShop
 	public static void Sell_W(mVector vec)
 	{
 		vecsell.removeAllElements();
+		if (vec == null) return;
 		for (int i = 0; i < vec.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vec.elementAt(i);
-			if (mainItem.typeObject == 3 && mainItem.colorName == 0 && mainItem.typeEquip >= 0 && mainItem.typeEquip <= 5)
+			if (mainItem != null && mainItem.typeObject == 3 && mainItem.colorName == 0 && mainItem.typeEquip >= 0 && mainItem.typeEquip <= 5)
 			{
 				vecsell.addElement(mainItem);
 			}
@@ -578,10 +582,11 @@ public class TabInventory : MainTabShop
 	public static void Sell_W_G(mVector vec)
 	{
 		vecsell.removeAllElements();
+		if (vec == null) return;
 		for (int i = 0; i < vec.size(); i++)
 		{
 			MainItem mainItem = (MainItem)vec.elementAt(i);
-			if (mainItem.typeObject == 3 && (mainItem.colorName == 0 || mainItem.colorName == 1) && mainItem.typeEquip >= 0 && mainItem.typeEquip <= 5)
+			if (mainItem != null && mainItem.typeObject == 3 && (mainItem.colorName == 0 || mainItem.colorName == 1) && mainItem.typeEquip >= 0 && mainItem.typeEquip <= 5)
 			{
 				vecsell.addElement(mainItem);
 			}
@@ -611,17 +616,18 @@ public class TabInventory : MainTabShop
 	public override mVector getMenuActionItem()
 	{
 		mVector mVector2 = null;
+		if (vecShop == null) return null;
 		MainItem mainItem = (MainItem)vecShop.elementAt(IdSelect);
-		for (int i = 0; i < GameScreen.vecQuickOpenPotion.size(); i++)
-		{
-			ItemQuickOpen itemQuickOpen = (ItemQuickOpen)GameScreen.vecQuickOpenPotion.elementAt(i);
-			if (mainItem.ID == itemQuickOpen.idItemQuickOpen)
-			{
-				mainItem.isQuickOpen = true;
-			}
-		}
 		if (mainItem != null)
 		{
+			for (int i = 0; i < GameScreen.vecQuickOpenPotion.size(); i++)
+			{
+				ItemQuickOpen itemQuickOpen = (ItemQuickOpen)GameScreen.vecQuickOpenPotion.elementAt(i);
+				if (itemQuickOpen != null && mainItem.ID == itemQuickOpen.idItemQuickOpen)
+				{
+					mainItem.isQuickOpen = true;
+				}
+			}
 			itemCur = mainItem;
 			mVector2 = itemCur.getActionInven(typeInventory);
 			if (typeInventory == 0)
@@ -710,7 +716,7 @@ public class TabInventory : MainTabShop
 			if (checkFullItem())
 			{
 				numPotionTemp = 0;
-				GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.fullItemQuickOpen);
+				Main.runOnMainThread(() => GameCanvas.Start_Normal_Only_CmdClose_DiaLog(T.fullItemQuickOpen));
 				break;
 			}
 			if (focusIDItem == -1)

@@ -317,6 +317,7 @@ public class GlobalService : Cmd_Message
 		try
 		{
 			m.writer().writeShort(id + cat);
+			m.writer().writeByte((sbyte)mGraphics.zoomLevel);
 		}
 		catch (Exception)
 		{
@@ -331,6 +332,7 @@ public class GlobalService : Cmd_Message
 		{
 			m.writer().writeByte(type);
 			m.writer().writeInt(id);
+			m.writer().writeByte((sbyte)mGraphics.zoomLevel);
 		}
 		catch (Exception)
 		{
@@ -713,7 +715,7 @@ public class GlobalService : Cmd_Message
 		{
 		}
 		send();
-		GameCanvas.chatTabScr.addNewChat(T.tabServer, "", GameScreen.player.name + ": " + text, 1, isFocus: false);
+		GameCanvas.chatTabScr.addNewChat("Công Cộng", "", GameScreen.player.name + ": " + text, 0, false, -1, ChatDetail.CAT_PUBLIC);
 	}
 
 	private void checkChangeHair()
@@ -856,6 +858,13 @@ public class GlobalService : Cmd_Message
 	public void CheckVersion()
 	{
 		init(-6);
+		try
+		{
+			m.writer().writeByte((sbyte)mGraphics.zoomLevel);
+		}
+		catch (Exception)
+		{
+		}
 		send();
 	}
 
@@ -952,6 +961,11 @@ public class GlobalService : Cmd_Message
 
 	public void Request_Image_Android()
 	{
+		Request_Image_Android(mGraphics.zoomLevel);
+	}
+
+	public void Request_Image_Android(int zoom)
+	{
 		init(-38);
 		try
 		{
@@ -961,7 +975,9 @@ public class GlobalService : Cmd_Message
 			}
 			else
 			{
-				m.writer().writeByte(mGraphics.zoomLevel);
+				if (zoom <= 0) zoom = mGraphics.zoomLevel;
+				if (zoom <= 0) zoom = 2;
+				m.writer().writeByte((sbyte)zoom);
 			}
 		}
 		catch (Exception)
@@ -1009,6 +1025,7 @@ public class GlobalService : Cmd_Message
 		{
 			m.writer().writeByte(type);
 			m.writer().writeShort(id);
+			m.writer().writeByte((sbyte)mGraphics.zoomLevel);
 		}
 		catch (Exception)
 		{

@@ -134,7 +134,7 @@ public class CharPartInfo
 		while (enumerator.MoveNext())
 		{
 			mPart mPart2 = (mPart)enumerator.Value;
-			if (mPart2.count != -1 && GameCanvas.timeNow / 1000 - mPart2.count > time)
+			if (mPart2 != null && mPart2.count != -1 && GameCanvas.timeNow / 1000 - mPart2.count > time)
 			{
 				string o = (string)enumerator.Key;
 				mVector2.addElement(o);

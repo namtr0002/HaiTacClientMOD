@@ -4,7 +4,7 @@ public class Plash
 {
 	public static MyHashTable hashPlash = new MyHashTable();
 
-	private MainSkill skill;
+	public MainSkill skill;
 
 	private Plashdata plashdata;
 
@@ -2406,7 +2406,10 @@ public class Plash
 			{
 				if (skill.typeBuff == 2 && GameCanvas.timeNow - timebeginSkill < timeEndPlash)
 				{
-					return plashdata.mDataPlash[removef - 1];
+					if (skill.typeEffSkill != 4026 && skill.typeEffSkill != 4029 && skill.typeEffSkill != 4023 && skill.typeEffSkill != 4019)
+					{
+						return plashdata.mDataPlash[removef - 1];
+					}
 				}
 				return -1;
 			}

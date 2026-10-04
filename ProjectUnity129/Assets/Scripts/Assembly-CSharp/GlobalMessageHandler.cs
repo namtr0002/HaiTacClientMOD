@@ -570,7 +570,6 @@ public class GlobalMessageHandler : Cmd_Message, IMessageHandler
 		}
 		catch (System.Exception ex)
 		{
-			UnityEngine.Debug.LogError("Error onMessage cmd=" + (msg != null ? msg.command.ToString() : "null") + ": " + ex.Message + "\n" + ex.StackTrace);
 		}
 	}
 }

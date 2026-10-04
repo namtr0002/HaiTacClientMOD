@@ -134,15 +134,108 @@ public class MsgDialog : MainDialog
 
 	private int framepaint;
 
-	public static int getResponsiveDialogWidth(int defaultMaxCompact, int defaultMaxWide)
+	public static int calcResponsiveDialogWidth(string info, int numCmd, string nameDia, mFont font)
 	{
+		if (font == null)
+		{
+			font = mFont.tahoma_7_black;
+		}
+
+		// Độ rộng tối thiểu: 1 nút cần >= 130px, 2 nút trở lên cần >= 175px để vừa viền nút
+		int minW = (numCmd >= 2) ? 175 : 130;
+		if (numCmd >= 2)
+		{
+			int btnWidthNeeded = iCommand.wButtonCmd * 2 + 30;
+			if (btnWidthNeeded > minW)
+			{
+				minW = btnWidthNeeded;
+			}
+		}
+
+		if (!string.IsNullOrEmpty(nameDia))
+		{
+			int titleW = mFont.tahoma_7b_white.getWidth(nameDia) + 64;
+			if (titleW > minW)
+			{
+				minW = titleW;
+			}
+		}
+
+		// Độ rộng tối đa theo màn hình: giới hạn vừa tầm đọc (không bè rộng vô ích)
+		int screenMax = MotherCanvas.w - 24;
+		int maxCap = 270;
 		if (GameCanvas.isCompactMode())
 		{
-			int w = MotherCanvas.w - 30;
-			return (w > defaultMaxCompact) ? defaultMaxCompact : w;
+			maxCap = 220;
 		}
-		int maxW = (MotherCanvas.w - 40 < defaultMaxWide) ? (MotherCanvas.w - 40) : defaultMaxWide;
-		return (maxW < 220) ? 220 : maxW;
+		int maxAllowed = (screenMax < maxCap) ? screenMax : maxCap;
+		if (maxAllowed < 140)
+		{
+			maxAllowed = (screenMax > 100) ? screenMax : 100;
+		}
+		if (minW > maxAllowed)
+		{
+			minW = maxAllowed;
+		}
+
+		if (string.IsNullOrEmpty(info))
+		{
+			return minW;
+		}
+
+		// Kiểm tra chiều dài các dòng ký tự gốc
+		string[] explicitLines = mFont.split(info, "\n");
+		int maxExplicitW = 0;
+		if (explicitLines != null)
+		{
+			for (int i = 0; i < explicitLines.Length; i++)
+			{
+				int w = font.getWidth(explicitLines[i]);
+				if (w > maxExplicitW)
+				{
+					maxExplicitW = w;
+				}
+			}
+		}
+
+		// Nếu các dòng vừa vặn trong maxAllowed thì ôm sát ký tự + lề padding
+		if (maxExplicitW + 28 <= maxAllowed)
+		{
+			int desired = maxExplicitW + 28;
+			return (desired < minW) ? minW : ((desired > maxAllowed) ? maxAllowed : desired);
+		}
+
+		// Nếu câu dài cần bẻ dòng, bẻ thử ở maxAllowed - 20 rồi ôm sát độ rộng lớn nhất của dòng thực tế
+		string[] wrapped = font.splitFontArray(info, maxAllowed - 20);
+		int maxWrappedW = 0;
+		if (wrapped != null)
+		{
+			for (int j = 0; j < wrapped.Length; j++)
+			{
+				int w = font.getWidth(wrapped[j]);
+				if (w > maxWrappedW)
+				{
+					maxWrappedW = w;
+				}
+			}
+		}
+		int finalDesired = maxWrappedW + 28;
+		return (finalDesired < minW) ? minW : ((finalDesired > maxAllowed) ? maxAllowed : finalDesired);
+	}
+
+	public static int getResponsiveDialogWidth(int defaultMaxCompact, int defaultMaxWide)
+	{
+		int maxAllowed = defaultMaxWide;
+		if (GameCanvas.isCompactMode())
+		{
+			maxAllowed = defaultMaxCompact;
+		}
+		int screenMax = MotherCanvas.w - 24;
+		if (maxAllowed > screenMax)
+		{
+			maxAllowed = screenMax;
+		}
+		return (maxAllowed < 140) ? Math.Max(100, screenMax) : maxAllowed;
 	}
 
 	public override void commandPointer(int index, int subIndex)
@@ -269,7 +362,7 @@ public class MsgDialog : MainDialog
 			GameCanvas.end_Dialog();
 			return;
 		}
-		wDia = getResponsiveDialogWidth(200, 360);
+		wDia = calcResponsiveDialogWidth(info, cmdList.size(), "", fontDia);
 		maxWShow = wDia;
 		if (GameCanvas.currentDialog == null)
 		{
@@ -284,6 +377,14 @@ public class MsgDialog : MainDialog
 		hDia = GameCanvas.hText * strinfo.Length + hPlus + ((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
+		if (yDia < 15)
+		{
+			yDia = MotherCanvas.hh - hDia / 2;
+		}
+		if (yDia < 10)
+		{
+			yDia = 10;
+		}
 		setPosCmdNew(0, isLast: false);
 	}
 
@@ -317,7 +418,15 @@ public class MsgDialog : MainDialog
 			return;
 		}
 		wItem = 22;
-		wDia = getResponsiveDialogWidth(180, 340);
+		wDia = calcResponsiveDialogWidth(info, cmdList.size(), "", fontDia);
+		if (wDia < 180)
+		{
+			wDia = 180;
+		}
+		if (wDia > MotherCanvas.w - 24)
+		{
+			wDia = MotherCanvas.w - 24;
+		}
 		maxWShow = wDia;
 		if (GameCanvas.currentDialog == null)
 		{
@@ -332,6 +441,14 @@ public class MsgDialog : MainDialog
 		hDia = GameCanvas.hText * strinfo.Length + (vecItem.size() - 1) * wItem + (((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5) + 5);
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
+		if (yDia < 15)
+		{
+			yDia = MotherCanvas.hh - hDia / 2;
+		}
+		if (yDia < 10)
+		{
+			yDia = 10;
+		}
 		setPosCmdNew(0, isLast: false);
 	}
 
@@ -355,7 +472,7 @@ public class MsgDialog : MainDialog
 			{
 				cmdList = new mVector();
 			}
-			wDia = getResponsiveDialogWidth(200, 360);
+			wDia = calcResponsiveDialogWidth(info, cmdList.size() + (isCmdClose ? 1 : 0), nameDia, fontDia);
 			maxWShow = wDia;
 			if (GameCanvas.currentDialog == null)
 			{
@@ -370,6 +487,14 @@ public class MsgDialog : MainDialog
 			hDia = GameCanvas.hText * strinfo.Length + hPlus + (iCommand.hButtonCmdNor + 5);
 			xDia = MotherCanvas.hw - wDia / 2;
 			yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
+			if (yDia < 15)
+			{
+				yDia = MotherCanvas.hh - hDia / 2;
+			}
+			if (yDia < 10)
+			{
+				yDia = 10;
+			}
 			int wButtonCmd = iCommand.wButtonCmd;
 			int num2 = 0;
 			if (num % 2 == 0)
@@ -424,11 +549,7 @@ public class MsgDialog : MainDialog
 		{
 			isBack = false;
 		}
-		wDia = MotherCanvas.w - 30;
-		if (wDia > 200)
-		{
-			wDia = 200;
-		}
+		wDia = calcResponsiveDialogWidth(info, cmdList.size(), "", fontDia);
 		maxWShow = wDia;
 		wShowPaper = maxWShow;
 		strinfo = fontDia.splitFontArray(info, wDia - 20);
@@ -441,6 +562,14 @@ public class MsgDialog : MainDialog
 		}
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
+		if (yDia < 15)
+		{
+			yDia = MotherCanvas.hh - hDia / 2;
+		}
+		if (yDia < 10)
+		{
+			yDia = 10;
+		}
 		int num = cmdList.size();
 		int wButtonCmd = iCommand.wButtonCmd;
 		int num2 = 0;
@@ -1278,13 +1407,46 @@ public class MsgDialog : MainDialog
 				}
 			}
 		}
-		if (GameCanvas.keyMyHold[5])
+		if (GameCanvas.isKeyPressed(13) || GameCanvas.keyMyPressed[13] || GameCanvas.keyMyHold[13] ||
+		    GameCanvas.isKeyPressed(41) || GameCanvas.keyMyPressed[41] || GameCanvas.keyMyHold[41] ||
+		    GameCanvas.UseKey(13) || GameCanvas.UseKey(41))
 		{
-			Console.WriteLine("nhấn key 5");
-			if (cmdList != null && idCommand < cmdList.size())
+			GameCanvas.clearKeyPressed(13);
+			GameCanvas.clearKeyHold(13);
+			GameCanvas.clearKeyPressed(41);
+			GameCanvas.clearKeyHold(41);
+			if (cmdClose != null)
+			{
+				cmdClose.perform();
+				return;
+			}
+			if (backCMD != null)
+			{
+				backCMD.perform();
+				return;
+			}
+			if (cmdList != null && cmdList.size() > 1)
+			{
+				((iCommand)cmdList.elementAt(cmdList.size() - 1)).perform();
+				return;
+			}
+			GameCanvas.end_Dialog();
+			return;
+		}
+		if (GameCanvas.keyMyPressed[5] || GameCanvas.keyMyHold[5] || GameCanvas.isKeyPressed(5) ||
+		    GameCanvas.keyMyPressed[12] || GameCanvas.keyMyHold[12] || GameCanvas.isKeyPressed(12) ||
+		    GameCanvas.keyMyPressed[40] || GameCanvas.keyMyHold[40] || GameCanvas.isKeyPressed(40))
+		{
+			GameCanvas.clearKeyPressed(5);
+			GameCanvas.clearKeyHold(5);
+			GameCanvas.clearKeyPressed(12);
+			GameCanvas.clearKeyHold(12);
+			GameCanvas.clearKeyPressed(40);
+			GameCanvas.clearKeyHold(40);
+			if (cmdList != null && idCommand >= 0 && idCommand < cmdList.size())
 			{
 				((iCommand)cmdList.elementAt(idCommand)).perform();
-				GameCanvas.clearKeyHold(5);
+				return;
 			}
 		}
 		base.updatekey();

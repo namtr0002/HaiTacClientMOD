@@ -165,7 +165,7 @@ public class LoadImageStatic
 		{
 			AvMain.imgLg = mImage.createImage("/interface/lgv_2.png");
 		}
-		LoginScreen.hLogo = mImage.getImageHeight(AvMain.imgLg.image) / 2;
+		LoginScreen.hLogo = (AvMain.imgLg != null && AvMain.imgLg.image != null) ? (mImage.getImageHeight(AvMain.imgLg.image) / 2) : 30;
 	}
 
 	public static mImage LoadImageNew(string str)

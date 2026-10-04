@@ -20,7 +20,7 @@ public class MainBuff
 
 	public int maxsize;
 
-	private long timeBegin;
+	public long timeBegin;
 
 	private sbyte numNextframe = 1;
 
@@ -431,6 +431,14 @@ public class MainBuff
 	{
 		timeBegin = GameCanvas.timeNow;
 		timeBuff = timebuff;
+	}
+
+	public int getRemainingTime()
+	{
+		long elapsed = GameCanvas.timeNow - timeBegin;
+		if (elapsed < 0) elapsed = 0;
+		int rem = (int)(timeBuff - elapsed);
+		return rem > 0 ? rem : 0;
 	}
 
 	public void setData(short idIcon)

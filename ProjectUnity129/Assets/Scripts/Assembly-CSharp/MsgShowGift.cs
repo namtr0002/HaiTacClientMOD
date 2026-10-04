@@ -64,6 +64,14 @@ public class MsgShowGift : MsgDialog
 
 	public const sbyte SHOW_GIFT = 2;
 
+	private bool isScroll;
+
+	private int giftAreaTop;
+
+	private int giftAreaH;
+
+	private int totalItemH;
+
 	public static int[] colorBorder = new int[18]
 	{
 		7351040, 9062926, 9062926, 6619136, 9175040, 11993088, 1377112, 2494085, 4202940, 6829826,
@@ -189,13 +197,18 @@ public class MsgShowGift : MsgDialog
 				}
 			}
 		}
-		if (wDia > MotherCanvas.w)
+		int maxAllowedW = MotherCanvas.w - 16;
+		if (wDia > maxAllowedW)
 		{
-			wDia = MotherCanvas.w;
+			wDia = maxAllowedW;
 		}
 		if (type == 20)
 		{
 			wDia = 190;
+			if (wDia > maxAllowedW)
+			{
+				wDia = maxAllowedW;
+			}
 			wItem = 44;
 		}
 		int num = 0;
@@ -204,14 +217,17 @@ public class MsgShowGift : MsgDialog
 			strinfo = fontDia.splitFontArray(info, wDia - 20);
 			num = strinfo.Length;
 		}
-		hDia = GameCanvas.hText * num + MsgDialog.hPlus + (iCommand.hButtonCmdNor + wItem);
-		hDia += GameCanvas.hCommand;
+		int topHeaderH = GameCanvas.hCommand + 10 + GameCanvas.hText * num;
+		int titleGiftH = wItem;
+		giftAreaTop = topHeaderH + titleGiftH;
+
+		totalItemH = 0;
 		if (mItemgift != null)
 		{
 			switch (type)
 			{
 			case 3:
-				hDia += mItemgift.Length * 50;
+				totalItemH = mItemgift.Length * 50;
 				if (mitem != null)
 				{
 					for (int j = 0; j < mitem.Length; j++)
@@ -221,13 +237,51 @@ public class MsgShowGift : MsgDialog
 				}
 				break;
 			case 20:
-				hDia = (mItemgift.Length / 3 + 1) * wItem + iCommand.hButtonCmdNor;
+				totalItemH = ((mItemgift.Length + 2) / 3) * wItem;
 				break;
 			default:
-				hDia += mItemgift.Length * wItem;
+				totalItemH = mItemgift.Length * wItem;
 				break;
 			}
 		}
+
+		int bottomCmdH = iCommand.hButtonCmdNor + 16;
+		int naturalHDia = topHeaderH + titleGiftH + totalItemH + bottomCmdH;
+
+		int maxAllowedH = MotherCanvas.h - 16;
+		if (MotherCanvas.h <= 200)
+		{
+			maxAllowedH = MotherCanvas.h - 8;
+		}
+
+		if (naturalHDia > maxAllowedH)
+		{
+			hDia = maxAllowedH;
+			giftAreaH = hDia - topHeaderH - titleGiftH - bottomCmdH;
+			int minAreaH = wItem * 2;
+			if (giftAreaH < minAreaH && maxAllowedH >= topHeaderH + bottomCmdH + minAreaH)
+			{
+				giftAreaH = minAreaH;
+				hDia = topHeaderH + titleGiftH + giftAreaH + bottomCmdH;
+			}
+			int maxLim = totalItemH - giftAreaH;
+			if (maxLim < 0)
+			{
+				maxLim = 0;
+			}
+			isScroll = (maxLim > 0);
+			int listX = MotherCanvas.hw - wDia / 2;
+			int listY = (MotherCanvas.hh - hDia / 2 - 2) + giftAreaTop;
+			list = new ListNew(listX + 8, listY, wDia - 16, giftAreaH, 0, 0, maxLim, isLim0: true);
+		}
+		else
+		{
+			hDia = naturalHDia;
+			giftAreaH = totalItemH;
+			isScroll = false;
+			list = null;
+		}
+
 		if (!GameCanvas.lowGraphic && typeBanner >= AvMain.fraBorderWanted.nFrame)
 		{
 			typeBanner = (sbyte)(AvMain.fraBorderWanted.nFrame - 1);
@@ -235,7 +289,25 @@ public class MsgShowGift : MsgDialog
 		maxWShow = wDia;
 		wShowPaper = 5;
 		xDia = MotherCanvas.hw - wDia / 2;
-		yDia = MotherCanvas.hh - hDia / 2 - 5;
+		yDia = MotherCanvas.hh - hDia / 2 - 2;
+		if (yDia < 6)
+		{
+			yDia = 6;
+		}
+		if (yDia + hDia > MotherCanvas.h - 6)
+		{
+			yDia = MotherCanvas.h - hDia - 6;
+		}
+
+		if (list != null)
+		{
+			list.x = xDia + 8;
+			list.y = yDia + giftAreaTop;
+		}
+
+		xCloseQuickOpen = xDia + wDia - 16;
+		yCloseQuickOpen = yDia + 14;
+
 		setPosCmdNew(-2, isLast: false);
 	}
 
@@ -281,7 +353,7 @@ public class MsgShowGift : MsgDialog
 		for (int i = 0; i < Player.vecInventory.size(); i++)
 		{
 			MainItem mainItem = (MainItem)Player.vecInventory.elementAt(i);
-			if (mainItem.ID == gift.ID && mainItem.typeObject == gift.typeObject)
+			if (mainItem != null && mainItem.ID == gift.ID && mainItem.typeObject == gift.typeObject)
 			{
 				if (mainItem.numPotion > 1)
 				{
@@ -373,15 +445,45 @@ public class MsgShowGift : MsgDialog
 				num += GameCanvas.hText;
 			}
 		}
+		fontDia.drawString(g, strphanthuong, xDia + 15, num, 0);
+		num += wItem;
 		if (mItemgift != null)
 		{
+			int startGiftY = num;
+			if (isScroll && list != null && list.cmxLim > 0)
+			{
+				g.setClip(xDia + 6, startGiftY, wDia - 12, giftAreaH);
+				g.translate(0, -list.cmx);
+			}
+
 			if (type == 20)
 			{
-				paintItemQuaySo(g, num);
+				paintItemQuaySo(g, startGiftY);
 			}
 			else
 			{
-				paintItemNormal(g, num);
+				paintItemNormal(g, startGiftY);
+			}
+
+			if (isScroll && list != null && list.cmxLim > 0)
+			{
+				GameCanvas.resetTrans(g);
+				g.restoreCanvas();
+
+				int barX = xDia + wDia - 13;
+				int barY = startGiftY + 2;
+				int barH = giftAreaH - 4;
+				if (barH > 8)
+				{
+					AvMain.paintRect(g, barX, barY, 4, barH, 1, 0);
+					int thumbH = barH * giftAreaH / (totalItemH > 0 ? totalItemH : 1);
+					if (thumbH < 8) thumbH = 8;
+					if (thumbH > barH) thumbH = barH;
+					int thumbY = barY + (barH - thumbH) * list.cmx / list.cmxLim;
+					if (thumbY < barY) thumbY = barY;
+					if (thumbY + thumbH > barY + barH) thumbY = barY + barH - thumbH;
+					AvMain.paintRect(g, barX, thumbY, 4, thumbH, 0, 3);
+				}
 			}
 		}
 		for (int l = 0; l < vecEffUni.size(); l++)
@@ -449,12 +551,10 @@ public class MsgShowGift : MsgDialog
 
 	private void paintItemNormal(mGraphics g, int ypaint)
 	{
-		fontDia.drawString(g, strphanthuong, xDia + 15, ypaint, 0);
 		if (type != 3)
 		{
-			AvMain.paintRect(g, xDia + 10, ypaint + wItem / 2 + 5, wDia - 20, mItemgift.Length * wItem, 0, 4);
+			AvMain.paintRect(g, xDia + 10, ypaint + 5, wDia - 20, totalItemH, 0, 4);
 		}
-		ypaint += wItem;
 		yShowEff = ypaint;
 		for (int i = 0; i < indexShowItemBox; i++)
 		{
@@ -538,7 +638,8 @@ public class MsgShowGift : MsgDialog
 		{
 			loadmImg();
 		}
-		for (int i = 0; i < mItemgift.Length / 3; i++)
+		int numRows = (mItemgift.Length + 2) / 3;
+		for (int i = 0; i < numRows; i++)
 		{
 			g.setColor(colorBorderVongQuay[i % 2]);
 			g.fillRect(xDia + wDia / 2 - 50, ypaint + i * wItem, 100, 36);
@@ -634,6 +735,10 @@ public class MsgShowGift : MsgDialog
 			return;
 		}
 		updateOpen();
+		if (isScroll && list != null)
+		{
+			list.moveCamera();
+		}
 		if (GameCanvas.isTouchNoOrPC())
 		{
 			updatekey();
@@ -679,11 +784,24 @@ public class MsgShowGift : MsgDialog
 				if (timeShowEff % num2 == 2)
 				{
 					mSound.playSound(26, mSound.volumeSound);
-					vecEffUni.addElement(GameScreen.CreateEffectEnd(53, 0, xDia + 30, yShowEff + indexShowItemBox * wItem, 0, null));
+					int effY = yShowEff + indexShowItemBox * wItem;
+					if (isScroll && list != null)
+					{
+						effY -= list.cmx;
+					}
+					vecEffUni.addElement(GameScreen.CreateEffectEnd(53, 0, xDia + 30, effY, 0, null));
 				}
 				if (timeShowEff % num2 == 0)
 				{
 					indexShowItemBox++;
+					if (isScroll && list != null)
+					{
+						int targetY = indexShowItemBox * wItem;
+						if (targetY > list.cmx + giftAreaH - wItem)
+						{
+							list.setToX(targetY - giftAreaH + wItem * 2);
+						}
+					}
 				}
 			}
 		}
@@ -695,12 +813,24 @@ public class MsgShowGift : MsgDialog
 			{
 				int x = xDia + wDia / 2 - wItem + wItem * (indexShowItemBox % 3);
 				int y = yDia + GameCanvas.hCommand + 10 + wItem / 2 + wItem * (indexShowItemBox / 3) - 4;
+				if (isScroll && list != null)
+				{
+					y -= list.cmx;
+				}
 				mSound.playSound(47, mSound.volumeSound);
 				vecEffUni.addElement(GameScreen.CreateEffectEnd(53, 0, x, y, 0, null));
 			}
 			if (timeShowEff % num3 == 0)
 			{
 				indexShowItemBox++;
+				if (isScroll && list != null)
+				{
+					int targetY = (indexShowItemBox / 3) * wItem;
+					if (targetY > list.cmx + giftAreaH - wItem)
+					{
+						list.setToX(targetY - giftAreaH + wItem * 2);
+					}
+				}
 			}
 		}
 	}
@@ -710,6 +840,19 @@ public class MsgShowGift : MsgDialog
 		if (type == 22 || (type == 21 && indexShow != 2))
 		{
 			return;
+		}
+		if (isScroll && list != null && list.cmxLim > 0)
+		{
+			if (GameCanvas.keyMove(1))
+			{
+				list.setToX(list.cmtoX - wItem);
+				GameCanvas.ClearkeyMove(1);
+			}
+			else if (GameCanvas.keyMove(3))
+			{
+				list.setToX(list.cmtoX + wItem);
+				GameCanvas.ClearkeyMove(3);
+			}
 		}
 		int num = idCommand;
 		int num2 = cmdList.size();
@@ -761,6 +904,10 @@ public class MsgShowGift : MsgDialog
 		}
 		if (type != 22 && (type != 21 || indexShow == 2))
 		{
+			if (isScroll && list != null)
+			{
+				list.update_Pos_UP_DOWN();
+			}
 			base.updatePointer();
 		}
 	}

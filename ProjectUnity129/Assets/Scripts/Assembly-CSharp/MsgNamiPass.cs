@@ -483,36 +483,33 @@ public class MsgNamiPass : MsgDialog
         }
 
         bool move = false;
-        if (GameCanvas.isKeyPressed(4) || GameCanvas.isKeyPressed(1)) // Trái
+        if (GameCanvas.keyMove(0)) // Trái
         {
             if (selectedIndex > 0)
             {
                 selectedIndex--;
                 move = true;
             }
-            GameCanvas.clearKeyPressed(4);
-            GameCanvas.clearKeyPressed(1);
+            GameCanvas.ClearkeyMove(0);
         }
-        else if (GameCanvas.isKeyPressed(6) || GameCanvas.isKeyPressed(3)) // Phải
+        else if (GameCanvas.keyMove(2)) // Phải
         {
-            if (vecMilestones != null && selectedIndex < vecMilestones.size())
+            if (vecMilestones != null && selectedIndex < vecMilestones.size() - 1)
             {
                 selectedIndex++;
                 move = true;
             }
-            GameCanvas.clearKeyPressed(6);
-            GameCanvas.clearKeyPressed(3);
+            GameCanvas.ClearkeyMove(2);
         }
-        else if (GameCanvas.isKeyPressed(2) || GameCanvas.isKeyPressed(0)) // Lên (Free Track)
+        else if (GameCanvas.keyMove(1)) // Lên (Free Track)
         {
             selectedTrack = 0;
-            GameCanvas.clearKeyPressed(2);
-            GameCanvas.clearKeyPressed(0);
+            GameCanvas.ClearkeyMove(1);
         }
-        else if (GameCanvas.isKeyPressed(8) || GameCanvas.isKeyPressed(2)) // Xuống (VIP Track)
+        else if (GameCanvas.keyMove(3)) // Xuống (VIP Track)
         {
             selectedTrack = 1;
-            GameCanvas.clearKeyPressed(8);
+            GameCanvas.ClearkeyMove(3);
         }
         else if (GameCanvas.keyMyPressed[5] || GameCanvas.isKeyPressed(5)) // OK / Chọn
         {
