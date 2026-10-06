@@ -26,7 +26,7 @@ public final class iCommand {
    private int BB;
    public int timeSelect;
    public FrameImage AJ;
-   private FrameImage BC;
+   public FrameImage BC;
    public int AK;
    private int BD;
    private int BE;
@@ -370,18 +370,30 @@ public final class iCommand {
                this.BO.updateTimeCountDownTicket();
             }
 
+            int wBtn = (this.AL > 0) ? this.AL : wButtonCmd;
+            if (this.AH > 0) {
+               wBtn -= this.AH * 6;
+            }
+            int maxTextW = wBtn - 8;
+            if (var4 > 0) {
+               maxTextW -= var4 * 2;
+            }
+            if (maxTextW < 20) {
+               maxTextW = 20;
+            }
+
             if (this.BG == BK) {
-               AvMain.AA(var1, var5, var2 + var4, var3, 2, (byte)1);
+               AvMain.paintTextAutoCenter(var1, var5, var2 + var4, var3, maxTextW, (byte)1);
             } else if (this.BG == BJ) {
-               AvMain.AA(var1, var5, var2 + var4, var3, 2, (byte)6);
+               AvMain.paintTextAutoCenter(var1, var5, var2 + var4, var3, maxTextW, (byte)6);
             } else if (this.BG == BI) {
-               AvMain.AA(var1, var5, var2 + var4, var3, 2, (byte)5);
+               AvMain.paintTextAutoCenter(var1, var5, var2 + var4, var3, maxTextW, (byte)5);
             } else if (GameCanvas.isSmallScreen) {
-               mFont.tahoma_7_white.drawString(var1, var5, var2 + var4, var3, 2);
+               mFont.tahoma_7_white.drawStringAutoCenter(var1, var5, var2 + var4, var3, maxTextW);
             } else if (this.isDisplay) {
-               AvMain.AA(var1, var5, var2 + var4, var3, 2, (byte)5);
+               AvMain.paintTextAutoCenter(var1, var5, var2 + var4, var3, maxTextW, (byte)5);
             } else {
-               AvMain.AA(var1, var5, var2 + var4, var3, 2, (byte)0);
+               AvMain.paintTextAutoCenter(var1, var5, var2 + var4, var3, maxTextW, (byte)0);
             }
          }
       }

@@ -10,7 +10,7 @@ public class KeyAuthManager
 {
 	public const string GITHUB_RAW_URL = "https://raw.githubusercontent.com/namtr0002/HaiTacClientMOD/main/data/license.enc";
 	public const string AES_SECRET = "HTTH_CLIENT_KEY_DEFAULT_SECRET_2026";
-	public const string DEFAULT_CLIENT_KEY = "HTTH-UNI-HAITACZ-2026-X9K";
+	public const string DEFAULT_CLIENT_KEY = "HTTH-HAITACZ-2026-PRO";
 	public const string CLIENT_LINE = "MOD_UNITY";
 	public const string NOTICE_MESSAGE = "liên hệ t.me/@ThanhNamYe để thuê mod nhé";
 
@@ -21,7 +21,13 @@ public class KeyAuthManager
 	{
 		if (string.IsNullOrEmpty(targetKey)) return false;
 		string k = targetKey.Trim();
-		return k.Equals("HTTH-UNI-HAITACZ-2026-X9K", StringComparison.OrdinalIgnoreCase)
+		return k.Equals("HTTH-HAITACZ-2026-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-UNI-HAITACZ-2026-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-J2ME-HAITACZ-2026-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-HAITACZ-129-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-UNI-HAITACZ-129-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-J2ME-HAITACZ-129-PRO", StringComparison.OrdinalIgnoreCase)
+			|| k.Equals("HTTH-UNI-HAITACZ-2026-X9K", StringComparison.OrdinalIgnoreCase)
 			|| k.Equals("HAITACZ_KEY_2026_SECURE", StringComparison.OrdinalIgnoreCase)
 			|| k.Equals("HaiTacZ", StringComparison.OrdinalIgnoreCase)
 			|| k.Equals("HaiTacZ2026", StringComparison.OrdinalIgnoreCase)
@@ -33,14 +39,14 @@ public class KeyAuthManager
 		try
 		{
 			loadSavedKey();
-			isAuthorized = false;
-			UpdateServer.clearServers();
+			isAuthorized = isLocalValidKey(activeKey);
+			UpdateServer.initDefaultServers();
 			new Thread(syncAndValidateLicense).Start();
 		}
 		catch (Exception)
 		{
-			isAuthorized = false;
-			UpdateServer.clearServers();
+			isAuthorized = true;
+			UpdateServer.initDefaultServers();
 		}
 	}
 

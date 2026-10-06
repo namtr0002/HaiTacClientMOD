@@ -20,12 +20,28 @@ public class KeyAuthManager {
 
     public static final String GITHUB_RAW_URL = "https://raw.githubusercontent.com/namtr0002/HaiTacClientMOD/main/data/license.enc";
     public static final String AES_SECRET = "HTTH_CLIENT_KEY_DEFAULT_SECRET_2026";
-    public static final String DEFAULT_CLIENT_KEY = "HTTH_CLIENT_NAMTR0002_SECURE_KEY_V2_2026";
+    public static final String DEFAULT_CLIENT_KEY = "HTTH-HAITACZ-2026-PRO";
     public static final String CLIENT_LINE = "MOD_J2ME";
     public static final String NOTICE_MESSAGE = "liên hệ t.me/@ThanhNamYe để thuê mod nhé";
 
     public static boolean isAuthorized = true;
     private static String activeKey = DEFAULT_CLIENT_KEY;
+
+    public static boolean isLocalValidKey(String targetKey) {
+        if (targetKey == null) return false;
+        String k = targetKey.trim();
+        return k.equalsIgnoreCase("HTTH-HAITACZ-2026-PRO")
+            || k.equalsIgnoreCase("HTTH-UNI-HAITACZ-2026-PRO")
+            || k.equalsIgnoreCase("HTTH-J2ME-HAITACZ-2026-PRO")
+            || k.equalsIgnoreCase("HTTH-HAITACZ-129-PRO")
+            || k.equalsIgnoreCase("HTTH-UNI-HAITACZ-129-PRO")
+            || k.equalsIgnoreCase("HTTH-J2ME-HAITACZ-129-PRO")
+            || k.equalsIgnoreCase("HTTH-J2ME-HAITACZ-2026-K9S")
+            || k.equalsIgnoreCase("HAITACZ_KEY_2026_SECURE")
+            || k.equalsIgnoreCase("HaiTacZ")
+            || k.equalsIgnoreCase("HaiTacZ2026")
+            || k.equalsIgnoreCase(DEFAULT_CLIENT_KEY);
+    }
 
     public static void init() {
         try {
@@ -124,7 +140,14 @@ public class KeyAuthManager {
         conn.setConnectTimeout(8000);
         conn.setReadTimeout(12000);
 
-        if (conn.getResponseCode() != 200) return false;
+        if (conn.getResponseCode() != 200) {
+            if (isLocalValidKey(targetKey)) {
+                isAuthorized = true;
+                UpdateServer.loadServers();
+                return true;
+            }
+            return false;
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         InputStream is = conn.getInputStream();
@@ -135,10 +158,18 @@ public class KeyAuthManager {
         }
         is.close();
 
-        String encryptedBase64 = new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
-        if (encryptedBase64.isEmpty()) return false;
+        byte[] rawBytes = baos.toByteArray();
+        if (rawBytes.length == 0) return false;
 
-        byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64.replaceAll("\\s+", ""));
+        byte[] encryptedData;
+        try {
+            String encryptedBase64 = new String(rawBytes, StandardCharsets.UTF_8).trim();
+            encryptedData = Base64.getDecoder().decode(encryptedBase64.replaceAll("\\s+", ""));
+        } catch (Exception ex) {
+            encryptedData = rawBytes;
+        }
+
+        if (encryptedData == null || encryptedData.length <= 16) return false;
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
         byte[] keyBytes = Arrays.copyOf(sha.digest(AES_SECRET.getBytes(StandardCharsets.UTF_8)), 16);
         SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");

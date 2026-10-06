@@ -509,29 +509,45 @@ public class iCommand
 			text = CountDownTicket.timeShow(timeCount.timeCountDown);
 			timeCount.updateTimeCountDownTicket();
 		}
+
+		int wBtn = (wimgCmd > 0) ? wimgCmd : wButtonCmd;
+		if (levelSmall > 0)
+		{
+			wBtn -= levelSmall * 6;
+		}
+		int maxTextW = wBtn - 8;
+		if (num2 > 0)
+		{
+			maxTextW -= num2 * 2;
+		}
+		if (maxTextW < 20)
+		{
+			maxTextW = 20;
+		}
+
 		if (typeButton == BTT_GREEN)
 		{
-			AvMain.Font3dColor(g, text, x + num2, y, pos, 1);
+			AvMain.paintTextAutoCenter(g, text, x + num2, y, maxTextW, 1);
 		}
 		else if (typeButton == BTT_RED)
 		{
-			AvMain.Font3dColor(g, text, x + num2, y, pos, 6);
+			AvMain.paintTextAutoCenter(g, text, x + num2, y, maxTextW, 6);
 		}
 		else if (typeButton == BTT_NONE)
 		{
-			AvMain.Font3dColor(g, text, x + num2, y, pos, 5);
+			AvMain.paintTextAutoCenter(g, text, x + num2, y, maxTextW, 5);
 		}
 		else if (GameCanvas.isSmallScreen)
 		{
-			mFont.tahoma_7_white.drawString(g, text, x + num2, y, pos);
+			mFont.tahoma_7_white.drawStringAutoCenter(g, text, x + num2, y, maxTextW);
 		}
 		else if (isDisplay)
 		{
-			AvMain.Font3dColor(g, text, x + num2, y, pos, 5);
+			AvMain.paintTextAutoCenter(g, text, x + num2, y, maxTextW, 5);
 		}
 		else
 		{
-			AvMain.Font3dColor(g, text, x + num2, y, pos, 0);
+			AvMain.paintTextAutoCenter(g, text, x + num2, y, maxTextW, 0);
 		}
 	}
 

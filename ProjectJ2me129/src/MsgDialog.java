@@ -56,13 +56,101 @@ public class MsgDialog extends MainDialog {
       this.BR = 0;
    }
 
-   public static int getResponsiveDialogWidth(int defaultMaxCompact, int defaultMaxWide) {
-      if (GameCanvas.isCompactMode()) {
-         int w = MotherCanvas.w - 30;
-         return (w > defaultMaxCompact) ? defaultMaxCompact : w;
+   public static int calcResponsiveDialogWidth(String info, int numCmd, String nameDia, mFont font) {
+      if (font == null) {
+         font = mFont.tahoma_7_black;
       }
-      int maxW = (MotherCanvas.w - 40 < defaultMaxWide) ? (MotherCanvas.w - 40) : defaultMaxWide;
-      return (maxW < 220) ? 220 : maxW;
+
+      int minW = (numCmd >= 2) ? 175 : 130;
+      if (numCmd >= 2) {
+         int btnWidthNeeded = iCommand.wButtonCmd * 2 + 30;
+         if (btnWidthNeeded > minW) {
+            minW = btnWidthNeeded;
+         }
+      }
+
+      if (nameDia != null && nameDia.length() > 0) {
+         int titleW = mFont.tahoma_7b_white.getWidth(nameDia) + 64;
+         if (titleW > minW) {
+            minW = titleW;
+         }
+      }
+
+      int screenMax = MotherCanvas.w - 24;
+      int maxCap = 270;
+      if (GameCanvas.isCompactMode()) {
+         maxCap = 220;
+      }
+      int maxAllowed = (screenMax < maxCap) ? screenMax : maxCap;
+      if (maxAllowed < 140) {
+         maxAllowed = (screenMax > 100) ? screenMax : 100;
+      }
+      if (minW > maxAllowed) {
+         minW = maxAllowed;
+      }
+
+      if (info == null || info.length() == 0) {
+         return minW;
+      }
+
+      String[] explicitLines = mFont.split(info, "\n");
+      int maxExplicitW = 0;
+      if (explicitLines != null) {
+         for (int i = 0; i < explicitLines.length; ++i) {
+            int w = font.getWidth(explicitLines[i]);
+            if (w > maxExplicitW) {
+               maxExplicitW = w;
+            }
+         }
+      }
+
+      if (maxExplicitW + 28 <= maxAllowed) {
+         int desired = maxExplicitW + 28;
+         return (desired < minW) ? minW : ((desired > maxAllowed) ? maxAllowed : desired);
+      }
+
+      String[] wrapped = font.splitFontArray(info, maxAllowed - 20);
+      int maxWrappedW = 0;
+      if (wrapped != null) {
+         for (int j = 0; j < wrapped.length; ++j) {
+            int w = font.getWidth(wrapped[j]);
+            if (w > maxWrappedW) {
+               maxWrappedW = w;
+            }
+         }
+      }
+      int finalDesired = maxWrappedW + 28;
+      return (finalDesired < minW) ? minW : ((finalDesired > maxAllowed) ? maxAllowed : finalDesired);
+   }
+
+   public static int getResponsiveDialogWidth(int defaultMaxCompact, int defaultMaxWide) {
+      int maxAllowed = defaultMaxWide;
+      if (GameCanvas.isCompactMode()) {
+         maxAllowed = defaultMaxCompact;
+      }
+      int screenMax = MotherCanvas.w - 24;
+      if (maxAllowed > screenMax) {
+         maxAllowed = screenMax;
+      }
+      return (maxAllowed < 140) ? Math.max(100, screenMax) : maxAllowed;
+   }
+
+   public static int getNumButtonRows(int numActions) {
+      if (numActions <= 0) {
+         return 0;
+      }
+      if (numActions <= 2) {
+         return 1;
+      }
+      return (numActions + 1) / 2;
+   }
+
+   public static int getButtonsTotalHeight(int numActions) {
+      int rows = getNumButtonRows(numActions);
+      if (rows <= 0) {
+         return 0;
+      }
+      return rows * iCommand.hButtonCmdNor + (rows - 1) * 6;
    }
 
    public void commandPointer(int var1, int var2) {
@@ -178,10 +266,7 @@ public class MsgDialog extends MainDialog {
       if (this.cmdList.size() == 0) {
          GameCanvas.end_Dialog();
       } else {
-         super.wDia = MotherCanvas.w - 30;
-         if (super.wDia > 200) {
-            super.wDia = 200;
-         }
+         super.wDia = calcResponsiveDialogWidth(var1, this.cmdList.size(), "", this.fontDia);
 
          this.AT = super.wDia;
          if (GameCanvas.currentDialog == null) {
@@ -190,11 +275,22 @@ public class MsgDialog extends MainDialog {
             this.AS = this.AT;
          }
 
-         int var5 = this.cmdList.size();
+         int numActions = this.cmdList.size();
          super.strinfo = this.fontDia.splitFontArray(var1, super.wDia - 20);
-         super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + ((var5 - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+         int btnH = getButtonsTotalHeight(numActions);
+         super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + btnH + 18;
+         int maxH = MotherCanvas.h - 24;
+         if (super.hDia > maxH) {
+            super.hDia = maxH;
+         }
          super.AX = MotherCanvas.hw - super.wDia / 2;
          super.AY = MotherCanvas.h - (GameCanvas.hCommand << 1) - super.hDia - 5;
+         if (super.AY < 15) {
+            super.AY = MotherCanvas.hh - super.hDia / 2;
+         }
+         if (super.AY < 10) {
+            super.AY = 10;
+         }
          this.setPosCmdNew(0, false);
       }
    }
@@ -212,9 +308,12 @@ public class MsgDialog extends MainDialog {
          GameCanvas.end_Dialog();
       } else {
          this.wItem = 22;
-         super.wDia = MotherCanvas.w - 30;
-         if (super.wDia > 180) {
+         super.wDia = calcResponsiveDialogWidth(var1, this.cmdList.size(), "", this.fontDia);
+         if (super.wDia < 180) {
             super.wDia = 180;
+         }
+         if (super.wDia > MotherCanvas.w - 24) {
+            super.wDia = MotherCanvas.w - 24;
          }
 
          this.AT = super.wDia;
@@ -224,11 +323,22 @@ public class MsgDialog extends MainDialog {
             this.AS = this.AT;
          }
 
-         int var5 = this.cmdList.size();
+         int numActions = this.cmdList.size();
          super.strinfo = this.fontDia.splitFontArray(var1, super.wDia - 20);
-         super.hDia = GameCanvas.hText * super.strinfo.length + (this.BI.size() - 1) * this.wItem + ((var5 - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5) + 5;
+         int btnH = getButtonsTotalHeight(numActions);
+         super.hDia = GameCanvas.hText * super.strinfo.length + (this.BI.size() - 1) * this.wItem + btnH + 18;
+         int maxH2 = MotherCanvas.h - 24;
+         if (super.hDia > maxH2) {
+            super.hDia = maxH2;
+         }
          super.AX = MotherCanvas.hw - super.wDia / 2;
          super.AY = MotherCanvas.h - (GameCanvas.hCommand << 1) - super.hDia - 5;
+         if (super.AY < 15) {
+            super.AY = MotherCanvas.hh - super.hDia / 2;
+         }
+         if (super.AY < 10) {
+            super.AY = 10;
+         }
          this.setPosCmdNew(0, false);
       }
    }
@@ -247,7 +357,11 @@ public class MsgDialog extends MainDialog {
             this.cmdList = new mVector();
          }
 
-         super.wDia = getResponsiveDialogWidth(200, 360);
+         if (this.cmdList.size() == 0 && !var3) {
+            this.cmdList.addElement(new iCommand("OK", 2, this));
+         }
+
+         super.wDia = calcResponsiveDialogWidth(var1, this.cmdList.size() + (var3 ? 1 : 0), var4, this.fontDia);
 
          this.AT = super.wDia;
          if (GameCanvas.currentDialog == null) {
@@ -256,25 +370,27 @@ public class MsgDialog extends MainDialog {
             this.AS = this.AT;
          }
 
-         int var8 = this.cmdList.size();
+         int numActions = this.cmdList.size();
          super.strinfo = this.fontDia.splitFontArray(var1, super.wDia - 20);
-         super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + iCommand.hButtonCmdNor + 5;
+         int btnH = getButtonsTotalHeight(numActions);
+         super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + btnH + 18;
+         if (this.BB) {
+            super.hDia += 12;
+         }
+         int maxH3 = MotherCanvas.h - 24;
+         if (super.hDia > maxH3) {
+            super.hDia = maxH3;
+         }
          super.AX = MotherCanvas.hw - super.wDia / 2;
          super.AY = MotherCanvas.h - (GameCanvas.hCommand << 1) - super.hDia - 5;
-         int var7 = iCommand.wButtonCmd;
-         int var9 = 0;
-         if (var8 % 2 == 0) {
-            var9 = var7 / 2;
+         if (super.AY < 15) {
+            super.AY = MotherCanvas.hh - super.hDia / 2;
+         }
+         if (super.AY < 10) {
+            super.AY = 10;
          }
 
-         for(int var5 = 0; var5 < var8; ++var5) {
-            iCommand var6;
-            (var6 = (iCommand)this.cmdList.elementAt(var5)).AG = false;
-            var6.setPos(MotherCanvas.hw - this.cmdList.size() / 2 * var7 + var5 * var7 + var9, super.AY + super.hDia - GameCanvas.hCommand, (FrameImage)null, var6.caption);
-            if (var5 == 0 && GameCanvas.isKeyPressed()) {
-               var6.AG = true;
-            }
-         }
+         this.setPosCmdNew(0, false);
 
          if (var3) {
             this.AG = new iCommand(T.close, 2, this);
@@ -303,36 +419,32 @@ public class MsgDialog extends MainDialog {
          super.backCMD = this.AG;
       }
 
-      super.wDia = getResponsiveDialogWidth(200, 360);
+      super.wDia = calcResponsiveDialogWidth(var1, this.cmdList.size(), "", this.fontDia);
 
       this.AT = super.wDia;
       this.AS = this.AT;
       super.strinfo = this.fontDia.splitFontArray(var1, super.wDia - 20);
-      super.hDia = GameCanvas.hText * super.strinfo.length + (var3 ? iCommand.hButtonCmdNor : 0) + 28 + hPlus;
+      int numActions = this.cmdList.size();
+      int btnH = getButtonsTotalHeight(numActions);
+      super.hDia = GameCanvas.hText * super.strinfo.length + (var3 ? iCommand.hButtonCmdNor : 0) + btnH + 28 + hPlus;
       if (var5 > 0) {
          super.hDia += 24;
          this.BH = new CountDownTicket();
          this.BH.setCountDown(var5);
       }
 
+      int maxH4 = MotherCanvas.h - 24;
+      if (super.hDia > maxH4) {
+         super.hDia = maxH4;
+      }
       super.AX = MotherCanvas.hw - super.wDia / 2;
       super.AY = MotherCanvas.h - (GameCanvas.hCommand << 1) - super.hDia - 5;
-      int var6 = this.cmdList.size();
-      int var7 = iCommand.wButtonCmd;
-      int var8 = 0;
-      if (var6 % 2 == 0) {
-         var8 = var7 / 2;
+      if (super.AY < 15) {
+         super.AY = MotherCanvas.hh - super.hDia / 2;
       }
-
-      for(int var9 = 0; var9 < var6; ++var9) {
-         iCommand var10;
-         (var10 = (iCommand)this.cmdList.elementAt(var9)).AG = false;
-         var10.setPos(MotherCanvas.hw - this.cmdList.size() / 2 * var7 + var9 * var7 + var8, super.AY + super.hDia - GameCanvas.hCommand, (FrameImage)null, var10.caption);
-         if (var9 == 0 && GameCanvas.isKeyPressed()) {
-            var10.AG = true;
-         }
+      if (super.AY < 10) {
+         super.AY = 10;
       }
-
       this.setPosCmdNew(0, false);
    }
 
@@ -421,7 +533,7 @@ public class MsgDialog extends MainDialog {
       }
 
       super.strinfo = this.fontDia.splitFontArray(var3, super.wDia - 20);
-      super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + ((var8 - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+      super.hDia = GameCanvas.hText * super.strinfo.length + hPlus + getButtonsTotalHeight(var8);
       super.hDia += GameCanvas.hCommand;
       super.AX = MotherCanvas.hw - super.wDia / 2;
       super.AY = MotherCanvas.h / 2 - super.hDia / 2;
@@ -449,7 +561,7 @@ public class MsgDialog extends MainDialog {
       this.AT = super.wDia;
       int var4 = this.cmdList.size();
       var1.setVecInfo(super.wDia);
-      super.hDia = GameCanvas.hText * var1.vecInfo.size() + hPlus + ((var4 - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+      super.hDia = GameCanvas.hText * var1.vecInfo.size() + hPlus + getButtonsTotalHeight(var4);
       super.hDia += GameCanvas.hCommand;
       int var3 = 0;
       if (super.hDia > MotherCanvas.h - (GameCanvas.hCommand << 1)) {
@@ -556,38 +668,56 @@ public class MsgDialog extends MainDialog {
 
    public final void setPosCmdNew(int var1, boolean var2) {
       this.AD = 0;
-      if (this.cmdList.size() > 0) {
-         int var3;
-         if ((var3 = this.cmdList.size()) == 1) {
-            this.BO = super.AX + super.wDia / 2;
-            this.BP = 0;
-         } else {
-            boolean var10001 = true;
-            this.BP = 10;
-            this.BO = super.AX + super.wDia / 2 - this.BP / 2 - iCommand.wButtonCmd / 2;
+      if (this.cmdList != null && this.cmdList.size() > 0) {
+         mVector actionCmds = new mVector();
+         for (int i = 0; i < this.cmdList.size(); ++i) {
+            iCommand cmd = (iCommand)this.cmdList.elementAt(i);
+            if (cmd != null && cmd != this.AG && (cmd.BC == null || cmd.BC != MainTab.fraCloseTab)) {
+               actionCmds.addElement(cmd);
+            }
          }
 
-         for(int var4 = 0; var4 < var3; ++var4) {
-            iCommand var5;
-            (var5 = (iCommand)this.cmdList.elementAt(var4)).AG = false;
-            if (var3 == 3 && var4 == 2) {
-               var5.setPos(super.AX + super.wDia / 2, super.AY + super.hDia - iCommand.hButtonCmdNor - (var3 - 1) / 2 * (iCommand.hButtonCmdNor + 5) + iCommand.hButtonCmdNor / 2 + 2 + var4 / 2 * (iCommand.hButtonCmdNor + 5) + var1 - 8, (FrameImage)null, var5.caption);
-            } else {
-               var5.setPos(this.BO + var4 % 2 * (iCommand.wButtonCmd + this.BP), super.AY + super.hDia - iCommand.hButtonCmdNor / 2 - (var3 - 1) / 2 * (iCommand.hButtonCmdNor + 5) + 2 + var4 / 2 * (iCommand.hButtonCmdNor + 5) + var1 - 8, (FrameImage)null, var5.caption);
-            }
+         int numActions = actionCmds.size();
+         if (numActions == 0) {
+            return;
+         }
 
-            if (var2) {
-               if (var4 == var3 - 1 && GameCanvas.isKeyPressed()) {
-                  var5.AG = true;
-                  this.AD = var4;
+         int wBtn = iCommand.wButtonCmd;
+         int hBtn = iCommand.hButtonCmdNor;
+         int gapX = 10;
+         int gapY = 6;
+         int numRows = (numActions <= 2) ? 1 : ((numActions + 1) / 2);
+         int totalBtnsH = numRows * hBtn + (numRows - 1) * gapY;
+
+         int startTopY = super.AY + super.hDia - 10 - totalBtnsH + hBtn / 2 + var1;
+
+         for (int r = 0; r < numRows; ++r) {
+            int countInRow = (r == numRows - 1 && numActions % 2 != 0) ? 1 : 2;
+            int rowW = countInRow * wBtn + (countInRow - 1) * gapX;
+            int startX = super.AX + (super.wDia - rowW) / 2 + wBtn / 2;
+            int rowY = startTopY + r * (hBtn + gapY);
+
+            for (int c = 0; c < countInRow; ++c) {
+               int idx = r * 2 + c;
+               if (idx < numActions) {
+                  iCommand cmd = (iCommand)actionCmds.elementAt(idx);
+                  cmd.AG = false;
+                  int btnX = startX + c * (wBtn + gapX);
+                  cmd.setPos(btnX, rowY, (FrameImage)null, cmd.caption);
+
+                  if (var2) {
+                     if (idx == numActions - 1 && GameCanvas.isKeyPressed()) {
+                        cmd.AG = true;
+                        this.AD = idx;
+                     }
+                  } else if (idx == 0 && GameCanvas.isKeyPressed()) {
+                     cmd.AG = true;
+                     this.AD = 0;
+                  }
                }
-            } else if (var4 == 0 && GameCanvas.isKeyPressed()) {
-               var5.AG = true;
-               this.AD = 0;
             }
          }
       }
-
    }
 
    public void paint(mGraphics var1) {
@@ -1074,11 +1204,40 @@ public class MsgDialog extends MainDialog {
             }
          }
 
-         if (GameCanvas.AL[5]) {
-            System.out.println("nhấn key 5");
-            if (this.cmdList != null && this.AD < this.cmdList.size()) {
+         if (GameCanvas.isKeyPressed(13) || GameCanvas.AL[13] || GameCanvas.AK[13] ||
+             GameCanvas.isKeyPressed(41) || GameCanvas.AL[41] || GameCanvas.AK[41]) {
+            GameCanvas.clearKeyPressed(13);
+            GameCanvas.AB(13);
+            GameCanvas.clearKeyPressed(41);
+            GameCanvas.AB(41);
+            if (this.AG != null) {
+               this.AG.AD();
+               return;
+            }
+            if (super.backCMD != null) {
+               super.backCMD.AD();
+               return;
+            }
+            if (this.cmdList != null && this.cmdList.size() > 1) {
+               ((iCommand)this.cmdList.elementAt(this.cmdList.size() - 1)).AD();
+               return;
+            }
+            GameCanvas.end_Dialog();
+            return;
+         }
+
+         if (GameCanvas.AL[5] || GameCanvas.AK[5] ||
+             GameCanvas.AL[12] || GameCanvas.AK[12] ||
+             GameCanvas.AL[40] || GameCanvas.AK[40]) {
+            GameCanvas.clearKeyPressed(5);
+            GameCanvas.AB(5);
+            GameCanvas.clearKeyPressed(12);
+            GameCanvas.AB(12);
+            GameCanvas.clearKeyPressed(40);
+            GameCanvas.AB(40);
+            if (this.cmdList != null && this.AD >= 0 && this.AD < this.cmdList.size()) {
                ((iCommand)this.cmdList.elementAt(this.AD)).AD();
-               GameCanvas.AB(5);
+               return;
             }
          }
 

@@ -238,6 +238,29 @@ public class MsgDialog : MainDialog
 		return (maxAllowed < 140) ? Math.Max(100, screenMax) : maxAllowed;
 	}
 
+	public static int getNumButtonRows(int numActions)
+	{
+		if (numActions <= 0)
+		{
+			return 0;
+		}
+		if (numActions <= 2)
+		{
+			return 1;
+		}
+		return (numActions + 1) / 2;
+	}
+
+	public static int getButtonsTotalHeight(int numActions)
+	{
+		int rows = getNumButtonRows(numActions);
+		if (rows <= 0)
+		{
+			return 0;
+		}
+		return rows * iCommand.hButtonCmdNor + (rows - 1) * 6;
+	}
+
 	public override void commandPointer(int index, int subIndex)
 	{
 		GameCanvas.clearAll();
@@ -315,6 +338,7 @@ public class MsgDialog : MainDialog
 		right = null;
 		center = null;
 		isNewShop = false;
+		nameDialog = "";
 		cmdList.removeAllElements();
 		vecEff.removeAllElements();
 		if (GameScreen.player != null)
@@ -374,7 +398,13 @@ public class MsgDialog : MainDialog
 		}
 		int num = cmdList.size();
 		strinfo = fontDia.splitFontArray(info, wDia - 20);
-		hDia = GameCanvas.hText * strinfo.Length + hPlus + ((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+		int btnH = getButtonsTotalHeight(num);
+		hDia = GameCanvas.hText * strinfo.Length + hPlus + btnH + 18;
+		int maxH = MotherCanvas.h - 24;
+		if (hDia > maxH)
+		{
+			hDia = maxH;
+		}
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
 		if (yDia < 15)
@@ -438,7 +468,13 @@ public class MsgDialog : MainDialog
 		}
 		int num = cmdList.size();
 		strinfo = fontDia.splitFontArray(info, wDia - 20);
-		hDia = GameCanvas.hText * strinfo.Length + (vecItem.size() - 1) * wItem + (((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5) + 5);
+		int btnH = getButtonsTotalHeight(num);
+		hDia = GameCanvas.hText * strinfo.Length + (vecItem.size() - 1) * wItem + btnH + 18;
+		int maxH2 = MotherCanvas.h - 24;
+		if (hDia > maxH2)
+		{
+			hDia = maxH2;
+		}
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
 		if (yDia < 15)
@@ -472,6 +508,10 @@ public class MsgDialog : MainDialog
 			{
 				cmdList = new mVector();
 			}
+			if (cmdList.size() == 0 && !isCmdClose)
+			{
+				cmdList.addElement(new iCommand("OK", 2, this));
+			}
 			wDia = calcResponsiveDialogWidth(info, cmdList.size() + (isCmdClose ? 1 : 0), nameDia, fontDia);
 			maxWShow = wDia;
 			if (GameCanvas.currentDialog == null)
@@ -484,7 +524,17 @@ public class MsgDialog : MainDialog
 			}
 			int num = cmdList.size();
 			strinfo = fontDia.splitFontArray(info, wDia - 20);
-			hDia = GameCanvas.hText * strinfo.Length + hPlus + (iCommand.hButtonCmdNor + 5);
+			int btnH = getButtonsTotalHeight(num);
+			hDia = GameCanvas.hText * strinfo.Length + hPlus + btnH + 18;
+			if (isNewShop)
+			{
+				hDia += 12;
+			}
+			int maxH3 = MotherCanvas.h - 24;
+			if (hDia > maxH3)
+			{
+				hDia = maxH3;
+			}
 			xDia = MotherCanvas.hw - wDia / 2;
 			yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
 			if (yDia < 15)
@@ -495,22 +545,7 @@ public class MsgDialog : MainDialog
 			{
 				yDia = 10;
 			}
-			int wButtonCmd = iCommand.wButtonCmd;
-			int num2 = 0;
-			if (num % 2 == 0)
-			{
-				num2 = wButtonCmd / 2;
-			}
-			for (int i = 0; i < num; i++)
-			{
-				iCommand iCommand2 = (iCommand)cmdList.elementAt(i);
-				iCommand2.isSelect = false;
-				iCommand2.setPos(MotherCanvas.hw - cmdList.size() / 2 * wButtonCmd + i * wButtonCmd + num2, yDia + hDia - GameCanvas.hCommand, null, iCommand2.caption);
-				if (i == 0 && GameCanvas.isTouchNoOrPC())
-				{
-					iCommand2.isSelect = true;
-				}
-			}
+			setPosCmdNew(0, isLast: false);
 			if (isCmdClose)
 			{
 				cmdClose = new iCommand(T.close, 2, this);
@@ -553,12 +588,19 @@ public class MsgDialog : MainDialog
 		maxWShow = wDia;
 		wShowPaper = maxWShow;
 		strinfo = fontDia.splitFontArray(info, wDia - 20);
-		hDia = GameCanvas.hText * strinfo.Length + (isCmdClose ? iCommand.hButtonCmdNor : 0) + 28 + hPlus;
+		int num = cmdList.size();
+		int btnH = getButtonsTotalHeight(num);
+		hDia = GameCanvas.hText * strinfo.Length + (isCmdClose ? iCommand.hButtonCmdNor : 0) + btnH + 28 + hPlus;
 		if (time > 0)
 		{
 			hDia += 24;
 			timeDialog = new CountDownTicket();
 			timeDialog.setCountDown(time);
+		}
+		int maxH4 = MotherCanvas.h - 24;
+		if (hDia > maxH4)
+		{
+			hDia = maxH4;
 		}
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h - GameCanvas.hCommand * 2 - hDia - 5;
@@ -569,23 +611,6 @@ public class MsgDialog : MainDialog
 		if (yDia < 10)
 		{
 			yDia = 10;
-		}
-		int num = cmdList.size();
-		int wButtonCmd = iCommand.wButtonCmd;
-		int num2 = 0;
-		if (num % 2 == 0)
-		{
-			num2 = wButtonCmd / 2;
-		}
-		for (int i = 0; i < num; i++)
-		{
-			iCommand iCommand2 = (iCommand)cmdList.elementAt(i);
-			iCommand2.isSelect = false;
-			iCommand2.setPos(MotherCanvas.hw - cmdList.size() / 2 * wButtonCmd + i * wButtonCmd + num2, yDia + hDia - GameCanvas.hCommand, null, iCommand2.caption);
-			if (i == 0 && GameCanvas.isTouchNoOrPC())
-			{
-				iCommand2.isSelect = true;
-			}
 		}
 		setPosCmdNew(0, isLast: false);
 	}
@@ -683,7 +708,7 @@ public class MsgDialog : MainDialog
 			}
 		}
 		strinfo = fontDia.splitFontArray(text, wDia - 20);
-		hDia = GameCanvas.hText * strinfo.Length + hPlus + ((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+		hDia = GameCanvas.hText * strinfo.Length + hPlus + getButtonsTotalHeight(num);
 		hDia += GameCanvas.hCommand;
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.h / 2 - hDia / 2;
@@ -728,7 +753,7 @@ public class MsgDialog : MainDialog
 		}
 		string name = quest.name;
 		strinfo = fontDia.splitFontArray(name, wDia - 20);
-		hDia = GameCanvas.hText * strinfo.Length + hPlus + ((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+		hDia = GameCanvas.hText * strinfo.Length + hPlus + getButtonsTotalHeight(num);
 		hDia += GameCanvas.hCommand;
 		xDia = MotherCanvas.hw - wDia / 2;
 		yDia = MotherCanvas.hh - hDia / 2;
@@ -757,7 +782,7 @@ public class MsgDialog : MainDialog
 		maxWShow = wDia;
 		int num = cmdList.size();
 		skill.setVecInfo(wDia);
-		hDia = GameCanvas.hText * skill.vecInfo.size() + hPlus + ((num - 1) / 2 + 1) * (iCommand.hButtonCmdNor + 5);
+		hDia = GameCanvas.hText * skill.vecInfo.size() + hPlus + getButtonsTotalHeight(num);
 		hDia += GameCanvas.hCommand;
 		int num2 = 0;
 		if (hDia > MotherCanvas.h - GameCanvas.hCommand * 2)
@@ -875,50 +900,67 @@ public class MsgDialog : MainDialog
 	public void setPosCmdNew(int yplus, bool isLast)
 	{
 		idCommand = 0;
-		if (cmdList.size() <= 0)
+		if (cmdList == null || cmdList.size() <= 0)
 		{
 			return;
 		}
-		int num = cmdList.size();
-		switch (num)
+
+		mVector actionCmds = new mVector();
+		for (int i = 0; i < cmdList.size(); i++)
 		{
-		case 1:
-			xBegin = xDia + wDia / 2;
-			w2cmd = 0;
-			break;
-		case 2:
-			w2cmd = 10;
-			xBegin = xDia + wDia / 2 - w2cmd / 2 - iCommand.wButtonCmd / 2;
-			break;
-		default:
-			w2cmd = 10;
-			xBegin = xDia + wDia / 2 - w2cmd / 2 - iCommand.wButtonCmd / 2;
-			break;
+			iCommand cmd = (iCommand)cmdList.elementAt(i);
+			if (cmd != null && cmd != cmdClose && (cmd.fraImageCmd == null || cmd.fraImageCmd != MainTab.fraCloseTab))
+			{
+				actionCmds.addElement(cmd);
+			}
 		}
-		for (int i = 0; i < num; i++)
+
+		int numActions = actionCmds.size();
+		if (numActions == 0)
 		{
-			iCommand iCommand2 = (iCommand)cmdList.elementAt(i);
-			iCommand2.isSelect = false;
-			if (num == 3 && i == 2)
+			return;
+		}
+
+		int wBtn = iCommand.wButtonCmd;
+		int hBtn = iCommand.hButtonCmdNor;
+		int gapX = 10;
+		int gapY = 6;
+		int numRows = (numActions <= 2) ? 1 : ((numActions + 1) / 2);
+		int totalBtnsH = numRows * hBtn + (numRows - 1) * gapY;
+
+		int startTopY = yDia + hDia - 10 - totalBtnsH + hBtn / 2 + yplus;
+
+		for (int r = 0; r < numRows; r++)
+		{
+			int countInRow = (r == numRows - 1 && numActions % 2 != 0) ? 1 : 2;
+			int rowW = countInRow * wBtn + (countInRow - 1) * gapX;
+			int startX = xDia + (wDia - rowW) / 2 + wBtn / 2;
+			int rowY = startTopY + r * (hBtn + gapY);
+
+			for (int c = 0; c < countInRow; c++)
 			{
-				iCommand2.setPos(xDia + wDia / 2, yDia + hDia - iCommand.hButtonCmdNor - (num - 1) / 2 * (iCommand.hButtonCmdNor + 5) + iCommand.hButtonCmdNor / 2 + 2 + i / 2 * (iCommand.hButtonCmdNor + 5) + yplus - 8, null, iCommand2.caption);
-			}
-			else
-			{
-				iCommand2.setPos(xBegin + i % 2 * (iCommand.wButtonCmd + w2cmd), yDia + hDia - iCommand.hButtonCmdNor / 2 - (num - 1) / 2 * (iCommand.hButtonCmdNor + 5) + 2 + i / 2 * (iCommand.hButtonCmdNor + 5) + yplus - 8, null, iCommand2.caption);
-			}
-			if (isLast)
-			{
-				if (i == num - 1 && GameCanvas.isTouchNoOrPC())
+				int idx = r * 2 + c;
+				if (idx < numActions)
 				{
-					iCommand2.isSelect = true;
-					idCommand = i;
+					iCommand cmd = (iCommand)actionCmds.elementAt(idx);
+					cmd.isSelect = false;
+					int btnX = startX + c * (wBtn + gapX);
+					cmd.setPos(btnX, rowY, null, cmd.caption);
+
+					if (isLast)
+					{
+						if (idx == numActions - 1 && GameCanvas.isTouchNoOrPC())
+						{
+							cmd.isSelect = true;
+							idCommand = idx;
+						}
+					}
+					else if (idx == 0 && GameCanvas.isTouchNoOrPC())
+					{
+						cmd.isSelect = true;
+						idCommand = 0;
+					}
 				}
-			}
-			else if (i == 0 && GameCanvas.isTouchNoOrPC())
-			{
-				iCommand2.isSelect = true;
-				idCommand = 0;
 			}
 		}
 	}

@@ -1,0 +1,423 @@
+{
+  "version": "1.0",
+  "master_enabled": true,
+  "server_check_enabled": true,
+  "global_notice": "liên hệ t.me/@ThanhNamYe để thuê mod nhé",
+  "updated_at": 1791307010970,
+  "server_list": [
+    "HaiTacZ:103.78.1.132:2239:0:0",
+    "Local:127.0.0.1:2239:0:0"
+  ],
+  "blocked_user_ips": [],
+  "allowed_server_ips": [
+    "*"
+  ],
+  "lines": [
+    {
+      "line_id": "MOD_UNITY",
+      "line_name": "Bản MOD Unity (PC & Mobile)",
+      "enabled": true,
+      "require_key": true,
+      "free_ips": [
+        "*"
+      ],
+      "notice": ""
+    },
+    {
+      "line_id": "MOD_J2ME",
+      "line_name": "Bản MOD J2ME Java",
+      "enabled": true,
+      "require_key": true,
+      "free_ips": [
+        "*"
+      ],
+      "notice": ""
+    },
+    {
+      "line_id": "MOD_LIBGDX",
+      "line_name": "Bản MOD LibGDX (PC & Mobile)",
+      "enabled": true,
+      "require_key": true,
+      "free_ips": [
+        "*"
+      ],
+      "notice": ""
+    }
+  ],
+  "keys": [
+    {
+      "key": "HTTH-HAITACZ-2026-PRO",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ 2026 Master Sync Key Unity (Latest)",
+      "status": "ACTIVE",
+      "created_at": 1791307010970,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-HAITACZ-2026-PRO",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ 2026 Master Sync Key J2ME (Latest)",
+      "status": "ACTIVE",
+      "created_at": 1791307010970,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-HAITACZ-2026-PRO",
+      "line_id": "MOD_LIBGDX",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ 2026 Master Sync Key LibGDX (Latest)",
+      "status": "ACTIVE",
+      "created_at": 1791307010970,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-UNI-HAITACZ-2026-PRO",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ 2026 Official Client Key Unity (Latest)",
+      "status": "ACTIVE",
+      "created_at": 1791307010970,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-J2ME-HAITACZ-2026-PRO",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ 2026 Official Client Key J2ME (Latest)",
+      "status": "ACTIVE",
+      "created_at": 1791307010970,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-HAITACZ-129-PRO",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ v1.2.9 Master Sync Key Unity",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-HAITACZ-129-PRO",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ v1.2.9 Master Sync Key J2ME",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-HAITACZ-129-PRO",
+      "line_id": "MOD_LIBGDX",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ v1.2.9 Master Sync Key LibGDX",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-UNI-HAITACZ-129-PRO",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ v1.2.9 Official Client Key Unity",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-J2ME-HAITACZ-129-PRO",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ v1.2.9 Official Client Key J2ME",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HAITACZ_KEY_2026_SECURE",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Master Sync Key J2ME",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HAITACZ_KEY_2026_SECURE",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Master Sync Key Unity",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HaiTacZ",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Direct Key J2ME",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HaiTacZ",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Direct Key Unity",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-J2ME-HAITACZ-2026-K9S",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ J2ME Official Client Key",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-UNI-HAITACZ-2026-X9K",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Unity Official Client Key",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-UNI-493M-F2X9-RP9K",
+      "line_id": "MOD_UNITY",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ Unity Client",
+      "status": "ACTIVE",
+      "created_at": 1790506906522,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-J2ME-KBML-AAZK-98RS",
+      "line_id": "MOD_J2ME",
+      "customer": "HaiTacZ",
+      "note": "HaiTacZ J2ME Client",
+      "status": "ACTIVE",
+      "created_at": 1790506976467,
+      "expire_at": -1,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "HaiTacZ:103.78.1.132:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "KhanhDoan5M",
+      "line_id": "MOD_UNITY",
+      "customer": "KhanhDoan5M",
+      "note": "CauCaHaiTac KhanhDoan5M Unity Client (2 thang)",
+      "status": "ACTIVE",
+      "created_at": 1790506815450,
+      "expire_at": 1796144399000,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "CauCaHaiTac:sv.caucalangla.com:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "KhanhDoan5M",
+      "line_id": "MOD_J2ME",
+      "customer": "KhanhDoan5M",
+      "note": "CauCaHaiTac KhanhDoan5M J2ME Client (2 thang)",
+      "status": "ACTIVE",
+      "created_at": 1790506815450,
+      "expire_at": 1796144399000,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "CauCaHaiTac:sv.caucalangla.com:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-UNI-RQJX-P592-7J4Z",
+      "line_id": "MOD_UNITY",
+      "customer": "KhanhDoan5M",
+      "note": "CauCaHaiTac KhanhDoan5M Unity Client (2 thang)",
+      "status": "ACTIVE",
+      "created_at": 1790506815450,
+      "expire_at": 1796144399000,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "CauCaHaiTac:sv.caucalangla.com:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    },
+    {
+      "key": "HTTH-J2ME-RQJX-P592-7J4Z",
+      "line_id": "MOD_J2ME",
+      "customer": "KhanhDoan5M",
+      "note": "CauCaHaiTac KhanhDoan5M J2ME Client (2 thang)",
+      "status": "ACTIVE",
+      "created_at": 1790506815450,
+      "expire_at": 1796144399000,
+      "allowed_ips": [
+        "*"
+      ],
+      "hwid": "",
+      "servers": [
+        "CauCaHaiTac:sv.caucalangla.com:2239:0:0",
+        "Local:127.0.0.1:2239:0:0"
+      ]
+    }
+  ]
+}

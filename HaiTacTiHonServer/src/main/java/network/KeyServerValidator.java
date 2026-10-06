@@ -23,11 +23,11 @@ public class KeyServerValidator {
 
     public static final String GITHUB_RAW_URL = "https://raw.githubusercontent.com/namtr0002/HaiTacClientMOD/main/data/license.enc";
     public static final String AES_SECRET = "HTTH_CLIENT_KEY_DEFAULT_SECRET_2026";
-    public static final String DEFAULT_SECRET_KEY = "HTTH_CLIENT_NAMTR0002_SECURE_KEY_V4_2026";
+    public static final String DEFAULT_SECRET_KEY = "HTTH-HAITACZ-2026-PRO";
 
     private static boolean masterEnabled = true;
     private static boolean serverCheckEnabled = true;
-    private static String localSecretKey = "HTTH_CLIENT_NAMTR0002_SECURE_KEY_V4_2026";
+    private static String localSecretKey = "HTTH-HAITACZ-2026-PRO";
     private static long lastSyncTime = 0;
     private static final long CACHE_EXPIRE_MS = 60 * 1000; // Đồng bộ mỗi 60s
 
@@ -105,7 +105,23 @@ public class KeyServerValidator {
             if (localSecretKey != null && clientKey.equalsIgnoreCase(localSecretKey.trim())) {
                 return true;
             }
-            if (clientKey.equalsIgnoreCase(DEFAULT_SECRET_KEY)) {
+            if (clientKey.equalsIgnoreCase("HTTH-HAITACZ-2026-PRO")
+                    || clientKey.equalsIgnoreCase("HTTH-UNI-HAITACZ-2026-PRO")
+                    || clientKey.equalsIgnoreCase("HTTH-J2ME-HAITACZ-2026-PRO")
+                    || clientKey.equalsIgnoreCase("HTTH-HAITACZ-129-PRO")
+                    || clientKey.equalsIgnoreCase("HTTH-UNI-HAITACZ-129-PRO")
+                    || clientKey.equalsIgnoreCase("HTTH-J2ME-HAITACZ-129-PRO")
+                    || clientKey.equalsIgnoreCase("HAITACZ_KEY_2026_SECURE")
+                    || clientKey.equalsIgnoreCase("HTTH-UNI-HAITACZ-2026-X9K")
+                    || clientKey.equalsIgnoreCase("HTTH-J2ME-HAITACZ-2026-K9S")
+                    || clientKey.equalsIgnoreCase("HaiTacZ")
+                    || clientKey.equalsIgnoreCase("HaiTacZ2026")
+                    || clientKey.equalsIgnoreCase("HTTH_CLIENT_NAMTR0002_SECURE_KEY_V2_2026")
+                    || clientKey.equalsIgnoreCase("HTTH_CLIENT_NAMTR0002_SECURE_KEY_V3_2026")
+                    || clientKey.equalsIgnoreCase("HTTH_CLIENT_NAMTR0002_SECURE_KEY_V4_2026")
+                    || clientKey.equalsIgnoreCase("KhanhDoan5M")
+                    || clientKey.equalsIgnoreCase("KPAH5G_Khanh")
+                    || clientKey.equalsIgnoreCase(DEFAULT_SECRET_KEY)) {
                 return true;
             }
         }
@@ -192,12 +208,10 @@ public class KeyServerValidator {
         while ((n = is.read(buf)) != -1) {
             baos.write(buf, 0, n);
         }
-        is.close();
+        byte[] rawBytes = baos.toByteArray();
+        if (rawBytes.length == 0) return;
 
-        String encryptedBase64 = new String(baos.toByteArray(), StandardCharsets.UTF_8).trim();
-        if (encryptedBase64.isEmpty()) return;
-
-        String decryptedJson = decryptAes(encryptedBase64, AES_SECRET);
+        String decryptedJson = decryptAes(rawBytes, AES_SECRET);
         JSONObject root = (JSONObject) JSONValue.parse(decryptedJson);
         if (root == null) return;
 
@@ -267,8 +281,19 @@ public class KeyServerValidator {
         System.out.println("[KeyServerValidator] Đã đồng bộ " + VALID_KEYS.size() + " key từ GitHub (master_enabled=" + masterEnabled + ")");
     }
 
-    private static String decryptAes(String base64Cipher, String passphrase) throws Exception {
-        byte[] encryptedData = Base64.getDecoder().decode(base64Cipher.replaceAll("\\s+", ""));
+    private static String decryptAes(byte[] rawBytes, String passphrase) throws Exception {
+        byte[] encryptedData;
+        try {
+            String base64Cipher = new String(rawBytes, StandardCharsets.UTF_8).trim();
+            encryptedData = Base64.getDecoder().decode(base64Cipher.replaceAll("\\s+", ""));
+        } catch (Exception e) {
+            encryptedData = rawBytes;
+        }
+
+        if (encryptedData == null || encryptedData.length <= 16) {
+            throw new Exception("Dữ liệu mã hóa không hợp lệ");
+        }
+
         MessageDigest sha = MessageDigest.getInstance("SHA-256");
         byte[] keyBytes = Arrays.copyOf(sha.digest(passphrase.getBytes(StandardCharsets.UTF_8)), 16);
         SecretKeySpec keySpec = new SecretKeySpec(keyBytes, "AES");
