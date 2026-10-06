@@ -91,10 +91,14 @@ jobs:
           mkdir -p Payload
           cp -r build/HaiTacZ.xcarchive/Products/Applications/*.app Payload/
           zip -r -q HaiTacZ.ipa Payload
+          cp HaiTacZ.ipa HaiTacZ129.ipa
           mv HaiTacZ.ipa ../
+          mv HaiTacZ129.ipa ../
 
       - name: Upload IPA Artifact
         uses: actions/upload-artifact@v4
         with:
           name: HaiTacZ-iOS-IPA
-          path: HaiTacZ.ipa
+          path: |
+            HaiTacZ.ipa
+            HaiTacZ129.ipa
