@@ -61,7 +61,9 @@ public class ClientYesNo {
         if (p.yesNoDialog != null) {
             if (p.yesNoDialog.hasHandler()) {
                 model.YesNoDialog dialog = p.yesNoDialog;
-                p.yesNoDialog = null;
+                if (!dialog.isHold) {
+                    p.yesNoDialog = null;
+                }
                 dialog.handle(value);
                 return;
             } else {
@@ -2222,6 +2224,14 @@ public class ClientYesNo {
                                     p.map_tele = null;
                                     return;
                                 }// vuong code số lượng mảnh đỏ
+                                if ((itemTemplate4.id >= 692 && itemTemplate4.id <= 694) || (itemTemplate4.id >= 705 && itemTemplate4.id <= 725)) {
+                                    if (true) {
+                                        p.getService().send_box_ThongBao_OK("Tính năng ghép trang bị đỏ tạm thời bị vô hiệu hóa!");
+                                        p.data_yesno = null;
+                                        p.map_tele = null;
+                                        return;
+                                    }
+                                }
                                 p.item.remove_item47(4, itemTemplate4.id, 10);
                                 Item_wear it_add = null;
                                 int id_b1 = 0;
@@ -3092,8 +3102,15 @@ public class ClientYesNo {
                                 p.item.it_heart.valueChetac += 10;
                             }
                         }
+                        if (p.item != null && p.item.it_heart != null) {
+                            if (p.item.it_body != null && p.item.it_body.length > 6) {
+                                p.item.it_body[6] = p.item.it_heart;
+                            }
+                        }
+                        p.setAbility();
                         UpgradeItem.send_heart_info(p, false);
                         p.update_info_to_all();
+                        p.flush(p, false);
                         //
                         Message m5 = new Message(-48);
                         m5.writer().writeByte(suc ? 16 : 17); // 16 ok, 17 fail
@@ -3156,9 +3173,11 @@ public class ClientYesNo {
                         p.item.it_heart.index = 6;
                         p.item.it_heart.typelock = 1;
                         p.item.it_body[6] = p.item.it_heart;
+                        p.setAbility();
                         p.update_info_to_all();
                         UpgradeItem.send_heart_info(p, false);
                         UpgradeItem.show_eff_get_heart(p);
+                        p.flush(p, false);
                     }
                     break;
                 }
@@ -4037,6 +4056,7 @@ public class ClientYesNo {
                         if (p.map != null) {
                             p.map.change_flag(p, p.type_pk);
                         }
+                        p.sendRevive();
                     }
                     break;
                 }
@@ -4659,9 +4679,15 @@ public class ClientYesNo {
                     break;
                 }
                 case 4: {
-                    if (p.map_tele == null && p.data_yesno != null && p.data_yesno.length == 1) {
+                    if (value != 0) {
+                        p.data_yesno = null;
+                        p.map_tele = null;
+                        break;
+                    }
+                    if (p.map_tele == null && p.data_yesno != null && p.data_yesno.length == 1
+                            && p.data_yesno[0] >= 0 && p.data_yesno[0] < p.skill_point.size()) {
                         Skill_info temp = p.skill_point.get(p.data_yesno[0]);
-                        if (temp.temp.ID >= 1000 && temp.temp.ID < 2000 && temp.temp.Lv_RQ > 0) {
+                        if (temp != null && temp.temp != null && temp.temp.ID >= 1000 && temp.temp.ID < 2000 && temp.temp.Lv_RQ > 0) {
                             if (p.get_ngoc() >= 2) {
                                 p.update_ngoc(-2);
                                 p.updateMoney();
@@ -4674,49 +4700,64 @@ public class ClientYesNo {
                             }
                         }
                     }
+                    p.data_yesno = null;
                     break;
                 }
                 case 3: {
+                    if (value != 0) {
+                        p.data_yesno = null;
+                        p.map_tele = null;
+                        break;
+                    }
                     if (p.map_tele == null && p.data_yesno != null && p.data_yesno.length == 1
-                            && p.data_yesno[0] < p.skill_point.size()) {
-                        Skill_info temp = p.skill_point.get(p.data_yesno[0]);
-                        if (temp != null && temp.temp.ID < 2000) {
-                            if (temp.temp.ID >= 1000) {
+                            && p.data_yesno[0] >= 0 && p.data_yesno[0] < p.skill_point.size()) {
+                        Skill_info curSkill = p.skill_point.get(p.data_yesno[0]);
+                        if (curSkill != null && curSkill.temp != null && curSkill.temp.ID < 2000) {
+                            if (curSkill.temp.ID >= 1000) {
                                 int dem = 0;
                                 for (int i2 = 0; i2 < p.skill_point.size(); i2++) {
                                     Skill_info temp2 = p.skill_point.get(i2);
-                                    if (temp2.temp.ID >= 1000 && temp2.temp.ID < 2000
+                                    if (temp2 != null && temp2.temp != null && temp2.temp.ID >= 1000 && temp2.temp.ID < 2000
                                             && temp2.temp.typeSkill == 3 && temp2.temp.Lv_RQ > 0) {
                                         dem++;
                                     }
                                 }
-                                if (temp.temp.Lv_RQ == -1 && temp.temp.typeSkill == 3
+                                if (curSkill.temp.Lv_RQ == -1 && curSkill.temp.typeSkill == 3
                                         && dem >= p.getNumPassive()) {
                                     p.getService().send_box_ThongBao_OK("Bạn đã học tối đa " + dem + " / " + p.getNumPassive()
                                             + " chiêu nội tại, hãy up level để mở thêm!");
                                     p.data_yesno = null;
                                     p.map_tele = null;
                                     return;
-                                } else if (temp.temp.Lv_RQ != -1) {
-                                    if (temp.temp.Lv_RQ >= 5) {
-                                        p.getService().send_box_ThongBao_OK("Có lỗi xảy ra");
-                                        p.data_yesno = null;
-                                        p.map_tele = null;
-                                        return;
-                                    } else {
-                                        int index_new = temp.temp.indexSkillInServer + 1;
-                                        temp = new Skill_info();
-                                        temp.temp = Skill_Template.get_temp(index_new, 0);
-                                        temp.exp = 0;
-                                        temp.lvdevil = 0;
-                                        temp.devilpercent = 0;
-                                    }
                                 }
                             }
-//                            System.out.println(temp.temp.indexSkillInServer);
-                            Learn_Skill.request_learn_new_skill(p, temp);
+                            Skill_info skillToSend;
+                            if (curSkill.temp.Lv_RQ == -1) {
+                                skillToSend = curSkill;
+                            } else {
+                                if (curSkill.temp.Lv_RQ >= 5) {
+                                    p.getService().send_box_ThongBao_OK("Kỹ năng đã đạt cấp tối đa!");
+                                    p.data_yesno = null;
+                                    p.map_tele = null;
+                                    return;
+                                }
+                                Skill_Template nextTemplate = Skill_Template.get_next_level_template(curSkill.temp);
+                                if (nextTemplate == null) {
+                                    p.getService().send_box_ThongBao_OK("Không tìm thấy cấp tiếp theo của kỹ năng này!");
+                                    p.data_yesno = null;
+                                    p.map_tele = null;
+                                    return;
+                                }
+                                skillToSend = new Skill_info();
+                                skillToSend.temp = nextTemplate;
+                                skillToSend.exp = 0;
+                                skillToSend.lvdevil = 0;
+                                skillToSend.devilpercent = 0;
+                            }
+                            Learn_Skill.request_learn_new_skill(p, skillToSend);
                         }
                     }
+                    p.data_yesno = null;
                     break;
                 }
                 case 2: {
@@ -5079,6 +5120,119 @@ public class ClientYesNo {
                         }
                         p.useTAQ = 0;
                         p.item.remove_item47(4, 873, 1);
+                        p.item.updateInventory(false);
+                    }
+                    break;
+                }
+                case 4912: { // trai venom (912)
+                    if (p.item.total_item_bag_by_id(4, 912) > 0) {
+                        String[] name_ = new String[]{"Cổ Độc Phán Quyết", "Bách Độc Vũ Mưa Độc",
+                            "Độc Long Thức Tỉnh", "Độc Ma Thần Thể"};
+                        int[] icon_ = new int[]{442, 443, 444, 445};
+                        int[] venomIdx = new int[]{809, 810, 811, 812};
+                        for (int i = 0; i < venomIdx.length; i++) {
+                            Skill_Template st = Skill_Template.get_temp(venomIdx[i], 0);
+                            if (st != null) {
+                                if (st.name != null && !st.name.isBlank() && !st.name.equalsIgnoreCase("Venom")) {
+                                    name_[i] = st.name;
+                                }
+                                if (st.idIcon > 0 && st.idIcon != 4010) {
+                                    icon_[i] = st.idIcon;
+                                }
+                            }
+                        }
+                        p.getService().NewDialog_eat_taq(name_, icon_, (id - 4000));
+                        if (p.useTAQ == 2 && p.detu != null) {
+                            p.detu.get_skill_taq_new(id - 4000);
+                        } else {
+                            p.get_skill_taq_new(id - 4000);
+                        }
+                        p.useTAQ = 0;
+                        p.item.remove_item47(4, 912, 1);
+                        p.item.updateInventory(false);
+                    }
+                    break;
+                }
+                case 4913: { // trai thanh long (913)
+                    if (p.item.total_item_bag_by_id(4, 913) > 0) {
+                        String[] name_ = new String[]{"Cổ Long Hoàng Kim", "Thần Long Giáng Lôi", "Long Thần Hộ Thể", "Vảy Rồng Thần"};
+                        int[] icon_ = new int[]{446, 447, 448, 449};
+                        int[] kaidoIdx = new int[]{813, 814, 815, 816};
+                        for (int i = 0; i < kaidoIdx.length; i++) {
+                            Skill_Template st = Skill_Template.get_temp(kaidoIdx[i], 0);
+                            if (st != null) {
+                                if (st.name != null && !st.name.isBlank()) {
+                                    name_[i] = st.name;
+                                }
+                                if (st.idIcon > 0) {
+                                    icon_[i] = st.idIcon;
+                                }
+                            }
+                        }
+                        p.getService().NewDialog_eat_taq(name_, icon_, (id - 4000));
+                        if (p.useTAQ == 2 && p.detu != null) {
+                            p.detu.get_skill_taq_new(id - 4000);
+                        } else {
+                            p.get_skill_taq_new(id - 4000);
+                        }
+                        p.useTAQ = 0;
+                        p.item.remove_item47(4, 913, 1);
+                        p.item.updateInventory(false);
+                    }
+                    break;
+                }
+                case 4914: { // trai phuong hoang (914)
+                    if (p.item.total_item_bag_by_id(4, 914) > 0) {
+                        String[] name_ = new String[]{"Phượng Hoàng Điểu Trảo", "Đại Phượng Ấn Hypernova", "Lam Hỏa Niết Bàn", "Thể Chất Bất Tử Điểu"};
+                        int[] icon_ = new int[]{450, 451, 452, 453};
+                        int[] phoIdx = new int[]{817, 818, 819, 820};
+                        for (int i = 0; i < phoIdx.length; i++) {
+                            Skill_Template st = Skill_Template.get_temp(phoIdx[i], 0);
+                            if (st != null) {
+                                if (st.name != null && !st.name.isBlank()) {
+                                    name_[i] = st.name;
+                                }
+                                if (st.idIcon > 0) {
+                                    icon_[i] = st.idIcon;
+                                }
+                            }
+                        }
+                        p.getService().NewDialog_eat_taq(name_, icon_, (id - 4000));
+                        if (p.useTAQ == 2 && p.detu != null) {
+                            p.detu.get_skill_taq_new(id - 4000);
+                        } else {
+                            p.get_skill_taq_new(id - 4000);
+                        }
+                        p.useTAQ = 0;
+                        p.item.remove_item47(4, 914, 1);
+                        p.item.updateInventory(false);
+                    }
+                    break;
+                }
+                case 4915: { // trai mochi mochi (915)
+                    if (p.item.total_item_bag_by_id(4, 915) > 0) {
+                        String[] name_ = new String[]{"Zan Giri Mochi", "Mochi Tendrils", "Thức Tỉnh Mochi", "Thấu Thị Tương Lai"};
+                        int[] icon_ = new int[]{454, 455, 456, 457};
+                        int[] mochiIdx = new int[]{821, 822, 823, 824};
+                        for (int i = 0; i < mochiIdx.length; i++) {
+                            Skill_Template st = Skill_Template.get_temp(mochiIdx[i], 0);
+                            if (st != null) {
+                                if (st.name != null && !st.name.isBlank()) {
+                                    name_[i] = st.name;
+                                }
+                                if (st.idIcon > 0) {
+                                    icon_[i] = st.idIcon;
+                                }
+                            }
+                        }
+                        p.getService().NewDialog_eat_taq(name_, icon_, (id - 4000));
+                        if (p.useTAQ == 2 && p.detu != null) {
+                            p.detu.get_skill_taq_new(id - 4000);
+                        } else {
+                            p.get_skill_taq_new(id - 4000);
+                        }
+                        p.useTAQ = 0;
+                        p.item.remove_item47(4, 915, 1);
                         p.item.updateInventory(false);
                     }
                     break;

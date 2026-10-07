@@ -909,9 +909,17 @@ public class MsgDialog : MainDialog
 		for (int i = 0; i < cmdList.size(); i++)
 		{
 			iCommand cmd = (iCommand)cmdList.elementAt(i);
-			if (cmd != null && cmd != cmdClose && (cmd.fraImageCmd == null || cmd.fraImageCmd != MainTab.fraCloseTab))
+			if (cmd != null)
 			{
-				actionCmds.addElement(cmd);
+				bool isCornerClose = (cmd.fraImageCmd != null && (cmd.fraImageCmd == MainTab.fraCloseTab || cmd.fraImageCmd == MainTab.fraCloseTab2 || cmd.fraImageCmd == MainTab.fraCloseTab3));
+				if (!isCornerClose)
+				{
+					actionCmds.addElement(cmd);
+				}
+				else if (cmd.xCmd == 0 && cmd.yCmd == 0)
+				{
+					cmd.setPos(xDia + wDia - 20, yDia - GameCanvas.hCommand / 2 + 7, cmd.fraImageCmd, "");
+				}
 			}
 		}
 

@@ -672,8 +672,13 @@ public class MsgDialog extends MainDialog {
          mVector actionCmds = new mVector();
          for (int i = 0; i < this.cmdList.size(); ++i) {
             iCommand cmd = (iCommand)this.cmdList.elementAt(i);
-            if (cmd != null && cmd != this.AG && (cmd.BC == null || cmd.BC != MainTab.fraCloseTab)) {
-               actionCmds.addElement(cmd);
+            if (cmd != null) {
+               boolean isCornerClose = (cmd.BC != null && (cmd.BC == MainTab.fraCloseTab || cmd.BC == MainTab.fraCloseTab2 || cmd.BC == MainTab.fraCloseTab3));
+               if (!isCornerClose) {
+                  actionCmds.addElement(cmd);
+               } else if (cmd.xCmd == 0 && cmd.yCmd == 0) {
+                  cmd.setPos(super.AX + super.wDia - 20, super.AY - GameCanvas.hCommand / 2 + 7, cmd.BC, "");
+               }
             }
          }
 

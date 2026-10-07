@@ -339,18 +339,34 @@ public class MainItem {
    }
 
    private void AA(mGraphics var1, int var2, int var3, short var4) {
+      int half = (MainTab.AE > 0) ? (MainTab.AE / 2) : 14;
+      int bgX = var2 + half - 11;
+      int bgY = var3 + half - 6;
+      int textY = bgY - 5;
       if (this.AS > 0) {
-         var1.drawRegion((mImage)AvMain.imgBgnum, var2 + MainTab.AE / 2 - 11, var3 + MainTab.AE / 2 - 6, 3);
+         if (AvMain.imgBgnum != null) {
+            var1.drawRegion((mImage)AvMain.imgBgnum, bgX, bgY, 3);
+         }
          mFont var5 = mFont.tahoma_7_yellow;
          if (this.AS > this.numPotion) {
             var5 = mFont.tahoma_7_red;
          }
 
-         var5.drawString(var1, this.numPotion + "/" + this.AS, var2 + MainTab.AE / 2 - 11, var3 + MainTab.AE / 2 - 9 - 2, 2);
+         String str = this.numPotion + "/" + this.AS;
+         if (mFont.tahoma_7_black != null) {
+            mFont.tahoma_7_black.drawString(var1, str, bgX + 1, textY + 1, 2);
+         }
+         var5.drawString(var1, str, bgX, textY, 2);
       } else {
          if (var4 > 1) {
-            var1.drawRegion((mImage)AvMain.imgBgnum, var2 + MainTab.AE / 2 - 11, var3 + MainTab.AE / 2 - 6, 3);
-            mFont.tahoma_7_yellow.drawString(var1, "" + var4, var2 + MainTab.AE / 2 - 11, var3 + MainTab.AE / 2 - 9 - 2, 2);
+            if (AvMain.imgBgnum != null) {
+               var1.drawRegion((mImage)AvMain.imgBgnum, bgX, bgY, 3);
+            }
+            String str = "" + var4;
+            if (mFont.tahoma_7_black != null) {
+               mFont.tahoma_7_black.drawString(var1, str, bgX + 1, textY + 1, 2);
+            }
+            mFont.tahoma_7_yellow.drawString(var1, str, bgX, textY, 2);
          }
 
       }
@@ -422,11 +438,39 @@ public class MainItem {
                var5 = 6;
             }
 
-            int var7 = var2 - var4 / 2 + 5 + var6 / 2 * 9;
-            int var8 = var3 - var4 / 2 + 5;
-            if (var6 % 2 == 1) {
-               var7 = var2 + var4 / 2 - 5 - var6 / 2 * 9;
-               var8 = var3 + var4 / 2 - 5;
+            int pad = 4;
+            if (var4 <= 12) {
+               pad = 1;
+            } else if (var4 <= 20) {
+               pad = 2;
+            }
+            int x1 = var2 - var4 / 2 + pad;
+            int x2 = var2 + var4 / 2 - pad;
+            int y1 = var3 - var4 / 2 + pad;
+            int y2 = var3 + var4 / 2 - pad;
+            int innerW = x2 - x1;
+            int innerH = y2 - y1;
+            if (innerW <= 0) innerW = 1;
+            if (innerH <= 0) innerH = 1;
+            int perimeter = 2 * (innerW + innerH);
+            int speedTick = GameCanvas.gameTick;
+            int pos = (speedTick + (var6 * perimeter) / this.mDaKham.length) % perimeter;
+            if (pos < 0) pos += perimeter;
+
+            int var7;
+            int var8;
+            if (pos < innerW) {
+               var7 = x1 + pos;
+               var8 = y1;
+            } else if (pos < innerW + innerH) {
+               var7 = x2;
+               var8 = y1 + (pos - innerW);
+            } else if (pos < innerW * 2 + innerH) {
+               var7 = x2 - (pos - (innerW + innerH));
+               var8 = y2;
+            } else {
+               var7 = x1;
+               var8 = y2 - (pos - (innerW * 2 + innerH));
             }
 
             if (var5 >= 0 && var5 < AvMain.fraEffItem.nFrame) {
@@ -541,9 +585,10 @@ public class MainItem {
    }
 
    public static void removeUpdateItemVec(byte var0, mVector var1) {
+      if (var1 == null) return;
       for(int var2 = 0; var2 < var1.size(); ++var2) {
          MainItem var3;
-         if ((var3 = (MainItem)var1.elementAt(var2)).typeObject == var0) {
+         if ((var3 = (MainItem)var1.elementAt(var2)) != null && var3.typeObject == var0) {
             var1.removeElement(var3);
             --var2;
          }
@@ -552,9 +597,10 @@ public class MainItem {
    }
 
    public static MainItem getItemVec(byte var0, short var1, mVector var2) {
+      if (var2 == null) return null;
       for(int var3 = 0; var3 < var2.size(); ++var3) {
          MainItem var4;
-         if ((var4 = (MainItem)var2.elementAt(var3)).typeObject == var0 && var4.ID == var1) {
+         if ((var4 = (MainItem)var2.elementAt(var3)) != null && var4.typeObject == var0 && var4.ID == var1) {
             return var4;
          }
       }
@@ -613,101 +659,140 @@ public class MainItem {
    public static String getFallbackAttributeName(int id) {
       switch (id) {
       case 0: return "Tấn công";
-      case 1: return "Tấn công";
-      case 2: return "Tấn công phép";
-      case 3: return "Sát thương";
-      case 4: return "Phòng thủ";
-      case 5: return "Sức mạnh";
-      case 6: return "Phòng thủ";
-      case 7: return "Thể lực";
-      case 8: return "Tinh thần";
-      case 9: return "Nhanh nhẹn";
+      case 1: return "Tăng tấn công";
+      case 2: return "Phép thuật";
+      case 3: return "Phòng thủ";
+      case 4: return "Tăng P.Thủ";
+      case 5: return "T/n sức mạnh";
+      case 6: return "T/n phòng thủ";
+      case 7: return "T/n thể lực";
+      case 8: return "T/n tinh thần";
+      case 9: return "T/n nhanh nhẹn";
       case 10: return "Chí mạng";
-      case 11: return "Chí mạng phép";
+      case 11: return "ST chí mạng";
       case 12: return "Né tránh";
       case 13: return "Xuyên giáp";
-      case 14: return "Xuyên kháng phép";
-      case 15: return "Máu";
-      case 16: return "Năng lượng";
-      case 17: return "Chính xác";
-      case 18: return "Hồi máu";
-      case 19: return "Hồi năng lượng";
-      case 20: return "Tốc độ chạy";
-      case 21: return "Kháng tất cả";
-      case 22: return "Kháng vật lý";
-      case 23: return "Hồi máu từ bình";
-      case 24: return "Hồi năng lượng từ bình";
-      case 25: return "Giảm hồi chiêu";
+      case 14: return "Phản đòn";
+      case 15: return "HP +";
+      case 16: return "MP +";
+      case 17: return "Tăng HP";
+      case 18: return "Tăng MP";
+      case 19: return "Tự hồi HP";
+      case 20: return "Tự hồi MP";
+      case 21: return "Hút HP";
+      case 22: return "Hút MP";
+      case 23: return "+ HP/Thức ăn";
+      case 24: return "+ MP/Nước uống";
+      case 25: return "Tốc độ hồi chiêu";
       case 26: return "Kháng vật lý";
       case 27: return "Kháng phép";
-      case 28: return "Phản đòn";
-      case 29: return "Hút máu";
-      case 30: return "Hút năng lượng";
-      case 31: return "Sát thương chí mạng";
-      case 32: return "Kháng chí mạng";
-      case 33: return "Kháng choáng";
-      case 34: return "Kháng đóng băng";
-      case 35: return "Kháng trúng độc";
-      case 36: return "Kháng tê liệt";
-      case 37: return "Kháng bỏng";
-      case 38: return "Tăng kinh nghiệm";
-      case 39: return "Tăng beri";
-      case 40: return "May mắn";
-      case 41: return "Kháng mù";
-      case 42: return "Kháng trói";
-      case 43: return "Kháng hóa đá";
-      case 44: return "Xuyên né tránh";
-      case 45: return "Chính xác tuyệt đối";
+      case 28: return "Hiệu ứng";
+      case 29: return "Tỷ lệ hiệu ứng";
+      case 30: return "Thời gian hiệu ứng";
+      case 31: return "Loại buff";
+      case 32: return "Thời gian tác dụng";
+      case 33: return "Tăng xp đánh quái";
+      case 34: return "Tăng bery nhặt được";
+      case 35: return "Tự hồi HP đánh quái";
+      case 36: return "Sát thương lên Boss";
+      case 37: return "Giảm ST nhận từ Boss";
+      case 38: return "Kháng phản đòn";
+      case 39: return "Exp Ác Quỷ";
+      case 40: return "Hút năng lượng";
+      case 41: return "Hút 1 phần máu";
+      case 42: return "Hút máu theo TGian";
+      case 43: return "X2 khả năng hồi phục";
+      case 44: return "Giảm % Max MP";
+      case 45: return "Giảm % Max Hp";
       case 46: return "Sát thương cuối";
-      case 47: return "Giảm hiệu ứng";
-      case 48: return "Hồi phục sau chiến đấu";
-      case 49: return "Sức mạnh bộc phát";
-      case 50: return "Miễn nhiễm sát thương";
-      case 51: return "Bỏ qua phòng thủ";
-      case 52: return "Bỏ qua kháng phép";
-      case 53: return "Bỏ qua sát thương";
-      case 54: return "Hút sinh lực đối thủ";
-      case 55: return "Kháng bạo kích";
-      case 56: return "Tăng máu (%)";
-      case 57: return "Tăng năng lượng (%)";
-      case 58: return "Tăng tấn công (%)";
-      case 59: return "Tăng phòng thủ (%)";
-      case 60: return "Giảm sức mạnh đối thủ";
+      case 47: return "Giảm hiệu ứng đ/t";
+      case 48: return "Sát thương % máu";
+      case 49: return "Giảm chí mạng đ/t";
+      case 50: return "Giảm xuyên giáp đ/t";
+      case 51: return "Giảm né đòn đ/t";
+      case 52: return "Giảm phản đòn đ/t";
+      case 53: return "Miễn thương";
+      case 54: return "Giảm 90% Damage";
+      case 55: return "Từ chối tử thần";
+      case 56: return "Máu cuối";
+      case 57: return "Sát thương chuẩn";
+      case 58: return "Hấp thụ";
+      case 59: return "Hút % máu";
+      case 60: return "Giảm sức mạnh";
+      case 61: return "Hút sức mạnh";
+      case 62: return "May Mắn";
+      case 63: return "Giảm miễn thương";
+      case 64: return "Bộc phá Ác Quỷ";
+      case 65: return "Xuyên kháng phép";
+      case 66: return "Mp Cuối";
+      case 67: return "Tăng Exp đánh quái";
+      case 68: return "Tăng Exp Skill đánh quái";
+      case 69: return "Giảm ST chí mạng đ/t";
+      case 70: return "Giảm P.Thủ cuối";
+      case 71: return "Kháng hiệu ứng";
+      case 72: return "Tăng beri train quái";
+      case 73: return "C.Hóa ST thành Hp";
+      case 74: return "C.Hóa ST thành Mp";
+      case 75: return "Tăng % choáng";
+      case 76: return "Tăng % chính xác";
+      case 77: return "Giảm né cuối";
+      case 78: return "Choáng xung quanh 2s";
+      case 79: return "Hồi máu cuối mỗi 10s";
+      case 80: return "+% gây Điện giật";
+      case 81: return "Sát thương PvP";
+      case 82: return "Giảm ST nhận từ người";
+      case 83: return "Kháng chí mạng";
+      case 84: return "Kháng choáng";
+      case 85: return "Kháng tê liệt";
+      case 86: return "Tốc độ di chuyển";
+      case 87: return "Kháng sát thương chuẩn";
+      case 88: return "Sát thương lên quái";
+      case 89: return "Giảm ST nhận từ quái";
+      case 90: return "Bỏ qua né tránh";
+      case 91: return "Bỏ qua phản đòn";
+      case 92: return "Kháng hút máu";
+      case 93: return "Tăng hiệu lực bình máu";
+      case 94: return "MP thức ăn tăng";
+      case 95: return "Tăng tỷ lệ rớt đồ hiếm";
+      case 96: return "Tăng Beri Boss";
+      case 97: return "Tăng Tấn công theo Cấp";
+      case 98: return "Tăng Phòng thủ theo Cấp";
+      case 99: return "Tăng HP theo Cấp";
+      case 100: return "Tăng MP theo Cấp";
       default: return "Chỉ số " + id;
       }
    }
 
    public static byte getFallbackAttributePercent(int id) {
       switch (id) {
+      case 1:
+      case 2:
+      case 4:
       case 10:
       case 11:
       case 12:
-      case 21:
+      case 13:
+      case 14:
+      case 17:
+      case 18:
       case 22:
       case 23:
       case 24:
       case 25:
       case 26:
       case 27:
-      case 28:
       case 29:
-      case 30:
-      case 31:
-      case 32:
       case 33:
       case 34:
       case 35:
       case 36:
       case 37:
       case 38:
-      case 39:
-      case 40:
-      case 41:
-      case 42:
-      case 43:
-      case 44:
       case 46:
       case 47:
+      case 48:
+      case 49:
+      case 50:
       case 51:
       case 52:
       case 53:
@@ -717,7 +802,41 @@ public class MainItem {
       case 57:
       case 58:
       case 59:
-      case 60:
+      case 62:
+      case 63:
+      case 64:
+      case 65:
+      case 66:
+      case 67:
+      case 68:
+      case 69:
+      case 70:
+      case 71:
+      case 72:
+      case 73:
+      case 74:
+      case 75:
+      case 76:
+      case 77:
+      case 78:
+      case 79:
+      case 80:
+      case 81:
+      case 82:
+      case 83:
+      case 84:
+      case 85:
+      case 86:
+      case 87:
+      case 88:
+      case 89:
+      case 90:
+      case 91:
+      case 92:
+      case 93:
+      case 94:
+      case 95:
+      case 96:
          return 1;
       default:
          return 0;
@@ -765,6 +884,7 @@ public class MainItem {
    }
 
    public static mVector SortVecItem(mVector var0) {
+      if (var0 == null) return null;
       int var4 = var0.size();
 
       int var1;
@@ -774,7 +894,9 @@ public class MainItem {
          var3 = var1;
 
          for(var2 = var1 + 1; var2 < var4; ++var2) {
-            if (((MainItem)var0.elementAt(var2)).indexSort < ((MainItem)var0.elementAt(var3)).indexSort) {
+            MainItem i2 = (MainItem)var0.elementAt(var2);
+            MainItem i3 = (MainItem)var0.elementAt(var3);
+            if (i2 != null && i3 != null && i2.indexSort < i3.indexSort) {
                var3 = var2;
             }
          }
@@ -784,13 +906,13 @@ public class MainItem {
          }
       }
 
-      boolean var6 = false;
-
       for(var1 = 0; var1 < var4 - 1; ++var1) {
          var3 = var1;
 
          for(var2 = var1 + 1; var2 < var4; ++var2) {
-            if (((MainItem)var0.elementAt(var2)).typeObject == 4 && ((MainItem)var0.elementAt(var2)).ID < ((MainItem)var0.elementAt(var3)).ID) {
+            MainItem i2 = (MainItem)var0.elementAt(var2);
+            MainItem i3 = (MainItem)var0.elementAt(var3);
+            if (i2 != null && i3 != null && i2.typeObject == 4 && i2.ID < i3.ID) {
                var3 = var2;
             }
          }

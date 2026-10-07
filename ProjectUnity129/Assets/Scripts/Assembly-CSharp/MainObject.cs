@@ -2197,14 +2197,14 @@ public class MainObject : AvMain
 
 	public void paintCharShowWithOverride(mGraphics g, int x, int y, int Dirr, bool isNhip, short cw, short ch, short cb, short cl)
 	{
-		short oldW = weapon, oldH = head, oldB = body, oldL = leg;
+		short oldW = weapon, oldHat = hat, oldB = body, oldL = leg;
 		if (cw >= 0) weapon = cw;
-		if (ch >= 0) head = ch;
+		if (ch >= 0) hat = ch;
 		if (cb >= 0) body = cb;
 		if (cl >= 0) leg = cl;
 		paintCharShow(g, x, y, Dirr, isNhip);
 		weapon = oldW;
-		head = oldH;
+		hat = oldHat;
 		body = oldB;
 		leg = oldL;
 	}
@@ -2219,11 +2219,24 @@ public class MainObject : AvMain
 	{
 		if (typeActionBoat != 0)
 		{
-			tickJoinSea++;
-			if (tickJoinSea >= 250)
+			if (LoadMap.specMap != 4 && (this == GameScreen.player || this is MainPlayer))
 			{
-				setNextSea();
-				tickJoinSea = 0;
+				if (stepUpboat == 1 || tickJoinSea >= 60)
+				{
+					typeActionBoat = 0;
+					stepUpboat = 0;
+					tickJoinSea = 0;
+					setSpeed(7, 7);
+				}
+			}
+			else
+			{
+				tickJoinSea++;
+				if (tickJoinSea >= 250)
+				{
+					setNextSea();
+					tickJoinSea = 0;
+				}
 			}
 		}
 		if (timeDragon > 0)

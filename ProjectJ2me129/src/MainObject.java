@@ -166,12 +166,37 @@ public class MainObject extends AvMain {
    public byte typeEfffashion = -1;
 
    public void paintCharShowWithOverride(mGraphics var1, int var2, int var3, boolean var4, short cw, short ch, short cb, short cl) {
+      short oldW = this.BY;
+      short oldW2 = this.BV;
+      short oldHat = this.BX;
+      short oldB = this.BT;
+      short oldL = this.BW;
+      if (cw >= 0) {
+         this.BY = cw;
+         this.BV = cw;
+      }
+      if (ch >= 0) {
+         this.BX = ch;
+      }
+      if (cb >= 0) {
+         this.BT = cb;
+      }
+      if (cl >= 0) {
+         this.BW = cl;
+      }
       this.AA(var1, var2, var3, var4);
+      this.BY = oldW;
+      this.BV = oldW2;
+      this.BX = oldHat;
+      this.BT = oldB;
+      this.BW = oldL;
    }
    public long timeLoadInfo;
    public long timeDie;
    public boolean AQ;
    public boolean isTanHinh;
+   public boolean isGom = false;
+   public int gomX, gomY;
    public boolean NF = true;
    public boolean NG = false;
    public boolean NH = true;
@@ -1322,6 +1347,24 @@ public class MainObject extends AvMain {
    }
 
    public static MainObject get_Object(int var0, byte var1) {
+      if (GameScreen.player != null && GameScreen.player.typeObject == var1) {
+         short numP = (var1 == 10) ? GameScreen.player.IDMainShiper : GameScreen.player.ID;
+         if (numP == var0) {
+            if (GameScreen.player.isRemove) {
+               return null;
+            }
+            return GameScreen.player;
+         }
+      }
+      if (GameScreen.objFocus != null && GameScreen.objFocus.typeObject == var1) {
+         short numF = (var1 == 10) ? GameScreen.objFocus.IDMainShiper : GameScreen.objFocus.ID;
+         if (numF == var0) {
+            if (GameScreen.objFocus.isRemove) {
+               return null;
+            }
+            return GameScreen.objFocus;
+         }
+      }
       for(int var2 = GameScreen.vecPlayers.size() - 1; var2 >= 0; --var2) {
          MainObject var3;
          if (var2 != GameScreen.vecPlayers.size() && (var3 = (MainObject)GameScreen.vecPlayers.elementAt(var2)) != null && var3.typeObject == var1) {
@@ -1332,6 +1375,7 @@ public class MainObject extends AvMain {
 
             if (var4 == var0) {
                if (var3.isRemove) {
+                  GameScreen.vecPlayers.removeElement(var3);
                   return null;
                }
 
@@ -1563,6 +1607,7 @@ public class MainObject extends AvMain {
 
    public void Reveive() {
       this.isFlyDie = false;
+      this.isDie = false;
       this.vecSkillFires.removeAllElements();
       this.vecEffBuff.removeAllElements();
       this.vecEffBuffNew.removeAllElements();
@@ -3136,6 +3181,10 @@ public class MainObject extends AvMain {
    }
 
    public final void addDataEff(short var1, int var2, byte var3, byte var4) {
+      this.addDataEff(var1, var2, var3, var4, (short)0);
+   }
+
+   public final void addDataEff(short var1, int var2, byte var3, byte var4, short rotate) {
       for(int var5 = 0; var5 < this.PL.size(); ++var5) {
          DataSkillEff var6;
          if ((var6 = (DataSkillEff)this.PL.elementAt(var5)) != null && var6.idEff == var1) {
@@ -3143,7 +3192,7 @@ public class MainObject extends AvMain {
          }
       }
 
-      DataSkillEff var7 = new DataSkillEff(var1, var2, var3, var4);
+      DataSkillEff var7 = new DataSkillEff(var1, var2, var3, var4, (int)rotate);
       this.PL.addElement(var7);
    }
 
@@ -3161,6 +3210,10 @@ public class MainObject extends AvMain {
 
    public final void addDataEff(int var1, int var2, int var3, int var4) {
       this.addDataEff((short)var1, var2, (byte)var3, (byte)var4);
+   }
+
+   public final void addDataEff(int var1, int var2, int var3, int var4, int rotate) {
+      this.addDataEff((short)var1, var2, (byte)var3, (byte)var4, (short)rotate);
    }
 
    public final void removeDataEff(short var1) {

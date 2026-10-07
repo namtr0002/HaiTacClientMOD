@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/ui-redesign-overhaul
     paths:
       - 'ios_parts/**'
       - '.github/workflows/build_ipa.yml'

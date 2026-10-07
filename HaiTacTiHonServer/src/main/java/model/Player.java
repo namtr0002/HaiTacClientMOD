@@ -896,6 +896,7 @@ public class Player {
     public int kimcuong;
     public int ruby;
     private int point_tich_tieu;
+    public int point_tich_luy;
     public int level_so_tay;
     public int exp_so_tay;
     public int point_hang_dong;
@@ -986,9 +987,9 @@ public class Player {
                         dos.writeByte(1); // 1 = skill
                         dos.writeShort(0); // ID 0
                     } else if (slot == 0) {
-                        // Nút phụ bên trái -> Gán Chiêu 4 (Thủy chiến - ID 3)
+                        // Nút phụ bên trái -> Gán Chiêu 2 (Tấn công thường - ID 1) thay vì Chiêu 4 biển
                         dos.writeByte(1); // 1 = skill
-                        dos.writeShort(3); // ID 3
+                        dos.writeShort(1); // ID 1
                     } else {
                         dos.writeByte(-1); // Trống
                     }
@@ -1057,6 +1058,118 @@ public class Player {
             }
         } catch (Exception ignored) {}
         return false;
+    }
+
+    public void autoAssignDevilFruitHotKey(List<Short> oldFruitSkillIds, List<Skill_info> newFruitSkills) {
+        if (this.rms == null || this.rms.length == 0 || this.rms[0] == null || this.rms[0].length == 0) {
+            ensureRms0();
+        }
+        if (this.rms == null || this.rms[0] == null || this.rms[0].length == 0) {
+            return;
+        }
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(this.rms[0]);
+            DataInputStream dis = new DataInputStream(bais);
+
+            byte[] types = new byte[12];
+            short[] ids = new short[12];
+            int count = 0;
+            while (dis.available() > 0 && count < 12) {
+                byte type = dis.readByte();
+                types[count] = type;
+                if (type == -1) {
+                    ids[count] = -1;
+                } else if (type == 0 || type == 1) {
+                    if (dis.available() >= 2) {
+                        ids[count] = dis.readShort();
+                    } else {
+                        ids[count] = -1;
+                    }
+                } else {
+                    ids[count] = -1;
+                }
+                count++;
+            }
+            while (count < 12) {
+                types[count] = -1;
+                ids[count] = -1;
+                count++;
+            }
+
+            boolean isSeaMap = (this.map != null && this.map.isMapSea());
+            List<Skill_info> unassignedNew = new ArrayList<>();
+            if (newFruitSkills != null) {
+                unassignedNew.addAll(newFruitSkills);
+            }
+
+            // 1. Thay thế trực tiếp vào các ô đang chứa skill của trái ác quỷ cũ
+            if (oldFruitSkillIds != null && !oldFruitSkillIds.isEmpty()) {
+                for (int i = 0; i < 12; i++) {
+                    if (types[i] == 1 && oldFruitSkillIds.contains(ids[i])) {
+                        if (!unassignedNew.isEmpty()) {
+                            Skill_info nextSk = unassignedNew.remove(0);
+                            types[i] = 1;
+                            ids[i] = (short) nextSk.temp.ID;
+                        } else {
+                            types[i] = -1;
+                            ids[i] = -1;
+                        }
+                    }
+                }
+            }
+
+            // 2. Nếu còn skill mới chưa gán, tìm ô trống đầu tiên (ưu tiên slot 0, 1, 3, 4, 5 rồi tab 1)
+            if (!unassignedNew.isEmpty()) {
+                int[] prioritySlots = {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+                for (int slotIdx : prioritySlots) {
+                    if (unassignedNew.isEmpty()) break;
+                    if (types[slotIdx] == -1) {
+                        Skill_info nextSk = unassignedNew.remove(0);
+                        types[slotIdx] = 1;
+                        ids[slotIdx] = (short) nextSk.temp.ID;
+                    }
+                }
+            }
+
+            // 3. Deduplicate: Đảm bảo 1 skill không xuất hiện ở 2 ô & loại skill biển khi ở trên bờ
+            Set<Short> seenSkills = new HashSet<>();
+            for (int i = 0; i < 12; i++) {
+                if (types[i] == 1) {
+                    short skId = ids[i];
+                    Skill_info skInfo = this.get_skill_temp(skId);
+                    if (skInfo != null && skInfo.temp != null) {
+                        if (!isSeaMap && skInfo.temp.typeSkill == 4) {
+                            types[i] = -1;
+                            ids[i] = -1;
+                            continue;
+                        }
+                    }
+                    if (seenSkills.contains(skId)) {
+                        types[i] = -1;
+                        ids[i] = -1;
+                    } else {
+                        seenSkills.add(skId);
+                    }
+                }
+            }
+
+            // 4. Ghi lại vào rms[0]
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
+            for (int i = 0; i < 12; i++) {
+                dos.writeByte(types[i]);
+                if (types[i] == 0 || types[i] == 1) {
+                    dos.writeShort(ids[i]);
+                }
+            }
+            dos.flush();
+            this.rms[0] = baos.toByteArray();
+
+            // 5. Đồng bộ RMS hotkey xuống client
+            if (this.getService() != null) {
+                this.getService().sendRms((byte) 0);
+            }
+        } catch (Exception ignored) {}
     }
     public List<Skill_info> skill_point = new ArrayList<>();
     public List<Skill_info> list_can_combo = new ArrayList<>();
@@ -1286,10 +1399,9 @@ public class Player {
     /** Lấy key cooldown của item dựa vào type và ID template 4. */
     public static int getItemCooldownKey(template.ItemTemplate4 it_temp) {
         if (it_temp == null) return 0;
-        if (it_temp.type == 1) return 501; // Bình HP
-        if (it_temp.type == 2) return 502; // Bình MP
-        if (it_temp.type > 2) return 500 + it_temp.type;
-        return 10000 + it_temp.id;
+        if (it_temp.type == 1) return 501; // Bình HP dùng chung cooldown nhóm
+        if (it_temp.type == 2) return 502; // Bình MP dùng chung cooldown nhóm
+        return 10000 + it_temp.id; // Các item khác (rương, vé, đan dược, quả...) có cooldown riêng biệt theo ID item
     }
     public long limitTime;
     public byte countSkill;
@@ -1774,6 +1886,10 @@ public class Player {
                 wanted_point    = jInt(inventoryObj, "wanted_point", 0);
                 ruby            = inventoryObj.containsKey("ruby") ? jInt(inventoryObj, "ruby", 0) : rs.getInt("ruby0");
                 point_tich_tieu = inventoryObj.containsKey("point_tich_tieu") ? jInt(inventoryObj, "point_tich_tieu", 0) : rs.getInt("point_tich_tieu");
+                int ptLuyCol = 0;
+                try { ptLuyCol = rs.getInt("point_tich_luy"); } catch (Exception ignored) {}
+                int ptLuyInv = inventoryObj.containsKey("point_tich_luy") ? jInt(inventoryObj, "point_tich_luy", 0) : 0;
+                point_tich_luy  = Math.max(ptLuyCol, ptLuyInv);
                 level_so_tay    = inventoryObj.containsKey("level_so_tay") ? jInt(inventoryObj, "level_so_tay", 0) : rs.getInt("level_so_tay");
                 exp_so_tay      = inventoryObj.containsKey("exp_so_tay") ? jInt(inventoryObj, "exp_so_tay", 0) : rs.getInt("exp_so_tay");
                 point_hang_dong = inventoryObj.containsKey("point_hang_dong") ? jInt(inventoryObj, "point_hang_dong", 0) : rs.getInt("point_hang_dong");
@@ -2486,6 +2602,19 @@ public class Player {
                             tempPet.template = Pet.getTemplate(jShort(eo, "tid", (short)0));
                             tempPet.isUse    = jBool(eo, "use", false);
                             tempPet.time     = jLong(eo, "time", 0L);
+                            if (eo.containsKey("ops")) {
+                                try {
+                                    JSONArray oArr = (JSONArray) eo.get("ops");
+                                    if (oArr != null) {
+                                        for (Object oObj : oArr) {
+                                            JSONObject opJson = (JSONObject) oObj;
+                                            byte opId = ((Number) opJson.get("id")).byteValue();
+                                            int opVal = ((Number) opJson.get("val")).intValue();
+                                            tempPet.op.add(new template.Option(opId, opVal));
+                                        }
+                                    }
+                                } catch (Exception ignored) {}
+                            }
                         } else {
                             JSONArray inner = (JSONArray) elem;
                             tempPet.id       = Short.parseShort(inner.get(0).toString());
@@ -2546,14 +2675,20 @@ public class Player {
                 for (Object o : parseArr(rs.getString("bag3"))) {
                     Item_wear t = new Item_wear();
                     Item.readUpdateItem(o.toString(), t);
-                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) pendingBag3.add(t);
+                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) {
+                        if (!t.isThanTrang() && t.template.typeEquip != 6 && t.template.id != 11000 && t.index != 6 && t.levelUp > 15) t.levelUp = 15;
+                        pendingBag3.add(t);
+                    }
                 }
 
                 // save_it3
                 for (Object o : parseArr(rs.getString("save_it3"))) {
                     Item_wear t = new Item_wear();
                     Item.readUpdateItem(o.toString(), t);
-                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) item.save_item_wear.add(t);
+                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) {
+                        if (!t.isThanTrang() && t.template.typeEquip != 6 && t.template.id != 11000 && t.index != 6 && t.levelUp > 15) t.levelUp = 15;
+                        item.save_item_wear.add(t);
+                    }
                 }
 
                 // pendingBox3
@@ -2561,7 +2696,10 @@ public class Player {
                 for (Object o : parseArr(rs.getString("box3"))) {
                     Item_wear t = new Item_wear();
                     Item.readUpdateItem(o.toString(), t);
-                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) pendingBox3.add(t);
+                    if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) {
+                        if (!t.isThanTrang() && t.template.typeEquip != 6 && t.template.id != 11000 && t.index != 6 && t.levelUp > 15) t.levelUp = 15;
+                        pendingBox3.add(t);
+                    }
                 }
 
                 // it_body
@@ -2569,6 +2707,7 @@ public class Player {
                     Item_wear t = new Item_wear();
                     Item.readUpdateItem(o.toString(), t);
                     if (t.template != null && ItemTemplate3.get_it_by_id(t.template.id) != null) {
+                        if (!t.isThanTrang() && t.template.typeEquip != 6 && t.template.id != 11000 && t.index != 6 && t.levelUp > 15) t.levelUp = 15;
                         if (t.template.id == 11000 || t.template.typeEquip == 6 || t.index == 6) {
                             t.index = 6;
                             item.it_heart = t;
@@ -3709,6 +3848,7 @@ public class Player {
                 inv.put("point_event1", p.pointEvent1);
                 inv.put("point_event2", p.pointEvent2);
                 inv.put("point_tich_tieu", p.point_tich_tieu);
+                inv.put("point_tich_luy", p.point_tich_luy);
                 inv.put("point_hang_dong", p.point_hang_dong);
                 inv.put("level_so_tay", p.level_so_tay);
                 inv.put("exp_so_tay", p.exp_so_tay);
@@ -3981,7 +4121,20 @@ public class Player {
               if (p.my_pet != null) {
                   for (MyPet pet : p.my_pet) {
                       if (pet != null && pet.template != null) {
-                          JSONObject o = new JSONObject(); o.put("slot", pet.id); o.put("tid", pet.template.id); o.put("use", pet.isUse ? 1 : 0); o.put("time", pet.time); a.add(o);
+                          JSONObject o = new JSONObject(); o.put("slot", pet.id); o.put("tid", pet.template.id); o.put("use", pet.isUse ? 1 : 0); o.put("time", pet.time);
+                          if (pet.op != null && !pet.op.isEmpty()) {
+                              JSONArray oArr = new JSONArray();
+                              for (template.Option op : pet.op) {
+                                  if (op != null) {
+                                      JSONObject opJson = new JSONObject();
+                                      opJson.put("id", (int) op.id);
+                                      opJson.put("val", op.param);
+                                      oArr.add(opJson);
+                                  }
+                              }
+                              o.put("ops", oArr);
+                          }
+                          a.add(o);
                       }
                   }
               }
@@ -4715,7 +4868,7 @@ public class Player {
         this.spawnX = this.x;
         this.spawnY = this.y;
         this.hasMovedFromSpawn = false;
-        this.time_change_map = System.currentTimeMillis() + 1500L;
+        this.time_change_map = System.currentTimeMillis() + 3500L;
         this.map.goto_map(this);
         this.getService().update_PK(this, true);
         this.getService().pet(this, true);
@@ -5368,6 +5521,39 @@ public class Player {
 
         }
     }
+
+    public int getPointTichLuy() {
+        return this.point_tich_luy;
+    }
+
+    public int get_point_tich_luy() {
+        return this.point_tich_luy;
+    }
+
+    public synchronized void updatePointTichLuy(long par) {
+        int oldVal = this.point_tich_luy;
+        long next = (long) this.point_tich_luy + par;
+        if (next > 2_000_000_000L) next = 2_000_000_000L;
+        if (next < 0) next = 0;
+        this.point_tich_luy = (int) next;
+        if (oldVal != this.point_tich_luy) {
+            historys.zLog.gI().add_log(this, "TICH_LUY_POINT", "Thay doi point_tich_luy: " + oldVal + " -> " + this.point_tich_luy + " (" + (par >= 0 ? "+" : "") + par + ")");
+            try {
+                final int finalVal = this.point_tich_luy;
+                final int pId = this.IDPlayer;
+                new Thread(() -> {
+                    try (java.sql.Connection conn = database.DbManager.gI().getConnect();
+                         java.sql.Statement st = conn.createStatement()) {
+                        st.executeUpdate("UPDATE `players` SET `point_tich_luy` = " + finalVal + " WHERE `id` = " + pId);
+                    } catch (Exception ignored) {}
+                }).start();
+            } catch (Exception ignored) {}
+        }
+    }
+
+    public synchronized void update_point_tich_luy(long par) {
+        updatePointTichLuy(par);
+    }
     
     public synchronized void update_level_so_tay(long par) {
         if ((((long) par) + this.level_so_tay) < 2_000_000_000L) {
@@ -5652,14 +5838,17 @@ public class Player {
     }
 
     public boolean isChoang() {
+        if (get_eff(EffTemplate.EFF_MOCHI_AWAKEN) != null) return false;
         return get_eff(201) != null;
     }
 
     public boolean isCantMove() {
+        if (get_eff(EffTemplate.EFF_MOCHI_AWAKEN) != null) return isdie;
         return isdie || isChoang() || get_eff(208) != null;
     }
 
     public boolean isCantSkill() {
+        if (get_eff(EffTemplate.EFF_MOCHI_AWAKEN) != null) return isdie;
         return isdie || isChoang() || get_eff(215) != null;
     }
 
@@ -5669,6 +5858,9 @@ public class Player {
             return;
         }
         Player notifyP = (this instanceof DeTu && ((DeTu) this).master != null) ? ((DeTu) this).master : this;
+        if (!it.isThanTrang() && it.template.typeEquip != 6 && it.template.id != 11000 && it.index != 6 && it.levelUp > 15) {
+            it.levelUp = 15;
+        }
         if (this.level < it.template.level) {
             if (notifyP.conn != null && notifyP.getService() != null) {
                 notifyP.getService().send_box_ThongBao_OK("Chưa đủ level");
@@ -5908,17 +6100,18 @@ public class Player {
         byte botClazz = clazz > 0 ? clazz : 1;
         short timLevel = (short) Math.max(1, Math.min(100, (int) botLevel));
 
-        // Xác định cấp độ cường hóa chuẩn theo tier cho đồ thường
+        // Xác định cấp độ cường hóa chuẩn theo tier cho đồ thường (TỐI ĐA CHỈ +15)
         byte targetLevelUp;
-        if (tier >= 3.5) { // Tier 4: VIP / Siêu VIP / Thần Thoại (+15..+16)
-            targetLevelUp = (byte) (15 + core.ZUtil.random(2));
-        } else if (tier >= 2.5) { // Tier 3: Cao Thủ (+13..+14)
-            targetLevelUp = (byte) (13 + core.ZUtil.random(2));
-        } else if (tier >= 1.5) { // Tier 2: Tầm Trung (+11..+12)
-            targetLevelUp = (byte) (11 + core.ZUtil.random(2));
-        } else { // Tier 1: Cơ bản (+7..+10)
-            targetLevelUp = (byte) (7 + core.ZUtil.random(4));
+        if (tier >= 3.5) { // Tier 4: VIP / Siêu VIP / Thần Thoại (MAX +15)
+            targetLevelUp = (byte) (14 + core.ZUtil.random(2));
+        } else if (tier >= 2.5) { // Tier 3: Cao Thủ (+12..+13)
+            targetLevelUp = (byte) (12 + core.ZUtil.random(2));
+        } else if (tier >= 1.5) { // Tier 2: Tầm Trung (+10..+11)
+            targetLevelUp = (byte) (10 + core.ZUtil.random(2));
+        } else { // Tier 1: Cơ bản (+7..+9)
+            targetLevelUp = (byte) (7 + core.ZUtil.random(3));
         }
+        targetLevelUp = (byte) Math.min(15, targetLevelUp);
 
         // Chọn 1 Kích Ẩn chủ đạo đồng bộ cho set đồ thường (0: Bất tử, 1: Lời cảm ơn, 2: Lá chắn, 3: Khóa MP, 4: Bộc phá)
         byte primaryKichAn = (byte) core.ZUtil.random(5);
@@ -6014,7 +6207,7 @@ public class Player {
         }
 
         // =====================================================================
-        // 2. CÀI ĐẶT BỘ THẦN TRANG (Slot 8..13: 6 Món Chuẩn ID 2604..2693)
+        // 2. CÀI ĐẶT BỘ THẦN TRANG (Slot 8..13: TỰ ĐỘNG CHỌN SET THEO CLASS & TIER)
         // =====================================================================
         if (tier >= 3.5 || specificThanTrangSet >= 0) {
             int setIndex = (specificThanTrangSet >= 0 && specificThanTrangSet < THAN_TRANG_SET_COUNT)
@@ -6222,9 +6415,10 @@ public class Player {
         int bestLevel = -1;
 
         if (ItemTemplate3.ENTRYS != null) {
-            // 1. Tìm item khớp đúng Class và level <= botLevel
+            // 1. Tìm item khớp đúng Class và level <= botLevel (Chỉ nhận Đồ Cam trở xuống: color <= 3, cấm đồ đỏ 2118..2693)
             for (ItemTemplate3 t : ItemTemplate3.ENTRYS) {
                 if (t == null) continue;
+                if (t.color == 8 || t.isThanTrang() || (t.id >= 2118 && t.id <= 2693) || t.color > 3) continue;
                 if (t.typeEquip != typeEquip) continue;
                 if (t.clazz != 0 && t.clazz != clazz) continue;
                 if (t.level > botLevel) continue;
@@ -6235,9 +6429,10 @@ public class Player {
             }
         }
         if (best == null && ItemTemplate3.ENTRYS != null) {
-            // 2. Tìm item dùng chung (clazz == 0) có level <= botLevel
+            // 2. Tìm item dùng chung (clazz == 0) có level <= botLevel (Chỉ nhận Đồ Cam trở xuống: color <= 3)
             for (ItemTemplate3 t : ItemTemplate3.ENTRYS) {
                 if (t == null) continue;
+                if (t.color == 8 || t.isThanTrang() || (t.id >= 2118 && t.id <= 2693) || t.color > 3) continue;
                 if (t.typeEquip != typeEquip) continue;
                 if (t.clazz != 0) continue;
                 if (t.level > botLevel) continue;
@@ -7658,25 +7853,27 @@ public class Player {
         if (this.timeEff < System.currentTimeMillis()) {
             this.timeEff = System.currentTimeMillis() + 7_000;
             List<Integer> idEff = new ArrayList<>();
-            int dem16 = 0;
-            int dem17 = 0;
-            for (int j = 0; j < 6; j++) {
-                if (this.item.it_body[j] != null && this.item.it_body[j].isThanTrang()) {
-                    if (this.item.it_body[j].levelUp >= 16) {
-                        dem16++;
-                    }
-                    if (this.item.it_body[j].levelUp == 17) {
-                        dem17++;
+            if (false) { // Vô hiệu hóa hiệu ứng hào quang Thần Trang +16 / +17
+                int dem16 = 0;
+                int dem17 = 0;
+                for (int j = 0; j < 6; j++) {
+                    if (this.item.it_body[j] != null && this.item.it_body[j].isThanTrang()) {
+                        if (this.item.it_body[j].levelUp >= 16) {
+                            dem16++;
+                        }
+                        if (this.item.it_body[j].levelUp == 17) {
+                            dem17++;
+                        }
                     }
                 }
-            }
-            if (dem16 >= 6) {
-                idEff.add(10);
-                idEff.add(11);
-            }
-            if (dem17 >= 6) {
-                idEff.add(12);
-                idEff.add(13);
+                if (dem16 >= 6) {
+                    idEff.add(10);
+                    idEff.add(11);
+                }
+                if (dem17 >= 6) {
+                    idEff.add(12);
+                    idEff.add(13);
+                }
             }
             if (rank.Ranked.get_Thanh_tich_pvp2(this) == 0) {
                 idEff.add(14);
@@ -7940,14 +8137,9 @@ public class Player {
         this.update_info_to_all();
     }
 
-    public void send_skill() throws IOException {
-        // update list can combo
-        list_can_combo.clear();
-
-        // Đảm bảo kỹ năng phe luôn tồn tại khi đã chọn phe
-        ensureFactionSkill();
-
+    public List<Skill_info> getSkillsToSend() {
         List<Skill_info> skillsToSend = new ArrayList<>();
+        if (this.skill_point == null) return skillsToSend;
 
         for (int i = 0; i < this.skill_point.size(); i++) {
             Skill_info sk_info = this.skill_point.get(i);
@@ -7994,6 +8186,17 @@ public class Player {
                 }
             }
         }
+        return skillsToSend;
+    }
+
+    public void send_skill() throws IOException {
+        // update list can combo
+        list_can_combo.clear();
+
+        // Đảm bảo kỹ năng phe luôn tồn tại khi đã chọn phe
+        ensureFactionSkill();
+
+        List<Skill_info> skillsToSend = getSkillsToSend();
 
         Message m = new Message(-7);
         m.writer().writeByte(3);
@@ -8197,15 +8400,55 @@ public class Player {
         this.conn.addmsg(m);
     }
 
-    public void addPointSkill(int indexHotKey, int points) throws IOException {
-        if (indexHotKey < 0 || this.skill_point == null || indexHotKey >= this.skill_point.size()) {
+    public void addPointSkill(int idSkill, int points) throws IOException {
+        if (this.skill_point == null || points <= 0 || points > this.pointSkill) {
             return;
         }
-        if (points <= 0 || points > this.pointSkill) {
-            return;
+
+        Skill_info sk_info = null;
+
+        // 1. Try resolving via skillsToSend order (since client sets indexHotKey based on order in send_skill())
+        List<Skill_info> sentList = this.getSkillsToSend();
+        if (sentList != null && idSkill >= 0 && idSkill < sentList.size()) {
+            Skill_info candidate = sentList.get(idSkill);
+            if (candidate != null && candidate.temp != null && candidate.temp.Lv_RQ > 0) {
+                sk_info = candidate;
+            }
         }
-        Skill_info sk_info = this.skill_point.get(indexHotKey);
-        if (sk_info != null && sk_info.temp != null && sk_info.temp.Lv_RQ > 0) {
+
+        // 2. Try resolving by matching ID directly (if client sent skill ID)
+        if (sk_info == null) {
+            for (Skill_info sk : this.skill_point) {
+                if (sk != null && sk.temp != null && sk.temp.ID == idSkill && sk.temp.Lv_RQ > 0) {
+                    sk_info = sk;
+                    break;
+                }
+            }
+        }
+
+        // 3. Try resolving by matching indexSkillInServer
+        if (sk_info == null) {
+            for (Skill_info sk : this.skill_point) {
+                if (sk != null && sk.temp != null && sk.temp.indexSkillInServer == idSkill && sk.temp.Lv_RQ > 0) {
+                    sk_info = sk;
+                    break;
+                }
+            }
+        }
+
+        // 4. Fallback to direct index in this.skill_point
+        if (sk_info == null && idSkill >= 0 && idSkill < this.skill_point.size()) {
+            Skill_info candidate = this.skill_point.get(idSkill);
+            if (candidate != null && candidate.temp != null && candidate.temp.Lv_RQ > 0) {
+                sk_info = candidate;
+            }
+        }
+
+        if (sk_info != null && sk_info.temp != null) {
+            if (sk_info.temp.Lv_RQ <= 0) {
+                this.getService().send_box_ThongBao_OK("Bạn chưa học kỹ năng này, hãy đến gặp Garp để học!");
+                return;
+            }
             int successUpgrades = 0;
             for (int k = 0; k < points; k++) {
                 if (Skill_Template.upgrade_skill(sk_info, this.clazz)) {
@@ -8220,9 +8463,12 @@ public class Player {
                 this.send_skill();
                 this.update_info_to_all();
                 this.getService().Main_char_Info();
+                this.getService().send_box_ThongBao_OK("Nâng cấp thành công kỹ năng " + sk_info.temp.name);
             } else {
-                this.getService().send_box_ThongBao_OK("Không thể nâng cấp kỹ năng này");
+                this.getService().send_box_ThongBao_OK("Không thể nâng cấp kỹ năng này (đã đạt cấp tối đa hoặc chưa đủ điều kiện)");
             }
+        } else {
+            this.getService().send_box_ThongBao_OK("Không tìm thấy kỹ năng để nâng cấp!");
         }
     }
 
@@ -8525,6 +8771,19 @@ public class Player {
                     if (idSkill == 4028 && (sk.temp.indexSkillInServer == 820 || sk.temp.ID == 5035)) {
                         return sk;
                     }
+                    // Trái Mochi Mochi (Katakuri): SQL id (5036..5039) & index (821..824) & Eff id (4030..4035) & Icon (454..457)
+                    if ((idSkill == 5036 || idSkill == 821 || idSkill == 4030 || idSkill == 4031 || idSkill == 454) && (sk.temp.indexSkillInServer == 821 || sk.temp.ID == 5036)) {
+                        return sk;
+                    }
+                    if ((idSkill == 5037 || idSkill == 822 || idSkill == 4032 || idSkill == 4033 || idSkill == 455) && (sk.temp.indexSkillInServer == 822 || sk.temp.ID == 5037)) {
+                        return sk;
+                    }
+                    if ((idSkill == 5038 || idSkill == 823 || idSkill == 4034 || idSkill == 4035 || idSkill == 456) && (sk.temp.indexSkillInServer == 823 || sk.temp.ID == 5038)) {
+                        return sk;
+                    }
+                    if ((idSkill == 5039 || idSkill == 824 || idSkill == 457) && (sk.temp.indexSkillInServer == 824 || sk.temp.ID == 5039)) {
+                        return sk;
+                    }
                 }
             }
             if (idSkill == 0 && !this.skill_point.isEmpty() && this.skill_point.get(0) != null) {
@@ -8565,12 +8824,14 @@ public class Player {
             id += 4000;
         }
         List<Skill_info> list_remove = new ArrayList<>();
+        List<Short> oldFruitSkillIds = new ArrayList<>();
         for (int i = 0; i < this.skill_point.size(); i++) {
             Skill_info temp = this.skill_point.get(i);
             if (temp != null && temp.temp != null) {
                 boolean isHaki = ((temp.temp.indexSkillInServer >= 660 && temp.temp.indexSkillInServer <= 666)
                         || (temp.temp.indexSkillInServer >= 672 && temp.temp.indexSkillInServer <= 690));
                 if ((temp.temp.typeDevil > 0 || temp.temp.ID > 2000) && !isHaki) {
+                    oldFruitSkillIds.add((short) temp.temp.ID);
                 // exp ac quy
                 if (temp.devilpercent > 0 || temp.lvdevil > 0) {
                     int numPotion = 0;
@@ -8903,9 +9164,23 @@ public class Player {
                 }
                 break;
             }
+            case 4915: { // Trái Mochi Mochi (item 915)
+                int[] id_ = new int[]{821, 822, 823, 824};
+                for (int i = 0; i < id_.length; i++) {
+                    Skill_info sk_add = new Skill_info();
+                    sk_add.exp = 0;
+                    sk_add.temp = Skill_Template.get_temp(id_[i], sk_add.exp);
+                    if (sk_add.temp != null) {
+                        list_remove.add(sk_add);
+                    }
+                }
+                break;
+            }
         }
+        List<Skill_info> newFruitSkills = new ArrayList<>(list_remove);
         this.skill_point.addAll(list_remove);
         list_remove.clear();
+        this.autoAssignDevilFruitHotKey(oldFruitSkillIds, newFruitSkills);
         this.send_skill();
         this.update_info_to_all();
         if (this.getService() != null) {
@@ -9628,6 +9903,12 @@ public class Player {
         }
     }
 
+    public void remove_eff(int idEff) {
+        if (this.list_eff != null) {
+            this.list_eff.removeIf(eff -> eff != null && eff.id == idEff);
+        }
+    }
+
     // === Ability & Stat Cache Management ===
     public void setAbility() {
         int fullSetId = ThanTrangConfig.getFullSetId(this);
@@ -9655,9 +9936,9 @@ public class Player {
     public int getHpMax() { return hpMax; }
     public int getMpMax() { return mpMax; }
     public int getAgility() { return agility; }
-    public int getCrit() { return crit; }
+    public int getCrit() { return Math.min(900, Math.max(0, crit)); }
     public int getPierce() { return pierce; }
-    public int getMiss() { return miss; }
+    public int getMiss() { return Math.min(900, Math.max(0, miss)); }
     public int getReactDame() { return reactDame; }
     public int getResPhys() { return resPhys; }
     public int getResMag() { return resMag; }
@@ -9805,6 +10086,13 @@ public class Player {
                 long def = p_target.ability.get_def(true);
                 def = (def * (1000L + (long) p_target.ability.get_def_percent(true))) / 1_000L;
 
+                // [TÍCH HỢP DEBUFF VỠ GIÁP EFF 204]
+                eff = p_target.get_eff(204);
+                if (eff != null && eff.param > 0) {
+                    long defBreak = Math.min(800L, (long) eff.param * 10L);
+                    def = (def * (1000L - defBreak)) / 1000L;
+                }
+
                 // [TÍCH HỢP OPTION 13 (Xuyên giáp), 50 (Giảm xuyên giáp đ/t), 70 (Giảm thủ cuối)]
                 int netPierce = Math.max(0, p.ability.get_pierce(true) - p_target.ability.get_pierce_reduce());
                 if (netPierce > 0) {
@@ -9842,7 +10130,7 @@ public class Player {
                 }
 
                 // [TÍCH HỢP OPTION 83: Kháng chí mạng của đối thủ]
-                int netCrit = crit_skill - p_target.ability.get_crit_reduce() - p_target.ability.get_crit_resist();
+                int netCrit = Math.min(900, Math.max(0, crit_skill - p_target.ability.get_crit_reduce() - p_target.ability.get_crit_resist()));
                 crit = netCrit > ZUtil.random(1000);
 
                 //
@@ -9901,8 +10189,14 @@ public class Player {
                 if (ignoreMiss > 0) {
                     get_miss = Math.max(0, get_miss - ignoreMiss);
                 }
+                get_miss = Math.min(900, Math.max(0, get_miss));
                 boolean miss = ((p.get_eff(205) != null || p_target.get_eff(24) != null
                         || get_miss > ZUtil.random(1000)));
+
+                // [TRÁI MOCHI MOCHI - CHIÊU 4: THẤU THỊ TƯƠNG LAI & THỦNG THÂN]
+                if (!miss && skill.MochiMochiSkill.checkPassiveKenbunshokuPlayer(p, p_target, dame_inf)) {
+                    miss = true;
+                }
 
                 if (miss) { // miss
                     dame2 = 0;
@@ -10331,6 +10625,10 @@ public class Player {
                 // [KÍCH HOẠT HAKI BÁ VƯƠNG (ID 4026)]
                 if (dame_inf.dameP > 0) {
                     p.triggerHakiBaVuong(p_target, null);
+                }
+                // [TRÁI MOCHI MOCHI - CHIÊU 1 & CHIÊU 2 DEBUFFS]
+                if (skill.MochiMochiSkill.isMochiSkill(sk_temp) && (dame_inf.dameP > 0 || dame_inf.dameM > 0)) {
+                    skill.MochiMochiSkill.applyMochiAttackToPlayer(p, p_target, sk_temp, dame_inf, dame2);
                 }
                 if (dame_inf.dameP > 0 && sk_temp.temp.idEffSpec > 0
                         && sk_temp.temp.idEffSpec < 17) {
@@ -10778,6 +11076,15 @@ public class Player {
                     }
                 }
 
+                // [HONE CAP: Quái/Boss đầy HP không bị 1-hit chết, giữ lại đúng hOne HP cho hit đánh cuối]
+                int hOne = (mob_target.mtemplate != null && mob_target.mtemplate.hOne > 0)
+                        ? (int) mob_target.mtemplate.hOne : 1;
+                if (mob_target.hp == mob_target.hp_max && mob_target.hp > hOne) {
+                    if (dame_to_target >= (long) (mob_target.hp - hOne)) {
+                        dame_to_target = (mob_target.hp - hOne);
+                    }
+                }
+
                 // add dame vào top dame st
                 if (mob_target.boss_inf != null && dame_to_target > 0) {
                     zabstracts.AbsBoss b = boss.BossManager.gI().getBossById(mob_target.boss_inf.id);
@@ -10786,12 +11093,6 @@ public class Player {
                     }
                 } else if (bossTarget != null && dame_to_target > 0) {
                     bossTarget.onDamage(p, dame_to_target);
-                }
-                if (mob_target.hp == mob_target.hp_max && dame_to_target >= mob_target.hp) {
-                    long maxHOne = (mob_target.mtemplate != null && mob_target.mtemplate.hOne > 0)
-                            ? (long) mob_target.mtemplate.hOne
-                            : ((mob_target.hp_max * 40L) / 100L);
-                    dame_to_target = Math.min(maxHOne, Math.max(1L, (long) mob_target.hp - 1));
                 }
                 int old_mob_hp = mob_target.hp;
                 if (map.clan_resource != null) {
@@ -10802,8 +11103,6 @@ public class Player {
                 if (bossTarget != null) {
                     bossTarget.checkHpMilestoneRewards(map, p, old_mob_hp, mob_target.hp, dame_to_target);
                 }
-                p.item.updateInventory(false);
-                p.updateMoney();
 
                 // [HÚT HP KHI ĐÁNH QUÁI op59 + op21]
                 if (dame_to_target >= 1 && p.hp > 0 && !miss) {
@@ -11013,20 +11312,18 @@ public class Player {
                             b = boss.BossManager.gI().getBossById(mob_target.boss_inf.id);
                         }
 
-                        // Remove dead boss object from map immediately for all clients in zone
-                        map.remove_obj(mob_target.index, 1);
-                        if (b != null && b.index != mob_target.index) {
-                            map.remove_obj(b.index, 1);
-                        }
+                        // Remove dead boss object from map cleanly
                         map.mobs.remove(mob_target.index);
 
                         if (b != null) {
                             b.isdie = true;
                             b.timeDeath = System.currentTimeMillis();
                             b.onDeath(pFind);
+                        } else {
+                            map.remove_obj(mob_target.index, 1);
                         }
                     }
-                    if (Zone.is_map_boss(map.template.id)) {
+                    if (Zone.is_map_boss(map.template.id) && mob_target.boss_inf == null) {
                         map.remove_obj(mob_target.index, 1);
                         if (map.mobs != null) {
                             map.mobs.remove(mob_target.index);
@@ -11122,6 +11419,10 @@ public class Player {
                 // [KÍCH HOẠT HAKI BÁ VƯƠNG (ID 4026)]
                 if (dame_inf.dameP > 0) {
                     p.triggerHakiBaVuong(null, mob_target);
+                }
+                // [TRÁI MOCHI MOCHI - CHIÊU 1 & CHIÊU 2 DEBUFFS LÊN QUÁI/BOSS]
+                if (skill.MochiMochiSkill.isMochiSkill(sk_temp) && (dame_inf.dameP > 0 || dame_inf.dameM > 0)) {
+                    skill.MochiMochiSkill.applyMochiAttackToMonster(p, mob_target, sk_temp, dame_inf, dame2);
                 }
                 if (dame_inf.dameP > 0 && sk_temp != null && sk_temp.temp != null && sk_temp.temp.idEffSpec > 0
                         && sk_temp.temp.idEffSpec < 17) {

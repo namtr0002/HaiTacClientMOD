@@ -131,21 +131,7 @@ public class UpgradeItem {
                     p.addmsg(m);
                     m.cleanup();
 
-                    if (isTT) {
-                        Message m5 = new Message(-48);
-                        m5.writer().writeByte(5);
-                        m5.writer().writeByte(0);
-                        m5.writer().writeShort(0);
-                        p.addmsg(m5);
-                        m5.cleanup();
 
-                        Message m6 = new Message(-48);
-                        m6.writer().writeByte(6);
-                        m6.writer().writeByte(0);
-                        m6.writer().writeShort(0);
-                        p.addmsg(m6);
-                        m6.cleanup();
-                    }
                 } else {
                     notice_upgrade(p, 0, "Trang bị đã cường hóa cấp tối đa (+" + maxLevel + ")!");
                 }
@@ -207,9 +193,6 @@ public class UpgradeItem {
                     return;
                 }
 
-                if (isTT) {
-                    p.tool_upgrade = new int[] {-1, -1};
-                }
 
                 DataUpgrade dataUpgrade = UpgradeItem.DATA.get(currentLv);
                 int[] material_req = get_material(currentLv, it.getColor());
@@ -275,25 +258,58 @@ public class UpgradeItem {
                     }
                 }
 
-                if (!isTT) {
-                    // Kiểm tra tools
-                    for (int i = 0; i < 2; i++) {
-                        if (p.tool_upgrade[i] != -1 && p.item.total_item_bag_by_id(7, p.tool_upgrade[i]) < 1) {
-                            p.tool_upgrade[i] = -1;
-                        }
+                // Kiểm tra tools trước khi cường hóa
+                for (int i = 0; i < 2; i++) {
+                    if (p.tool_upgrade[i] != -1 && p.item.total_item_bag_by_id(7, p.tool_upgrade[i]) < 1) {
+                        p.tool_upgrade[i] = -1;
                     }
                 }
 
                 int percent = dataUpgrade.per;
                 if (isTT) {
-                    percent = Math.max(1, percent / 5);
-                } else {
-                    if (p.tool_upgrade[1] != -1) {
-                        if (p.tool_upgrade[1] == 5) { // Ngôi sao may mắn
+                    // Cân bằng chuẩn tỉ lệ cho Thần Trang (thấp & thử thách theo cấp độ)
+                    int[] ttBaseRates = {
+                        600, 500, 400, 300, 250, // 0->1 (60%), 1->2 (50%), 2->3 (40%), 3->4 (30%), 4->5 (25%)
+                        200, 150, 120, 100, 80,  // 5->6 (20%), 6->7 (15%), 7->8 (12%), 8->9 (10%), 9->10 (8%)
+                        60, 50, 40, 30, 20,      // 10->11 (6%), 11->12 (5%), 12->13 (4%), 13->14 (3%), 14->15 (2%)
+                        15, 10, 8, 5, 3          // 15->16 (1.5%), 16->17 (1.0%), 17->18 (0.8%), 18->19 (0.5%), 19->20 (0.3%)
+                    };
+                    if (currentLv >= 0 && currentLv < ttBaseRates.length) {
+                        percent = ttBaseRates[currentLv];
+                    } else {
+                        percent = 3;
+                    }
+                }
+
+                // Thêm vật phẩm tăng tỉ lệ (áp dụng cho cả trang bị thường và Thần Trang)
+                if (p.tool_upgrade[1] != -1) {
+                    int luckyId = p.tool_upgrade[1];
+                    switch (luckyId) {
+                        case 5: // Ngôi sao may mắn (+50% tỉ lệ)
                             percent = (percent * 15) / 10;
-                        } else if (p.tool_upgrade[1] == 11) { // Thiên thạch may mắn
-                            percent = (percent * 2);
-                        }
+                            break;
+                        case 7: // Tinh tú may mắn (+70% tỉ lệ)
+                            percent = (percent * 17) / 10;
+                            break;
+                        case 11: // Thiên thạch may mắn (x2 tỉ lệ)
+                        case 12: // Bùa cường hóa (x2 tỉ lệ)
+                            percent = percent * 2;
+                            break;
+                        case 14: // Sao 5 cánh (x2.2 tỉ lệ)
+                            percent = (percent * 22) / 10;
+                            break;
+                        case 15: // Sao 6 cánh (x2.5 tỉ lệ)
+                            percent = (percent * 25) / 10;
+                            break;
+                        case 16: // Sao 8 cánh (x3 tỉ lệ)
+                            percent = percent * 3;
+                            break;
+                        case 17: // Bảo thạch may mắn (x3.5 tỉ lệ)
+                            percent = (percent * 35) / 10;
+                            break;
+                        default:
+                            percent = percent * 2;
+                            break;
                     }
                 }
 
@@ -306,31 +322,24 @@ public class UpgradeItem {
                     }
                     notice_upgrade(p, 2, "Cường hóa thành công lên +" + it.levelUp);
                 } else {
-                    if (isTT) {
-                        // Thần Trang tuyệt đối không có bảo hiểm, chỉ các mốc an toàn mới không rớt cấp
+                    boolean protectedByShield = (p.tool_upgrade[0] != -1);
+                    if (!protectedByShield) {
+                        // Không có khiên/mai rùa bảo hiểm: kiểm tra mốc an toàn
                         if (!isSafeLevel(it, it.levelUp)) {
                             it.levelUp = (byte) Math.max(0, it.levelUp - 1);
                         }
-                    } else {
-                        if (p.tool_upgrade[0] == -1) { // Không có bảo hiểm
-                            if (!isSafeLevel(it, it.levelUp)) {
-                                it.levelUp = (byte) Math.max(0, it.levelUp - 1);
-                            }
-                        }
                     }
-                    notice_upgrade(p, 3, "Cường hóa thất bại!");
+                    notice_upgrade(p, 3, "Cường hóa thất bại!" + (protectedByShield ? " (Khiên đã bảo vệ không rớt cấp)" : ""));
                 }
 
-                if (!isTT) {
-                    // Tiêu hao tool
-                    if (p.tool_upgrade[0] != -1) {
-                        p.item.remove_item47(7, p.tool_upgrade[0], 1);
-                        if (p.item.total_item_bag_by_id(7, p.tool_upgrade[0]) < 1) p.tool_upgrade[0] = -1;
-                    }
-                    if (p.tool_upgrade[1] != -1) {
-                        p.item.remove_item47(7, p.tool_upgrade[1], 1);
-                        if (p.item.total_item_bag_by_id(7, p.tool_upgrade[1]) < 1) p.tool_upgrade[1] = -1;
-                    }
+                // Tiêu hao tool cho cả Thần Trang và đồ thường
+                if (p.tool_upgrade[0] != -1) {
+                    p.item.remove_item47(7, p.tool_upgrade[0], 1);
+                    if (p.item.total_item_bag_by_id(7, p.tool_upgrade[0]) < 1) p.tool_upgrade[0] = -1;
+                }
+                if (p.tool_upgrade[1] != -1) {
+                    p.item.remove_item47(7, p.tool_upgrade[1], 1);
+                    if (p.item.total_item_bag_by_id(7, p.tool_upgrade[1]) < 1) p.tool_upgrade[1] = -1;
                 }
 
                 p.item.updateInventory(false);
@@ -338,16 +347,7 @@ public class UpgradeItem {
                 p.update_info_to_all();
                 p.updateMoney();
             }
-        } else if (type == 6 && (bery_gem == 1 || bery_gem == 0)) { // mai rua
-            if (bery_gem == 1) {
-                if (p.item_upgrade_index >= 0 && p.item_upgrade_index < p.item.bag3.length) {
-                    Item_wear currentEquip = p.item.bag3[p.item_upgrade_index];
-                    if (currentEquip != null && currentEquip.isThanTrang()) {
-                        p.getService().send_box_ThongBao_OK("Thần Trang không thể sử dụng vật phẩm hỗ trợ hay bảo hộ!");
-                        return;
-                    }
-                }
-            }
+        } else if (type == 6 && (bery_gem == 1 || bery_gem == 0)) { // mai rua / khien
             if (bery_gem == 0 || p.item.total_item_bag_by_id(7, id) > 0) {
                 Message m5 = new Message(-48);
                 m5.writer().writeByte(6);
@@ -357,16 +357,7 @@ public class UpgradeItem {
                 m5.cleanup();
                 p.tool_upgrade[0] = (bery_gem == 0) ? -1 : id;
             }
-        } else if (type == 5 && (bery_gem == 1 || bery_gem == 0)) { // ngoi sao may man
-            if (bery_gem == 1) {
-                if (p.item_upgrade_index >= 0 && p.item_upgrade_index < p.item.bag3.length) {
-                    Item_wear currentEquip = p.item.bag3[p.item_upgrade_index];
-                    if (currentEquip != null && currentEquip.isThanTrang()) {
-                        p.getService().send_box_ThongBao_OK("Thần Trang không thể sử dụng vật phẩm hỗ trợ hay bảo hộ!");
-                        return;
-                    }
-                }
-            }
+        } else if (type == 5 && (bery_gem == 1 || bery_gem == 0)) { // ngoi sao may man / thien thach
             if (bery_gem == 0 || p.item.total_item_bag_by_id(7, id) > 0) {
                 Message m5 = new Message(-48);
                 m5.writer().writeByte(5);
@@ -819,11 +810,27 @@ public class UpgradeItem {
         try {
             p.updateMoney();
             if (isDeTu && p.detu != null) {
+                if (p.detu.item != null) {
+                    p.detu.item.it_heart = heart;
+                    if (p.detu.item.it_body != null && p.detu.item.it_body.length > 6) {
+                        p.detu.item.it_body[6] = heart;
+                    }
+                }
                 UpgradeItem.send_heart_info(p.detu, false);
+                p.detu.setAbility();
                 p.detu.update_info_to_all();
+                p.detu.saveDeTu(false);
             } else {
+                if (p.item != null) {
+                    p.item.it_heart = heart;
+                    if (p.item.it_body != null && p.item.it_body.length > 6) {
+                        p.item.it_body[6] = heart;
+                    }
+                }
                 UpgradeItem.send_heart_info(p, false);
+                p.setAbility();
                 p.update_info_to_all();
+                p.flush(p, false);
             }
 
             p.getService().send_box_ThongBao_OK(
